@@ -1,0 +1,14 @@
+vaadincreate-backend/.settings/org.eclipse.core.resources.prefs
+vaadincreate-backend/.settings/
+vaadincreate-components/.settings/
+vaadincreate-ui/.settings/
+vaadincreate-ui/.classpath
+vaadincreate-ui/appsec-data.json
+vaadincreate-ui/.project
+vaadincreate-components/.project
+vaadincreate-components/.classpath
+.project
+vaadincreate-backend/src/main/resources/rebel.xml
+vaadincreate-backend/.project
+vaadincreate-backend/.classpath
+.settings/org.eclipse.m2e.core.prefs

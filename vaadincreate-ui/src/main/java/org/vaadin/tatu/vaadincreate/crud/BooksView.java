@@ -1,0 +1,203 @@
+package org.vaadin.tatu.vaadincreate.crud;
+
+import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
+import org.vaadin.tatu.vaadincreate.backend.data.Product;
+
+import java.util.Collection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.ResetButtonForTextField;
+
+import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.icons.VaadinIcons;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.shared.ui.grid.ScrollDestination;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.UIDetachedException;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
+
+/**
+ * A view for performing create-read-update-delete operations on products.
+ *
+ * See also {@link BookPresenter} for fetching the data, the actual CRUD
+ * operations and controlling the view based on events from outside.
+ */
+@SuppressWarnings("serial")
+public class BooksView extends CssLayout implements View {
+
+    private static final String BOOKVIEW_TOOLBAR = "bookview-toolbar";
+    private static final String BOOKVIEW_FILTER = "bookview-filter";
+    private static final String BOOKVIEW = "bookview";
+
+    public static final String VIEW_NAME = "books";
+    private BookGrid grid;
+    private BookForm form;
+    private TextField filter;
+
+    private BooksPresenter presenter = new BooksPresenter(this);
+    private Button newProduct;
+
+    private ListDataProvider<Product> dataProvider;
+    private UI ui;
+    private VerticalLayout spinnerWrapper;
+    private String params;
+
+    public BooksView() {
+        setSizeFull();
+        addStyleName(BOOKVIEW);
+        var topLayout = createTopBar();
+
+        grid = new BookGrid();
+        grid.asSingleSelect().addValueChangeListener(
+                event -> presenter.rowSelected(event.getValue()));
+        grid.setVisible(false);
+
+        spinnerWrapper = new FakeGrid();
+
+        form = new BookForm(presenter);
+        form.setCategories(ProductDataService.get().getAllCategories());
+
+        var barAndGridLayout = new VerticalLayout();
+        barAndGridLayout.addComponent(topLayout);
+        barAndGridLayout.addComponent(spinnerWrapper);
+        barAndGridLayout.addComponent(grid);
+        barAndGridLayout.setSizeFull();
+        barAndGridLayout.setExpandRatio(grid, 1);
+        barAndGridLayout.setExpandRatio(spinnerWrapper, 1);
+        barAndGridLayout.setStyleName("bookview-grid");
+
+        addComponent(barAndGridLayout);
+        addComponent(form);
+
+        presenter.init();
+    }
+
+    private boolean filterCondition(Object object, String filterText) {
+        return object != null
+                && object.toString().toLowerCase().contains(filterText);
+    }
+
+    private boolean passesFilter(Product book, String filterText) {
+        filterText = filterText.trim();
+        return filterCondition(book.getProductName(), filterText)
+                || filterCondition(book.getAvailability(), filterText)
+                || filterCondition(book.getCategory(), filterText);
+    }
+
+    public HorizontalLayout createTopBar() {
+        filter = new TextField();
+        filter.setStyleName(BOOKVIEW_FILTER);
+        filter.setPlaceholder("Filter name, availability or category");
+        ResetButtonForTextField.extend(filter);
+        // Apply the filter to grid's data provider. TextField value is never
+        // null
+        filter.addValueChangeListener(event -> dataProvider
+                .setFilter(book -> passesFilter(book, event.getValue())));
+
+        newProduct = new Button("New product");
+        newProduct.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        newProduct.setIcon(VaadinIcons.PLUS_CIRCLE);
+        newProduct.addClickListener(click -> presenter.newProduct());
+
+        var topLayout = new HorizontalLayout();
+        topLayout.setWidth("100%");
+        topLayout.addComponent(filter);
+        topLayout.addComponent(newProduct);
+        topLayout.setComponentAlignment(filter, Alignment.MIDDLE_LEFT);
+        topLayout.setExpandRatio(filter, 1);
+        topLayout.setStyleName(BOOKVIEW_TOOLBAR);
+        return topLayout;
+    }
+
+    @Override
+    public void enter(ViewChangeEvent event) {
+        ui = UI.getCurrent();
+        params = event.getParameters();
+        presenter.requestUpdateProducts();
+    }
+
+    public void setProductsAsync(Collection<Product> products) {
+        try {
+            ui.access(() -> {
+                dataProvider = new ListDataProvider<>(products);
+                grid.setDataProvider(dataProvider);
+                grid.setVisible(true);
+                spinnerWrapper.setVisible(false);
+                presenter.enter(params);
+            });
+        } catch (UIDetachedException e) {
+            logger.info("Browser was closed, updates not pushed");
+        }
+    }
+
+    public void showError(String msg) {
+        Notification.show(msg, Type.ERROR_MESSAGE);
+    }
+
+    public void showSaveNotification(String msg) {
+        Notification.show(msg, Type.TRAY_NOTIFICATION);
+    }
+
+    public void setNewProductEnabled(boolean enabled) {
+        newProduct.setEnabled(enabled);
+    }
+
+    public void clearSelection() {
+        grid.getSelectionModel().deselectAll();
+    }
+
+    public void selectRow(Product row) {
+        grid.getSelectionModel().select(row);
+    }
+
+    public Product getSelectedRow() {
+        return grid.getSelectedRow();
+    }
+
+    public void updateProduct(Product product) {
+        var newProduct = product.getId() == -1;
+        grid.setEdited(product);
+        if (newProduct) {
+            dataProvider.refreshAll();
+        } else {
+            dataProvider.refreshItem(product);
+            var index = grid.getDataCommunicator()
+                    .fetchItemsWithRange(0, Integer.MAX_VALUE).indexOf(product);
+            grid.scrollTo(index, ScrollDestination.MIDDLE);
+        }
+    }
+
+    public void removeProduct(Product product) {
+        dataProvider.refreshAll();
+    }
+
+    public void editProduct(Product product) {
+        grid.setEdited(null);
+        if (product != null) {
+            form.addStyleName(BookForm.BOOKFORM_WRAPPER_VISIBLE);
+            form.setEnabled(true);
+        } else {
+            form.removeStyleName(BookForm.BOOKFORM_WRAPPER_VISIBLE);
+            form.setEnabled(false);
+        }
+        form.editProduct(product);
+    }
+
+    @Override
+    public void detach() {
+        super.detach();
+        presenter.cancelUpdateProducts();
+    }
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+}

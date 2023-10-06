@@ -48,6 +48,7 @@ public class VaadinCreateUI extends UI {
         var appLayout = new AppLayout(this);
         setContent(appLayout);
 
+        // Use String constants for view names, allows easy refactoring if so needed
         appLayout.addView(AboutView.class, "About", VaadinIcons.INFO, AboutView.VIEW_NAME);
         appLayout.addView(BooksView.class, "Books", VaadinIcons.TABLE, BooksView.VIEW_NAME);
         appLayout.addView(StatsView.class, "Stats", VaadinIcons.CHART, StatsView.VIEW_NAME);

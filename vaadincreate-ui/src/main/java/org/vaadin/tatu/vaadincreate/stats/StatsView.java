@@ -48,6 +48,8 @@ public class StatsView extends VerticalLayout implements View {
         availabilityChart = new Chart(ChartType.COLUMN);
         availabilityChartWrapper.addStyleName(DASHBOARD_CHART);
         Lang lang = new Lang();
+        // Set loading label to Chart no data as loading of data is done
+        // asynchronously
         lang.setNoData("Loading ...");
         var conf = availabilityChart.getConfiguration();
         conf.setTitle("Availabilities");
@@ -73,8 +75,6 @@ public class StatsView extends VerticalLayout implements View {
 
         dashboard.addComponents(availabilityChartWrapper, priceChartWrapper,
                 categoryChartWrapper);
-        // you can add Vaadin components in predefined slots in the custom
-        // layout
         setSizeFull();
         setMargin(false);
         addComponent(dashboard);
@@ -141,6 +141,8 @@ public class StatsView extends VerticalLayout implements View {
 
     @Override
     public void enter(ViewChangeEvent event) {
+        // There is no need to fetch data before navigation is complete, thus we
+        // trigger it in enter, not in constructor
         presenter.requestUpdateStats();
     }
 

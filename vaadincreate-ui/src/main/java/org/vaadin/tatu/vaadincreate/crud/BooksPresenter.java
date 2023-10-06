@@ -34,13 +34,13 @@ public class BooksPresenter implements Serializable {
         view = simpleCrudView;
     }
 
-    public CompletableFuture<Collection<Product>> loadProductsAsync() {
+    private CompletableFuture<Collection<Product>> loadProductsAsync() {
         logger.info("Fetching products");
         return CompletableFuture.supplyAsync(
                 () -> ProductDataService.get().getAllProducts(), executor);
     }
 
-    public CompletableFuture<Collection<Category>> loadCategoriesAsync() {
+    private CompletableFuture<Collection<Category>> loadCategoriesAsync() {
         return CompletableFuture.supplyAsync(
                 () -> ProductDataService.get().getAllCategories(), executor);
     }

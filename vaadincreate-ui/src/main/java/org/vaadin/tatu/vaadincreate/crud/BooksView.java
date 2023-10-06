@@ -49,7 +49,7 @@ public class BooksView extends CssLayout implements View {
 
     private ListDataProvider<Product> dataProvider;
     private UI ui;
-    private VerticalLayout spinnerWrapper;
+    private VerticalLayout fakeGrid;
     private String params;
 
     public BooksView() {
@@ -62,18 +62,18 @@ public class BooksView extends CssLayout implements View {
                 event -> presenter.rowSelected(event.getValue()));
         grid.setVisible(false);
 
-        spinnerWrapper = new FakeGrid();
+        // Display fake Grid while loading data
+        fakeGrid = new FakeGrid();
 
         form = new BookForm(presenter);
-        form.setCategories(ProductDataService.get().getAllCategories());
 
         var barAndGridLayout = new VerticalLayout();
         barAndGridLayout.addComponent(topLayout);
-        barAndGridLayout.addComponent(spinnerWrapper);
+        barAndGridLayout.addComponent(fakeGrid);
         barAndGridLayout.addComponent(grid);
         barAndGridLayout.setSizeFull();
         barAndGridLayout.setExpandRatio(grid, 1);
-        barAndGridLayout.setExpandRatio(spinnerWrapper, 1);
+        barAndGridLayout.setExpandRatio(fakeGrid, 1);
         barAndGridLayout.setStyleName("bookview-grid");
 
         addComponent(barAndGridLayout);
@@ -124,15 +124,25 @@ public class BooksView extends CssLayout implements View {
         ui = UI.getCurrent();
         params = event.getParameters();
         presenter.requestUpdateProducts();
+        form.setCategories(ProductDataService.get().getAllCategories());
     }
 
+    /**
+     * Set Grid's DataProvider to use collection of products as data. The update
+     * is done in {@link UI#access(Runnable)} wrapping in order to be thread
+     * safe and ensure locking of the UI during update.
+     * 
+     * @param products
+     *            Collection of Product
+     */
     public void setProductsAsync(Collection<Product> products) {
         try {
             ui.access(() -> {
                 dataProvider = new ListDataProvider<>(products);
                 grid.setDataProvider(dataProvider);
                 grid.setVisible(true);
-                spinnerWrapper.setVisible(false);
+                fakeGrid.setVisible(false);
+                // Open form with url parameter based book
                 presenter.enter(params);
             });
         } catch (UIDetachedException e) {
@@ -171,6 +181,8 @@ public class BooksView extends CssLayout implements View {
             dataProvider.refreshAll();
         } else {
             dataProvider.refreshItem(product);
+            // Scroll to item, note this makes sense only when using in memory
+            // data provider
             var index = grid.getDataCommunicator()
                     .fetchItemsWithRange(0, Integer.MAX_VALUE).indexOf(product);
             grid.scrollTo(index, ScrollDestination.MIDDLE);
@@ -196,6 +208,7 @@ public class BooksView extends CssLayout implements View {
     @Override
     public void detach() {
         super.detach();
+        // If detach happens before completion of data fetch, cancel the fetch
         presenter.cancelUpdateProducts();
     }
 

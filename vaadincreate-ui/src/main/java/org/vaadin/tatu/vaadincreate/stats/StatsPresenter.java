@@ -30,11 +30,15 @@ public class StatsPresenter implements Serializable {
         this.view = view;
     }
 
-    public CompletableFuture<Collection<Product>> loadProductsAsync() {
+    private CompletableFuture<Collection<Product>> loadProductsAsync() {
         return CompletableFuture.supplyAsync(
                 () -> ProductDataService.get().getAllProducts(), executor);
     }
 
+    /**
+     * Load the product data in background thread calculate statistics when
+     * loading completes. Finally push statitics data to UI.
+     */
     public void requestUpdateStats() {
         logger.info("Fetching products for statistics");
         future = loadProductsAsync().thenAccept(products -> {
@@ -87,7 +91,7 @@ public class StatsPresenter implements Serializable {
         return brackets;
     }
 
-    public static class PriceBracket {
+    private static class PriceBracket {
         private int max;
 
         public PriceBracket(int max) {

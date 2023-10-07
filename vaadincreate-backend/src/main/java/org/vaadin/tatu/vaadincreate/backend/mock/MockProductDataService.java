@@ -52,7 +52,7 @@ public class MockProductDataService extends ProductDataService {
     }
 
     @Override
-    public synchronized void updateProduct(Product p) {
+    public synchronized Product updateProduct(Product p) {
         try {
             Thread.sleep(250);
         } catch (InterruptedException e) {
@@ -61,12 +61,12 @@ public class MockProductDataService extends ProductDataService {
             // New product
             p.setId(nextProductId++);
             products.add(p);
-            return;
+            return p;
         }
         for (int i = 0; i < products.size(); i++) {
             if (products.get(i).getId() == p.getId()) {
                 products.set(i, p);
-                return;
+                return p;
             }
         }
 

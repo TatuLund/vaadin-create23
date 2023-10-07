@@ -116,10 +116,10 @@ public class BooksPresenter implements Serializable {
         view.showSaveNotification(product.getProductName() + " ("
                 + product.getId() + ") updated");
         view.clearSelection();
+        view.updateProduct(product);
         logger.info("Saving product: {}",
                 product.getId() == -1 ? "new" : product.getId());
         ProductDataService.get().updateProduct(product);
-        view.updateProduct(product);
         setFragmentParameter("");
     }
 

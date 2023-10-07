@@ -14,6 +14,7 @@ public class FakeGrid extends VerticalLayout {
     private static final String FAKEGRID = "fakegrid";
 
     public FakeGrid() {
+        setId("fake-grid");
         addStyleName(FAKEGRID);
         setHeightFull();
         setMargin(false);

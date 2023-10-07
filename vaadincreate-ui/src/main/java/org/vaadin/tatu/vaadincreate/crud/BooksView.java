@@ -35,6 +35,7 @@ import com.vaadin.ui.themes.ValoTheme;
 @SuppressWarnings("serial")
 public class BooksView extends CssLayout implements View {
 
+    private static final String BOOKVIEW_GRID = "bookview-grid";
     private static final String BOOKVIEW_TOOLBAR = "bookview-toolbar";
     private static final String BOOKVIEW_FILTER = "bookview-filter";
     private static final String BOOKVIEW = "bookview";
@@ -74,7 +75,7 @@ public class BooksView extends CssLayout implements View {
         barAndGridLayout.setSizeFull();
         barAndGridLayout.setExpandRatio(grid, 1);
         barAndGridLayout.setExpandRatio(fakeGrid, 1);
-        barAndGridLayout.setStyleName("bookview-grid");
+        barAndGridLayout.setStyleName(BOOKVIEW_GRID);
 
         addComponent(barAndGridLayout);
         addComponent(form);
@@ -96,6 +97,7 @@ public class BooksView extends CssLayout implements View {
 
     public HorizontalLayout createTopBar() {
         filter = new TextField();
+        filter.setId("filter-field");
         filter.setStyleName(BOOKVIEW_FILTER);
         filter.setPlaceholder("Filter name, availability or category");
         ResetButtonForTextField.extend(filter);
@@ -105,6 +107,7 @@ public class BooksView extends CssLayout implements View {
                 .setFilter(book -> passesFilter(book, event.getValue())));
 
         newProduct = new Button("New product");
+        newProduct.setId("new-product");
         newProduct.addStyleName(ValoTheme.BUTTON_PRIMARY);
         newProduct.setIcon(VaadinIcons.PLUS_CIRCLE);
         newProduct.addClickListener(click -> presenter.newProduct());
@@ -179,13 +182,13 @@ public class BooksView extends CssLayout implements View {
         grid.setEdited(product);
         if (newProduct) {
             dataProvider.refreshAll();
+            form.removeStyleName(BookForm.BOOKFORM_WRAPPER_VISIBLE);
+            form.setEnabled(false);
+            grid.scrollToEnd();
         } else {
             dataProvider.refreshItem(product);
-            // Scroll to item, note this makes sense only when using in memory
-            // data provider
-            var index = grid.getDataCommunicator()
-                    .fetchItemsWithRange(0, Integer.MAX_VALUE).indexOf(product);
-            grid.scrollTo(index, ScrollDestination.MIDDLE);
+            form.removeStyleName(BookForm.BOOKFORM_WRAPPER_VISIBLE);
+            form.setEnabled(false);
         }
     }
 

@@ -17,7 +17,7 @@ public abstract class ProductDataService implements Serializable {
 
     public abstract Collection<Category> getAllCategories();
 
-    public abstract void updateProduct(Product p);
+    public abstract Product updateProduct(Product p);
 
     public abstract void deleteProduct(int productId);
 

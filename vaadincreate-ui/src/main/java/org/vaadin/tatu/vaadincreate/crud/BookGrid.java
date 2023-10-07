@@ -32,6 +32,7 @@ public class BookGrid extends Grid<Product> {
     private int edited;
 
     public BookGrid() {
+        setId("book-grid");
         setSizeFull();
 
         setStyleGenerator(

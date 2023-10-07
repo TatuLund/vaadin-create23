@@ -134,6 +134,7 @@ public class BookForm extends CssLayout {
         formLayout.setMargin(false);
         formLayout.addStyleName(BOOKFORM_FORM);
 
+        productName.setId("product-name");
         productName.setWidthFull();
         productName.setMaxLength(100);
         CharacterCountExtension.extend(productName);
@@ -141,22 +142,28 @@ public class BookForm extends CssLayout {
         // Layout price and stockCount horizontally
         var fieldWrapper = new HorizontalLayout();
         fieldWrapper.setWidthFull();
+        price.setId("price");
         price.setWidthFull();
+        stockCount.setId("stock-count");
         stockCount.setWidthFull();
         fieldWrapper.addComponents(price, stockCount);
 
+        availability.setId("availability");
         availability.setWidthFull();
         availability.setEmptySelectionAllowed(false);
         availability.setTextInputAllowed(false);
+        category.setId("category");
         category.setWidthFull();
 
         var spacer = new CssLayout();
 
         // Buttons
         save.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        save.setId("save-button");
         discard.addStyleName("cancel");
         cancel.addStyleName("cancel");
         delete.addStyleName(ValoTheme.BUTTON_DANGER);
+        delete.setId("delete-button");
         delete.setEnabled(false);
 
         formLayout.addComponents(productName, fieldWrapper, availability,

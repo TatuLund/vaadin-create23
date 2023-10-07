@@ -130,6 +130,7 @@ public class AppLayout extends HorizontalLayout {
     public void addView(Class<? extends View> view, String viewName,
             Resource Icon, String path) {
         var menuItem = new Button(viewName);
+        menuItem.setId(path);
         menuItem.setData(path);
         menuItem.addClickListener(e -> {
             ui.getNavigator().navigateTo(path);

@@ -3,6 +3,8 @@ package org.vaadin.tatu.vaadincreate.backend.mock;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 
@@ -21,6 +23,7 @@ public class MockUserService implements UserService {
 
     public MockUserService() {
         users = MockDataGenerator.createUsers();
+        logger.info("Generated mock user data");
     }
 
     @Override
@@ -46,4 +49,5 @@ public class MockUserService implements UserService {
         return users;
     }
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

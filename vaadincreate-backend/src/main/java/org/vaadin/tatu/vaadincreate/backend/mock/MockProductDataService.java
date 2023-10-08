@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.backend.mock;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -24,6 +26,7 @@ public class MockProductDataService extends ProductDataService {
         categories = MockDataGenerator.createCategories();
         products = MockDataGenerator.createProducts(categories);
         nextProductId = products.size() + 1;
+        logger.info("Generated mock product data");
     }
 
     public synchronized static ProductDataService getInstance() {
@@ -101,4 +104,6 @@ public class MockProductDataService extends ProductDataService {
         }
         products.remove(p);
     }
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

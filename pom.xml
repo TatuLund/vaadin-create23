@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.vaadin.tatu</groupId>
@@ -15,6 +16,8 @@
 	<properties>
 		<vaadin.version>8.21.0</vaadin.version>
 		<vaadin.plugin.version>8.21.0</vaadin.plugin.version>
+		<logback.version>1.2.0</logback.version>
+		<slf4j.version>1.7.21</slf4j.version>
 	</properties>
 
 	<modules>
@@ -30,7 +33,7 @@
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
-			
+
 			<repositories>
 				<repository>
 					<id>vaadin-prereleases</id>

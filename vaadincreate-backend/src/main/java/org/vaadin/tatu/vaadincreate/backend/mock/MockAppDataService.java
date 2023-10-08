@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.backend.mock;
 
 import java.time.LocalDateTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.AppDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 
@@ -20,6 +22,7 @@ public class MockAppDataService implements AppDataService {
     public MockAppDataService() {
         message = new Message(MockDataGenerator.createMessage(),
                 LocalDateTime.now());
+        logger.info("Generated mock app data");
     }
 
     @Override
@@ -32,4 +35,6 @@ public class MockAppDataService implements AppDataService {
     public synchronized Message getMessage() {
         return message;
     }
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

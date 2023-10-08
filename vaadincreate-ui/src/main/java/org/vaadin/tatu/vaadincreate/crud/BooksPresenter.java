@@ -60,7 +60,7 @@ public class BooksPresenter implements Serializable {
         if (future != null) {
             boolean cancelled = future.cancel(true);
             future = null;
-            logger.info("Fetching products cancelled: " + cancelled);
+            logger.info("Fetching products cancelled: {}", cancelled);
         }
     }
 

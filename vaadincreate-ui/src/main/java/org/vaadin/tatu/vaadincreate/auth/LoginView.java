@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.auth;
 
 import java.io.Serializable;
 
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.Page;
 import com.vaadin.shared.ui.ContentMode;
@@ -23,10 +25,6 @@ import com.vaadin.ui.themes.ValoTheme;
 @SuppressWarnings("serial")
 public class LoginView extends CssLayout {
 
-    private static final String LOGINVIEW_INFORMATION = "loginview-information";
-    private static final String LOGINVIEW_FORM = "loginview-form";
-    private static final String LOGINVIEW_CENTER = "loginview-center";
-    private static final String LOGINVIEW = "loginview";
     private TextField username;
     private PasswordField password;
     private Button login;
@@ -42,7 +40,7 @@ public class LoginView extends CssLayout {
     }
 
     private void buildUI() {
-        addStyleName(LOGINVIEW);
+        addStyleName(VaadinCreateTheme.LOGINVIEW);
 
         // login form, centered in the available part of the screen
         var loginForm = buildLoginForm();
@@ -53,7 +51,7 @@ public class LoginView extends CssLayout {
         var centeringLayout = new VerticalLayout();
         centeringLayout.setMargin(false);
         centeringLayout.setSpacing(false);
-        centeringLayout.setStyleName(LOGINVIEW_CENTER);
+        centeringLayout.setStyleName(VaadinCreateTheme.LOGINVIEW_CENTER);
         centeringLayout.addComponent(loginForm);
         centeringLayout.setComponentAlignment(loginForm,
                 Alignment.MIDDLE_CENTER);
@@ -68,7 +66,7 @@ public class LoginView extends CssLayout {
     private Component buildLoginForm() {
         var loginForm = new FormLayout();
 
-        loginForm.addStyleName(LOGINVIEW_FORM);
+        loginForm.addStyleName(VaadinCreateTheme.LOGINVIEW_FORM);
         loginForm.setSizeUndefined();
         loginForm.setMargin(false);
 
@@ -104,7 +102,7 @@ public class LoginView extends CssLayout {
 
     private CssLayout buildLoginInformation() {
         var loginInformation = new CssLayout();
-        loginInformation.setStyleName(LOGINVIEW_INFORMATION);
+        loginInformation.setStyleName(VaadinCreateTheme.LOGINVIEW_INFORMATION);
         var loginInfoText = new Label("<h1>Login Information</h1>"
                 + "Log in as &quot;Admin&quot; to have full access. Log in with any other &quot;UserX&quot; to have read-only access. For all users, any &quot;userX&quot; is fine",
                 ContentMode.HTML);

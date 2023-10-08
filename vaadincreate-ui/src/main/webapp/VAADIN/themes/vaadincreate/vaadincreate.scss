@@ -370,6 +370,10 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
     color: #b8d0ec;
   }
 
+  .valo-menu-item {
+     padding: 4px 32px 4px 16px;	  
+  }
+
   .fakegrid {
 	  background: white;
 	  border: 1px solid #d4d4d4;

@@ -22,6 +22,7 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+@AccessAllowed({ Role.USER, Role.ADMIN })
 @SuppressWarnings("serial")
 public class AboutView extends VerticalLayout implements View {
 
@@ -30,7 +31,7 @@ public class AboutView extends VerticalLayout implements View {
 
     public AboutView() {
         var aboutContent = new CustomLayout("aboutview");
-        aboutContent.setStyleName("aboutview-aboutcontent");
+        aboutContent.setStyleName(VaadinCreateTheme.ABOUTVIEW_ABOUTCONTENT);
 
         // you can add Vaadin components in predefined slots in the custom
         // layout
@@ -48,7 +49,7 @@ public class AboutView extends VerticalLayout implements View {
         textField.setVisible(false);
 
         var adminsContent = new HorizontalLayout();
-        adminsContent.addStyleName("aboutview-adminscontent");
+        adminsContent.addStyleName(VaadinCreateTheme.ABOUTVIEW_ADMINSCONTENT);
         adminsContent.setWidth("500px");
         var adminsNote = new Label();
         Message message = AppDataService.get().getMessage();
@@ -56,7 +57,7 @@ public class AboutView extends VerticalLayout implements View {
         adminsNote.setValue(message.getMessage());
 
         adminsNote.setContentMode(ContentMode.HTML);
-        adminsNote.addStyleName("whitespace-pre");
+        adminsNote.addStyleName(VaadinCreateTheme.WHITESPACE_PRE);
         adminsContent.addComponents(adminsNote, textField);
         if (VaadinCreateUI.get().getAccessControl().isUserInRole(Role.ADMIN)) {
             editButton = new Button();
@@ -93,7 +94,7 @@ public class AboutView extends VerticalLayout implements View {
         });
         setSizeFull();
         setMargin(false);
-        setStyleName("about-view");
+        setStyleName(VaadinCreateTheme.ABOUT_VIEW);
         addComponents(aboutContent, adminsContent);
         setComponentAlignment(aboutContent, Alignment.MIDDLE_CENTER);
         setComponentAlignment(adminsContent, Alignment.MIDDLE_CENTER);

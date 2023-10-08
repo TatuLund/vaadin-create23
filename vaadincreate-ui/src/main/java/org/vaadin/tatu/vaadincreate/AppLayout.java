@@ -1,5 +1,10 @@
 package org.vaadin.tatu.vaadincreate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
+import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
@@ -86,7 +91,7 @@ public class AppLayout extends HorizontalLayout {
         });
         item.setIcon(VaadinIcons.KEY);
         item.setDescription("Logout");
-        logout.addStyleName("user-menu");
+        logout.addStyleName(ValoTheme.MENU_USER);
         menu.addComponent(logout);
 
         content.setPrimaryStyleName(ValoTheme.NAV_CONTENT);
@@ -106,14 +111,34 @@ public class AppLayout extends HorizontalLayout {
             public void afterViewChange(ViewChangeEvent event) {
                 clearSelected();
                 setSelected(event.getViewName());
+                logger.info("User '{}' navigated to view '{}'",
+                        CurrentUser.get().get().getName(), event.getViewName());
             }
 
             @Override
             public boolean beforeViewChange(ViewChangeEvent event) {
-                return true;
+                var view = event.getNewView();
+                return hasAccessToView(view.getClass());
             }
+
         });
     }
+
+    private boolean hasAccessToView(Class<? extends View> view) {
+        var annotation = view.getAnnotation(AccessAllowed.class);
+        if (annotation != null) {
+            boolean canAccess = false;
+            for (Role role : annotation.value()) {
+                if (VaadinCreateUI.get().getAccessControl()
+                        .isUserInRole(role)) {
+                    canAccess = true;
+                    break;
+                }
+            }
+            return canAccess;
+        }
+        return true;
+    } 
 
     /**
      * Add a new view to application shell
@@ -129,6 +154,9 @@ public class AppLayout extends HorizontalLayout {
      */
     public void addView(Class<? extends View> view, String viewName,
             Resource Icon, String path) {
+        if (!hasAccessToView(view)) {
+            return;
+        }
         var menuItem = new Button(viewName);
         menuItem.setId(path);
         menuItem.setData(path);
@@ -164,4 +192,5 @@ public class AppLayout extends HorizontalLayout {
         }
     }
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

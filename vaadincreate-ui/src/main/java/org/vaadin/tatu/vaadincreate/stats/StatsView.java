@@ -1,11 +1,15 @@
 package org.vaadin.tatu.vaadincreate.stats;
 
-import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.AccessAllowed;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
+import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.ChartType;
@@ -20,12 +24,9 @@ import com.vaadin.ui.UIDetachedException;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+@SuppressWarnings("serial")
+@AccessAllowed({ Role.USER, Role.ADMIN })
 public class StatsView extends VerticalLayout implements View {
-
-    private static final String STATSVIEW = "statsview";
-    private static final String DASHBOARD = "dashboard";
-    private static final String DASHBOARD_CHART_WIDE = "dashboard-chart-wide";
-    private static final String DASHBOARD_CHART = "dashboard-chart";
 
     public static final String VIEW_NAME = "stats";
 
@@ -40,13 +41,14 @@ public class StatsView extends VerticalLayout implements View {
     private Chart priceChart;
 
     public StatsView() {
-        addStyleNames(STATSVIEW, ValoTheme.SCROLLABLE);
+        addStyleNames(VaadinCreateTheme.STATSVIEW, ValoTheme.SCROLLABLE);
         dashboard = new CssLayout();
-        dashboard.addStyleName(DASHBOARD);
+        dashboard.addStyleName(VaadinCreateTheme.DASHBOARD);
 
         var availabilityChartWrapper = new CssLayout();
         availabilityChart = new Chart(ChartType.COLUMN);
-        availabilityChartWrapper.addStyleName(DASHBOARD_CHART);
+        availabilityChartWrapper
+                .addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
         Lang lang = new Lang();
         // Set loading label to Chart no data as loading of data is done
         // asynchronously
@@ -59,7 +61,8 @@ public class StatsView extends VerticalLayout implements View {
 
         categoryChart = new Chart(ChartType.BAR);
         var categoryChartWrapper = new CssLayout();
-        categoryChartWrapper.addStyleName(DASHBOARD_CHART_WIDE);
+        categoryChartWrapper
+                .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_WIDE);
         var cConf = categoryChart.getConfiguration();
         cConf.setTitle("Categories");
         cConf.setLang(lang);
@@ -67,7 +70,7 @@ public class StatsView extends VerticalLayout implements View {
 
         var priceChartWrapper = new CssLayout();
         priceChart = new Chart(ChartType.PIE);
-        priceChartWrapper.addStyleName(DASHBOARD_CHART);
+        priceChartWrapper.addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
         var pConf = priceChart.getConfiguration();
         pConf.setTitle("Prices");
         pConf.setLang(lang);

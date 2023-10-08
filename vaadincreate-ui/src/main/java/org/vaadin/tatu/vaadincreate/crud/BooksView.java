@@ -2,12 +2,16 @@ package org.vaadin.tatu.vaadincreate.crud;
 
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
 import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.AccessAllowed;
 import org.vaadin.tatu.vaadincreate.ResetButtonForTextField;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
@@ -33,12 +37,8 @@ import com.vaadin.ui.themes.ValoTheme;
  * operations and controlling the view based on events from outside.
  */
 @SuppressWarnings("serial")
+@AccessAllowed({ Role.USER, Role.ADMIN })
 public class BooksView extends CssLayout implements View {
-
-    private static final String BOOKVIEW_GRID = "bookview-grid";
-    private static final String BOOKVIEW_TOOLBAR = "bookview-toolbar";
-    private static final String BOOKVIEW_FILTER = "bookview-filter";
-    private static final String BOOKVIEW = "bookview";
 
     public static final String VIEW_NAME = "books";
     private BookGrid grid;
@@ -55,7 +55,7 @@ public class BooksView extends CssLayout implements View {
 
     public BooksView() {
         setSizeFull();
-        addStyleName(BOOKVIEW);
+        addStyleName(VaadinCreateTheme.BOOKVIEW);
         var topLayout = createTopBar();
 
         grid = new BookGrid();
@@ -75,7 +75,7 @@ public class BooksView extends CssLayout implements View {
         barAndGridLayout.setSizeFull();
         barAndGridLayout.setExpandRatio(grid, 1);
         barAndGridLayout.setExpandRatio(fakeGrid, 1);
-        barAndGridLayout.setStyleName(BOOKVIEW_GRID);
+        barAndGridLayout.setStyleName(VaadinCreateTheme.BOOKVIEW_GRID);
 
         addComponent(barAndGridLayout);
         addComponent(form);
@@ -98,7 +98,7 @@ public class BooksView extends CssLayout implements View {
     public HorizontalLayout createTopBar() {
         filter = new TextField();
         filter.setId("filter-field");
-        filter.setStyleName(BOOKVIEW_FILTER);
+        filter.setStyleName(VaadinCreateTheme.BOOKVIEW_FILTER);
         filter.setPlaceholder("Filter name, availability or category");
         ResetButtonForTextField.extend(filter);
         // Apply the filter to grid's data provider. TextField value is never
@@ -118,12 +118,12 @@ public class BooksView extends CssLayout implements View {
         topLayout.addComponent(newProduct);
         topLayout.setComponentAlignment(filter, Alignment.MIDDLE_LEFT);
         topLayout.setExpandRatio(filter, 1);
-        topLayout.setStyleName(BOOKVIEW_TOOLBAR);
+        topLayout.setStyleName(VaadinCreateTheme.BOOKVIEW_TOOLBAR);
         return topLayout;
     }
 
     @Override
-    public void enter(ViewChangeEvent event) {
+    public void enter(ViewChangeEvent event) {      
         ui = UI.getCurrent();
         params = event.getParameters();
         presenter.requestUpdateProducts();

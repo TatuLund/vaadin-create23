@@ -86,6 +86,7 @@ public class AppLayout extends HorizontalLayout {
 
         var logout = new MenuBar();
         var item = logout.addItem("Logout", e -> {
+            logger.info("User '{}' logout", CurrentUser.get().get().getName());
             ui.getSession().getSession().invalidate();
             ui.getPage().reload();
         });
@@ -105,7 +106,8 @@ public class AppLayout extends HorizontalLayout {
 
         // Use view change listener to detect when navigation happened either by
         // user or directly using location. Update Menu's selected item based on
-        // path.
+        // path. Also check if the user has access granted by @AccessAllowed
+        // annotation, if not reject navigation to path.
         nav.addViewChangeListener(new ViewChangeListener() {
             @Override
             public void afterViewChange(ViewChangeEvent event) {
@@ -124,6 +126,8 @@ public class AppLayout extends HorizontalLayout {
         });
     }
 
+    // Check if the view has @AccessAllowed annotation. If the annotation exists
+    // grant the access based on it.
     private boolean hasAccessToView(Class<? extends View> view) {
         var annotation = view.getAnnotation(AccessAllowed.class);
         if (annotation != null) {
@@ -138,10 +142,11 @@ public class AppLayout extends HorizontalLayout {
             return canAccess;
         }
         return true;
-    } 
+    }
 
     /**
-     * Add a new view to application shell
+     * Add a new view to application shell if the current user has access to it
+     * based on @AccessAllowed annotation in the view.
      * 
      * @param view
      *            The view class

@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate;
+package org.vaadin.tatu.vaadincreate.auth;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

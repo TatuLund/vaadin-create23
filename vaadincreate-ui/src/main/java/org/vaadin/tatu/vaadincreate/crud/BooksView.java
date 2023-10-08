@@ -8,9 +8,9 @@ import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vaadin.tatu.vaadincreate.AccessAllowed;
 import org.vaadin.tatu.vaadincreate.ResetButtonForTextField;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.auth.AccessAllowed;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 
 import com.vaadin.data.provider.ListDataProvider;

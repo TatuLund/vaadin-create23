@@ -50,8 +50,10 @@ public class BooksPresenter implements Serializable {
     }
 
     public void requestUpdateProducts() {
-        future = loadProductsAsync()
-                .thenAccept(products -> view.setProductsAsync(products));
+        future = loadProductsAsync().thenAccept(products -> {
+            view.setProductsAsync(products);
+            future = null;
+        });
     }
 
     public void cancelUpdateProducts() {

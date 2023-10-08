@@ -68,6 +68,7 @@ public class StatsPresenter implements Serializable {
             }
 
             view.updateStatsAsync(availabilityStats, categoryStats, priceStats);
+            future = null;
         });
     }
 

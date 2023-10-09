@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.CheckBoxGroupElement;
@@ -53,8 +54,8 @@ public class CrudViewIT extends AbstractViewTest {
         notification.close();
 
         // Book form should close
-        Assert.assertFalse(
-                form.getClassNames().contains("bookform-wrapper-visible"));
+        Assert.assertFalse(form.getClassNames()
+                .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
 
         // Part II: Find it by filter
         $(TextFieldElement.class).id("filter-field").setValue("test");
@@ -88,7 +89,7 @@ public class CrudViewIT extends AbstractViewTest {
     public void editedRowHighlighted() {
         waitForElementPresent(By.id("book-grid"));
 
-        // Part I: Open first book to editor, change its name
+        // Open first book to editor, change its name
         var row = $(GridElement.class).first().getRow(0);
         row.click();
         var form = $(CssLayoutElement.class).id("book-form");
@@ -103,12 +104,13 @@ public class CrudViewIT extends AbstractViewTest {
         notification.close();
 
         // Book form should close
-        Assert.assertFalse(
-                form.getClassNames().contains("bookform-wrapper-visible"));
+        Assert.assertFalse(form.getClassNames()
+                .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
 
         // Assert that row highlight class name exists now
         row = $(GridElement.class).first().getRow(0);
-        Assert.assertTrue(row.getClassNames().contains("bookview-grid-edited"));
+        Assert.assertTrue(row.getClassNames()
+                .contains(VaadinCreateTheme.BOOKVIEW_GRID_EDITED));
 
         // Open book in editor again change name back and assert
         row.click();

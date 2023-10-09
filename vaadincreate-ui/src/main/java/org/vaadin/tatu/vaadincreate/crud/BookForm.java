@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -28,11 +29,6 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings("serial")
 public class BookForm extends CssLayout {
-
-    private static final String BOOKFORM_FORM = "bookform-form";
-    private static final String BOOKFORM_WRAPPER = "bookform-wrapper";
-    private static final String BOOKFORM = "bookform";
-    public static final String BOOKFORM_WRAPPER_VISIBLE = "bookform-wrapper-visible";
 
     protected TextField productName = new TextField("Product name");
     protected TextField price = new TextField("Price");
@@ -117,7 +113,7 @@ public class BookForm extends CssLayout {
 
         cancel.addClickListener(event -> {
             presenter.cancelProduct();
-            removeStyleName(BOOKFORM_WRAPPER_VISIBLE);
+            removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
         });
 
         delete.addClickListener(event -> {
@@ -128,11 +124,12 @@ public class BookForm extends CssLayout {
     }
 
     private void buildForm() {
-        addStyleNames(BOOKFORM, BOOKFORM_WRAPPER);
+        addStyleNames(VaadinCreateTheme.BOOKFORM,
+                VaadinCreateTheme.BOOKFORM_WRAPPER);
         var formLayout = new VerticalLayout();
         formLayout.setHeightFull();
         formLayout.setMargin(false);
-        formLayout.addStyleName(BOOKFORM_FORM);
+        formLayout.addStyleName(VaadinCreateTheme.BOOKFORM_FORM);
 
         productName.setId("product-name");
         productName.setWidthFull();

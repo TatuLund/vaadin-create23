@@ -182,12 +182,12 @@ public class BooksView extends CssLayout implements View {
         grid.setEdited(product);
         if (newProduct) {
             dataProvider.refreshAll();
-            form.removeStyleName(BookForm.BOOKFORM_WRAPPER_VISIBLE);
+            form.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
             form.setEnabled(false);
             grid.scrollToEnd();
         } else {
             dataProvider.refreshItem(product);
-            form.removeStyleName(BookForm.BOOKFORM_WRAPPER_VISIBLE);
+            form.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
             form.setEnabled(false);
         }
     }
@@ -199,10 +199,10 @@ public class BooksView extends CssLayout implements View {
     public void editProduct(Product product) {
         grid.setEdited(null);
         if (product != null) {
-            form.addStyleName(BookForm.BOOKFORM_WRAPPER_VISIBLE);
+            form.addStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
             form.setEnabled(true);
         } else {
-            form.removeStyleName(BookForm.BOOKFORM_WRAPPER_VISIBLE);
+            form.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
             form.setEnabled(false);
         }
         form.editProduct(product);

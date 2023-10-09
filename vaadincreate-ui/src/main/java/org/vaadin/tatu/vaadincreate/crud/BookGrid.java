@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 
@@ -22,9 +23,6 @@ import com.vaadin.ui.renderers.NumberRenderer;
 @SuppressWarnings("serial")
 public class BookGrid extends Grid<Product> {
 
-    private static final String BOOKVIEW_GRID_ALIGNRIGHT = "bookview-grid-alignright";
-    private static final String BOOKVIEW_GRID_EDITED = "bookview-grid-edited";
-    private static final String BOOKVIEW_AVAILABILITYLABEL = "bookview-availabilitylabel";
     private Registration resizeReg;
     private Label availabilityCaption;
 
@@ -35,8 +33,9 @@ public class BookGrid extends Grid<Product> {
         setId("book-grid");
         setSizeFull();
 
-        setStyleGenerator(
-                book -> book.getId() == edited ? BOOKVIEW_GRID_EDITED : "");
+        setStyleGenerator(book -> book.getId() == edited
+                ? VaadinCreateTheme.BOOKVIEW_GRID_EDITED
+                : "");
 
         addColumn(Product::getId, new NumberRenderer()).setCaption("Id");
         addColumn(Product::getProductName).setId("name")
@@ -58,7 +57,8 @@ public class BookGrid extends Grid<Product> {
                             .compareTo(p2.getAvailability().toString());
                 }).setId("availability");
         availabilityCaption = new Label("Availability");
-        availabilityCaption.addStyleName(BOOKVIEW_AVAILABILITYLABEL);
+        availabilityCaption
+                .addStyleName(VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL);
 
         // Show empty stock as "-"
         addColumn(product -> {
@@ -68,7 +68,8 @@ public class BookGrid extends Grid<Product> {
             return Integer.toString(product.getStockCount());
         }).setCaption("Stock Count").setComparator((p1, p2) -> {
             return Integer.compare(p1.getStockCount(), p2.getStockCount());
-        }).setStyleGenerator(product -> BOOKVIEW_GRID_ALIGNRIGHT)
+        }).setStyleGenerator(
+                product -> VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT)
                 .setId("stock");
 
         // Show all categories the product is in, separated by commas
@@ -109,8 +110,9 @@ public class BookGrid extends Grid<Product> {
                 + Integer.toHexString(VaadinIcons.CIRCLE.getCodepoint())
                 + ";</span>";
 
-        return iconCode + "<span class=\"" + BOOKVIEW_AVAILABILITYLABEL + "\"> "
-                + text + "</span>";
+        return iconCode + "<span class=\""
+                + VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL + "\"> " + text
+                + "</span>";
     }
 
     private String formatCategories(Product product) {

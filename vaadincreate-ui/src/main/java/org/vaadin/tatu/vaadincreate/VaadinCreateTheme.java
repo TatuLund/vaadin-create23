@@ -18,6 +18,16 @@ public class VaadinCreateTheme {
     public static final String BOOKVIEW_FILTER = "bookview-filter";
     public static final String BOOKVIEW = "bookview";
 
+    public static final String BOOKVIEW_GRID_ALIGNRIGHT = "bookview-grid-alignright";
+    public static final String BOOKVIEW_GRID_EDITED = "bookview-grid-edited";
+    public static final String BOOKVIEW_AVAILABILITYLABEL = "bookview-availabilitylabel";
+
+    public static final String BOOKFORM_FORM = "bookform-form";
+    public static final String BOOKFORM_WRAPPER = "bookform-wrapper";
+    public static final String BOOKFORM = "bookform";
+    public static final String BOOKFORM_WRAPPER_VISIBLE = "bookform-wrapper-visible";
+
+
     public static final String STATSVIEW = "statsview";
     public static final String DASHBOARD = "dashboard";
     public static final String DASHBOARD_CHART_WIDE = "dashboard-chart-wide";

@@ -137,24 +137,25 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
     height: 100%;
     overflow: auto;
     padding: $v-layout-spacing-vertical $v-layout-spacing-horizontal;
-    background-color: $editor-background-color;
-    color: valo-font-color($editor-background-color, 0.8);
+    background-color: #fafafa;
+//    background-color: $editor-background-color;
+//    color: valo-font-color($editor-background-color, 0.8);
 
     // Set the context color for the style mixins
     $temp: $v-app-background-color;
     $v-app-background-color: $editor-background-color;
 
-    .v-textfield {
-      @include valo-textfield-style($background-color: $editor-embed-background-color);
-    }
-
-    .v-checkbox {
-      @include valo-checkbox-style($background-color: $editor-raised-background-color);
-    }
-
-    .v-filterselect {
-      @include valo-combobox-style($background-color: $editor-raised-background-color, $bevel: $v-bevel, $gradient: $v-gradient);
-    }
+//    .v-textfield {
+//      @include valo-textfield-style($background-color: $editor-embed-background-color);
+//    }
+//
+//    .v-checkbox {
+//      @include valo-checkbox-style($background-color: $editor-raised-background-color);
+//    }
+//
+//    .v-filterselect {
+//      @include valo-combobox-style($background-color: $editor-raised-background-color, $bevel: $v-bevel, $gradient: $v-gradient);
+//    }
 
     // Restore variable
     $v-app-background-color: $temp;

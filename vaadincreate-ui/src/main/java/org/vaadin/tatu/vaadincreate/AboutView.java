@@ -29,6 +29,7 @@ public class AboutView extends VerticalLayout implements View {
 
     public static final String VIEW_NAME = "about";
     private Button editButton;
+    private Label adminsNote;
 
     public AboutView() {
         var aboutContent = new CustomLayout("aboutview");
@@ -52,10 +53,7 @@ public class AboutView extends VerticalLayout implements View {
         var adminsContent = new HorizontalLayout();
         adminsContent.addStyleName(VaadinCreateTheme.ABOUTVIEW_ADMINSCONTENT);
         adminsContent.setWidth("500px");
-        var adminsNote = new Label();
-        Message message = AppDataService.get().getMessage();
-        adminsNote.setCaption(message.getDateStamp().toString());
-        adminsNote.setValue(message.getMessage());
+        adminsNote = new Label();
 
         adminsNote.setContentMode(ContentMode.HTML);
         adminsNote.addStyleName(VaadinCreateTheme.WHITESPACE_PRE);
@@ -103,6 +101,9 @@ public class AboutView extends VerticalLayout implements View {
 
     @Override
     public void enter(ViewChangeEvent event) {
+        Message message = AppDataService.get().getMessage();
+        adminsNote.setCaption(message.getDateStamp().toString());
+        adminsNote.setValue(message.getMessage());
     }
 
 }

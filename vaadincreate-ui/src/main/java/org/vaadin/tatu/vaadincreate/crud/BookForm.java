@@ -8,7 +8,6 @@ import java.util.Locale;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
-import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 
@@ -20,7 +19,6 @@ import com.vaadin.data.ValueContext;
 import com.vaadin.server.Page;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
@@ -33,7 +31,7 @@ public class BookForm extends CssLayout {
     protected TextField productName = new TextField("Product name");
     protected TextField price = new TextField("Price");
     protected TextField stockCount = new TextField("In stock");
-    protected ComboBox<Availability> availability = new ComboBox<>(
+    protected AvailabilitySelector availability = new AvailabilitySelector(
             "Availability");
     protected CheckBoxGroup<Category> category = new CheckBoxGroup<>(
             "Categories");
@@ -77,12 +75,6 @@ public class BookForm extends CssLayout {
     public BookForm(BooksPresenter presenter) {
         buildForm();
         setId("book-form");
-
-        // Mark the stock count field as numeric.
-        // This affects the virtual keyboard shown on mobile devices.
-
-        availability.setItems(Availability.values());
-        availability.setEmptySelectionAllowed(false);
 
         binder = new BeanValidationBinder<>(Product.class);
         binder.forField(price).withConverter(new EuroConverter()).bind("price");
@@ -141,14 +133,15 @@ public class BookForm extends CssLayout {
         fieldWrapper.setWidthFull();
         price.setId("price");
         price.setWidthFull();
+        // Mark the stock count field as numeric.
+        // This affects the virtual keyboard shown on mobile devices.
+        var stockFieldExtension = new AttributeExtension();
+        stockFieldExtension.extend(stockCount);
+        stockFieldExtension.setAttribute("type", "number");
         stockCount.setId("stock-count");
         stockCount.setWidthFull();
         fieldWrapper.addComponents(price, stockCount);
 
-        availability.setId("availability");
-        availability.setWidthFull();
-        availability.setEmptySelectionAllowed(false);
-        availability.setTextInputAllowed(false);
         category.setId("category");
         category.setWidthFull();
 
@@ -193,9 +186,5 @@ public class BookForm extends CssLayout {
     @Override
     public void attach() {
         super.attach();
-        var stockFieldExtension = new AttributeExtension();
-        stockFieldExtension.extend(stockCount);
-        stockFieldExtension.setAttribute("type", "number");
-
     }
 }

@@ -187,6 +187,42 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
     @include box-shadow($editor-shadow);
   }
 
+  .v-filterselect-item-bookform-availability-available {
+    span.v-icon {
+      color: #2dd085;
+    }
+  }
+
+  .v-filterselect-item-bookform-availability-coming {
+    span.v-icon {
+      color: #ffc66e;
+    }
+  }
+
+  .v-filterselect-item-bookform-availability-discontinued {
+    span.v-icon {
+      color: #f54993;
+    }
+  }
+
+  .bookform-availability-available {
+    span.v-icon {
+      color: #2dd085;
+    }
+  }
+
+  .bookform-availability-coming {
+    span.v-icon {
+      color: #ffc66e;
+    }
+  }
+
+  .bookform-availability-discontinued {
+    span.v-icon {
+      color: #f54993;
+    }
+  }
+
   // About view
 
   .aboutview {
@@ -420,5 +456,9 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
   .v-grid-scroller-vertical {
     visibility: visible !important;
     width: 30px !important;
+  }
+
+  .v-spacing {
+	height: 10px;
   }
 }

@@ -44,6 +44,8 @@ public class AppLayout extends HorizontalLayout {
      *            The UI
      */
     public AppLayout(UI ui) {
+        setSpacing(false);
+        setMargin(false);
         this.ui = ui;
         ui.addStyleName(ValoTheme.UI_WITH_MENU);
         addStyleName("applayout");

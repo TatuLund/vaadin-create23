@@ -336,9 +336,9 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
   // Editor should take whole browser width when we are under 550px in width.
   .v-ui[width-range~="0-550px"] {
     .bookform-wrapper {
-      width:100%;
+      width: 100%;     
     }
-
+    
     // Remove margins around the grid and reduce top bar margins on small screens
     .bookview .bookview-grid {
       padding: 0 0 0 0;

@@ -56,6 +56,15 @@ public class ProductDataServiceTest {
         assertEquals(oldSize + 1, service.getAllProducts().size());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void updateNonExistentProduct() {
+        Product p = new Product();
+        p.setProductName("A new book");
+        p.setPrice(new BigDecimal(10));
+        p.setId(1000);
+        service.updateProduct(p);
+    }
+
     @Test
     public void removeProduct() throws Exception {
         var oldSize = service.getAllProducts().size();
@@ -64,5 +73,20 @@ public class ProductDataServiceTest {
         service.deleteProduct(pid);
         assertEquals(null, service.getProductById(pid));
         assertEquals(oldSize - 1, service.getAllProducts().size());
+    }
+
+    @Test
+    public void findProductById() {
+        assertNotEquals(null, service.getProductById(1));
+    }
+
+    @Test
+    public void findProductByNonExistentId() {
+        assertEquals(null, service.getProductById(1000));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void removeProductByNonExistentId() {
+        service.deleteProduct(1000);
     }
 }

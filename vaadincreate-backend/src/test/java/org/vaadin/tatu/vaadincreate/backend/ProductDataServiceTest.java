@@ -8,6 +8,7 @@ import org.vaadin.tatu.vaadincreate.backend.mock.MockProductDataService;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
@@ -54,6 +55,9 @@ public class ProductDataServiceTest {
         var newProduct = service.updateProduct(p);
         assertNotEquals(-1, newProduct.getId());
         assertEquals(oldSize + 1, service.getAllProducts().size());
+        
+        var foundProduct = service.getProductById(newProduct.getId());
+        assertTrue(foundProduct.equals(newProduct));
     }
 
     @Test(expected = IllegalArgumentException.class)

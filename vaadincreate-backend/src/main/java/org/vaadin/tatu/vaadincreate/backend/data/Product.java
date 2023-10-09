@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.backend.data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.validation.constraints.Min;
@@ -72,4 +73,20 @@ public class Product implements Serializable {
         this.availability = availability;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Product other = (Product) obj;
+        return id == other.id;
+    }
 }

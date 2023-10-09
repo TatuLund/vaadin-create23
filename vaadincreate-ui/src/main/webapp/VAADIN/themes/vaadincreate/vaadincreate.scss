@@ -110,7 +110,6 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
       display: inline-block;
       width: 100%;
       height: 100%;
-      padding-left: $login-info-width;
 
       .v-slot {
         height: 100%;

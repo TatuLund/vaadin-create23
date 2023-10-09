@@ -6,6 +6,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.Page;
+import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -31,6 +32,9 @@ public class LoginView extends CssLayout {
     private Button forgotPassword;
     private LoginListener loginListener;
     private AccessControl accessControl;
+    private Registration resizeReg;
+    private CssLayout loginInformation;
+    private VerticalLayout centeringLayout;
 
     public LoginView(AccessControl accessControl, LoginListener loginListener) {
         this.loginListener = loginListener;
@@ -48,7 +52,7 @@ public class LoginView extends CssLayout {
         // layout to center login form when there is sufficient screen space
         // - see the theme for how this is made responsive for various screen
         // sizes
-        var centeringLayout = new VerticalLayout();
+        centeringLayout = new VerticalLayout();
         centeringLayout.setMargin(false);
         centeringLayout.setSpacing(false);
         centeringLayout.setStyleName(VaadinCreateTheme.LOGINVIEW_CENTER);
@@ -57,10 +61,31 @@ public class LoginView extends CssLayout {
                 Alignment.MIDDLE_CENTER);
 
         // information text about logging in
-        var loginInformation = buildLoginInformation();
+        loginInformation = buildLoginInformation();
 
         addComponent(centeringLayout);
-        addComponent(loginInformation);
+    }
+
+    @Override
+    public void attach() {
+        super.attach();
+        resizeReg = getUI().getPage().addBrowserWindowResizeListener(e -> {
+            showLoginInformation(e.getWidth());
+        });
+    }
+
+    @Override
+    public void detach() {
+        super.detach();
+        resizeReg.remove();
+    }
+
+    public void showLoginInformation(int width) {
+        if (width < 700) {
+            removeComponent(loginInformation);
+        } else {
+            addComponent(loginInformation);
+        }
     }
 
     private Component buildLoginForm() {
@@ -132,4 +157,5 @@ public class LoginView extends CssLayout {
     public interface LoginListener extends Serializable {
         void loginSuccessful();
     }
+
 }

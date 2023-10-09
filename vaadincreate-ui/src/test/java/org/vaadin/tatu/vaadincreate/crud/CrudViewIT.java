@@ -45,7 +45,7 @@ public class CrudViewIT extends AbstractViewTest {
         form.$(TextFieldElement.class).id("price").setValue("10.00 €");
         form.$(TextFieldElement.class).id("stock-count").setValue("10");
         form.$(ComboBoxElement.class).id("availability")
-                .selectByText("Available");
+                .getPopupSuggestionElements().get(1).click();
         form.$(CheckBoxGroupElement.class).id("category")
                 .selectByText("Sci-fi");
         form.$(ButtonElement.class).id("save-button").click();

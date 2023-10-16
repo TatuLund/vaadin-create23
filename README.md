@@ -9,6 +9,7 @@ The demo app covers various use cases you may encounter in real life application
 - Multi-module project setup (backend, components and ui)
 - AppLayout uses ValoMenu to create responsive application shell
   - Setup also navigator and combine building of the menu and registrations of the views
+  - Implements per view role based access control
 - The application views have been implemented using Model View Presenter pattern
 - StatsView and BooksView load data from backend asynchronously and use push to update the view
   - StatsView uses fake grid as placeholder
@@ -20,6 +21,8 @@ The demo app covers various use cases you may encounter in real life application
   - Responsive CRUD editor
   - Highlight last edited item
 - Simplified example of access control
+- AdminView
+  - Stub view shown only for admin access
 - AboutView
   - Demo how to correctly sanitize user input with Jsoup in order to avoid XSS
   - CustomLayout example
@@ -27,10 +30,11 @@ The demo app covers various use cases you may encounter in real life application
 - The custom theme is using BEM (Block Element Modifier) naming scheme to avoid class name conflicts in CSS
 
 - Components module has examples of GWT and JavaScript extensions
-  - Reset button for text field
-  - Character counter for TextArea and TextField showing remaining characters
-  - Attribute extensions (used in form's number input)
+  - Reset button for text field, extension with client side GWT 
+  - Character counter for TextArea and TextField showing remaining characters, another extension with GWT
+  - Attribute extensions (used in form's number input), JavaScript
   - Java 11 code used in widgets
+  - ConfirmDialog, server side composition component
   
 Notes
 

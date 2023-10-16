@@ -9,7 +9,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface AccessAllowed {
+public @interface RolesPermitted {
 
     Role[] value();
 }

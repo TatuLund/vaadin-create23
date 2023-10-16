@@ -11,8 +11,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
 /**
  * Default mock implementation of {@link AccessControl}. This implementation
- * accepts any string as a password, and considers the user "admin" as the only
- * administrator.
+ * uses UserService for user information (credentials and roles).
  */
 @SuppressWarnings("serial")
 public class BasicAccessControl implements AccessControl {

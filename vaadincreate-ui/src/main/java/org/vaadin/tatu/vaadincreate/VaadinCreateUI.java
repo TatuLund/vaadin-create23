@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate;
 
 import javax.servlet.annotation.WebServlet;
 
+import org.vaadin.tatu.vaadincreate.admin.AdminView;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.BasicAccessControl;
 import org.vaadin.tatu.vaadincreate.auth.LoginView;
@@ -48,11 +49,17 @@ public class VaadinCreateUI extends UI {
         var appLayout = new AppLayout(this);
         setContent(appLayout);
 
-        // Use String constants for view names, allows easy refactoring if so needed
-        appLayout.addView(AboutView.class, "About", VaadinIcons.INFO, AboutView.VIEW_NAME);
-        appLayout.addView(BooksView.class, "Books", VaadinIcons.TABLE, BooksView.VIEW_NAME);
-        appLayout.addView(StatsView.class, "Stats", VaadinIcons.CHART, StatsView.VIEW_NAME);
-        
+        // Use String constants for view names, allows easy refactoring if so
+        // needed
+        appLayout.addView(AboutView.class, "About", VaadinIcons.INFO,
+                AboutView.VIEW_NAME);
+        appLayout.addView(BooksView.class, "Books", VaadinIcons.TABLE,
+                BooksView.VIEW_NAME);
+        appLayout.addView(StatsView.class, "Stats", VaadinIcons.CHART,
+                StatsView.VIEW_NAME);
+        appLayout.addView(AdminView.class, "Admin", VaadinIcons.USERS,
+                AdminView.VIEW_NAME);
+
         getNavigator().navigateTo(AboutView.VIEW_NAME);
     }
 

@@ -7,7 +7,9 @@ import java.util.Locale;
 
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
+import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 
@@ -105,14 +107,42 @@ public class BookForm extends CssLayout {
 
         cancel.addClickListener(event -> {
             presenter.cancelProduct();
-            removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
+            showForm(false);
         });
 
         delete.addClickListener(event -> {
             if (currentProduct != null) {
-                presenter.deleteProduct(currentProduct);
+                var dialog = new ConfirmDialog(
+                        "Book '" + currentProduct.getProductName()
+                                + "' will be deleted. Are you sure?",
+                        Type.ALERT);
+                getUI().addWindow(dialog);
+                dialog.addConfirmedListener(e -> {
+                    presenter.deleteProduct(currentProduct);
+                });
             }
         });
+    }
+
+    public void showForm(boolean visible) {
+        if (visible) {
+            addStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
+        } else {
+            removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
+        }
+        setEnabled(visible);
+    }
+
+    public boolean isShown() {
+        return this.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
+    }
+
+    public boolean hasChanges() {
+        if (!isShown()) {
+            return false;
+        }
+        return binder.hasChanges();
     }
 
     private void buildForm() {
@@ -151,6 +181,7 @@ public class BookForm extends CssLayout {
         save.addStyleName(ValoTheme.BUTTON_PRIMARY);
         save.setId("save-button");
         discard.addStyleName("cancel");
+        discard.setId("discard-button");
         cancel.addStyleName("cancel");
         delete.addStyleName(ValoTheme.BUTTON_DANGER);
         delete.setId("delete-button");

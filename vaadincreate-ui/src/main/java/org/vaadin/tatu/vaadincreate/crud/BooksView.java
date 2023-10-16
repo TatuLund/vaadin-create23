@@ -8,16 +8,15 @@ import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.ResetButtonForTextField;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
-import org.vaadin.tatu.vaadincreate.auth.AccessAllowed;
-import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
+import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.shared.ui.grid.ScrollDestination;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
@@ -37,7 +36,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * operations and controlling the view based on events from outside.
  */
 @SuppressWarnings("serial")
-@AccessAllowed({ Role.USER, Role.ADMIN })
+@RolesPermitted({ Role.USER, Role.ADMIN })
 public class BooksView extends CssLayout implements View {
 
     public static final String VIEW_NAME = "books";
@@ -59,8 +58,19 @@ public class BooksView extends CssLayout implements View {
         var topLayout = createTopBar();
 
         grid = new BookGrid();
-        grid.asSingleSelect().addValueChangeListener(
-                event -> presenter.rowSelected(event.getValue()));
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            if (form.hasChanges()) {
+                var dialog = new ConfirmDialog(
+                        "There are unsaved changes. Are you sure to change the book?",
+                        ConfirmDialog.Type.ALERT);
+                getUI().addWindow(dialog);
+                dialog.addConfirmedListener(e -> {
+                    presenter.rowSelected(event.getValue());
+                });
+            } else {
+                presenter.rowSelected(event.getValue());
+            }
+        });
         grid.setVisible(false);
 
         // Display fake Grid while loading data
@@ -123,7 +133,7 @@ public class BooksView extends CssLayout implements View {
     }
 
     @Override
-    public void enter(ViewChangeEvent event) {      
+    public void enter(ViewChangeEvent event) {
         ui = UI.getCurrent();
         params = event.getParameters();
         presenter.requestUpdateProducts();
@@ -182,13 +192,11 @@ public class BooksView extends CssLayout implements View {
         grid.setEdited(product);
         if (newProduct) {
             dataProvider.refreshAll();
-            form.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
-            form.setEnabled(false);
+            form.showForm(false);
             grid.scrollToEnd();
         } else {
             dataProvider.refreshItem(product);
-            form.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
-            form.setEnabled(false);
+            form.showForm(false);
         }
     }
 
@@ -199,11 +207,9 @@ public class BooksView extends CssLayout implements View {
     public void editProduct(Product product) {
         grid.setEdited(null);
         if (product != null) {
-            form.addStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
-            form.setEnabled(true);
+            form.showForm(true);
         } else {
-            form.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
-            form.setEnabled(false);
+            form.showForm(false);
         }
         form.editProduct(product);
     }

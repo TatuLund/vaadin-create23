@@ -6,7 +6,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
-import org.vaadin.tatu.vaadincreate.auth.AccessAllowed;
+import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
@@ -25,7 +25,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings("serial")
-@AccessAllowed({ Role.USER, Role.ADMIN })
+@RolesPermitted({ Role.USER, Role.ADMIN })
 public class StatsView extends VerticalLayout implements View {
 
     public static final String VIEW_NAME = "stats";

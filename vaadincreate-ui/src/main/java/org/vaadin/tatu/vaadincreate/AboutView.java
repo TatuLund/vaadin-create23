@@ -3,7 +3,8 @@ package org.vaadin.tatu.vaadincreate;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
-import org.vaadin.tatu.vaadincreate.auth.AccessAllowed;
+import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
+import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.AppDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
@@ -23,7 +24,7 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-@AccessAllowed({ Role.USER, Role.ADMIN })
+@AllPermitted
 @SuppressWarnings("serial")
 public class AboutView extends VerticalLayout implements View {
 

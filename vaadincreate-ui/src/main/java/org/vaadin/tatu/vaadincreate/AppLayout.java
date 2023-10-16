@@ -2,7 +2,8 @@ package org.vaadin.tatu.vaadincreate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vaadin.tatu.vaadincreate.auth.AccessAllowed;
+import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
+import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
@@ -132,10 +133,14 @@ public class AppLayout extends HorizontalLayout {
     // Check if the view has @AccessAllowed annotation. If the annotation exists
     // grant the access based on it.
     private boolean hasAccessToView(Class<? extends View> view) {
-        var annotation = view.getAnnotation(AccessAllowed.class);
-        if (annotation != null) {
+        var allPermitted = view.getAnnotation(AllPermitted.class);
+        if (allPermitted != null) {
+            return true;
+        }
+        var rolePermitted = view.getAnnotation(RolesPermitted.class);
+        if (rolePermitted != null) {
             boolean canAccess = false;
-            for (Role role : annotation.value()) {
+            for (Role role : rolePermitted.value()) {
                 if (VaadinCreateUI.get().getAccessControl()
                         .isUserInRole(role)) {
                     canAccess = true;
@@ -144,7 +149,9 @@ public class AppLayout extends HorizontalLayout {
             }
             return canAccess;
         }
-        return true;
+        logger.warn("User '{}' has no permission to view '{}'",
+                CurrentUser.get().get().getName(), view.getName());
+        return false;
     }
 
     /**

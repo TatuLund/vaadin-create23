@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,7 @@ public class BookGrid extends Grid<Product> {
 
     private Product editedProduct;
     private int edited;
+    private DecimalFormat decimalFormat;
 
     public BookGrid() {
         setId("book-grid");
@@ -42,9 +44,6 @@ public class BookGrid extends Grid<Product> {
                 .setCaption("Product Name");
 
         // Format and add " €" to price
-        var decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
         addColumn(product -> decimalFormat.format(product.getPrice()) + " €")
                 .setCaption("Price").setComparator((p1, p2) -> {
                     return p1.getPrice().compareTo(p2.getPrice());
@@ -134,6 +133,12 @@ public class BookGrid extends Grid<Product> {
         resizeReg = getUI().getPage().addBrowserWindowResizeListener(e -> {
             adjustColumns(e.getWidth());
         });
+        
+        // Ensure that we use the same format as the Converter
+        decimalFormat = (DecimalFormat) NumberFormat
+                .getNumberInstance(getUI().getLocale());
+        decimalFormat.setMaximumFractionDigits(2);
+        decimalFormat.setMinimumFractionDigits(2);
     }
 
     private void adjustColumns(int width) {

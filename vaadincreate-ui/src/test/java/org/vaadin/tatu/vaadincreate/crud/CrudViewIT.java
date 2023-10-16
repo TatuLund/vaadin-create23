@@ -173,4 +173,51 @@ public class CrudViewIT extends AbstractViewTest {
         Assert.assertTrue(notification.getText().startsWith(oldName));
         notification.close();
     }
+
+    @Test
+    public void browseProducts() {
+        waitForElementPresent(By.id("book-grid"));
+
+        // Click first book and pick the name of it
+        var row = $(GridElement.class).first().getRow(0);
+        row.click();
+        var form = $(CssLayoutElement.class).id("book-form");
+        var nameField = form.$(TextFieldElement.class).id("product-name");
+        var oldName = nameField.getValue();
+        // Compare values to Grid row
+        Assert.assertEquals(oldName, row.getCell(0).getText());
+        Assert.assertEquals(
+                form.$(TextFieldElement.class).id("price").getValue(),
+                row.getCell(1).getText());
+        Assert.assertTrue(row.getCell(2).getText().endsWith(
+                form.$(ComboBoxElement.class).id("availability").getText()));
+        Assert.assertEquals(
+                form.$(TextFieldElement.class).id("stock-count").getValue(),
+                stockCount(row.getCell(3).getText()));
+
+        // Click the second book
+        row = $(GridElement.class).first().getRow(1);
+        row.click();
+        // Form is still open
+        Assert.assertTrue(form.getClassNames()
+                .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
+        nameField = form.$(TextFieldElement.class).id("product-name");
+        // Name should be different
+        Assert.assertNotEquals(oldName, nameField.getValue());
+        // Values should match Grid row
+        Assert.assertEquals(nameField.getValue(), row.getCell(0).getText());
+        Assert.assertEquals(
+                form.$(TextFieldElement.class).id("price").getValue(),
+                row.getCell(1).getText());
+        Assert.assertTrue(row.getCell(2).getText().endsWith(
+                form.$(ComboBoxElement.class).id("availability").getText()));
+        Assert.assertEquals(
+                form.$(TextFieldElement.class).id("stock-count").getValue(),
+                stockCount(row.getCell(3).getText()));
+    }
+
+    private static String stockCount(String count) {
+        if (count.equals("-")) return "0";
+        return count;
+    }
 }

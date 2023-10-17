@@ -3,6 +3,10 @@ package org.vaadin.tatu.vaadincreate.backend.data;
 import java.io.Serializable;
 import java.util.Objects;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 @SuppressWarnings("serial")
 public class User implements Serializable {
 
@@ -10,13 +14,25 @@ public class User implements Serializable {
         USER, ADMIN;
     }
 
+    @Min(0)
     private int id;
+
+    @NotNull
+    @Size(min = 5, max = 20)
     private String name;
+
+    @NotNull
+    @Size(min = 5, max = 20)
     private String passwd;
+
+    @NotNull
     private Role role;
 
+    public User() {
+        this.id = -1;
+    }
+
     public User(int id, String name, String passwd, Role role) {
-        super();
         this.id = id;
         this.name = name;
         this.passwd = passwd;

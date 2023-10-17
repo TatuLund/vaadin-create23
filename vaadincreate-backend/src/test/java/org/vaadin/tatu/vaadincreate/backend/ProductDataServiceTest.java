@@ -40,7 +40,7 @@ public class ProductDataServiceTest {
         var p = service.getAllProducts().iterator().next();
         p.setProductName("My Test Name");
         service.updateProduct(p);
-        Product p2 = service.getAllProducts().iterator().next();
+        var p2 = service.getProductById(p.getId());
         assertEquals("My Test Name", p2.getProductName());
         assertEquals(oldSize, service.getAllProducts().size());
     }

@@ -1,6 +1,8 @@
 package org.vaadin.tatu.vaadincreate.backend.mock;
 
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,8 @@ public class MockProductDataService extends ProductDataService {
     private List<Category> categories;
     private int nextProductId = 0;
 
+    Random random = new Random();
+
     private MockProductDataService() {
         categories = MockDataGenerator.createCategories();
         products = MockDataGenerator.createProducts(categories);
@@ -38,37 +42,34 @@ public class MockProductDataService extends ProductDataService {
 
     @Override
     public synchronized List<Product> getAllProducts() {
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-        }
-        return products;
+        randomWait(12);
+        return products.stream().map(p -> new Product(p))
+                .collect(Collectors.toList());
     }
 
     @Override
     public synchronized List<Category> getAllCategories() {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-        }
+        randomWait(2);
         return categories;
     }
 
     @Override
-    public synchronized Product updateProduct(Product p) {
-        try {
-            Thread.sleep(250);
-        } catch (InterruptedException e) {
-        }
+    public synchronized Product updateProduct(Product product) {
+        randomWait(1);
+        var p = new Product(product);
         if (p.getId() < 0) {
             // New product
             p.setId(nextProductId++);
             products.add(p);
+            logger.info("Saved a new product ({}) {}", p.getId(),
+                    p.getProductName());
             return p;
         }
         for (int i = 0; i < products.size(); i++) {
             if (products.get(i).getId() == p.getId()) {
                 products.set(i, p);
+                logger.info("Updated the product ({}) {}", p.getId(),
+                        p.getProductName());
                 return p;
             }
         }
@@ -79,13 +80,10 @@ public class MockProductDataService extends ProductDataService {
 
     @Override
     public synchronized Product getProductById(int productId) {
-        try {
-            Thread.sleep(250);
-        } catch (InterruptedException e) {
-        }
+        randomWait(1);
         for (int i = 0; i < products.size(); i++) {
             if (products.get(i).getId() == productId) {
-                return products.get(i);
+                return new Product(products.get(i));
             }
         }
         return null;
@@ -93,16 +91,21 @@ public class MockProductDataService extends ProductDataService {
 
     @Override
     public synchronized void deleteProduct(int productId) {
-        try {
-            Thread.sleep(250);
-        } catch (InterruptedException e) {
-        }
+        randomWait(1);
         Product p = getProductById(productId);
         if (p == null) {
             throw new IllegalArgumentException(
                     "Product with id " + productId + " not found");
         }
         products.remove(p);
+    }
+
+    private void randomWait(int count) {
+        int wait = random.nextInt(50, 200);
+        try {
+            Thread.sleep(wait * count);
+        } catch (InterruptedException e) {
+        }
     }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());

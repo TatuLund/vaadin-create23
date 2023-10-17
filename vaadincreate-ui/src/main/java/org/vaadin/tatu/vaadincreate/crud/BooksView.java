@@ -188,19 +188,22 @@ public class BooksView extends CssLayout implements View {
     }
 
     public void updateProduct(Product product) {
-        var newProduct = product.getId() == -1;
+        logger.info("Refresh item");
         grid.setEdited(product);
-        if (newProduct) {
-            dataProvider.refreshAll();
-            form.showForm(false);
-            grid.scrollToEnd();
-        } else {
-            dataProvider.refreshItem(product);
-            form.showForm(false);
-        }
+        dataProvider.refreshItem(product);
+        form.showForm(false);
+    }
+
+    public void updateGrid(Product product) {
+        logger.info("Refresh grid");
+        dataProvider.getItems().add(product);
+        dataProvider.refreshAll();
+        form.showForm(false);
+        grid.scrollToEnd();
     }
 
     public void removeProduct(Product product) {
+        dataProvider.getItems().remove(product);
         dataProvider.refreshAll();
     }
 

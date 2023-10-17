@@ -18,4 +18,8 @@ public interface UserService {
         return MockUserService.getInstance();
     }
 
+    public User getUserById(int userId);
+
+    void removeUser(int userId);
+
 }

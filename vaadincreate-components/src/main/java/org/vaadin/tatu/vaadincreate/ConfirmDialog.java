@@ -1,7 +1,6 @@
 package org.vaadin.tatu.vaadincreate;
 
 import java.lang.reflect.Method;
-import java.util.EventObject;
 
 import com.vaadin.event.ConnectorEventListener;
 import com.vaadin.event.ShortcutAction.KeyCode;

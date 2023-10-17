@@ -111,6 +111,26 @@ public class CrudViewIT extends AbstractViewTest {
     @Test
     public void editDiscardChanges() {
         waitForElementPresent(By.id("book-grid"));
+
+        $(GridElement.class).first().getRow(0).click();
+        var form = $(CssLayoutElement.class).id("book-form");
+        Assert.assertFalse(
+                form.$(ButtonElement.class).id("discard-button").isEnabled());
+        var nameField = form.$(TextFieldElement.class).id("product-name");
+        var oldName = nameField.getValue();
+
+        nameField.setValue("A renamed book");
+        var discard = form.$(ButtonElement.class).id("discard-button");
+        Assert.assertTrue(discard.isEnabled());
+        discard.click();
+
+        Assert.assertEquals(oldName, nameField.getValue());
+    }
+
+    @Test
+    public void editDiscardChangesWarningOnSelect() {
+        waitForElementPresent(By.id("book-grid"));
+
         $(GridElement.class).first().getRow(0).click();
         var form = $(CssLayoutElement.class).id("book-form");
         Assert.assertFalse(
@@ -144,14 +164,14 @@ public class CrudViewIT extends AbstractViewTest {
 
         var nameField = form.$(TextFieldElement.class).id("product-name");
         var oldName = nameField.getValue();
-        nameField.setValue("A renamed book");
+        nameField.setValue("A changed book");
         Assert.assertTrue(
                 form.$(ButtonElement.class).id("save-button").isEnabled());
 
         // Save the book and assert the name was changed in notification
         form.$(ButtonElement.class).id("save-button").click();
         var notification = $(NotificationElement.class).first();
-        Assert.assertTrue(notification.getText().startsWith("A renamed book"));
+        Assert.assertTrue(notification.getText().startsWith("A changed book"));
         notification.close();
 
         // Book form should close
@@ -217,7 +237,8 @@ public class CrudViewIT extends AbstractViewTest {
     }
 
     private static String stockCount(String count) {
-        if (count.equals("-")) return "0";
+        if (count.equals("-"))
+            return "0";
         return count;
     }
 }

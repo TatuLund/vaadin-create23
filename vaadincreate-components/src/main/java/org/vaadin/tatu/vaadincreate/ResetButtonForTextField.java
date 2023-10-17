@@ -11,6 +11,7 @@ import com.vaadin.ui.TextField;
  * @see <a href="https://vaadin.com/blog/-/blogs/2656782">Extending components
  *      in Vaadin 7</a>
  */
+@SuppressWarnings("serial")
 public class ResetButtonForTextField extends AbstractExtension {
 
     public static void extend(TextField field) {

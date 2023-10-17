@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 public class Product implements Serializable {
 
     @NotNull
+    @Min(0)
     private int id = -1;
     @NotNull
     @Size(min = 2, max = 100, message = "Product name must have at least two characters, but max 100")
@@ -24,6 +25,19 @@ public class Product implements Serializable {
     private int stockCount = 0;
     @NotNull
     private Availability availability = Availability.COMING;
+
+    public Product() {
+        setId(-1);
+    }
+
+    public Product(Product other) {
+        setId(other.getId());
+        setProductName(other.getProductName());
+        setPrice(other.getPrice());
+        setStockCount(other.getStockCount());
+        setAvailability(other.getAvailability());
+        setCategory(other.getCategory());
+    }
 
     public int getId() {
         return id;

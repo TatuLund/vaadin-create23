@@ -86,13 +86,15 @@ public class VaadinCreateUI extends UI implements EventBusListener {
 
     @Override
     public void eventFired(Object event) {
-        Message message = (Message) event;
+        if (event instanceof Message) {
+            Message message = (Message) event;
 
-        access(() -> {
-            var note = new Notification(message.getDateStamp().toString(),
-                    message.getMessage(), Type.TRAY_NOTIFICATION, true);
-            note.show(getPage());
-        });
+            access(() -> {
+                var note = new Notification(message.getDateStamp().toString(),
+                        message.getMessage(), Type.TRAY_NOTIFICATION, true);
+                note.show(getPage());
+            });
+        }
     }
 
     @Override

@@ -36,8 +36,8 @@ public class EventBusImpl implements EventBus, Serializable {
         synchronized (eventListeners) {
             logger.info("Listeners: " + eventListeners.size() + " eventBus: "
                     + this.toString());
+            logger.info("EventBus ({}) event fired", this.hashCode());
             eventListeners.forEach((listener, o) -> {
-                logger.info("Event fired");
                 listener.eventFired(event);
             });
         }
@@ -45,13 +45,15 @@ public class EventBusImpl implements EventBus, Serializable {
 
     public void registerEventBusListener(EventBusListener listener) {
         synchronized (eventListeners) {
-            logger.info("EventBus: " + this.toString());
+            logger.info("EventBus ({}) listenerer registered", this.hashCode());
             eventListeners.put(listener, null);
         }
     }
 
     public void unregisterEventBusListener(EventBusListener listener) {
         synchronized (eventListeners) {
+            logger.info("EventBus ({}) listenerer un-registered",
+                    this.hashCode());
             eventListeners.remove(listener);
         }
     }

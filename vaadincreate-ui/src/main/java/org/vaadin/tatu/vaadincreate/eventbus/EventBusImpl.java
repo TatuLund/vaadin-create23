@@ -34,9 +34,8 @@ public class EventBusImpl implements EventBus, Serializable {
 
     public void post(Object event) {
         synchronized (eventListeners) {
-            logger.info("Listeners: " + eventListeners.size() + " eventBus: "
-                    + this.toString());
-            logger.info("EventBus ({}) event fired", this.hashCode());
+            logger.info("EventBus ({}) event fired for {} recipients.",
+                    this.hashCode(), eventListeners.size());
             eventListeners.forEach((listener, o) -> {
                 listener.eventFired(event);
             });

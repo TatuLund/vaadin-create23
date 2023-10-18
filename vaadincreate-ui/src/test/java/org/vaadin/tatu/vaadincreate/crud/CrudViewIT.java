@@ -1,7 +1,5 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
-import static org.junit.Assert.assertFalse;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;

@@ -42,14 +42,15 @@ public class AboutView extends VerticalLayout implements View {
                 + " This application is using Vaadin "
                 + Version.getFullVersion(), ContentMode.HTML), "info");
 
-        var textField = new TextArea();
-        textField.setMaxLength(250);
-        textField.setWidth("450px");
-        textField.setIcon(VaadinIcons.FILE_TEXT_O);
-        textField.setCaption("HTML");
-        textField.setPlaceholder("max 250 chars");
-        CharacterCountExtension.extend(textField);
-        textField.setVisible(false);
+        var textArea = new TextArea();
+        textArea.setId("admins-text-area");
+        textArea.setMaxLength(250);
+        textArea.setWidth("450px");
+        textArea.setIcon(VaadinIcons.FILE_TEXT_O);
+        textArea.setCaption("HTML");
+        textArea.setPlaceholder("max 250 chars");
+        CharacterCountExtension.extend(textArea);
+        textArea.setVisible(false);
 
         var adminsContent = new HorizontalLayout();
         adminsContent.addStyleName(VaadinCreateTheme.ABOUTVIEW_ADMINSCONTENT);
@@ -58,24 +59,26 @@ public class AboutView extends VerticalLayout implements View {
 
         adminsNote.setContentMode(ContentMode.HTML);
         adminsNote.addStyleName(VaadinCreateTheme.WHITESPACE_PRE);
-        adminsContent.addComponents(adminsNote, textField);
+        adminsNote.setId("admins-note");
+        adminsContent.addComponents(adminsNote, textArea);
         if (VaadinCreateUI.get().getAccessControl().isUserInRole(Role.ADMIN)) {
             editButton = new Button();
+            editButton.setId("admin-edit");
             editButton.setIcon(VaadinIcons.EDIT);
             editButton.addStyleNames(ValoTheme.BUTTON_BORDERLESS,
                     ValoTheme.BUTTON_SMALL);
             editButton.addClickListener(e -> {
-                textField.setVisible(true);
+                textArea.setVisible(true);
                 adminsNote.setVisible(false);
                 editButton.setVisible(false);
-                textField.setValue(adminsNote.getValue());
+                textArea.setValue(adminsNote.getValue());
             });
             adminsContent.addComponent(editButton);
             adminsContent.setComponentAlignment(editButton,
                     Alignment.TOP_RIGHT);
         }
 
-        textField.addValueChangeListener(e -> {
+        textArea.addValueChangeListener(e -> {
             if (e.isUserOriginated()) {
                 var settings = new OutputSettings();
                 settings.prettyPrint(false);
@@ -86,10 +89,10 @@ public class AboutView extends VerticalLayout implements View {
                 adminsNote.setValue(mes.getMessage());
             }
         });
-        textField.setValueChangeMode(ValueChangeMode.BLUR);
-        textField.addBlurListener(e -> {
+        textArea.setValueChangeMode(ValueChangeMode.BLUR);
+        textArea.addBlurListener(e -> {
             adminsNote.setVisible(true);
-            textField.setVisible(false);
+            textArea.setVisible(false);
             editButton.setVisible(true);
         });
         setSizeFull();

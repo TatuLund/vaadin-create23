@@ -8,6 +8,7 @@ import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.AppDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
@@ -31,6 +32,7 @@ public class AboutView extends VerticalLayout implements View {
     public static final String VIEW_NAME = "about";
     private Button editButton;
     private Label adminsNote;
+    private EventBus eventBus = EventBus.get();
 
     public AboutView() {
         var aboutContent = new CustomLayout("aboutview");
@@ -87,6 +89,7 @@ public class AboutView extends VerticalLayout implements View {
                 Message mes = AppDataService.get().updateMessage(text);
                 adminsNote.setCaption(mes.getDateStamp().toString());
                 adminsNote.setValue(mes.getMessage());
+                eventBus.post(mes);
             }
         });
         textArea.setValueChangeMode(ValueChangeMode.BLUR);

@@ -7,7 +7,10 @@ import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.BasicAccessControl;
 import org.vaadin.tatu.vaadincreate.auth.LoginView;
 import org.vaadin.tatu.vaadincreate.auth.LoginView.LoginListener;
+import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.stats.StatsView;
 
 import com.vaadin.annotations.PreserveOnRefresh;
@@ -18,6 +21,8 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 
 @Theme("vaadincreate")
@@ -25,9 +30,11 @@ import com.vaadin.ui.UI;
 @SuppressWarnings("serial")
 @Push
 @PreserveOnRefresh
-public class VaadinCreateUI extends UI {
+public class VaadinCreateUI extends UI implements EventBusListener {
 
     private AccessControl accessControl = new BasicAccessControl();
+
+    private EventBus eventBus = EventBus.get();
 
     @Override
     protected void init(VaadinRequest request) {
@@ -43,6 +50,7 @@ public class VaadinCreateUI extends UI {
         } else {
             showAppLayout();
         }
+        eventBus.registerEventBusListener(this);
     }
 
     protected void showAppLayout() {
@@ -76,4 +84,20 @@ public class VaadinCreateUI extends UI {
     public static class Servlet extends VaadinServlet {
     }
 
+    @Override
+    public void eventFired(Object event) {
+        Message message = (Message) event;
+
+        access(() -> {
+            var note = new Notification(message.getDateStamp().toString(),
+                    message.getMessage(), Type.TRAY_NOTIFICATION, true);
+            note.show(getPage());
+        });
+    }
+
+    @Override
+    public void detach() {
+        super.detach();
+        eventBus.unregisterEventBusListener(this);
+    }
 }

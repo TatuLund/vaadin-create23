@@ -3,6 +3,8 @@ package org.vaadin.tatu.vaadincreate;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.AppDataService;
@@ -90,6 +92,7 @@ public class AboutView extends VerticalLayout implements View {
                 adminsNote.setCaption(mes.getDateStamp().toString());
                 adminsNote.setValue(mes.getMessage());
                 eventBus.post(mes);
+                logger.info("Admin message updated");
             }
         });
         textArea.setValueChangeMode(ValueChangeMode.BLUR);
@@ -113,4 +116,5 @@ public class AboutView extends VerticalLayout implements View {
         adminsNote.setValue(message.getMessage());
     }
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

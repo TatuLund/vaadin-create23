@@ -79,11 +79,6 @@ public class VaadinCreateUI extends UI implements EventBusListener {
         return accessControl;
     }
 
-    @WebServlet(value = "/*", asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = VaadinCreateUI.class)
-    public static class Servlet extends VaadinServlet {
-    }
-
     @Override
     public void eventFired(Object event) {
         if (event instanceof Message) {
@@ -102,4 +97,10 @@ public class VaadinCreateUI extends UI implements EventBusListener {
         super.detach();
         eventBus.unregisterEventBusListener(this);
     }
+
+    @WebServlet(value = "/*", asyncSupported = true)
+    @VaadinServletConfiguration(productionMode = false, ui = VaadinCreateUI.class)
+    public static class Servlet extends VaadinServlet {
+    }
+
 }

@@ -48,7 +48,6 @@ public class BooksView extends CssLayout implements View {
     private Button newProduct;
 
     private ListDataProvider<Product> dataProvider;
-    private UI ui;
     private VerticalLayout fakeGrid;
     private String params;
 
@@ -134,7 +133,6 @@ public class BooksView extends CssLayout implements View {
 
     @Override
     public void enter(ViewChangeEvent event) {
-        ui = UI.getCurrent();
         params = event.getParameters();
         presenter.requestUpdateProducts();
         form.setCategories(ProductDataService.get().getAllCategories());
@@ -150,7 +148,7 @@ public class BooksView extends CssLayout implements View {
      */
     public void setProductsAsync(Collection<Product> products) {
         try {
-            ui.access(() -> {
+            getUI().access(() -> {
                 dataProvider = new ListDataProvider<>(products);
                 grid.setDataProvider(dataProvider);
                 grid.setVisible(true);

@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.stats;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,6 @@ public class StatsView extends VerticalLayout implements View {
         var conf = availabilityChart.getConfiguration();
         conf.setTitle("Availabilities");
         conf.setLang(lang);
-        conf.getxAxis().setCategories("Coming", "Available", "Discontinued");
         availabilityChartWrapper.addComponent(availabilityChart);
 
         categoryChart = new Chart(ChartType.BAR);
@@ -91,6 +91,11 @@ public class StatsView extends VerticalLayout implements View {
                 var availabilitySeries = availabilitySeries(availabilityStats);
                 var conf = availabilityChart.getConfiguration();
                 conf.setSeries(availabilitySeries);
+                var categories = (String[]) availabilitySeries.getData()
+                        .stream().map(item -> item.getName())
+                        .toArray(String[]::new);
+                var axis = conf.getxAxis();
+                axis.setCategories(categories);
 
                 var categorySeries = categorySeries(categoryStats);
                 var cConf = categoryChart.getConfiguration();

@@ -31,7 +31,7 @@
 			<!-- Vaadin pre-release repositories -->
 			<id>vaadin-prerelease</id>
 			<activation>
-				<activeByDefault>false</activeByDefault>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 
 			<repositories>

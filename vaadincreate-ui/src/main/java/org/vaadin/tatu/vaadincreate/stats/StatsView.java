@@ -17,6 +17,7 @@ import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.Lang;
+import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Alignment;
@@ -131,10 +132,23 @@ public class StatsView extends VerticalLayout implements View {
         var series = new DataSeries();
         availabilities.forEach((availability, count) -> {
             var item = new DataSeriesItem(availability.name(), count);
+            item.setColor(toColor(availability));
             series.setName("Availabilities");
             series.add(item);
         });
         return series;
+    }
+
+    private static SolidColor toColor(Availability availability) {
+        var color = "#0000ff";
+        if (availability == Availability.COMING) {
+            color = "#ffc66e";
+        } else if (availability == Availability.AVAILABLE) {
+            color = "#2dd085";
+        } else {
+            color = "#f54993";
+        }
+        return new SolidColor(color);
     }
 
     private DataSeries priceSeries(Map<String, Long> prices) {

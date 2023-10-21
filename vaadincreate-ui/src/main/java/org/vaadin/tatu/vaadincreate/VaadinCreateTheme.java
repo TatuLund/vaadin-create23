@@ -32,7 +32,7 @@ public class VaadinCreateTheme {
     public static final String DASHBOARD_CHART_WIDE = "dashboard-chart-wide";
     public static final String DASHBOARD_CHART = "dashboard-chart";
 
-    public static final String COLOR_AVAILABLE = "rgb(0,100,100)";
+    public static final String COLOR_AVAILABLE = "var(--color-available)";
     public static final String COLOR_COMING = "var(--color-coming)";
     public static final String COLOR_DISCONTINUED = "var(--color-discontinued)";
 

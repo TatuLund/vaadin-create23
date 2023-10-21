@@ -91,13 +91,13 @@ public class BookGrid extends Grid<Product> {
         var color = "";
         switch (availability) {
         case AVAILABLE:
-            color = "#2dd085";
+            color = VaadinCreateTheme.COLOR_AVAILABLE;
             break;
         case COMING:
-            color = "#ffc66e";
+            color = VaadinCreateTheme.COLOR_COMING;
             break;
         case DISCONTINUED:
-            color = "#f54993";
+            color = VaadinCreateTheme.COLOR_DISCONTINUED;
             break;
         default:
             break;

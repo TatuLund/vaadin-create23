@@ -142,11 +142,11 @@ public class StatsView extends VerticalLayout implements View {
     private static SolidColor toColor(Availability availability) {
         var color = "#0000ff";
         if (availability == Availability.COMING) {
-            color = "#ffc66e";
+            color = VaadinCreateTheme.COLOR_COMING;
         } else if (availability == Availability.AVAILABLE) {
-            color = "#2dd085";
+            color = VaadinCreateTheme.COLOR_AVAILABLE;
         } else {
-            color = "#f54993";
+            color = VaadinCreateTheme.COLOR_DISCONTINUED;
         }
         return new SolidColor(color);
     }

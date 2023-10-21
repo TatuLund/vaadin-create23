@@ -31,8 +31,8 @@
 
 $v-luminance-threshold: 180 !default;
 
-$editor-background-color: #3b3f42 !default;
-$valo-menu-background-color: $editor-background-color !default;
+$editor-background-color: #fafafa !default;
+$valo-menu-background-color: rgb(59, 63, 66) !default;
 
 $v-focus-color: rgb(96, 160, 234) !default;
 $v-error-indicator-color: #eb2977 !default;
@@ -53,6 +53,14 @@ $editor-embed-background-color: darken($editor-background-color, 5%) !default;
 $editor-raised-background-color: lighten($editor-background-color, 10%) !default;
 $editor-caption-font-color: valo-font-color($editor-background-color, 0.5) !default;
 
+$color-available: var(--color-available) !default;
+$color-coming: var(--color-coming) !default;
+$color-discontinued: var(--color-discontinued) !default;
+
+$light-shadow: 0 2px 3px rgba(0, 0, 0, 0.05) !default;
+$chart-shadow: $light-shadow !default;
+$admin-content-shadow: $light-shadow !default;
+
 $v-layout-margin-top: round($v-unit-size / 1.5) !default;
 $v-layout-margin-right: $v-layout-margin-top !default;
 $v-layout-margin-bottom: $v-layout-margin-top !default;
@@ -67,6 +75,9 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
 @mixin vaadincreate {
   @include valo;
 
+  --color-available: #2dd085;
+  --color-coming: #ffc66e;
+  --color-discontinued: #f54993;
 
   // login screen - for small screens, see below
   .loginview {
@@ -136,25 +147,11 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
     height: 100%;
     overflow: auto;
     padding: $v-layout-spacing-vertical $v-layout-spacing-horizontal;
-    background-color: #fafafa;
-//    background-color: $editor-background-color;
-//    color: valo-font-color($editor-background-color, 0.8);
+    background-color: $editor-background-color;
 
     // Set the context color for the style mixins
     $temp: $v-app-background-color;
     $v-app-background-color: $editor-background-color;
-
-//    .v-textfield {
-//      @include valo-textfield-style($background-color: $editor-embed-background-color);
-//    }
-//
-//    .v-checkbox {
-//      @include valo-checkbox-style($background-color: $editor-raised-background-color);
-//    }
-//
-//    .v-filterselect {
-//      @include valo-combobox-style($background-color: $editor-raised-background-color, $bevel: $v-bevel, $gradient: $v-gradient);
-//    }
 
     // Restore variable
     $v-app-background-color: $temp;
@@ -188,37 +185,37 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
 
   .v-filterselect-item-bookform-availability-available {
     span.v-icon {
-      color: #2dd085;
+      color: $color-available;
     }
   }
 
   .v-filterselect-item-bookform-availability-coming {
     span.v-icon {
-      color: #ffc66e;
+      color: $color-coming;
     }
   }
 
   .v-filterselect-item-bookform-availability-discontinued {
     span.v-icon {
-      color: #f54993;
+      color: $color-discontinued;
     }
   }
 
   .bookform-availability-available {
     span.v-icon {
-      color: #2dd085;
+      color: $color-available;
     }
   }
 
   .bookform-availability-coming {
     span.v-icon {
-      color: #ffc66e;
+      color: $color-coming;
     }
   }
 
   .bookform-availability-discontinued {
     span.v-icon {
-      color: #f54993;
+      color: $color-discontinued;
     }
   }
 
@@ -238,7 +235,7 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
 
   .aboutview-adminscontent {
 	padding: 10px;
-	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
+	box-shadow: $admin-content-shadow;
     background: white;
   }
 
@@ -395,7 +392,7 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
   }
 
   .bookview-grid-edited {
-  	color: #60a0ea;;
+  	color: $v-focus-color;
   }
 
   .whitespace-pre {
@@ -426,13 +423,13 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
 	  .dashboard-chart {
 		  margin: 10px;
 		  width: 430px;
-          box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
+          box-shadow: $chart-shadow;
 	  }
 
 	  .dashboard-chart-wide {
 		  margin: 10px;
 		  width: 880px;
-          box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
+          box-shadow: $chart-shadow;
 	  }
   }
   

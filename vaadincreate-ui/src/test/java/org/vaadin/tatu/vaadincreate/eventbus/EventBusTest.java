@@ -35,15 +35,23 @@ public class EventBusTest {
     public void eventFiredAndRemoval() {
         var listener1 = new TestListener();
         var listener2 = new TestListener();
+        var listener3 = new TestListener();
         var event = "Hello";
         eventBus.post(event);
-        Assert.assertTrue(out.toString().contains("event fired for 2 recipients."));
+        Assert.assertTrue(out.toString().contains("event fired for 3 recipients."));
         Assert.assertEquals(1, listener1.getEventCount());
         Assert.assertEquals("Hello", listener1.getLastEvent());
         Assert.assertEquals(1, listener2.getEventCount());
         Assert.assertEquals("Hello", listener2.getLastEvent());
 
         listener1.remove();
+        listener3 = null;
+        
+        System.gc();
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+        }
 
         event = "World";
         eventBus.post(event);
@@ -51,6 +59,7 @@ public class EventBusTest {
         Assert.assertEquals("Hello", listener1.getLastEvent());
         Assert.assertEquals(2, listener2.getEventCount());
         Assert.assertEquals("World", listener2.getLastEvent());
+        Assert.assertTrue(out.toString().contains("event fired for 1 recipients."));
 
         listener2.remove();
     }

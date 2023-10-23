@@ -6,7 +6,6 @@ import org.jsoup.safety.Safelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
-import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.AppDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;

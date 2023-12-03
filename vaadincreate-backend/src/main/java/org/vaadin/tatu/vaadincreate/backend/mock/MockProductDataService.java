@@ -101,7 +101,7 @@ public class MockProductDataService extends ProductDataService {
     }
 
     private void randomWait(int count) {
-        int wait = random.nextInt(50, 200);
+        int wait = 50 + random.nextInt(150);
         try {
             Thread.sleep(wait * count);
         } catch (InterruptedException e) {

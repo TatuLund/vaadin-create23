@@ -28,7 +28,7 @@ public class MockUserService implements UserService {
 
     public MockUserService() {
         users = MockDataGenerator.createUsers();
-        nextUserId = users.get(users.size()-1).getId() + 1;
+        nextUserId = users.get(users.size() - 1).getId() + 1;
         logger.info("Generated mock user data");
     }
 
@@ -124,11 +124,12 @@ public class MockUserService implements UserService {
     }
 
     private void randomWait(int count) {
-        int wait = random.nextInt(20, 50);
+        int wait = 20 + random.nextInt(30);
         try {
             Thread.sleep(wait * count);
         } catch (InterruptedException e) {
         }
     }
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

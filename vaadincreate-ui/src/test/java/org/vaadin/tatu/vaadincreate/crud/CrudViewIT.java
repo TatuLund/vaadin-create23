@@ -20,6 +20,9 @@ import com.vaadin.ui.themes.ValoTheme;
 
 public class CrudViewIT extends AbstractViewTest {
 
+    private final static String PRICE_EN = "10.00 €";
+    private final static String PRICE_FI = "10,00 €";
+
     @Override
     public void setup() throws Exception {
         super.setup();
@@ -35,9 +38,22 @@ public class CrudViewIT extends AbstractViewTest {
                 .contains(ValoTheme.LABEL_SPINNER));
     }
 
+    private String getLocale() {
+        return (String) executeScript(
+                "return window.navigator.userLanguage || window.navigator.language");
+    }
+
     @Test
     public void saveFindAndDeleteBook() {
         waitForElementPresent(By.id("book-grid"));
+
+        String locale = getLocale();
+        String price = "";
+        if (locale.contains("en")) {
+            price = PRICE_EN;
+        } else {
+            price = PRICE_FI;
+        }
 
         // Part I: Create and save a new book
         $(ButtonElement.class).id("new-product").click();
@@ -46,7 +62,8 @@ public class CrudViewIT extends AbstractViewTest {
                 form.$(ButtonElement.class).id("save-button").isEnabled());
 
         form.$(TextFieldElement.class).id("product-name").setValue("Test book");
-        form.$(TextFieldElement.class).id("price").setValue("10.00 €");
+
+        form.$(TextFieldElement.class).id("price").setValue(price);
         form.$(TextFieldElement.class).id("stock-count").setValue("10");
         form.$(ComboBoxElement.class).id("availability")
                 .getPopupSuggestionElements().get(1).click();
@@ -81,7 +98,7 @@ public class CrudViewIT extends AbstractViewTest {
 
         Assert.assertEquals("Test book",
                 form.$(TextFieldElement.class).id("product-name").getValue());
-        Assert.assertEquals("10.00 €",
+        Assert.assertEquals(price,
                 form.$(TextFieldElement.class).id("price").getValue());
         Assert.assertEquals("10",
                 form.$(TextFieldElement.class).id("stock-count").getValue());

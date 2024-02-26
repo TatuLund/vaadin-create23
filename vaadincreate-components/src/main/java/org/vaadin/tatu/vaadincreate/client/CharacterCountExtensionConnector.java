@@ -59,6 +59,8 @@ public class CharacterCountExtensionConnector extends AbstractExtensionConnector
             countElement.getStyle().setDisplay(Style.Display.NONE);
         } else {
             countElement.getStyle().clearDisplay();
+            wrapper.getStyle().setProperty("width", textField.getElement()
+                    .getStyle().getProperty("width"));
         }
     }
 
@@ -79,8 +81,10 @@ public class CharacterCountExtensionConnector extends AbstractExtensionConnector
             textField.getElement().removeFromParent();
             wrapper.appendChild(textField.getElement());
             wrapper.appendChild(countElement);
-            countElement.getStyle().setProperty("background",
-                    textField.getElement().getStyle().getProperty("background"));
+            wrapper.getStyle().setProperty("width", textField.getElement()
+                    .getStyle().getProperty("width"));
+            countElement.getStyle().setProperty("background", textField
+                    .getElement().getStyle().getProperty("background"));
             updateCountElementVisibility();
         } else {
             var parentElement = wrapper.getParentElement();

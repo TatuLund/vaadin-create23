@@ -16,6 +16,6 @@ public class AdminView extends VerticalLayout implements View {
     private AdminPresenter presenter = new AdminPresenter(this);
 
     public AdminView() {
-        addComponent(new Label("TODO"));
+        addComponents(new Label("TODO"));
     }
 }

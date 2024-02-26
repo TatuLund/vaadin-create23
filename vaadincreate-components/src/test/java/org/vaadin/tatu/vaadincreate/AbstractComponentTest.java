@@ -37,7 +37,7 @@ import com.vaadin.testbench.elements.TextFieldElement;
  * "https://vaadin.com/docs/v10/testbench/testbench-overview.html">Vaadin
  * TestBench</a>.
  */
-public abstract class AbstractViewTest extends TestBenchTestCase {
+public abstract class AbstractComponentTest extends TestBenchTestCase {
     private static final int SERVER_PORT = 8080;
 
     private final String urlFragment;
@@ -51,11 +51,11 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
         WebDriverManager.chromedriver().setup();
     }
 
-    public AbstractViewTest() {
+    public AbstractComponentTest() {
         this("");
     }
 
-    protected AbstractViewTest(String route) {
+    protected AbstractComponentTest(String route) {
         this.urlFragment = route;
     }
 
@@ -67,14 +67,6 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
         String url = getTestURL(parameters);
         getDriver().get(url);
         waitForAppLoaded();
-    }
-
-    public void login(String user, String pass) {
-        var loginForm = $(FormLayoutElement.class).first();
-        loginForm.$(TextFieldElement.class).first().setValue(user);
-        loginForm.$(PasswordFieldElement.class).first().setValue(pass);
-        blur();
-        loginForm.$(ButtonElement.class).first().click();
     }
 
     public void blur() {
@@ -137,7 +129,7 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
     }
 
     public void waitForAppLoaded() {
-        this.waitForElementPresent(By.id("AppWidgetset"));
+        this.waitForElementPresent(By.id("org.vaadin.tatu.vaadincreate.WidgetSet"));
     }
 
     /**

@@ -444,14 +444,16 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
   }
 
   // Fix horizontal Grod scoll with Firefox
-  .v-grid-scroller-horizontal {
-    visibility: visible !important;
-    height: 30px !important;
-  }
+  .v-ff { 
+    .v-grid-scroller-horizontal {
+      visibility: visible !important;
+      height: 30px !important;
+    }
 
-  .v-grid-scroller-vertical {
-    visibility: visible !important;
-    width: 30px !important;
+    .v-grid-scroller-vertical {
+      visibility: visible !important;
+      width: 30px !important;
+    }
   }
 
   .v-spacing {

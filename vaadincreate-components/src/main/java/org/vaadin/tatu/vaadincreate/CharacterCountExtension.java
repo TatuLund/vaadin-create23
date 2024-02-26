@@ -7,6 +7,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
+@SuppressWarnings("serial")
 public class CharacterCountExtension extends AbstractExtension {
 
     /**
@@ -16,8 +17,7 @@ public class CharacterCountExtension extends AbstractExtension {
      *            TextField or TextArea
      */
     public static void extend(Component field) {
-        if (field instanceof TextField || field instanceof TextArea
-                || field instanceof ComboBox) {
+        if (field instanceof TextField || field instanceof TextArea) {
             new CharacterCountExtension()
                     .extend((AbstractClientConnector) field);
         } else {

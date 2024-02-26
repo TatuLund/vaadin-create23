@@ -35,17 +35,29 @@ The demo app covers various use cases you may encounter in real life application
   - Attribute extensions (used in form's number input), JavaScript
   - Java 11 code used in widgets
   - ConfirmDialog, server side composition component
-  
+  - Test suite for the components and standalone test UI for them
+    
 Notes
 
 - Backend module has mock data service only with simulated latency
 - Dependency injection framework such as CDI or Spring is not being used, the demo has neutral stance on purpose
 
-## Building and running demo
+## Building and running the application
 
 git clone <url of the repository>
 mvn clean install
-cd ui
+    (or use "mvn clean install -Pit" to run also the TestBench tests)
+cd vaadincreate-ui
+mvn jetty:run
+
+To see the demo, navigate to http://localhost:8080/
+
+## Building and running the component tests
+
+git clone <url of the repository>
+mvn clean install
+    (or use "mvn clean install -Pit" to run also the TestBench tests)
+cd vaadincreate-components
 mvn jetty:run
 
 To see the demo, navigate to http://localhost:8080/

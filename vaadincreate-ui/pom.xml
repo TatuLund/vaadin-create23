@@ -75,11 +75,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
-			<artifactId>appsec-kit-v8</artifactId>
-			<version>1.0.5</version>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-charts</artifactId>
 			<version>4.3.3</version>
 			<exclusions>
@@ -92,7 +87,7 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
+			<version>4.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- Bean validation implementation -->
@@ -166,36 +161,6 @@
 				</executions>
 			</plugin>
 
-			<plugin>
-				<groupId>org.cyclonedx</groupId>
-				<artifactId>cyclonedx-maven-plugin</artifactId>
-				<version>2.7.7</version>
-				<executions>
-					<execution>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>makeAggregateBom</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<projectType>library</projectType>
-					<schemaVersion>1.4</schemaVersion>
-					<includeBomSerialNumber>true</includeBomSerialNumber>
-					<includeCompileScope>true</includeCompileScope>
-					<includeProvidedScope>true</includeProvidedScope>
-					<includeRuntimeScope>true</includeRuntimeScope>
-					<includeSystemScope>true</includeSystemScope>
-					<includeTestScope>false</includeTestScope>
-					<includeLicenseText>false</includeLicenseText>
-					<outputReactorProjects>true</outputReactorProjects>
-					<outputFormat>json</outputFormat>
-					<outputName>bom</outputName>
-					<outputDirectory>${project.build.outputDirectory}/resources</outputDirectory>
-					<verbose>false</verbose>
-				</configuration>
-			</plugin>
-
 			<!-- The Jetty plugin allows us to easily test the development build
 			by -->
 			<!-- running jetty:run on the command line. -->
@@ -213,6 +178,49 @@
 	</build>
 
 	<profiles>
+		<profile>
+			<id>appsec</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.vaadin</groupId>
+					<artifactId>appsec-kit-v8</artifactId>
+					<version>1.0.5</version>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.cyclonedx</groupId>
+						<artifactId>cyclonedx-maven-plugin</artifactId>
+						<version>2.7.7</version>
+						<executions>
+							<execution>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>makeAggregateBom</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<projectType>library</projectType>
+							<schemaVersion>1.4</schemaVersion>
+							<includeBomSerialNumber>true</includeBomSerialNumber>
+							<includeCompileScope>true</includeCompileScope>
+							<includeProvidedScope>true</includeProvidedScope>
+							<includeRuntimeScope>true</includeRuntimeScope>
+							<includeSystemScope>true</includeSystemScope>
+							<includeTestScope>false</includeTestScope>
+							<includeLicenseText>false</includeLicenseText>
+							<outputReactorProjects>true</outputReactorProjects>
+							<outputFormat>json</outputFormat>
+							<outputName>bom</outputName>
+							<outputDirectory>${project.build.outputDirectory}/resources</outputDirectory>
+							<verbose>false</verbose>
+						</configuration>
+					</plugin>					
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<!-- Vaadin pre-release repositories -->
 			<id>vaadin-prerelease</id>

@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate;
 
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.annotation.WebInitParam;
 
 import org.vaadin.tatu.vaadincreate.admin.AdminView;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
@@ -98,7 +99,10 @@ public class VaadinCreateUI extends UI implements EventBusListener {
         eventBus.unregisterEventBusListener(this);
     }
 
-    @WebServlet(value = "/*", asyncSupported = true)
+    // Set maxIdleTime because of Jetty 10, see:
+    // https://github.com/vaadin/flow/issues/17215
+    @WebServlet(value = "/*", asyncSupported = true, initParams = {
+            @WebInitParam(name = "org.atmosphere.websocket.maxIdleTime", value = "300000") })
     @VaadinServletConfiguration(productionMode = false, ui = VaadinCreateUI.class)
     public static class Servlet extends VaadinServlet {
     }

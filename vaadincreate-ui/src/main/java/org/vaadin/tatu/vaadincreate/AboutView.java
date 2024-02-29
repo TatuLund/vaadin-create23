@@ -1,8 +1,5 @@
 package org.vaadin.tatu.vaadincreate;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document.OutputSettings;
-import org.jsoup.safety.Safelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
@@ -10,6 +7,7 @@ import org.vaadin.tatu.vaadincreate.backend.AppDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
@@ -83,10 +81,8 @@ public class AboutView extends VerticalLayout implements View {
 
         textArea.addValueChangeListener(e -> {
             if (e.isUserOriginated()) {
-                var settings = new OutputSettings();
-                settings.prettyPrint(false);
-                var text = Jsoup.clean(e.getValue(), "", Safelist.relaxed(),
-                        settings);
+                var unsanitized = e.getValue();
+                var text = Utils.sanitize(unsanitized);
                 Message mes = AppDataService.get().updateMessage(text);
                 adminsNote.setCaption(mes.getDateStamp().toString());
                 adminsNote.setValue(mes.getMessage());

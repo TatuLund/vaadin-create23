@@ -77,12 +77,6 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-charts</artifactId>
 			<version>4.3.3</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-databind</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>

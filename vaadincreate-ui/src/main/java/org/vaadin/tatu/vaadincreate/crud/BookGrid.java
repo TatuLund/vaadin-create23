@@ -6,13 +6,18 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
+import com.vaadin.data.ValueContext;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.Registration;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.renderers.HtmlRenderer;
 import com.vaadin.ui.renderers.NumberRenderer;
 
@@ -88,6 +93,14 @@ public class BookGrid extends Grid<Product> {
         var availability = product.getAvailability();
         var text = availability.toString();
 
+        var iconCode = createAvailabilityIcon(availability);
+
+        return iconCode + "<span class=\""
+                + VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL + "\"> " + text
+                + "</span>";
+    }
+
+    private static String createAvailabilityIcon(Availability availability) {
         var color = "";
         switch (availability) {
         case AVAILABLE:
@@ -108,10 +121,7 @@ public class BookGrid extends Grid<Product> {
                 + "\">&#x"
                 + Integer.toHexString(VaadinIcons.CIRCLE.getCodepoint())
                 + ";</span>";
-
-        return iconCode + "<span class=\""
-                + VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL + "\"> " + text
-                + "</span>";
+        return iconCode;
     }
 
     private String formatCategories(Product product) {
@@ -133,7 +143,7 @@ public class BookGrid extends Grid<Product> {
         resizeReg = getUI().getPage().addBrowserWindowResizeListener(e -> {
             adjustColumns(e.getWidth());
         });
-        
+
         // Ensure that we use the same format as the Converter
         decimalFormat = (DecimalFormat) NumberFormat
                 .getNumberInstance(getUI().getLocale());
@@ -142,10 +152,13 @@ public class BookGrid extends Grid<Product> {
     }
 
     private void adjustColumns(int width) {
+        setDescriptionGenerator(null);
         getColumns().forEach(c -> c.setHidden(true));
         if (width < 650) {
             getColumn("name").setHidden(false).setWidth(300);
             getColumn("price").setHidden(false);
+            setDescriptionGenerator(book -> createTooltip(book),
+                    ContentMode.HTML);
         } else if (width < 920) {
             getColumn("name").setHidden(false).setWidthUndefined();
             getColumn("price").setHidden(false);
@@ -159,6 +172,29 @@ public class BookGrid extends Grid<Product> {
             getColumns().forEach(c -> c.setHidden(false));
         }
         recalculateColumnWidths();
+    }
+
+    private String createTooltip(Product book) {
+        var converter = new EuroConverter();
+        StringBuilder unsanitized = new StringBuilder();
+        unsanitized.append(
+                "<div><span class='bookview-grid-descriptioncaption'>Product name:</span> <b>")
+                .append(book.getProductName())
+                .append("</b><br><span class='bookview-grid-descriptioncaption'>Price:</span> ")
+                .append(converter.convertToPresentation(book.getPrice(),
+                        createValueContext()))
+                .append("<br><span class='bookview-grid-descriptioncaption'>Availability:</span> ")
+                .append(createAvailabilityIcon(book.getAvailability()))
+                .append("<br><span class='bookview-grid-descriptioncaption'>Stock count:</span> ")
+                .append(book.getStockCount())
+                .append("<br><span class='bookview-grid-descriptioncaption'>Category:</span> ")
+                .append(formatCategories(book)).append("</div>");
+        return Utils.sanitize(unsanitized.toString());
+    }
+
+    private static ValueContext createValueContext() {
+        var field = new TextField();
+        return new ValueContext(field, field);
     }
 
     @Override

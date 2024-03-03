@@ -11,9 +11,11 @@ import com.vaadin.ui.TextField;
 
 public class EuroConverterTest {
 
+    private static final String MESSAGE = "Cannot convert value to a number";
+
     @Test
     public void convertToModelUS() {
-        var converter = new EuroConverter();
+        var converter = new EuroConverter(MESSAGE);
         var field = new TextField();
         var context = new ValueContext(null, field, Locale.US);
         var string = "10.1 €";
@@ -29,7 +31,7 @@ public class EuroConverterTest {
 
     @Test
     public void convertToModelFI() {
-        var converter = new EuroConverter();
+        var converter = new EuroConverter(MESSAGE);
         var field = new TextField();
         var context = new ValueContext(null, field, new Locale("fi"));
         var string = "10,1 €";
@@ -45,7 +47,7 @@ public class EuroConverterTest {
 
     @Test
     public void convertToModelFails() {
-        var converter = new EuroConverter();
+        var converter = new EuroConverter(MESSAGE);
         var field = new TextField();
         var context = new ValueContext(null, field, Locale.US);
         var string = "NUMBER";
@@ -54,13 +56,13 @@ public class EuroConverterTest {
             Assert.fail("Converting '" + string + "' should fail.");
         });
         result.ifError(message -> {
-            Assert.assertEquals("Cannot convert value to a number", message);
+            Assert.assertEquals(MESSAGE, message);
         });
     }
 
     @Test
     public void convertToPresentationUS() {
-        var converter = new EuroConverter();
+        var converter = new EuroConverter(MESSAGE);
         var field = new TextField();
         var context = new ValueContext(null, field, Locale.US);
         var number = new BigDecimal("10.1");
@@ -71,7 +73,7 @@ public class EuroConverterTest {
 
     @Test
     public void convertToPresentationFI() {
-        var converter = new EuroConverter();
+        var converter = new EuroConverter(MESSAGE);
         var field = new TextField();
         var context = new ValueContext(null, field, new Locale("fi"));
         var number = new BigDecimal("10.1");

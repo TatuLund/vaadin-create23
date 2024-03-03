@@ -10,8 +10,10 @@ import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
+import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 
 import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.Binder;
@@ -19,6 +21,10 @@ import com.vaadin.data.Result;
 import com.vaadin.data.converter.StringToIntegerConverter;
 import com.vaadin.data.ValueContext;
 import com.vaadin.server.Page;
+import com.vaadin.server.UserError;
+import com.vaadin.shared.ui.ErrorLevel;
+import com.vaadin.server.AbstractErrorMessage.ContentMode;
+import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
 import com.vaadin.ui.CssLayout;
@@ -28,27 +34,43 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings("serial")
-public class BookForm extends CssLayout {
+public class BookForm extends CssLayout implements HasI18N {
 
-    protected TextField productName = new TextField("Product name");
-    protected TextField price = new TextField("Price");
-    protected TextField stockCount = new TextField("In stock");
+    // Localization constants
+    private static final String AVAILABILITY_MISMATCH = "availability-mismatch";
+    private static final String DISCARD_CHANGES = "discard-changes";
+    private static final String SAVE = "save";
+    private static final String CANCEL = "cancel";
+    private static final String CANNOT_CONVERT = "cannot-convert";
+    private static final String CATEGORIES = "categories";
+    private static final String DISCARD = "discard";
+    private static final String AVAILABILITY = "availability";
+    private static final String IN_STOCK = "in-stock";
+    private static final String PRICE = "price";
+    private static final String PRODUCT_NAME = "product-name";
+    private static final String DELETE = "delete";
+    private static final String WILL_DELETE = "will-delete";
+
+    protected TextField productName = new TextField(
+            getTranslation(PRODUCT_NAME));
+    protected TextField price = new TextField(getTranslation(PRICE));
+    protected TextField stockCount = new TextField(getTranslation(IN_STOCK));
     protected AvailabilitySelector availability = new AvailabilitySelector(
-            "Availability");
+            getTranslation(AVAILABILITY));
     protected CheckBoxGroup<Category> category = new CheckBoxGroup<>(
-            "Categories");
-    protected Button save = new Button("Save");
-    protected Button discard = new Button("Discard changes");
-    protected Button cancel = new Button("Cancel");
-    protected Button delete = new Button("Delete");
+            getTranslation(CATEGORIES));
+    protected Button save = new Button(getTranslation(SAVE));
+    protected Button discard = new Button(getTranslation(DISCARD));
+    protected Button cancel = new Button(getTranslation(CANCEL));
+    protected Button delete = new Button(getTranslation(DELETE));
 
     private Binder<Product> binder;
     private Product currentProduct;
 
     private static class StockPriceConverter extends StringToIntegerConverter {
 
-        public StockPriceConverter() {
-            super("Could not convert value to " + Integer.class.getName());
+        public StockPriceConverter(String message) {
+            super(message);
         }
 
         @Override
@@ -79,12 +101,22 @@ public class BookForm extends CssLayout {
         setId("book-form");
 
         binder = new BeanValidationBinder<>(Product.class);
-        binder.forField(price).withConverter(new EuroConverter()).bind("price");
-        binder.forField(stockCount).withConverter(new StockPriceConverter())
+        binder.forField(price)
+                .withConverter(
+                        new EuroConverter(getTranslation(CANNOT_CONVERT)))
+                .bind("price");
+        binder.forField(stockCount)
+                .withConverter(
+                        new StockPriceConverter(getTranslation(CANNOT_CONVERT)))
                 .bind("stockCount");
 
         category.setItemCaptionGenerator(Category::getName);
         binder.forField(category).bind("category");
+
+        // Add bean level validation for Availability vs. Stock count cross
+        // checking.
+        binder.withValidator(this::checkAvailabilityVsStockCount, "Error");
+
         binder.bindInstanceFields(this);
 
         // enable/disable save button while editing
@@ -99,6 +131,8 @@ public class BookForm extends CssLayout {
             if (currentProduct != null
                     && binder.writeBeanIfValid(currentProduct)) {
                 presenter.saveProduct(currentProduct);
+            } else if (binderHasInvalidFieldsBound()) {
+                flagStockCountAndAvailabilityInvalid();
             }
         });
 
@@ -112,16 +146,37 @@ public class BookForm extends CssLayout {
 
         delete.addClickListener(event -> {
             if (currentProduct != null) {
-                var dialog = new ConfirmDialog(
-                        "Book '" + currentProduct.getProductName()
-                                + "' will be deleted. Are you sure?",
-                        Type.ALERT);
+                var dialog = new ConfirmDialog(getTranslation(WILL_DELETE,
+                        currentProduct.getProductName()), Type.ALERT);
                 getUI().addWindow(dialog);
                 dialog.addConfirmedListener(e -> {
                     presenter.deleteProduct(currentProduct);
                 });
             }
         });
+    }
+
+    private boolean binderHasInvalidFieldsBound() {
+        return binder.getFields().filter(field -> ((AbstractComponent) field)
+                .getComponentError() != null).count() == 0;
+    }
+
+    private boolean checkAvailabilityVsStockCount(Product product) {
+        return (product.getAvailability() == Availability.AVAILABLE
+                && product.getStockCount() > 0)
+                || (product.getAvailability() == Availability.DISCONTINUED
+                        && product.getStockCount() == 0)
+                || (product.getAvailability() == Availability.COMING
+                        && product.getStockCount() == 0);
+    }
+
+    private void flagStockCountAndAvailabilityInvalid() {
+        stockCount.setComponentError(
+                new UserError(getTranslation(AVAILABILITY_MISMATCH),
+                        ContentMode.TEXT, ErrorLevel.ERROR));
+        availability.setComponentError(
+                new UserError(getTranslation(AVAILABILITY_MISMATCH),
+                        ContentMode.TEXT, ErrorLevel.ERROR));
     }
 
     public void showForm(boolean visible) {

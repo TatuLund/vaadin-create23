@@ -16,8 +16,8 @@ import com.vaadin.data.ValueContext;
 @SuppressWarnings("serial")
 public class EuroConverter extends StringToBigDecimalConverter {
 
-    public EuroConverter() {
-        super("Cannot convert value to a number");
+    public EuroConverter(String message) {
+        super(message);
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate.crud;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 
 import java.util.Collection;
 
@@ -37,9 +38,20 @@ import com.vaadin.ui.themes.ValoTheme;
  */
 @SuppressWarnings("serial")
 @RolesPermitted({ Role.USER, Role.ADMIN })
-public class BooksView extends CssLayout implements View {
+public class BooksView extends CssLayout implements View, HasI18N {
 
     public static final String VIEW_NAME = "books";
+
+    private static final String UPDATED = "updated";
+    private static final String CREATED = "created";
+    private static final String REMOVED = "removed";
+    private static final String CONFIRM = "confirm";
+    private static final String DELETE = "delete";
+    private static final String NEW_PRODUCT = "new-product";
+    private static final String FILTER = "filter";
+    private static final String NOT_VALID_PID = "not-valid-pid";
+    private static final String UNSAVED_CHANGES = "unsaved-changes";
+
     private BookGrid grid;
     private BookForm form;
     private TextField filter;
@@ -59,8 +71,7 @@ public class BooksView extends CssLayout implements View {
         grid = new BookGrid();
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (form.hasChanges()) {
-                var dialog = new ConfirmDialog(
-                        "There are unsaved changes. Are you sure to change the book?",
+                var dialog = new ConfirmDialog(getTranslation(UNSAVED_CHANGES),
                         ConfirmDialog.Type.ALERT);
                 getUI().addWindow(dialog);
                 dialog.addConfirmedListener(e -> {
@@ -108,14 +119,16 @@ public class BooksView extends CssLayout implements View {
         filter = new TextField();
         filter.setId("filter-field");
         filter.setStyleName(VaadinCreateTheme.BOOKVIEW_FILTER);
-        filter.setPlaceholder("Filter name, availability or category");
+        filter.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
+        filter.setPlaceholder(getTranslation(FILTER));
+        filter.setIcon(VaadinIcons.SEARCH);
         ResetButtonForTextField.extend(filter);
         // Apply the filter to grid's data provider. TextField value is never
         // null
         filter.addValueChangeListener(event -> dataProvider
                 .setFilter(book -> passesFilter(book, event.getValue())));
 
-        newProduct = new Button("New product");
+        newProduct = new Button(getTranslation(NEW_PRODUCT));
         newProduct.setId("new-product");
         newProduct.addStyleName(ValoTheme.BUTTON_PRIMARY);
         newProduct.setIcon(VaadinIcons.PLUS_CIRCLE);
@@ -123,8 +136,7 @@ public class BooksView extends CssLayout implements View {
 
         var topLayout = new HorizontalLayout();
         topLayout.setWidth("100%");
-        topLayout.addComponent(filter);
-        topLayout.addComponent(newProduct);
+        topLayout.addComponents(filter, newProduct);
         topLayout.setComponentAlignment(filter, Alignment.MIDDLE_LEFT);
         topLayout.setExpandRatio(filter, 1);
         topLayout.setStyleName(VaadinCreateTheme.BOOKVIEW_TOOLBAR);
@@ -165,8 +177,14 @@ public class BooksView extends CssLayout implements View {
         Notification.show(msg, Type.ERROR_MESSAGE);
     }
 
-    public void showSaveNotification(String msg) {
-        Notification.show(msg, Type.TRAY_NOTIFICATION);
+    public void showSaveNotification(String book) {
+        Notification.show(getTranslation(UPDATED, book),
+                Type.TRAY_NOTIFICATION);
+    }
+
+    public void showDeleteNotification(String book) {
+        Notification.show(getTranslation(REMOVED, book),
+                Type.TRAY_NOTIFICATION);
     }
 
     public void setNewProductEnabled(boolean enabled) {

@@ -115,15 +115,13 @@ public class BooksPresenter implements Serializable {
     }
 
     public void saveProduct(Product product) {
-        view.showSaveNotification(product.getProductName() + " ("
-                + product.getId() + ") updated");
+        view.showSaveNotification(product.getProductName());
         view.clearSelection();
         boolean newBook = product.getId() == -1;
-        logger.info("Saving product: {}",
-                newBook ? "new" : product.getId());
+        logger.info("Saving product: {}", newBook ? "new" : product.getId());
         var p = ProductDataService.get().updateProduct(product);
         if (newBook) {
-            view.updateGrid(p);            
+            view.updateGrid(p);
         } else {
             view.updateProduct(p);
         }
@@ -131,8 +129,7 @@ public class BooksPresenter implements Serializable {
     }
 
     public void deleteProduct(Product product) {
-        view.showSaveNotification(product.getProductName() + " ("
-                + product.getId() + ") removed");
+        view.showDeleteNotification(product.getProductName());
         view.clearSelection();
         logger.info("Deleting product: {}", product.getId());
         ProductDataService.get().deleteProduct(product.getId());

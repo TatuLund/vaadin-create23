@@ -19,10 +19,36 @@ import com.vaadin.util.ReflectTools;
 @SuppressWarnings("serial")
 public class ConfirmDialog extends Window {
 
+    /**
+     * Type of the ConfirmDialog
+     */
     public enum Type {
-        SUCCESS, ALERT, BLANK;
+        // @formatter:off
+        /**
+         * Success colored dialog
+         */
+        SUCCESS, 
+        /**
+         * Alert, warning style dialog
+         */
+        ALERT, 
+        /**
+         * Default style dialog
+         */
+        BLANK;
+        // @formatter:on
     }
 
+    /**
+     * Constructs a ConfirmDialog with given text and Type for style:
+     * 
+     * @see Type
+     * 
+     * @param text
+     *            Text shown in Dialog body
+     * @param type
+     *            Type of the Dialog
+     */
     public ConfirmDialog(String text, Type type) {
         setId("confirm-dialog");
         setModal(true);
@@ -62,11 +88,23 @@ public class ConfirmDialog extends Window {
         setContent(content);
     }
 
+    /**
+     * Add event listener for confirmed event. Event is fired when user clicks
+     * confirm button.
+     * 
+     * @param listener
+     *            The listener, can be Lambda expression.
+     * @return Registration Use Registration#remove() for listener removal.
+     */
     public Registration addConfirmedListener(ConfirmedListener listener) {
         return addListener(ConfirmedEvent.class, listener,
                 ConfirmedListener.MEDIA_PAUSED_METHOD);
     }
 
+    /**
+     * Confirm listener interface, can be implemented with Lambda or anonymous
+     * inner class.
+     */
     public interface ConfirmedListener extends ConnectorEventListener {
         Method MEDIA_PAUSED_METHOD = ReflectTools.findMethod(
                 ConfirmedListener.class, "confirmed", ConfirmedEvent.class);
@@ -74,6 +112,10 @@ public class ConfirmDialog extends Window {
         public void confirmed(ConfirmedEvent event);
     }
 
+    /**
+     * ConfirmEvent is fired when user clicks confirm button of the
+     * ConfirmDialog.
+     */
     public static class ConfirmedEvent extends Component.Event {
 
         public ConfirmedEvent(Component source) {

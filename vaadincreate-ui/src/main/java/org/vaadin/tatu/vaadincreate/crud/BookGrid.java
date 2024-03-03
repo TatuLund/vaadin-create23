@@ -9,6 +9,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.ValueContext;
@@ -27,7 +28,14 @@ import com.vaadin.ui.renderers.NumberRenderer;
  * data sets.
  */
 @SuppressWarnings("serial")
-public class BookGrid extends Grid<Product> {
+public class BookGrid extends Grid<Product> implements HasI18N {
+
+    private static final String CATEGORIES = "categories";
+    private static final String IN_STOCK = "in-stock";
+    private static final String AVAILABILITY = "availability";
+    private static final String PRICE = "price";
+    private static final String PRODUCT_NAME = "product-name";
+    private static final String CANNOT_CONVERT = "cannot-convert";
 
     private Registration resizeReg;
     private Label availabilityCaption;
@@ -46,11 +54,11 @@ public class BookGrid extends Grid<Product> {
 
         addColumn(Product::getId, new NumberRenderer()).setCaption("Id");
         addColumn(Product::getProductName).setId("name")
-                .setCaption("Product Name");
+                .setCaption(getTranslation(PRODUCT_NAME));
 
         // Format and add " €" to price
         addColumn(product -> decimalFormat.format(product.getPrice()) + " €")
-                .setCaption("Price").setComparator((p1, p2) -> {
+                .setCaption(getTranslation(PRICE)).setComparator((p1, p2) -> {
                     return p1.getPrice().compareTo(p2.getPrice());
                 }).setStyleGenerator(product -> "align-right").setId("price");
 
@@ -60,7 +68,7 @@ public class BookGrid extends Grid<Product> {
                     return p1.getAvailability().toString()
                             .compareTo(p2.getAvailability().toString());
                 }).setId("availability");
-        availabilityCaption = new Label("Availability");
+        availabilityCaption = new Label(getTranslation(AVAILABILITY));
         availabilityCaption
                 .addStyleName(VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL);
 
@@ -70,14 +78,14 @@ public class BookGrid extends Grid<Product> {
                 return "-";
             }
             return Integer.toString(product.getStockCount());
-        }).setCaption("Stock Count").setComparator((p1, p2) -> {
+        }).setCaption(getTranslation(IN_STOCK)).setComparator((p1, p2) -> {
             return Integer.compare(p1.getStockCount(), p2.getStockCount());
         }).setStyleGenerator(
                 product -> VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT)
                 .setId("stock");
 
         // Show all categories the product is in, separated by commas
-        addColumn(this::formatCategories).setCaption("Category")
+        addColumn(this::formatCategories).setCaption(getTranslation(CATEGORIES))
                 .setSortable(false);
     }
 
@@ -175,19 +183,24 @@ public class BookGrid extends Grid<Product> {
     }
 
     private String createTooltip(Product book) {
-        var converter = new EuroConverter();
+        var converter = new EuroConverter(getTranslation(CANNOT_CONVERT));
         StringBuilder unsanitized = new StringBuilder();
-        unsanitized.append(
-                "<div><span class='bookview-grid-descriptioncaption'>Product name:</span> <b>")
+        unsanitized
+                .append("<div><span class='bookview-grid-descriptioncaption'>")
+                .append(getTranslation(PRODUCT_NAME)).append(":</span> <b>")
                 .append(book.getProductName())
-                .append("</b><br><span class='bookview-grid-descriptioncaption'>Price:</span> ")
+                .append("</b><br><span class='bookview-grid-descriptioncaption'>")
+                .append(getTranslation(PRICE)).append("</span> ")
                 .append(converter.convertToPresentation(book.getPrice(),
                         createValueContext()))
-                .append("<br><span class='bookview-grid-descriptioncaption'>Availability:</span> ")
+                .append("<br><span class='bookview-grid-descriptioncaption'>")
+                .append(getTranslation(AVAILABILITY)).append(":</span> ")
                 .append(createAvailabilityIcon(book.getAvailability()))
-                .append("<br><span class='bookview-grid-descriptioncaption'>Stock count:</span> ")
+                .append("<br><span class='bookview-grid-descriptioncaption'>")
+                .append(getTranslation(IN_STOCK)).append(":</span> ")
                 .append(book.getStockCount())
-                .append("<br><span class='bookview-grid-descriptioncaption'>Category:</span> ")
+                .append("<br><span class='bookview-grid-descriptioncaption'>")
+                .append(getTranslation(CATEGORIES)).append(":</span> ")
                 .append(formatCategories(book)).append("</div>");
         return Utils.sanitize(unsanitized.toString());
     }

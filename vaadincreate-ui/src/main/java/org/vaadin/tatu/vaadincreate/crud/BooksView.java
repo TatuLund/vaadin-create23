@@ -40,7 +40,7 @@ import com.vaadin.ui.themes.ValoTheme;
 @RolesPermitted({ Role.USER, Role.ADMIN })
 public class BooksView extends CssLayout implements View, HasI18N {
 
-    public static final String VIEW_NAME = "books";
+    public static final String VIEW_NAME = "inventory";
 
     private static final String UPDATED = "updated";
     private static final String CREATED = "created";

@@ -6,6 +6,7 @@ import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
@@ -30,7 +31,12 @@ import com.vaadin.ui.themes.ValoTheme;
  * This is a responsive application shell with Navigator build wiht ValoMenu
  */
 @SuppressWarnings("serial")
-public class AppLayout extends HorizontalLayout {
+public class AppLayout extends HorizontalLayout implements HasI18N {
+
+    private static final String LOGOUT = "logout";
+    private static final String MENU = "menu";
+    private static final String BOOKSTORE = "bookstore";
+    private static final String SHOW_TABS = "show-tabs";
 
     private final VerticalLayout content = new VerticalLayout();
     private final CssLayout menu = new CssLayout();
@@ -71,13 +77,14 @@ public class AppLayout extends HorizontalLayout {
 
         menu.addComponent(title);
 
-        var toggleButton = new Button("Menu", event -> {
+        var toggleButton = new Button(getTranslation(MENU), vent -> {
             if (menu.getStyleName().contains(ValoTheme.MENU_VISIBLE)) {
                 menu.removeStyleName(ValoTheme.MENU_VISIBLE);
             } else {
                 menu.addStyleName(ValoTheme.MENU_VISIBLE);
             }
         });
+        toggleButton.setDescription(getTranslation(MENU));
 
         toggleButton.setIcon(VaadinIcons.LIST);
         toggleButton.addStyleName(ValoTheme.MENU_TOGGLE);
@@ -89,13 +96,13 @@ public class AppLayout extends HorizontalLayout {
         menuItems.addStyleName(ValoTheme.MENU_ITEMS);
 
         var logout = new MenuBar();
-        var item = logout.addItem("Logout", e -> {
+        var item = logout.addItem(getTranslation(LOGOUT), e -> {
             logger.info("User '{}' logout", CurrentUser.get().get().getName());
             ui.getSession().getSession().invalidate();
             ui.getPage().reload();
         });
         item.setIcon(VaadinIcons.KEY);
-        item.setDescription("Logout");
+        item.setDescription(getTranslation(LOGOUT));
         logout.addStyleName(ValoTheme.MENU_USER);
         menu.addComponent(logout);
 

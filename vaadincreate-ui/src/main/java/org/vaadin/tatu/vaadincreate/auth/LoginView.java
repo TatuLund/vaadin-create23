@@ -1,15 +1,23 @@
 package org.vaadin.tatu.vaadincreate.auth;
 
 import java.io.Serializable;
+import java.util.Locale;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.i18n.I18NProvider;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.Page;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.FormLayout;
@@ -24,7 +32,17 @@ import com.vaadin.ui.themes.ValoTheme;
  * UI content when the user is not logged in yet.
  */
 @SuppressWarnings("serial")
-public class LoginView extends CssLayout {
+public class LoginView extends CssLayout implements HasI18N {
+
+    private static final String LOGIN_INFO = "login-info";
+    private static final String LOGIN_INFO_TEXT = "login-info-text";
+    private static final String LOGIN_BUTTON = "login-button";
+    private static final String LOGIN = "login";
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
+    private static final String FORGOT_PASSWORD = "forgot-password";
+    private static final String HINT = "hint";
+    private static final String LANGUAGE = "language";
 
     private TextField username;
     private PasswordField password;
@@ -35,16 +53,19 @@ public class LoginView extends CssLayout {
     private Registration resizeReg;
     private CssLayout loginInformation;
     private VerticalLayout centeringLayout;
+    private ComboBox<Locale> lang;
+    private Label loginInfoText;
 
     public LoginView(AccessControl accessControl, LoginListener loginListener) {
         this.loginListener = loginListener;
         this.accessControl = accessControl;
-        buildUI();
-        username.focus();
     }
 
     private void buildUI() {
         addStyleName(VaadinCreateTheme.LOGINVIEW);
+
+        // information text about logging in
+        loginInformation = buildLoginInformation();
 
         // login form, centered in the available part of the screen
         var loginForm = buildLoginForm();
@@ -60,9 +81,6 @@ public class LoginView extends CssLayout {
         centeringLayout.setComponentAlignment(loginForm,
                 Alignment.MIDDLE_CENTER);
 
-        // information text about logging in
-        loginInformation = buildLoginInformation();
-
         addComponent(centeringLayout);
     }
 
@@ -72,6 +90,20 @@ public class LoginView extends CssLayout {
         resizeReg = getUI().getPage().addBrowserWindowResizeListener(e -> {
             showLoginInformation(e.getWidth());
         });
+        // ((VaadinCreateUI) getUI())
+        // .addLocaleChangeListener(e -> updateTranslations());
+        buildUI();
+        username.focus();
+    }
+
+    private void updateTranslations() {
+        username.setCaption(getTranslation(USERNAME));
+        password.setCaption(getTranslation(PASSWORD));
+        login.setCaption(getTranslation(LOGIN_BUTTON));
+        forgotPassword.setCaption(getTranslation(FORGOT_PASSWORD));
+        loginInfoText.setValue("<h1>" + getTranslation(LOGIN_INFO) + "</h1>"
+                + getTranslation(LOGIN_INFO_TEXT));
+        lang.setCaption(getTranslation(LANGUAGE));
     }
 
     @Override
@@ -95,16 +127,18 @@ public class LoginView extends CssLayout {
         loginForm.setSizeUndefined();
         loginForm.setMargin(false);
 
-        loginForm.addComponent(username = new TextField("Username", "Admin"));
+        loginForm.addComponent(
+                username = new TextField(getTranslation(USERNAME), "Admin"));
         username.setWidth(15, Unit.EM);
-        loginForm.addComponent(password = new PasswordField("Password"));
+        loginForm.addComponent(
+                password = new PasswordField(getTranslation(PASSWORD)));
         password.setWidth(15, Unit.EM);
-        password.setDescription("Write anything");
+        password.setDescription(getTranslation(HINT));
         CssLayout buttons = new CssLayout();
         buttons.setStyleName("buttons");
         loginForm.addComponent(buttons);
 
-        buttons.addComponent(login = new Button("Login"));
+        buttons.addComponent(login = new Button(getTranslation(LOGIN_BUTTON)));
         login.setDisableOnClick(true);
         login.addClickListener(event -> {
             try {
@@ -116,21 +150,38 @@ public class LoginView extends CssLayout {
         login.setClickShortcut(ShortcutAction.KeyCode.ENTER);
         login.addStyleName(ValoTheme.BUTTON_FRIENDLY);
 
-        buttons.addComponent(forgotPassword = new Button("Forgot password?"));
+        buttons.addComponent(
+                forgotPassword = new Button(getTranslation(FORGOT_PASSWORD)));
         forgotPassword.addClickListener(event -> {
-            showNotification(new Notification(
-                    "Hint: Try User0 / user0 or Admin / admin"));
+            showNotification(new Notification(getTranslation(HINT)));
         });
         forgotPassword.addStyleName(ValoTheme.BUTTON_LINK);
+
+        lang = new ComboBox<>(getTranslation(LANGUAGE));
+        lang.setWidth(15, Unit.EM);
+        lang.setItems(I18NProvider.getInstance().getLocales());
+        lang.setItemCaptionGenerator(item -> item.toString());
+        lang.setEmptySelectionAllowed(false);
+        lang.setTextInputAllowed(false);
+        loginForm.addComponent(lang);
+        lang.addValueChangeListener(e -> {
+            var ui = getUI();
+            ui.getSession().setAttribute("locale", e.getValue().getLanguage());
+            ui.getSession().setLocale(e.getValue());
+            updateTranslations();
+            logger.info("Changing locale to {}", e.getValue().getLanguage());
+        });
+        var locale = VaadinRequest.getCurrent().getLocale();
+        lang.setValue(locale);
+
         return loginForm;
     }
 
     private CssLayout buildLoginInformation() {
         var loginInformation = new CssLayout();
         loginInformation.setStyleName(VaadinCreateTheme.LOGINVIEW_INFORMATION);
-        var loginInfoText = new Label("<h1>Login Information</h1>"
-                + "Log in as &quot;Admin&quot; to have full access. Log in with any other &quot;UserX&quot; to have read-only access. For all users, any &quot;userX&quot; is fine",
-                ContentMode.HTML);
+        loginInfoText = new Label("<h1>" + getTranslation(LOGIN_INFO) + "</h1>"
+                + getTranslation(LOGIN_INFO_TEXT), ContentMode.HTML);
         loginInfoText.setSizeFull();
         loginInformation.addComponent(loginInfoText);
         return loginInformation;
@@ -158,4 +209,5 @@ public class LoginView extends CssLayout {
         void loginSuccessful();
     }
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

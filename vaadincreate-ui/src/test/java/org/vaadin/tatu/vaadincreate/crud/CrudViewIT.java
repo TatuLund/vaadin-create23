@@ -27,7 +27,7 @@ public class CrudViewIT extends AbstractViewTest {
     public void setup() throws Exception {
         super.setup();
         login("Admin", "admin");
-        open("#!books");
+        open("#!" + BooksView.VIEW_NAME);
     }
 
     @Test

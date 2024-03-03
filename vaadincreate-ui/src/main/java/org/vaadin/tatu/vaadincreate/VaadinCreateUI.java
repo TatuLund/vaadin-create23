@@ -1,6 +1,9 @@
 package org.vaadin.tatu.vaadincreate;
 
 import javax.servlet.annotation.WebServlet;
+
+import java.util.EventObject;
+
 import javax.servlet.annotation.WebInitParam;
 
 import org.vaadin.tatu.vaadincreate.admin.AdminView;
@@ -12,6 +15,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.stats.StatsView;
 
 import com.vaadin.annotations.PreserveOnRefresh;
@@ -27,11 +31,10 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 
 @Theme("vaadincreate")
-@Title("VaadinCreate UI")
 @SuppressWarnings("serial")
 @Push
 @PreserveOnRefresh
-public class VaadinCreateUI extends UI implements EventBusListener {
+public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     private AccessControl accessControl = new BasicAccessControl();
 
@@ -39,7 +42,6 @@ public class VaadinCreateUI extends UI implements EventBusListener {
 
     @Override
     protected void init(VaadinRequest request) {
-        setLocale(request.getLocale());
         getPage().setTitle("Vaadin Create 23'");
         if (!accessControl.isUserSignedIn()) {
             setContent(new LoginView(accessControl, new LoginListener() {
@@ -60,14 +62,14 @@ public class VaadinCreateUI extends UI implements EventBusListener {
 
         // Use String constants for view names, allows easy refactoring if so
         // needed
-        appLayout.addView(AboutView.class, "About", VaadinIcons.INFO,
-                AboutView.VIEW_NAME);
-        appLayout.addView(BooksView.class, "Books", VaadinIcons.TABLE,
-                BooksView.VIEW_NAME);
-        appLayout.addView(StatsView.class, "Stats", VaadinIcons.CHART,
-                StatsView.VIEW_NAME);
-        appLayout.addView(AdminView.class, "Admin", VaadinIcons.USERS,
-                AdminView.VIEW_NAME);
+        appLayout.addView(AboutView.class, getTranslation(AboutView.VIEW_NAME),
+                VaadinIcons.INFO, AboutView.VIEW_NAME);
+        appLayout.addView(BooksView.class, getTranslation(BooksView.VIEW_NAME),
+                VaadinIcons.TABLE, BooksView.VIEW_NAME);
+        appLayout.addView(StatsView.class, getTranslation(StatsView.VIEW_NAME),
+                VaadinIcons.CHART, StatsView.VIEW_NAME);
+        appLayout.addView(AdminView.class, getTranslation(AdminView.VIEW_NAME),
+                VaadinIcons.USERS, AdminView.VIEW_NAME);
 
         getNavigator().navigateTo(AboutView.VIEW_NAME);
     }

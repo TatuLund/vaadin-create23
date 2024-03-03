@@ -70,7 +70,7 @@ public class ConfirmDialog extends Window {
         var cancelButton = new Button("Cancel", e -> close());
         cancelButton.setId("cancel-button");
         var confirmButton = new Button("Confirm", e -> {
-            this.fireEvent(new ConfirmedEvent(this));
+            fireEvent(new ConfirmedEvent(this));
             close();
         });
         confirmButton.setId("confirm-button");

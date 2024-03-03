@@ -14,7 +14,7 @@ public class AboutViewIT extends AbstractViewTest {
     public void setup() throws Exception {
         super.setup();
         login("Admin", "admin");
-        open("#!about");
+        open("#!" + AboutView.VIEW_NAME);
     }
 
     @Test

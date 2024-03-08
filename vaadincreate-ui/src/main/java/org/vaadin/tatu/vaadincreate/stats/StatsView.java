@@ -11,12 +11,14 @@ import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.Lang;
+import com.vaadin.addon.charts.model.Legend;
 import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -28,9 +30,14 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings("serial")
 @RolesPermitted({ Role.USER, Role.ADMIN })
-public class StatsView extends VerticalLayout implements View {
+public class StatsView extends VerticalLayout implements View, HasI18N {
 
     public static final String VIEW_NAME = "stats";
+
+    private static final String NO_DATA = "no-data";
+    private static final String CATEGORIES = "categories";
+    private static final String AVAILABILITIES = "availabilities";
+    private static final String PRICES = "prices";
 
     private StatsPresenter presenter = new StatsPresenter(this);
 
@@ -54,9 +61,9 @@ public class StatsView extends VerticalLayout implements View {
         Lang lang = new Lang();
         // Set loading label to Chart no data as loading of data is done
         // asynchronously
-        lang.setNoData("Loading ...");
+        lang.setNoData(getTranslation(NO_DATA));
         var conf = availabilityChart.getConfiguration();
-        conf.setTitle("Availabilities");
+        conf.setTitle(getTranslation(AVAILABILITIES));
         conf.setLang(lang);
         availabilityChartWrapper.addComponent(availabilityChart);
 
@@ -65,7 +72,7 @@ public class StatsView extends VerticalLayout implements View {
         categoryChartWrapper
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_WIDE);
         var cConf = categoryChart.getConfiguration();
-        cConf.setTitle("Categories");
+        cConf.setTitle(getTranslation(CATEGORIES));
         cConf.setLang(lang);
         categoryChartWrapper.addComponent(categoryChart);
 
@@ -73,7 +80,7 @@ public class StatsView extends VerticalLayout implements View {
         priceChart = new Chart(ChartType.PIE);
         priceChartWrapper.addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
         var pConf = priceChart.getConfiguration();
-        pConf.setTitle("Prices");
+        pConf.setTitle(getTranslation(PRICES));
         pConf.setLang(lang);
         priceChartWrapper.addComponent(priceChart);
 
@@ -92,6 +99,7 @@ public class StatsView extends VerticalLayout implements View {
                 var availabilitySeries = availabilitySeries(availabilityStats);
                 var conf = availabilityChart.getConfiguration();
                 conf.setSeries(availabilitySeries);
+                conf.getLegend().setEnabled(false);
                 var categories = (String[]) availabilitySeries.getData()
                         .stream().map(item -> item.getName())
                         .toArray(String[]::new);
@@ -101,6 +109,7 @@ public class StatsView extends VerticalLayout implements View {
                 var categorySeries = categorySeries(categoryStats);
                 var cConf = categoryChart.getConfiguration();
                 cConf.setSeries(categorySeries);
+                cConf.getLegend().setEnabled(false);
                 categoryStats.keySet()
                         .forEach(cat -> cConf.getxAxis().addCategory(cat));
 
@@ -121,7 +130,7 @@ public class StatsView extends VerticalLayout implements View {
         var series = new DataSeries();
         categories.forEach((category, count) -> {
             var item = new DataSeriesItem(category, count);
-            series.setName("Categories");
+            series.setName(getTranslation(CATEGORIES));
             series.add(item);
         });
         return series;
@@ -133,7 +142,7 @@ public class StatsView extends VerticalLayout implements View {
         availabilities.forEach((availability, count) -> {
             var item = new DataSeriesItem(availability.name(), count);
             item.setColor(toColor(availability));
-            series.setName("Availabilities");
+            series.setName(getTranslation(AVAILABILITIES));
             series.add(item);
         });
         return series;
@@ -155,7 +164,7 @@ public class StatsView extends VerticalLayout implements View {
         var series = new DataSeries();
         prices.forEach((pricebracket, count) -> {
             var item = new DataSeriesItem(pricebracket, count);
-            series.setName("Prices");
+            series.setName(getTranslation(PRICES));
             series.add(item);
         });
         return series;

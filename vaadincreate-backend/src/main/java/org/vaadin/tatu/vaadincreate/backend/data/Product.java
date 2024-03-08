@@ -15,15 +15,15 @@ public class Product implements Serializable {
     @NotNull
     @Min(0)
     private int id = -1;
-    @NotNull
-    @Size(min = 2, max = 100, message = "Product name must have at least two characters, but max 100")
+    @NotNull(message = "{product.name.required}")
+    @Size(min = 2, max = 100, message = "{product.name.min2max200}")
     private String productName = "";
-    @Min(0)
+    @Min(value = 0, message = "{price.not.negative}")
     private BigDecimal price = BigDecimal.ZERO;
     private Set<Category> category;
-    @Min(value = 0, message = "Can't have negative amount in stock")
+    @Min(value = 0, message = "{stock.not.negative}")
     private int stockCount = 0;
-    @NotNull
+    @NotNull(message = "{availability.required}")
     private Availability availability = Availability.COMING;
 
     public Product() {

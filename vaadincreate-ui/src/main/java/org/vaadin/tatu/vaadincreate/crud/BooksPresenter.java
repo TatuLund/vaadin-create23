@@ -2,7 +2,7 @@ package org.vaadin.tatu.vaadincreate.crud;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -67,30 +67,13 @@ public class BooksPresenter implements Serializable {
     public void init() {
         editProduct(null);
         // Hide and disable if not admin
-        if (!VaadinCreateUI.get().getAccessControl().isUserInRole(Role.ADMIN)) {
+        if (!AccessControl.get().isUserInRole(Role.ADMIN)) {
             view.setNewProductEnabled(false);
         }
     }
 
     public void cancelProduct() {
-        setFragmentParameter("");
-        view.clearSelection();
-    }
-
-    /**
-     * Update the fragment without causing navigator to change view
-     */
-    private void setFragmentParameter(String productId) {
-        String fragmentParameter;
-        if (productId == null || productId.isEmpty()) {
-            fragmentParameter = "";
-        } else {
-            fragmentParameter = productId;
-        }
-
-        var page = VaadinCreateUI.get().getPage();
-        page.setUriFragment("!" + BooksView.VIEW_NAME + "/" + fragmentParameter,
-                false);
+        view.cancelProduct();
     }
 
     public void enter(String productId) {
@@ -125,7 +108,7 @@ public class BooksPresenter implements Serializable {
         } else {
             view.updateProduct(p);
         }
-        setFragmentParameter("");
+        view.setFragmentParameter("");
     }
 
     public void deleteProduct(Product product) {
@@ -134,14 +117,14 @@ public class BooksPresenter implements Serializable {
         logger.info("Deleting product: {}", product.getId());
         ProductDataService.get().deleteProduct(product.getId());
         view.removeProduct(product);
-        setFragmentParameter("");
+        view.setFragmentParameter("");
     }
 
     public void editProduct(Product product) {
         if (product == null) {
-            setFragmentParameter("");
+            view.setFragmentParameter("");
         } else {
-            setFragmentParameter(product.getId() + "");
+            view.setFragmentParameter(product.getId() + "");
         }
         logger.info("Editing product: {}",
                 product != null ? product.getId() : "none");
@@ -150,7 +133,7 @@ public class BooksPresenter implements Serializable {
 
     public void newProduct() {
         view.clearSelection();
-        setFragmentParameter("new");
+        view.setFragmentParameter("new");
         logger.info("New product");
         view.editProduct(new Product());
     }
@@ -160,7 +143,7 @@ public class BooksPresenter implements Serializable {
         // view.editProduct(null);
         // return;
         // }
-        if (VaadinCreateUI.get().getAccessControl().isUserInRole(Role.ADMIN)) {
+        if (AccessControl.get().isUserInRole(Role.ADMIN)) {
             editProduct(product);
         }
     }

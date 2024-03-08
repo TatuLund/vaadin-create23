@@ -73,7 +73,10 @@ public class ConfirmDialog extends Composite {
         }
         var content = new VerticalLayout();
         content.setSizeFull();
-        cancelButton = new Button("Cancel", e -> window.close());
+        cancelButton = new Button("Cancel", e -> {
+            fireEvent(new CancelEvent(this));
+            window.close();
+        });
         cancelButton.setId("cancel-button");
         confirmButton = new Button("Confirm", e -> {
             fireEvent(new ConfirmedEvent(this));
@@ -115,6 +118,13 @@ public class ConfirmDialog extends Composite {
     }
 
     /**
+     * Open the dialog
+     */
+    public void open() {
+        UI.getCurrent().addWindow(window);
+    }
+
+    /**
      * Add event listener for confirmed event. Event is fired when user clicks
      * confirm button.
      * 
@@ -124,7 +134,7 @@ public class ConfirmDialog extends Composite {
      */
     public Registration addConfirmedListener(ConfirmedListener listener) {
         return addListener(ConfirmedEvent.class, listener,
-                ConfirmedListener.MEDIA_PAUSED_METHOD);
+                ConfirmedListener.CONFIRMED_METHOD);
     }
 
     /**
@@ -132,7 +142,7 @@ public class ConfirmDialog extends Composite {
      * inner class.
      */
     public interface ConfirmedListener extends ConnectorEventListener {
-        Method MEDIA_PAUSED_METHOD = ReflectTools.findMethod(
+        Method CONFIRMED_METHOD = ReflectTools.findMethod(
                 ConfirmedListener.class, "confirmed", ConfirmedEvent.class);
 
         public void confirmed(ConfirmedEvent event);
@@ -150,9 +160,37 @@ public class ConfirmDialog extends Composite {
     }
 
     /**
-     * Open the dialog 
+     * Add event listener for cancelled event. Event is fired when user clicks
+     * cancel button.
+     * 
+     * @param listener
+     *            The listener, can be Lambda expression.
+     * @return Registration Use Registration#remove() for listener removal.
      */
-    public void open() {
-        UI.getCurrent().addWindow(window);
+    public Registration addCancelListener(CancelListener listener) {
+        return addListener(CancelEvent.class, listener,
+                CancelListener.CANCELLED_METHOD);
     }
+
+    /**
+     * Cancel listener interface, can be implemented with Lambda or anonymous
+     * inner class.
+     */
+    public interface CancelListener extends ConnectorEventListener {
+        Method CANCELLED_METHOD = ReflectTools.findMethod(CancelListener.class,
+                "cancelled", CancelEvent.class);
+
+        public void cancelled(CancelEvent event);
+    }
+
+    /**
+     * CancelEvent is fired when user clicks cancel button of the ConfirmDialog.
+     */
+    public static class CancelEvent extends Component.Event {
+
+        public CancelEvent(Component source) {
+            super(source);
+        }
+    }
+
 }

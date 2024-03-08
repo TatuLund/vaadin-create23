@@ -26,6 +26,7 @@ public class VaadinCreateTheme {
     public static final String BOOKFORM_WRAPPER = "bookform-wrapper";
     public static final String BOOKFORM = "bookform";
     public static final String BOOKFORM_WRAPPER_VISIBLE = "bookform-wrapper-visible";
+    public static final String BOOKFORM_FIELD_DIRTY = "bookform-field-dirty";
 
     public static final String STATSVIEW = "statsview";
     public static final String DASHBOARD = "dashboard";

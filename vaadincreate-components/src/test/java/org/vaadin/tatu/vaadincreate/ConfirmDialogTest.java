@@ -40,6 +40,21 @@ public class ConfirmDialogTest {
     }
 
     @Test
+    public void cancelEvent() {
+        var dialog = new ConfirmDialog("Are you sure?", Type.ALERT);
+
+        var content = (VerticalLayout) dialog.window.getContent();
+        var buttons = (HorizontalLayout) content.getComponent(1);
+        var cancelButton = (Button) buttons.getComponent(0);
+        var count = new AtomicInteger(0);
+        dialog.addCancelListener(e -> {
+            count.addAndGet(1);
+        });
+        cancelButton.click();
+        Assert.assertEquals(1, count.get());
+    }
+
+    @Test
     public void testButtonTexts() {
         var dialog = new ConfirmDialog("Are you sure?", Type.ALERT);
 

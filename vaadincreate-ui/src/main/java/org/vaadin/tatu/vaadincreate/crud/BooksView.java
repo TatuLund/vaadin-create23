@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.ResetButtonForTextField;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 
 import com.vaadin.data.provider.ListDataProvider;
@@ -78,7 +79,8 @@ public class BooksView extends CssLayout implements View, HasI18N {
                 dialog.setCancelText(getTranslation(CANCEL));
                 dialog.open();
                 dialog.addConfirmedListener(e -> {
-                    presenter.rowSelected(event.getValue());
+                    form.showForm(false);
+                    setFragmentParameter("");
                 });
             } else {
                 presenter.rowSelected(event.getValue());
@@ -151,6 +153,23 @@ public class BooksView extends CssLayout implements View, HasI18N {
         params = event.getParameters();
         presenter.requestUpdateProducts();
         form.setCategories(ProductDataService.get().getAllCategories());
+    }
+
+    public void cancelProduct() {
+        if (form.hasChanges()) {
+            var dialog = new ConfirmDialog(getTranslation(UNSAVED_CHANGES),
+                    ConfirmDialog.Type.ALERT);
+            dialog.setConfirmText(getTranslation(CONFIRM));
+            dialog.setCancelText(getTranslation(CANCEL));
+            dialog.open();
+            dialog.addConfirmedListener(e -> {
+                form.showForm(false);
+                clearSelection();
+                setFragmentParameter("");
+            });
+        } else {
+            clearSelection();
+        }
     }
 
     /**
@@ -241,6 +260,25 @@ public class BooksView extends CssLayout implements View, HasI18N {
         super.detach();
         // If detach happens before completion of data fetch, cancel the fetch
         presenter.cancelUpdateProducts();
+    }
+
+    /**
+     * Update the fragment without causing navigator to change view
+     * 
+     * @param productId
+     *            The parameter
+     */
+    public void setFragmentParameter(String productId) {
+        String fragmentParameter;
+        if (productId == null || productId.isEmpty()) {
+            fragmentParameter = "";
+        } else {
+            fragmentParameter = productId;
+        }
+
+        var page = VaadinCreateUI.get().getPage();
+        page.setUriFragment("!" + BooksView.VIEW_NAME + "/" + fragmentParameter,
+                false);
     }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());

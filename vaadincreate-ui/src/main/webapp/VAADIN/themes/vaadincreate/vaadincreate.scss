@@ -189,6 +189,10 @@ $fake-grid-background-color: white;
     @include box-shadow($editor-shadow);
   }
 
+  .bookform-field-dirty {
+	border: 2px dashed rgb(255, 128, 0);
+  }
+
   .v-filterselect-item-bookform-availability-available {
     span.v-icon {
       color: $color-available;

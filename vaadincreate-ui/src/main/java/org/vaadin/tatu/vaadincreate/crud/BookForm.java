@@ -27,6 +27,7 @@ import com.vaadin.server.AbstractErrorMessage.ContentMode;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
@@ -136,12 +137,13 @@ public class BookForm extends CssLayout implements HasI18N {
             }
         });
 
-        discard.addClickListener(
-                event -> presenter.editProduct(currentProduct));
+        discard.addClickListener(event -> {
+            presenter.editProduct(currentProduct);
+            updateDirtyIndicators();
+        });
 
         cancel.addClickListener(event -> {
             presenter.cancelProduct();
-            showForm(false);
         });
 
         delete.addClickListener(event -> {
@@ -183,6 +185,7 @@ public class BookForm extends CssLayout implements HasI18N {
 
     public void showForm(boolean visible) {
         if (visible) {
+            updateDirtyIndicators();
             addStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
         } else {
             removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
@@ -191,15 +194,28 @@ public class BookForm extends CssLayout implements HasI18N {
     }
 
     public boolean isShown() {
-        return this.getStyleName()
+        var isShown = getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
+        return isShown;
     }
 
     public boolean hasChanges() {
         if (!isShown()) {
             return false;
         }
-        return binder.hasChanges();
+        var hasChanges = binder.hasChanges();
+        if (hasChanges) {
+            updateDirtyIndicators();
+        }
+        return hasChanges;
+    }
+
+    public void updateDirtyIndicators() {
+        binder.getFields().forEach(field -> ((Component) field)
+                .removeStyleName(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        binder.getChangedBindings()
+                .forEach(binding -> ((Component) binding.getField())
+                        .addStyleName(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
     }
 
     private void buildForm() {

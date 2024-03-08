@@ -13,6 +13,7 @@ import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.ResetButtonForTextField;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 
 import com.vaadin.data.provider.ListDataProvider;
@@ -22,6 +23,7 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -151,6 +153,9 @@ public class BooksView extends CssLayout implements View, HasI18N {
     @Override
     public void enter(ViewChangeEvent event) {
         params = event.getParameters();
+        if (!AccessControl.get().isUserInRole(Role.ADMIN)) {
+            grid.setSelectionMode(SelectionMode.NONE);
+        }
         presenter.requestUpdateProducts();
         form.setCategories(ProductDataService.get().getAllCategories());
     }

@@ -126,6 +126,9 @@ public class BookForm extends CssLayout implements HasI18N {
             var hasChanges = binder.hasChanges();
             save.setEnabled(hasChanges && isValid);
             discard.setEnabled(hasChanges);
+            if (isValid) {
+                flagStockCountAndAvailabilityInvalid(false);
+            }
         });
 
         save.addClickListener(event -> {
@@ -133,7 +136,7 @@ public class BookForm extends CssLayout implements HasI18N {
                     && binder.writeBeanIfValid(currentProduct)) {
                 presenter.saveProduct(currentProduct);
             } else if (binderHasInvalidFieldsBound()) {
-                flagStockCountAndAvailabilityInvalid();
+                flagStockCountAndAvailabilityInvalid(true);
             }
         });
 
@@ -174,13 +177,18 @@ public class BookForm extends CssLayout implements HasI18N {
                         && product.getStockCount() == 0);
     }
 
-    private void flagStockCountAndAvailabilityInvalid() {
-        stockCount.setComponentError(
-                new UserError(getTranslation(AVAILABILITY_MISMATCH),
-                        ContentMode.TEXT, ErrorLevel.ERROR));
-        availability.setComponentError(
-                new UserError(getTranslation(AVAILABILITY_MISMATCH),
-                        ContentMode.TEXT, ErrorLevel.ERROR));
+    private void flagStockCountAndAvailabilityInvalid(boolean invalid) {
+        if (invalid) {
+            stockCount.setComponentError(
+                    new UserError(getTranslation(AVAILABILITY_MISMATCH),
+                            ContentMode.TEXT, ErrorLevel.ERROR));
+            availability.setComponentError(
+                    new UserError(getTranslation(AVAILABILITY_MISMATCH),
+                            ContentMode.TEXT, ErrorLevel.ERROR));
+        } else {
+            stockCount.setComponentError(null);
+            availability.setComponentError(null);
+        }
     }
 
     public void showForm(boolean visible) {

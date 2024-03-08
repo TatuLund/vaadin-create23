@@ -9,15 +9,17 @@ import com.vaadin.shared.Registration;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Composite;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.ReflectTools;
 
 @SuppressWarnings("serial")
-public class ConfirmDialog extends Window {
+public class ConfirmDialog extends Composite {
 
     /**
      * Type of the ConfirmDialog
@@ -39,6 +41,10 @@ public class ConfirmDialog extends Window {
         // @formatter:on
     }
 
+    private Button cancelButton;
+    private Button confirmButton;
+    Window window = new Window();
+
     /**
      * Constructs a ConfirmDialog with given text and Type for style:
      * 
@@ -50,14 +56,14 @@ public class ConfirmDialog extends Window {
      *            Type of the Dialog
      */
     public ConfirmDialog(String text, Type type) {
-        setId("confirm-dialog");
-        setModal(true);
-        setClosable(false);
-        setResizable(false);
-        setWidth("50%");
-        setHeight("50%");
-        setDraggable(false);
-        setIcon(VaadinIcons.EXCLAMATION_CIRCLE);
+        window.setId("confirm-dialog");
+        window.setModal(true);
+        window.setClosable(false);
+        window.setResizable(false);
+        window.setWidth("50%");
+        window.setHeight("50%");
+        window.setDraggable(false);
+        window.setIcon(VaadinIcons.EXCLAMATION_CIRCLE);
         var message = new Label(text);
         message.setSizeFull();
         if (type == Type.SUCCESS) {
@@ -67,11 +73,11 @@ public class ConfirmDialog extends Window {
         }
         var content = new VerticalLayout();
         content.setSizeFull();
-        var cancelButton = new Button("Cancel", e -> close());
+        cancelButton = new Button("Cancel", e -> window.close());
         cancelButton.setId("cancel-button");
-        var confirmButton = new Button("Confirm", e -> {
+        confirmButton = new Button("Confirm", e -> {
             fireEvent(new ConfirmedEvent(this));
-            close();
+            window.close();
         });
         confirmButton.setId("confirm-button");
         confirmButton.setClickShortcut(KeyCode.ENTER);
@@ -85,7 +91,27 @@ public class ConfirmDialog extends Window {
         content.setExpandRatio(message, 1);
         content.setComponentAlignment(message, Alignment.MIDDLE_CENTER);
         content.setComponentAlignment(buttons, Alignment.BOTTOM_CENTER);
-        setContent(content);
+        window.setContent(content);
+    }
+
+    /**
+     * Set the caption of the Cancel button.
+     * 
+     * @param cancelText
+     *            The caption string
+     */
+    public void setCancelText(String cancelText) {
+        cancelButton.setCaption(cancelText);
+    }
+
+    /**
+     * Set the caption of the Confirm button.
+     * 
+     * @param confirmText
+     *            The caption string
+     */
+    public void setConfirmText(String confirmText) {
+        confirmButton.setCaption(confirmText);
     }
 
     /**
@@ -121,5 +147,12 @@ public class ConfirmDialog extends Window {
         public ConfirmedEvent(Component source) {
             super(source);
         }
+    }
+
+    /**
+     * Open the dialog 
+     */
+    public void open() {
+        UI.getCurrent().addWindow(window);
     }
 }

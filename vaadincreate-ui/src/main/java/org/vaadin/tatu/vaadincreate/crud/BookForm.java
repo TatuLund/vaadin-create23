@@ -148,7 +148,9 @@ public class BookForm extends CssLayout implements HasI18N {
             if (currentProduct != null) {
                 var dialog = new ConfirmDialog(getTranslation(WILL_DELETE,
                         currentProduct.getProductName()), Type.ALERT);
-                getUI().addWindow(dialog);
+                dialog.setConfirmText(getTranslation(DELETE));
+                dialog.setCancelText(getTranslation(CANCEL));
+                dialog.open();
                 dialog.addConfirmedListener(e -> {
                     presenter.deleteProduct(currentProduct);
                 });

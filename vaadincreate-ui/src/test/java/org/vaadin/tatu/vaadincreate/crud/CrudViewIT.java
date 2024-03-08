@@ -156,8 +156,8 @@ public class CrudViewIT extends AbstractViewTest {
 
         $(GridElement.class).first().getRow(1).click();
         var dialog = $(WindowElement.class).id("confirm-dialog");
-        Assert.assertTrue(
-                dialog.$(LabelElement.class).first().getText().length() > 0);
+        Assert.assertTrue(dialog.$(LabelElement.class).first().getClassNames()
+                .contains("failure"));
         dialog.$(ButtonElement.class).id("confirm-button").click();
     }
 

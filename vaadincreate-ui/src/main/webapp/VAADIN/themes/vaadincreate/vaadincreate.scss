@@ -29,6 +29,7 @@
 // For more information, see: https://vaadin.com/book/-/page/themes.valo.html
 // Example variants can be copy/pasted from https://vaadin.com/docs/v8/framework/articles/ValoExamples.html
 
+$v-app-loading-text: "Vaadin Create '23";
 $v-luminance-threshold: 180 !default;
 
 $editor-background-color: #fafafa !default;
@@ -68,6 +69,11 @@ $v-layout-margin-left: $v-layout-margin-top !default;
 $v-layout-spacing-vertical: round($v-unit-size / 1.8) !default;
 $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
 
+$highlight-contrast-color: #b8d0ec;
+
+$fake-grid-border-color: #d4d4d4;
+$fake-grid-header-background-color: #fafafa;
+$fake-grid-background-color: white;
 
 @import "../valo/valo.scss";
 
@@ -318,6 +324,9 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
     .v-slot-logo + .v-spacing {
       display: none;
     }
+    .user-menu {
+      width: 71px;
+    }
   }
 
   // Move logout button to the bottom of the menu on large screens
@@ -396,7 +405,7 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
   }
 
   .bookview-grid-descriptioncaption {
-	  color: #b8d0ec;
+	  color: $highlight-contrast-color;
   }
 
   .whitespace-pre {
@@ -404,7 +413,7 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
   }
 
   .valo-menu-toggle {
-    color: #b8d0ec;
+    color: $highlight-contrast-color;
   }
 
   .valo-menu-item {
@@ -412,14 +421,14 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
   }
 
   .fakegrid {
-	  background: white;
-	  border: 1px solid #d4d4d4;
+	  background: $fake-grid-background-color;
+	  border: 1px solid $fake-grid-border-color;
 	  
 	  .fakegrid-header {
-		  background: #fafafa;
+		  background: $fake-grid-header-background-color;
 		  height: 33px;
 		  width: 100%;
-		  border: 1px solid #d4d4d4;
+		  border: 1px solid $fake-grid-border-color;
 	  }
   }
 

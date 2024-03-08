@@ -51,6 +51,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
     private static final String FILTER = "filter";
     private static final String NOT_VALID_PID = "not-valid-pid";
     private static final String UNSAVED_CHANGES = "unsaved-changes";
+    private static final String CANCEL = "cancel";
 
     private BookGrid grid;
     private BookForm form;
@@ -73,7 +74,9 @@ public class BooksView extends CssLayout implements View, HasI18N {
             if (form.hasChanges()) {
                 var dialog = new ConfirmDialog(getTranslation(UNSAVED_CHANGES),
                         ConfirmDialog.Type.ALERT);
-                getUI().addWindow(dialog);
+                dialog.setConfirmText(getTranslation(CONFIRM));
+                dialog.setCancelText(getTranslation(CANCEL));
+                dialog.open();
                 dialog.addConfirmedListener(e -> {
                     presenter.rowSelected(event.getValue());
                 });

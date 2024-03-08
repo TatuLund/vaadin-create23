@@ -16,10 +16,10 @@ public class ConfirmDialogTest {
     @Test
     public void dialogComposition() {
         var dialog = new ConfirmDialog("Are you sure?", Type.ALERT);
-        Assert.assertFalse(dialog.isDraggable());
-        Assert.assertTrue(dialog.isModal());
-        Assert.assertFalse(dialog.isResizable());
-        var content = (VerticalLayout) dialog.getContent();
+        Assert.assertFalse(dialog.window.isDraggable());
+        Assert.assertTrue(dialog.window.isModal());
+        Assert.assertFalse(dialog.window.isResizable());
+        var content = (VerticalLayout) dialog.window.getContent();
         var message = (Label) content.getComponent(0);
         Assert.assertEquals("Are you sure?", message.getValue());
     }
@@ -28,7 +28,7 @@ public class ConfirmDialogTest {
     public void confirmEvent() {
         var dialog = new ConfirmDialog("Are you sure?", Type.ALERT);
 
-        var content = (VerticalLayout) dialog.getContent();
+        var content = (VerticalLayout) dialog.window.getContent();
         var buttons = (HorizontalLayout) content.getComponent(1);
         var confirmButton = (Button) buttons.getComponent(1);
         var count = new AtomicInteger(0);
@@ -37,5 +37,22 @@ public class ConfirmDialogTest {
         });
         confirmButton.click();
         Assert.assertEquals(1, count.get());
+    }
+
+    @Test
+    public void testButtonTexts() {
+        var dialog = new ConfirmDialog("Are you sure?", Type.ALERT);
+
+        dialog.setConfirmText("Yes");
+        dialog.setCancelText("No");
+
+        var content = (VerticalLayout) dialog.window.getContent();
+        var buttons = (HorizontalLayout) content.getComponent(1);
+
+        var cancelButton = (Button) buttons.getComponent(0);
+        Assert.assertEquals("No", cancelButton.getCaption());
+
+        var confirmButton = (Button) buttons.getComponent(1);
+        Assert.assertEquals("Yes", confirmButton.getCaption());
     }
 }

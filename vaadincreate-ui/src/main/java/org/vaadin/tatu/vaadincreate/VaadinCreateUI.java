@@ -23,6 +23,7 @@ import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.annotations.Viewport;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -34,6 +35,7 @@ import com.vaadin.ui.UI;
 @SuppressWarnings("serial")
 @Push
 @PreserveOnRefresh
+@Viewport("width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no")
 public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     private AccessControl accessControl = new BasicAccessControl();

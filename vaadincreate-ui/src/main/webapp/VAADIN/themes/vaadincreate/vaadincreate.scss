@@ -348,6 +348,10 @@ $fake-grid-background-color: white;
       width: 100%;     
     }
     
+    .v-grid {
+      user-select: none;
+	}
+
     // Remove margins around the grid and reduce top bar margins on small screens
     .bookview .bookview-grid {
       padding: 0 0 0 0;

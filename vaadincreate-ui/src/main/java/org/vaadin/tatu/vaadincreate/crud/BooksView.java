@@ -64,7 +64,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
     private Button newProduct;
 
     private ListDataProvider<Product> dataProvider;
-    private VerticalLayout fakeGrid;
+    private FakeGrid fakeGrid;
     private String params;
 
     public BooksView() {

@@ -4,6 +4,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
 
+import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinServletRequest;
+import com.vaadin.shared.communication.PushMode;
+import com.vaadin.ui.UI;
+
 public class Utils {
 
     public static String sanitize(String unsanitized) {
@@ -13,5 +18,14 @@ public class Utils {
                 .addAttributes("span", "style").addAttributes("span", "class"),
                 settings);
         return text;
+    }
+
+    public static void sessionFixation() {
+        UI.getCurrent().getPushConfiguration().setPushMode(PushMode.DISABLED);
+        VaadinServletRequest request = (VaadinServletRequest) VaadinService
+                .getCurrentRequest();
+        request.getHttpServletRequest().changeSessionId();
+//        VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
+        UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
     }
 }

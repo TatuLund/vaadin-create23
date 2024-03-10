@@ -1,24 +1,27 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Composite;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings("serial")
-public class FakeGrid extends VerticalLayout {
+public class FakeGrid extends Composite {
 
     private static final String FAKEGRID_HEADER = "fakegrid-header";
     private static final String FAKEGRID_SPINNERWRAPPER = "fakegrid-spinnerwrapper";
     private static final String FAKEGRID = "fakegrid";
 
     public FakeGrid() {
-        setId("fake-grid");
-        addStyleName(FAKEGRID);
-        setHeightFull();
-        setMargin(false);
-        setSpacing(false);
+        VerticalLayout layout = new VerticalLayout();
+        setCompositionRoot(layout);
+        layout.setId("fake-grid");
+        layout.addStyleName(FAKEGRID);
+        layout.setHeightFull();
+        layout.setMargin(false);
+        layout.setSpacing(false);
         var spinnerWrapper = new VerticalLayout();
         spinnerWrapper.addStyleName(FAKEGRID_SPINNERWRAPPER);
         spinnerWrapper = new VerticalLayout();
@@ -31,7 +34,7 @@ public class FakeGrid extends VerticalLayout {
         spinner.addStyleName(ValoTheme.LABEL_SPINNER);
         spinnerWrapper.addComponent(spinner);
         spinnerWrapper.setComponentAlignment(spinner, Alignment.MIDDLE_CENTER);
-        addComponents(fakeHeader, spinnerWrapper);
-        setExpandRatio(spinnerWrapper, 1);
+        layout.addComponents(fakeHeader, spinnerWrapper);
+        layout. setExpandRatio(spinnerWrapper, 1);
     }
 }

@@ -28,6 +28,7 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Composite;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
@@ -35,7 +36,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings("serial")
-public class BookForm extends CssLayout implements HasI18N {
+public class BookForm extends Composite implements HasI18N {
 
     // Localization constants
     private static final String AVAILABILITY_MISMATCH = "availability-mismatch";
@@ -67,7 +68,8 @@ public class BookForm extends CssLayout implements HasI18N {
 
     private Binder<Product> binder;
     private Product currentProduct;
-
+    private CssLayout layout = new CssLayout();
+    
     private static class StockPriceConverter extends StringToIntegerConverter {
 
         public StockPriceConverter(String message) {
@@ -98,8 +100,9 @@ public class BookForm extends CssLayout implements HasI18N {
     }
 
     public BookForm(BooksPresenter presenter) {
+        setCompositionRoot(layout);
         buildForm();
-        setId("book-form");
+        layout.setId("book-form");
 
         binder = new BeanValidationBinder<>(Product.class);
         binder.forField(price)
@@ -194,15 +197,15 @@ public class BookForm extends CssLayout implements HasI18N {
     public void showForm(boolean visible) {
         if (visible) {
             updateDirtyIndicators();
-            addStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
+            layout.addStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
         } else {
-            removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
+            layout.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
         }
         setEnabled(visible);
     }
 
     public boolean isShown() {
-        var isShown = getStyleName()
+        var isShown = layout.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
         return isShown;
     }
@@ -227,7 +230,7 @@ public class BookForm extends CssLayout implements HasI18N {
     }
 
     private void buildForm() {
-        addStyleNames(VaadinCreateTheme.BOOKFORM,
+        layout.addStyleNames(VaadinCreateTheme.BOOKFORM,
                 VaadinCreateTheme.BOOKFORM_WRAPPER);
         var formLayout = new VerticalLayout();
         formLayout.setHeightFull();
@@ -273,7 +276,7 @@ public class BookForm extends CssLayout implements HasI18N {
         formLayout.addComponent(spacer);
         formLayout.addComponents(save, discard, cancel, delete);
         formLayout.setExpandRatio(spacer, 1);
-        addComponent(formLayout);
+        layout.addComponent(formLayout);
     }
 
     public void setCategories(Collection<Category> categories) {

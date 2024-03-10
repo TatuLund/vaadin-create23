@@ -177,7 +177,7 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
     }
 
     protected void waitForElementPresent(final By by) {
-        waitUntil(ExpectedConditions.presenceOfElementLocated(by));
+        waitUntil(ExpectedConditions.presenceOfElementLocated(by), 15);
     }
 
     protected void waitForElementNotPresent(final By by) {

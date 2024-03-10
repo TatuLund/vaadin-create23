@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate.auth;
+package org.vaadin.tatu.vaadincreate.login;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -6,13 +6,13 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
-import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18NProvider;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.Page;
-import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -90,8 +90,6 @@ public class LoginView extends CssLayout implements HasI18N {
         resizeReg = getUI().getPage().addBrowserWindowResizeListener(e -> {
             showLoginInformation(e.getWidth());
         });
-        // ((VaadinCreateUI) getUI())
-        // .addLocaleChangeListener(e -> updateTranslations());
         buildUI();
         username.focus();
     }
@@ -157,22 +155,18 @@ public class LoginView extends CssLayout implements HasI18N {
         });
         forgotPassword.addStyleName(ValoTheme.BUTTON_LINK);
 
-        lang = new ComboBox<>(getTranslation(LANGUAGE));
-        lang.setWidth(15, Unit.EM);
-        lang.setItems(I18NProvider.getInstance().getLocales());
-        lang.setItemCaptionGenerator(item -> item.toString());
-        lang.setEmptySelectionAllowed(false);
-        lang.setTextInputAllowed(false);
+        lang = new LanguageSelect();
         loginForm.addComponent(lang);
         lang.addValueChangeListener(e -> {
             var ui = getUI();
+            // Set the locale to session attribute, request handler will persist
+            // it to the cookie from there.
             ui.getSession().setAttribute("locale", e.getValue().getLanguage());
             ui.getSession().setLocale(e.getValue());
             updateTranslations();
             logger.info("Changing locale to {}", e.getValue().getLanguage());
         });
-        var locale = VaadinRequest.getCurrent().getLocale();
-        lang.setValue(locale);
+        lang.setValue(I18NProvider.fetchLocaleFromCookie());
 
         return loginForm;
     }

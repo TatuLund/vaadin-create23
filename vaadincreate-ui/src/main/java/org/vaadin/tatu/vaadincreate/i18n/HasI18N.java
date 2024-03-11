@@ -12,7 +12,7 @@ public interface HasI18N extends Component {
      * Get translation with given key and parameter from I18NProvider. Locale is
      * fetched from a "language" Cookie and using system Locale as fallback.
      *
-     * @see I18NProvider
+     * @see DefaultI18NProvider
      *
      * @param key
      *            Key for the translation
@@ -21,7 +21,7 @@ public interface HasI18N extends Component {
      * @return String composed with Locale.
      */
     public default String getTranslation(String key, Object... params) {
-        return I18NProvider.getInstance().getTranslation(key,
+        return I18NProvider.get().getTranslation(key,
                 I18NProvider.getCurrentSupportedLocale(), params);
     }
 

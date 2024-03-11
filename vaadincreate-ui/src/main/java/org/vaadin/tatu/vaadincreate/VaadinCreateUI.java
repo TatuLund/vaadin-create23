@@ -10,13 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.admin.AdminView;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.BasicAccessControl;
-import org.vaadin.tatu.vaadincreate.auth.LoginView;
-import org.vaadin.tatu.vaadincreate.auth.LoginView.LoginListener;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.login.LoginView;
 import org.vaadin.tatu.vaadincreate.stats.StatsView;
 import org.vaadin.tatu.vaadincreate.util.CookieUtil;
 import org.vaadin.tatu.vaadincreate.util.Utils;
@@ -52,13 +51,10 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     protected void init(VaadinRequest request) {
         getPage().setTitle("Vaadin Create 23'");
         if (!accessControl.isUserSignedIn()) {
-            setContent(new LoginView(accessControl, new LoginListener() {
-                @Override
-                public void loginSuccessful() {
-                    Utils.sessionFixation();
-                    showAppLayout();
-                    getPage().reload();
-                }
+            setContent(new LoginView(accessControl, e -> {
+                Utils.sessionFixation();
+                getPage().reload();
+                showAppLayout();
             }));
         } else {
             showAppLayout();

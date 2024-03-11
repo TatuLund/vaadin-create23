@@ -1,8 +1,10 @@
 package org.vaadin.tatu.vaadincreate.backend.data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Message {
+@SuppressWarnings("serial")
+public class Message implements Serializable {
 
     private String message;
     private LocalDateTime dateStamp;

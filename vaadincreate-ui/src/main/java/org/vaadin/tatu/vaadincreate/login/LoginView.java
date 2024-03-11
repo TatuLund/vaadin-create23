@@ -1,6 +1,6 @@
 package org.vaadin.tatu.vaadincreate.login;
 
-import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.Locale;
 
 import org.slf4j.Logger;
@@ -10,9 +10,9 @@ import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18NProvider;
 
+import com.vaadin.event.ConnectorEventListener;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.Page;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -27,6 +27,7 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.util.ReflectTools;
 
 /**
  * UI content when the user is not logged in yet.
@@ -44,11 +45,10 @@ public class LoginView extends CssLayout implements HasI18N {
     private static final String HINT = "hint";
     private static final String LANGUAGE = "language";
 
-    private TextField username;
-    private PasswordField password;
-    private Button login;
+    TextField username;
+    PasswordField password;
+    Button login;
     private Button forgotPassword;
-    private LoginListener loginListener;
     private AccessControl accessControl;
     private Registration resizeReg;
     private CssLayout loginInformation;
@@ -57,11 +57,11 @@ public class LoginView extends CssLayout implements HasI18N {
     private Label loginInfoText;
 
     public LoginView(AccessControl accessControl, LoginListener loginListener) {
-        this.loginListener = loginListener;
         this.accessControl = accessControl;
+        addLoginListener(loginListener);
     }
 
-    private void buildUI() {
+    void buildUI() {
         addStyleName(VaadinCreateTheme.LOGINVIEW);
 
         // information text about logging in
@@ -183,7 +183,7 @@ public class LoginView extends CssLayout implements HasI18N {
 
     private void login() {
         if (accessControl.signIn(username.getValue(), password.getValue())) {
-            loginListener.loginSuccessful();
+            fireEvent(new LoginEvent(this));
         } else {
             showNotification(new Notification("Login failed",
                     "Please check your username and password and try again.",
@@ -199,8 +199,37 @@ public class LoginView extends CssLayout implements HasI18N {
         notification.show(Page.getCurrent());
     }
 
-    public interface LoginListener extends Serializable {
-        void loginSuccessful();
+    /**
+     * Add event listener for login event. Event is fired when user logged in.
+     * 
+     * @param listener
+     *            The listener, can be Lambda expression.
+     * @return Registration Use Registration#remove() for listener removal.
+     */
+    public Registration addLoginListener(LoginListener listener) {
+        return addListener(LoginEvent.class, listener,
+                LoginListener.LOGIN_METHOD);
+    }
+
+    /**
+     * Login listener interface, can be implemented with Lambda or anonymous
+     * inner class.
+     */
+    public interface LoginListener extends ConnectorEventListener {
+        Method LOGIN_METHOD = ReflectTools.findMethod(LoginListener.class,
+                "login", LoginEvent.class);
+
+        public void login(LoginEvent event);
+    }
+
+    /**
+     * LoginEvent is fired when user logs in.
+     */
+    public static class LoginEvent extends Component.Event {
+
+        public LoginEvent(Component source) {
+            super(source);
+        }
     }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());

@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.validation.constraints.NotNull;
 
+@SuppressWarnings("serial")
 public class Category implements Serializable {
 
     @NotNull

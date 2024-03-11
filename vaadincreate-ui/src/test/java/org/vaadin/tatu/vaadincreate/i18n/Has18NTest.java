@@ -1,9 +1,6 @@
 package org.vaadin.tatu.vaadincreate.i18n;
 
-import java.util.Locale;
-
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.MockVaadinSession;
 
@@ -18,11 +15,11 @@ public class Has18NTest {
         VaadinSession.setCurrent(session);
         session.lock();
 
-        session.setLocale(I18NProvider.LOCALE_EN);
+        session.setLocale(DefaultI18NProvider.LOCALE_EN);
         var label = new LocalizedLabel("save");
         Assert.assertEquals("Save", label.getValue());
 
-        session.setLocale(I18NProvider.LOCALE_FI);
+        session.setLocale(DefaultI18NProvider.LOCALE_FI);
         label = new LocalizedLabel("save");
         Assert.assertEquals("Tallenna", label.getValue());
     }

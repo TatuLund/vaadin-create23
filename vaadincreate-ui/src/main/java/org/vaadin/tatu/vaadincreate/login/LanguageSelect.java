@@ -3,7 +3,7 @@ package org.vaadin.tatu.vaadincreate.login;
 import java.util.Locale;
 
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
-import org.vaadin.tatu.vaadincreate.i18n.I18NProvider;
+import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
 
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.ComboBox;
@@ -16,7 +16,7 @@ public class LanguageSelect extends ComboBox<Locale> implements HasI18N {
     public LanguageSelect() {
         setCaption(getTranslation(LANGUAGE));
         setWidth(15, Unit.EM);
-        setItems(I18NProvider.getInstance().getLocales());
+        setItems(DefaultI18NProvider.getInstance().getLocales());
         setItemCaptionGenerator(item -> getTranslation(item.getLanguage()));
         setItemIconGenerator(locale -> new ThemeResource(
                 "flags/" + locale.getLanguage() + ".gif"));

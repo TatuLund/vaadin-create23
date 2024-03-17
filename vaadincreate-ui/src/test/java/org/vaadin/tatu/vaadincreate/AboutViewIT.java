@@ -19,6 +19,7 @@ public class AboutViewIT extends AbstractViewTest {
 
     @Test
     public void leaveMessageSanitized() {
+        waitForElementPresent(By.id("admins-note"));
         var note = $(LabelElement.class).id("admins-note");
         var oldText = note.getHTML();
 

@@ -1,21 +1,75 @@
 package org.vaadin.tatu.vaadincreate.admin;
 
+import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
-import com.vaadin.ui.Label;
+import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings("serial")
 @RolesPermitted({ Role.ADMIN })
-public class AdminView extends VerticalLayout implements View {
+public class AdminView extends VerticalLayout implements View, HasI18N {
 
     public static final String VIEW_NAME = "admin";
-
-    private AdminPresenter presenter = new AdminPresenter(this);
+    private String params;
+    private TabSheet tabSheet;
+    private CategoryManagementView categories;
+    private UserManagementView users;
 
     public AdminView() {
-        addComponents(new Label("TODO"));
+    }
+
+    @Override
+    public void enter(ViewChangeEvent event) {
+        params = event.getParameters();
+        tabSheet = new TabSheet();
+        categories = new CategoryManagementView();
+        users = new UserManagementView();
+        tabSheet.addTab(categories,
+                getTranslation(CategoryManagementView.VIEW_NAME));
+        tabSheet.getTab(categories).setIcon(VaadinIcons.LIST);
+        tabSheet.addTab(users, getTranslation(UserManagementView.VIEW_NAME));
+        tabSheet.getTab(users).setIcon(VaadinIcons.USERS);
+        tabSheet.setSizeFull();
+        tabSheet.addStyleNames(ValoTheme.TABSHEET_PADDED_TABBAR,
+                ValoTheme.TABSHEET_CENTERED_TABS);
+        tabSheet.addSelectedTabChangeListener(e -> {
+            setFragmentParameter(
+                    ((TabView) tabSheet.getSelectedTab()).getTabName());
+        });
+        if (params.equals(UserManagementView.VIEW_NAME)) {
+            tabSheet.setSelectedTab(users);
+        }
+        if (params.equals(CategoryManagementView.VIEW_NAME)) {
+            tabSheet.setSelectedTab(categories);
+        }
+        removeAllComponents();
+        addComponent(tabSheet);
+        setSizeFull();
+    }
+
+    /**
+     * Update the fragment without causing navigator to change view
+     * 
+     * @param tabName
+     *            The name of the tab to show
+     */
+    public void setFragmentParameter(String tabName) {
+        String fragmentParameter;
+        if (tabName == null || tabName.isEmpty()) {
+            fragmentParameter = "";
+        } else {
+            fragmentParameter = tabName;
+        }
+
+        var page = VaadinCreateUI.get().getPage();
+        page.setUriFragment("!" + AdminView.VIEW_NAME + "/" + fragmentParameter,
+                false);
     }
 }

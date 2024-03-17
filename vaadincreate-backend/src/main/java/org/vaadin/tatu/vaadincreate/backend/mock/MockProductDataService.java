@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.backend.mock;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ public class MockProductDataService extends ProductDataService {
     private List<Product> products;
     private List<Category> categories;
     private int nextProductId = 0;
+    private int nextCategoryId = 0;
 
     Random random = new Random();
 
@@ -30,6 +32,7 @@ public class MockProductDataService extends ProductDataService {
         categories = MockDataGenerator.createCategories();
         products = MockDataGenerator.createProducts(categories);
         nextProductId = products.size() + 1;
+        nextCategoryId = categories.size() + 1;
         logger.info("Generated mock product data");
     }
 
@@ -98,6 +101,38 @@ public class MockProductDataService extends ProductDataService {
                     "Product with id " + productId + " not found");
         }
         products.remove(p);
+    }
+
+    @Override
+    public Category updateCategory(Category category) {
+        randomWait(1);
+        var newCategory = new Category(category);
+        if (newCategory.getId() < 0) {
+            newCategory.setId(nextCategoryId++);
+            categories.add(newCategory);
+        } else {
+            deleteCategory(category.getId());
+            categories.add(newCategory);
+        }
+        return newCategory;
+    }
+
+    @Override
+    public void deleteCategory(int categoryId) {
+        randomWait(1);
+        if (categories.removeIf(category -> category.getId() == categoryId)) {
+            getAllProducts().forEach(product -> {
+                product.getCategory()
+                        .removeIf(category -> category.getId() == categoryId);
+            });
+        }
+    }
+
+    @Override
+    public Set<Category> findCategoriesByIds(Set<Integer> categoryIds) {
+        return categories.stream()
+                .filter(cat -> categoryIds.contains(cat.getId()))
+                .collect(Collectors.toSet());
     }
 
     private void randomWait(int count) {

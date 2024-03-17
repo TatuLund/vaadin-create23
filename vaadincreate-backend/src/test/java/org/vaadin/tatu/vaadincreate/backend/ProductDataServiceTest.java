@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.backend;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.mock.MockProductDataService;
 
@@ -11,6 +12,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 /**
  * Simple unit test for the back-end data service.
@@ -55,7 +57,7 @@ public class ProductDataServiceTest {
         var newProduct = service.updateProduct(p);
         assertNotEquals(-1, newProduct.getId());
         assertEquals(oldSize + 1, service.getAllProducts().size());
-        
+
         var foundProduct = service.getProductById(newProduct.getId());
         assertTrue(foundProduct.equals(newProduct));
     }
@@ -92,5 +94,50 @@ public class ProductDataServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void removeProductByNonExistentId() {
         service.deleteProduct(1000);
+    }
+
+    @Test
+    public void addUpdateRemoveCategory() {
+        var category = new Category();
+        category.setName("Sports books");
+        var newCategory = service.updateCategory(category);
+        assertFalse(category.equals(newCategory));
+        assertTrue(newCategory.getId() > 0);
+        assertEquals("Sports books", newCategory.getName());
+        assertFalse(category == newCategory);
+        assertTrue(service.getAllCategories().contains(newCategory));
+
+        newCategory.setName("Athletics");
+        var updatedCategory = service.updateCategory(newCategory);
+        assertTrue(updatedCategory.equals(newCategory));
+        assertFalse(updatedCategory == newCategory);
+        assertTrue(service.getAllCategories().contains(updatedCategory));
+        assertEquals("Athletics", updatedCategory.getName());
+
+        service.deleteCategory(updatedCategory.getId());
+        assertFalse(service.getAllCategories().contains(updatedCategory));
+    }
+
+    @Test
+    public void updateCategoryUsedInProduct_removeUsedCategory() {
+        var category = new Category();
+        category.setName("Sports");
+        var newCategory = service.updateCategory(category);
+
+        var book = new Product();
+        book.setProductName("Sports book");
+        book.setCategory(Set.of(newCategory));
+
+        var newBook = service.updateProduct(book);
+        var bookId = newBook.getId();
+
+        newCategory.setName("Athletics");
+        var foundBook = service.getProductById(bookId);
+        assertEquals("Athletics",
+                foundBook.getCategory().stream().findFirst().get().getName());
+
+        service.deleteCategory(newCategory.getId());
+        foundBook = service.getProductById(bookId);
+        assertTrue(foundBook.getCategory().isEmpty());
     }
 }

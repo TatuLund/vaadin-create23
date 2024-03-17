@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.backend;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Set;
 
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -58,8 +59,14 @@ public abstract class ProductDataService implements Serializable {
      */
     public abstract Product getProductById(int productId);
 
+    public abstract Category updateCategory(Category category);
+
+    public abstract void deleteCategory(int categoryId);
+
     public static ProductDataService get() {
         return MockProductDataService.getInstance();
     }
+
+    public abstract Set<Category> findCategoriesByIds(Set<Integer> category);
 
 }

@@ -2,12 +2,17 @@ package org.vaadin.tatu.vaadincreate.backend.data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 
 @SuppressWarnings("serial")
 public class Product implements Serializable {
@@ -20,7 +25,7 @@ public class Product implements Serializable {
     private String productName = "";
     @Min(value = 0, message = "{price.not.negative}")
     private BigDecimal price = BigDecimal.ZERO;
-    private Set<Category> category;
+    private Set<Integer> category = Collections.emptySet();
     @Min(value = 0, message = "{stock.not.negative}")
     private int stockCount = 0;
     @NotNull(message = "{availability.required}")
@@ -64,11 +69,13 @@ public class Product implements Serializable {
     }
 
     public Set<Category> getCategory() {
-        return category;
+        return ProductDataService.get().findCategoriesByIds(category);
     }
 
     public void setCategory(Set<Category> category) {
-        this.category = category;
+        this.category = category.stream()
+                .map(cat -> Integer.valueOf(cat.getId()))
+                .collect(Collectors.toSet());
     }
 
     public int getStockCount() {

@@ -35,9 +35,10 @@ $v-luminance-threshold: 180 !default;
 $editor-background-color: #fafafa !default;
 $valo-menu-background-color: rgb(59, 63, 66) !default;
 
-$v-focus-color: rgb(96, 160, 234) !default;
-$v-error-indicator-color: #eb2977 !default;
+$v-focus-color: rgb(76, 150, 214) !default;
+$v-error-indicator-color: #eb1937 !default;
 $v-friendly-color: rgb(54, 185, 85);
+$warning-indicator-color:  rgb(255, 128, 0) !default;
 
 $v-font-size: 15px !default;
 $v-font-weight: 400 !default;
@@ -190,7 +191,7 @@ $fake-grid-background-color: white;
   }
 
   .bookform-field-dirty {
-	border: 2px dashed rgb(255, 128, 0);
+	border: 2px dashed $warning-indicator-color;
   }
 
   .v-filterselect-item-bookform-availability-available {

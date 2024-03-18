@@ -98,13 +98,13 @@ public class CategoryManagementView extends VerticalLayout
             presenter.removeCategory(category);
             dataProvider.getItems().remove(category);
             dataProvider.refreshAll();
-            Notification.show(getTranslation(CATEGORY_DELETED, category.getName()));
+            Notification
+                    .show(getTranslation(CATEGORY_DELETED, category.getName()));
         });
         deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
         deleteButton.setDescription(getTranslation(DELETE));
 
-        var<Category> binder = new BeanValidationBinder<Category>(
-                Category.class);
+        var binder = new BeanValidationBinder<Category>(Category.class);
         binder.forField(nameField).bind("name");
         binder.setBean(category);
         binder.addValueChangeListener(event -> {
@@ -122,7 +122,8 @@ public class CategoryManagementView extends VerticalLayout
                 }
                 deleteButton.setEnabled(true);
                 newCategoryButton.setEnabled(true);
-                Notification.show(getTranslation(CATEGORY_SAVED, newCategory.getName()));
+                Notification.show(
+                        getTranslation(CATEGORY_SAVED, newCategory.getName()));
             }
         });
         deleteButton.setEnabled(category.getId() > 0);

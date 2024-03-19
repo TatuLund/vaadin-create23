@@ -42,6 +42,7 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
         tabSheet.addSelectedTabChangeListener(e -> {
             setFragmentParameter(
                     ((TabView) tabSheet.getSelectedTab()).getTabName());
+            ((TabView) tabSheet.getSelectedTab()).enter();
         });
         if (params.equals(UserManagementView.VIEW_NAME)) {
             tabSheet.setSelectedTab(users);
@@ -51,6 +52,7 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
         }
         removeAllComponents();
         addComponent(tabSheet);
+        categories.enter();
         setSizeFull();
     }
 

@@ -3,6 +3,8 @@ package org.vaadin.tatu.vaadincreate.admin;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.vaadin.tatu.vaadincreate.ConfirmDialog;
+import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 
@@ -28,13 +30,14 @@ public class CategoryManagementView extends VerticalLayout
     public static final String VIEW_NAME = "categories";
 
     private static final String DELETE = "delete";
+    private static final String CANCEL = "cancel";
     private static final String CATEGORY_DELETED = "category-deleted";
     private static final String CATEGORY_SAVED = "category-saved";
     private static final String ADD_NEW_CATEGORY = "add-new-category";
-    private static final String ADMIN = "admin";
     private static final String EDIT_CATEGORIES = "edit-categories";
+    private static final String WILL_DELETE = "will-delete";
 
-    private CategoryManagmentPresenter presenter = new CategoryManagmentPresenter(
+    private CategoryManagementPresenter presenter = new CategoryManagementPresenter(
             this);
     private Grid<Category> categoriesListing;
     private ListDataProvider<Category> dataProvider;
@@ -42,12 +45,7 @@ public class CategoryManagementView extends VerticalLayout
 
     public CategoryManagementView() {
         setSizeFull();
-        categoriesListing = new Grid<>();
-        categoriesListing.setRowHeight(40);
-        categoriesListing.addComponentColumn(this::createCategoryEditor);
-        categoriesListing.setHeaderRowHeight(1);
-        categoriesListing.setSizeFull();
-        categoriesListing.setSelectionMode(SelectionMode.NONE);
+        createCategoryListing();
 
         newCategoryButton = new Button(getTranslation(ADD_NEW_CATEGORY),
                 event -> {
@@ -59,18 +57,24 @@ public class CategoryManagementView extends VerticalLayout
         newCategoryButton.setDisableOnClick(true);
         newCategoryButton.setId("new-category");
 
-        var h2 = new Label(getTranslation(ADMIN));
-        h2.addStyleName(ValoTheme.LABEL_H2);
         var h4 = new Label(getTranslation(EDIT_CATEGORIES));
         h4.addStyleName(ValoTheme.LABEL_H4);
 
-        addComponents(h2, h4, newCategoryButton, categoriesListing);
+        addComponents(h4, newCategoryButton, categoriesListing);
         setExpandRatio(categoriesListing, 1);
     }
 
+    private void createCategoryListing() {
+        categoriesListing = new Grid<>();
+        categoriesListing.setRowHeight(40);
+        categoriesListing.addComponentColumn(this::createCategoryEditor);
+        categoriesListing.setHeaderRowHeight(1);
+        categoriesListing.setSizeFull();
+        categoriesListing.setSelectionMode(SelectionMode.NONE);
+    }
+
     @Override
-    public void attach() {
-        super.attach();
+    public void enter() {
         presenter.requestUpdateCategories();
     }
 
@@ -95,11 +99,18 @@ public class CategoryManagementView extends VerticalLayout
         }
 
         var deleteButton = new Button(VaadinIcons.MINUS_CIRCLE_O, event -> {
-            presenter.removeCategory(category);
-            dataProvider.getItems().remove(category);
-            dataProvider.refreshAll();
-            Notification
-                    .show(getTranslation(CATEGORY_DELETED, category.getName()));
+            var dialog = new ConfirmDialog(getTranslation(WILL_DELETE,
+                    category.getName()), Type.ALERT);
+            dialog.setConfirmText(getTranslation(DELETE));
+            dialog.setCancelText(getTranslation(CANCEL));
+            dialog.open();
+            dialog.addConfirmedListener(e -> {
+                presenter.removeCategory(category);
+                dataProvider.getItems().remove(category);
+                dataProvider.refreshAll();
+                Notification.show(
+                        getTranslation(CATEGORY_DELETED, category.getName()));
+            });
         });
         deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
         deleteButton.setDescription(getTranslation(DELETE));

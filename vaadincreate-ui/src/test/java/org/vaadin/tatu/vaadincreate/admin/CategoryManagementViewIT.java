@@ -7,8 +7,10 @@ import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.GridElement;
+import com.vaadin.testbench.elements.LabelElement;
 import com.vaadin.testbench.elements.NotificationElement;
 import com.vaadin.testbench.elements.TextFieldElement;
+import com.vaadin.testbench.elements.WindowElement;
 
 public class CategoryManagementViewIT extends AbstractViewTest {
 
@@ -36,9 +38,12 @@ public class CategoryManagementViewIT extends AbstractViewTest {
 
         cell = grid.getCell((int) grid.getRowCount() - 1, 0);
         cell.$(ButtonElement.class).first().click();
+        var dialog = $(WindowElement.class).id("confirm-dialog");
+        Assert.assertTrue(dialog.$(LabelElement.class).first().getText()
+                .contains("Sports"));
+        dialog.$(ButtonElement.class).id("confirm-button").click();
         notification = $(NotificationElement.class).last();
         Assert.assertTrue(notification.getText().contains("Sports"));
         Assert.assertEquals(count, grid.getRowCount());
-
     }
 }

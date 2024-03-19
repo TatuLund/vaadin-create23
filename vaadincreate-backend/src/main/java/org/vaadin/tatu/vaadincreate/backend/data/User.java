@@ -30,6 +30,9 @@ public class User implements Serializable {
 
     public User() {
         this.id = -1;
+        this.name = "";
+        this.passwd = "";
+        this.role = null;
     }
 
     public User(int id, String name, String passwd, Role role) {

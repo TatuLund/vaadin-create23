@@ -8,35 +8,39 @@ The demo app covers various use cases you may encounter in real life application
 
 - Multi-module project setup (backend, components and ui)
 - AppLayout uses ValoMenu to create responsive application shell
-  - Setup also navigator and combine building of the menu and registrations of the views
-  - Implements per view role based access control
-- The application views have been implemented using Model View Presenter pattern
+	- Setup also navigator and combine building of the menu and registrations of the views,
+	- Implements per view role based access control
+- The main application views have been implemented using Model View Presenter pattern
 - StatsView and BooksView load data from backend asynchronously and use push to update the view
-  - StatsView uses fake grid as placeholder
+	- StatsView uses fake grid as placeholder,
 - StatsView
-  - Responsive dashboard layout of Charts using Vaadin responsive CSS
+	- Responsive dashboard layout of Charts using Vaadin responsive CSS
 - BooksView
-  - Responsive Grid using BrowserResizeListener 
-  - Responsive CSS in Grid column
-  - Responsive CRUD editor
-  - Highlight last edited item
+	- Responsive Grid using BrowserResizeListener, 
+	- Responsive CSS in Grid column,
+	- Responsive CRUD editor,
+	- Highlight last edited item
 - Simplified example of access control
 - AdminView
-  - Stub view shown only for admin access
+	- Example of nested sub-navigation using url-parameters and TabSheet component,
+	- Category management view,
+	- User management view
 - AboutView
-  - Demo how to correctly sanitize user input with Jsoup in order to avoid XSS
-  - CustomLayout example
+	- Demo how to correctly sanitize user input with Jsoup in order to avoid XSS,
+	- CustomLayout example
 - How to use logger in UI module
+- How to create application scoped EventBus
 - The custom theme is using BEM (Block Element Modifier) naming scheme to avoid class name conflicts in CSS
 
 - Components module has examples of GWT and JavaScript extensions
-  - Reset button for text field, extension with client side GWT 
-  - Character counter for TextArea and TextField showing remaining characters, another extension with GWT
-  - Attribute extensions (used in form's number input), JavaScript
-  - Java 11 code used in widgets
-  - ConfirmDialog, server side composition component
-  - Test suite for the components and standalone test UI for them
-    
+	- Reset button for text field extension with client side GWT,
+	- Character counter for TextArea and TextField showing remaining characters extension with GWT,
+	- Attribute extensions (used in form's number input) using JavaScript,
+	- Java 11 code used in widgets,
+	- ConfirmDialog server side composition component,
+	- Suite of unit and integration tests for the components and standalone test UI for them
+- Example of how to localize / provide translations for texts used in UI
+
 Notes
 
 - Backend module has mock data service only with simulated latency

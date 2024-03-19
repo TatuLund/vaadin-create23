@@ -71,6 +71,8 @@ public class CategoryManagementView extends VerticalLayout
         categoriesListing.setHeaderRowHeight(1);
         categoriesListing.setSizeFull();
         categoriesListing.setSelectionMode(SelectionMode.NONE);
+        categoriesListing.addStyleNames("no-stripes", "no-borders",
+                "no-cell-focus");
     }
 
     @Override
@@ -99,8 +101,9 @@ public class CategoryManagementView extends VerticalLayout
         }
 
         var deleteButton = new Button(VaadinIcons.MINUS_CIRCLE_O, event -> {
-            var dialog = new ConfirmDialog(getTranslation(WILL_DELETE,
-                    category.getName()), Type.ALERT);
+            var dialog = new ConfirmDialog(
+                    getTranslation(WILL_DELETE, category.getName()),
+                    Type.ALERT);
             dialog.setConfirmText(getTranslation(DELETE));
             dialog.setCancelText(getTranslation(CANCEL));
             dialog.open();

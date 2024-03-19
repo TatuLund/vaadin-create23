@@ -468,4 +468,25 @@ $fake-grid-background-color: white;
   .v-spacing {
 	height: 10px;
   }
+
+  .no-stripes {
+    .v-grid-row-stripe {
+	  background-color: $v-grid-row-background-color;
+    }
+    .v-grid-row-stripe > td {
+      background-color: $v-grid-row-background-color;
+    }
+  }
+
+  .no-borders {
+    .v-grid-row > td {
+       border-bottom: unset;
+    }	  
+  }
+
+  .no-cell-focus {
+	.v-grid-cell-focused:before {
+	  border: unset;
+	}  
+  }
 }

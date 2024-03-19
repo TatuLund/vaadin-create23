@@ -80,6 +80,11 @@ public class CategoryManagementView extends VerticalLayout
         presenter.requestUpdateCategories();
     }
 
+    /**
+     * Sets the categories for the CategoryManagementView.
+     * 
+     * @param categories the collection of categories to be set
+     */
     public void setCategories(Collection<Category> categories) {
         dataProvider = new ListDataProvider<Category>(
                 new ArrayList<>(categories)) {

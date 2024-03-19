@@ -177,19 +177,34 @@ public class UserManagementView extends VerticalLayout
         return VIEW_NAME;
     }
 
+    /**
+     * Sets the list of users for the user select component.
+     *
+     * @param allUsers the list of users to be set
+     */
     public void setUsers(List<User> allUsers) {
         userSelect.setItems(allUsers);
     }
 
+    /**
+     * Shows an error notification indicating that the user is a duplicate.
+     * The notification message is constructed using the user's name.
+     */
     public void showDuplicateError() {
         Notification.show(getTranslation(USER_IS_DUPLICATE, user.getName()),
                 Type.ERROR_MESSAGE);
     }
 
+    /**
+     * Shows a notification indicating that the user has been updated.
+     */
     public void showUserUpdated() {
         Notification.show(getTranslation(USER_SAVED, user.getName()));
     }
 
+    /**
+     * Shows a notification indicating that a user has been removed.
+     */
     public void showUserRemoved() {
         Notification.show(getTranslation(USER_DELETED, user.getName()));
     }

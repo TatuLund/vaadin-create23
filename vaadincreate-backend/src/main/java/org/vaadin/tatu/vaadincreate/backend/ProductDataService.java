@@ -59,14 +59,31 @@ public abstract class ProductDataService implements Serializable {
      */
     public abstract Product getProductById(int productId);
 
+
+    /**
+     * Saves a new category or updates an existing one.
+     *
+     * @param category the category to save
+     * @return the saved category
+     */
     public abstract Category updateCategory(Category category);
 
+    /**
+     * Deletes a category with the specified category ID.
+     *
+     * @param categoryId the ID of the category to delete
+     */
     public abstract void deleteCategory(int categoryId);
+
+    /**
+     * Find categories by their ids.
+     *
+     * @param categories the IDs of the categories to find
+     * @return the categories with the given IDs
+     */
+    public abstract Set<Category> findCategoriesByIds(Set<Integer> categories);
 
     public static ProductDataService get() {
         return MockProductDataService.getInstance();
     }
-
-    public abstract Set<Category> findCategoriesByIds(Set<Integer> category);
-
 }

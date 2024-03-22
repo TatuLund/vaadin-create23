@@ -50,8 +50,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     @Override
     protected void init(VaadinRequest request) {
         getPage().setTitle("Vaadin Create 23'");
-        if (!accessControl.isUserSignedIn()) {
-            setContent(new LoginView(accessControl, e -> {
+        if (!getAccessControl().isUserSignedIn()) {
+            setContent(new LoginView(getAccessControl(), e -> {
                 Utils.sessionFixation();
                 getPage().reload();
                 showAppLayout();
@@ -63,7 +63,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     }
 
     protected void showAppLayout() {
-        var appLayout = new AppLayout(this);
+        var appLayout = new AppLayout(this, getAccessControl());
         setContent(appLayout);
 
         // Use String constants for view names, allows easy refactoring if so

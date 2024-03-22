@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -17,9 +18,9 @@ import com.vaadin.ui.themes.ValoTheme;
  */
 @SuppressWarnings("serial")
 @AllPermitted
-public class ErrorView extends VerticalLayout implements View {
+public class ErrorView extends VerticalLayout implements View, HasI18N {
 
-    private Label explanation;
+    Label explanation;
 
     public ErrorView() {
         var header = new Label("The view could not be found");

@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate;
 
+import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
@@ -8,7 +9,7 @@ import com.vaadin.ui.UI;
 @SuppressWarnings("serial")
 public class MockUI extends UI {
 
-    public MockUI() {
+    public MockUI() throws ServiceException {
         this(findOrcreateSession());
     }
 
@@ -22,10 +23,10 @@ public class MockUI extends UI {
         // Do nothing
     }
 
-    private static VaadinSession findOrcreateSession() {
+    private static VaadinSession findOrcreateSession() throws ServiceException {
         VaadinSession session = VaadinSession.getCurrent();
         if (session == null) {
-            session = new AlwaysLockedVaadinSession(null);
+            session = new AlwaysLockedVaadinSession(new MockVaadinService());
             VaadinSession.setCurrent(session);
         }
         return session;

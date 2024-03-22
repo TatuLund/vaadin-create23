@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
@@ -43,6 +44,7 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
     private final CssLayout menuItems = new CssLayout();
     private final CssLayout title;
     private final UI ui;
+    private AccessControl accessControl;
 
     /**
      * Constructor.
@@ -50,9 +52,10 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
      * @param ui
      *            The UI
      */
-    public AppLayout(UI ui) {
+    public AppLayout(UI ui, AccessControl accessControl) {
         setSpacing(false);
         setMargin(false);
+        this.accessControl = accessControl;
         this.ui = ui;
         ui.addStyleName(ValoTheme.UI_WITH_MENU);
         addStyleName("applayout");
@@ -148,8 +151,7 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
         if (rolePermitted != null) {
             boolean canAccess = false;
             for (Role role : rolePermitted.value()) {
-                if (VaadinCreateUI.get().getAccessControl()
-                        .isUserInRole(role)) {
+                if (accessControl.isUserInRole(role)) {
                     canAccess = true;
                     break;
                 }

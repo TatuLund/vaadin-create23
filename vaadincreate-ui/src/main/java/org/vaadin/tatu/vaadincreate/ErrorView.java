@@ -20,10 +20,13 @@ import com.vaadin.ui.themes.ValoTheme;
 @AllPermitted
 public class ErrorView extends VerticalLayout implements View, HasI18N {
 
+    private static final String VIEW_NOT_FOUND = "view-not-found";
+    private static final String NOT_FOUND_DESC = "not-found-desc";
+
     Label explanation;
 
     public ErrorView() {
-        var header = new Label("The view could not be found");
+        var header = new Label(getTranslation(VIEW_NOT_FOUND));
         header.addStyleName(ValoTheme.LABEL_H1);
         addComponent(header);
         addComponent(explanation = new Label());
@@ -31,9 +34,8 @@ public class ErrorView extends VerticalLayout implements View, HasI18N {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        explanation.setValue(String.format(
-                "You tried to navigate to a view ('%s') that does not exist.",
-                event.getViewName()));
+        explanation
+                .setValue(getTranslation(NOT_FOUND_DESC, event.getViewName()));
         logger.warn("User '{}' attempted to navigate non-existent view '{}'",
                 CurrentUser.get().get().getName(), event.getViewName());
     }

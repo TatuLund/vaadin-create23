@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.CapsLockWarning;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -44,6 +45,7 @@ public class LoginView extends CssLayout implements HasI18N {
     private static final String FORGOT_PASSWORD = "forgot-password";
     private static final String HINT = "hint";
     private static final String LANGUAGE = "language";
+    private static final String CAPSLOCK = "capslock";
 
     TextField username;
     PasswordField password;
@@ -55,6 +57,7 @@ public class LoginView extends CssLayout implements HasI18N {
     private VerticalLayout centeringLayout;
     private ComboBox<Locale> lang;
     private Label loginInfoText;
+    private CapsLockWarning capsLockWarning;
 
     public LoginView(AccessControl accessControl, LoginListener loginListener) {
         this.accessControl = accessControl;
@@ -102,6 +105,7 @@ public class LoginView extends CssLayout implements HasI18N {
         loginInfoText.setValue("<h1>" + getTranslation(LOGIN_INFO) + "</h1>"
                 + getTranslation(LOGIN_INFO_TEXT));
         lang.setCaption(getTranslation(LANGUAGE));
+        capsLockWarning.setMessage(getTranslation(CAPSLOCK));
     }
 
     @Override
@@ -130,6 +134,8 @@ public class LoginView extends CssLayout implements HasI18N {
         username.setWidth(15, Unit.EM);
         loginForm.addComponent(
                 password = new PasswordField(getTranslation(PASSWORD)));
+        capsLockWarning = CapsLockWarning.warnFor(password);
+        capsLockWarning.setMessage(getTranslation(CAPSLOCK));
         password.setWidth(15, Unit.EM);
         password.setDescription(getTranslation(HINT));
         CssLayout buttons = new CssLayout();

@@ -11,4 +11,7 @@
 	<!-- Widget styles in public -directory -->
 	<stylesheet src="resetbuttonfortextfield/styles.css"/>
 
+	<source path="shared/" />
+	<source path="client/" />
+
 </module>

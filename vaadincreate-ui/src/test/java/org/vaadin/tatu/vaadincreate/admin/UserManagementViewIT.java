@@ -36,6 +36,12 @@ public class UserManagementViewIT extends AbstractViewTest {
                 .id("password-repeat");
         var role = $(ComboBoxElement.class).id("role-field");
 
+        var delete = $(ButtonElement.class).id("delete-button");
+        var save = $(ButtonElement.class).id("save-button");
+
+        assertFalse(delete.isEnabled());
+        assertFalse(save.isEnabled());
+
         assertFalse(user.isEnabled());
         assertFalse(password.isEnabled());
         assertFalse(passwordRepeat.isEnabled());
@@ -46,15 +52,20 @@ public class UserManagementViewIT extends AbstractViewTest {
         user.setValue("Testuser");
         password.setValue("testuser");
         assertTrue(password.getClassNames().contains("v-textfield-error"));
+        assertFalse(save.isEnabled());
         passwordRepeat.setValue("testuser");
         assertFalse(password.getClassNames().contains("v-textfield-error"));
         role.selectByText("USER");
         assertFalse(role.getClassNames().contains("v-textfield-error"));
 
-        $(ButtonElement.class).id("save-button").click();
+        assertTrue(save.isEnabled());
+        save.click();
 
         assertTrue($(NotificationElement.class).last().getText()
                 .contains("Testuser"));
+
+        assertFalse(delete.isEnabled());
+        assertFalse(save.isEnabled());
 
         assertEquals("", user.getValue());
         assertEquals("", password.getValue());
@@ -65,15 +76,18 @@ public class UserManagementViewIT extends AbstractViewTest {
         assertEquals("", userSelect.getValue());
         userSelect.selectByText("Testuser");
 
+        assertFalse(save.isEnabled());
+        assertTrue(delete.isEnabled());
+
         assertEquals("Testuser", user.getValue());
         assertEquals("testuser", password.getValue());
         assertEquals("testuser", passwordRepeat.getValue());
         assertEquals("USER", role.getValue());
 
-        $(ButtonElement.class).id("delete-button").click();
+        delete.click();
 
         var dialog = $(WindowElement.class).id("confirm-dialog");
-        Assert.assertTrue(dialog.$(LabelElement.class).first().getText()
+        assertTrue(dialog.$(LabelElement.class).first().getText()
                 .contains("Testuser"));
         dialog.$(ButtonElement.class).id("confirm-button").click();
 
@@ -81,6 +95,9 @@ public class UserManagementViewIT extends AbstractViewTest {
                 .contains("Testuser"));
 
         assertEquals("", userSelect.getValue());
+
+        assertFalse(delete.isEnabled());
+        assertFalse(save.isEnabled());
 
         assertEquals("", user.getValue());
         assertEquals("", password.getValue());

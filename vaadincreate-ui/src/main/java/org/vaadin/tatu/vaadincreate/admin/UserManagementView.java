@@ -63,7 +63,12 @@ public class UserManagementView extends VerticalLayout
         var buttons = new HorizontalLayout();
         var form = createUserForm();
         form.setEnabled(false);
-        buttons.setEnabled(false);
+        var save = new Button(getTranslation(SAVE));
+        save.setEnabled(false);
+        var delete = new Button(getTranslation(DELETE));
+        delete.addStyleName(ValoTheme.BUTTON_DANGER);
+        delete.setId("delete-button");
+        delete.setEnabled(false);
         userSelect.setEmptySelectionAllowed(false);
         userSelect.setItemCaptionGenerator(user -> user.getName());
         userSelect.setPlaceholder(getTranslation(SEARCH));
@@ -71,7 +76,9 @@ public class UserManagementView extends VerticalLayout
         userSelect.addValueChangeListener(event -> {
             if (event.isUserOriginated()) {
                 user = event.getValue();
-                populateForm(buttons, form);
+                populateForm(form);
+                delete.setEnabled(true);
+                save.setEnabled(false);
             }
         });
         var newUser = new Button(getTranslation(NEW_USER));
@@ -79,21 +86,21 @@ public class UserManagementView extends VerticalLayout
         newUser.setId("new-button");
         newUser.addClickListener(event -> {
             user = new User();
-            populateForm(buttons, form);
+            populateForm(form);
+            delete.setEnabled(false);
+            save.setEnabled(false);
         });
         header.addComponents(newUser, userSelect);
-        var save = new Button(getTranslation(SAVE));
         save.addStyleName(ValoTheme.BUTTON_PRIMARY);
         save.setClickShortcut(KeyCode.ENTER);
         save.setId("save-button");
-        var delete = new Button(getTranslation(DELETE));
-        delete.addStyleName(ValoTheme.BUTTON_DANGER);
-        delete.setId("delete-button");
         save.addClickListener(event -> {
             try {
                 binder.writeBean(user);
                 presenter.updateUser(user);
-                clearForm(buttons, form);
+                clearForm(form);
+                delete.setEnabled(false);
+                save.setEnabled(false);
                 userSelect.setValue(null);
             } catch (ValidationException e1) {
             }
@@ -107,15 +114,17 @@ public class UserManagementView extends VerticalLayout
             dialog.open();
             dialog.addConfirmedListener(e -> {
                 presenter.removeUser(user.getId());
-                clearForm(buttons, form);
+                clearForm(form);
+                delete.setEnabled(false);
+                save.setEnabled(false);
                 userSelect.setValue(null);
             });
         });
         binder.addStatusChangeListener(event -> {
             if (event.hasValidationErrors()) {
-                buttons.setEnabled(false);
+                save.setEnabled(false);
             } else {
-                buttons.setEnabled(true);
+                save.setEnabled(true);
             }
         });
         buttons.addComponents(delete, save);
@@ -128,17 +137,15 @@ public class UserManagementView extends VerticalLayout
         setSizeFull();
     }
 
-    private void populateForm(HorizontalLayout buttons, FormLayout form) {
+    private void populateForm(FormLayout form) {
         binder.readBean(user);
         password2.setValue(user.getPasswd());
-        buttons.setEnabled(true);
         form.setEnabled(true);
     }
 
-    private void clearForm(HorizontalLayout buttons, FormLayout form) {
+    private void clearForm(FormLayout form) {
         binder.readBean(null);
         password2.setValue("");
-        buttons.setEnabled(false);
         form.setEnabled(false);
     }
 

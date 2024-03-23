@@ -17,15 +17,15 @@ public class User implements Serializable {
     @Min(0)
     private int id;
 
-    @NotNull
-    @Size(min = 5, max = 20)
+    @NotNull(message = "{user.name.required}")
+    @Size(min = 5, max = 20, message = "{user.length}")
     private String name;
 
-    @NotNull
-    @Size(min = 5, max = 20)
+    @NotNull(message = "{passwd.required}")
+    @Size(min = 5, max = 20, message = "{passwd.length}")
     private String passwd;
 
-    @NotNull
+    @NotNull(message = "{role.required}")
     private Role role;
 
     public User() {

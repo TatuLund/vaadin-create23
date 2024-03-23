@@ -34,6 +34,7 @@ public class ComponentsUI extends UI {
         addView(ResetButtonForTextFieldView.NAME,
                 ResetButtonForTextFieldView.class);
         addView(AttributeExtensionView.NAME, AttributeExtensionView.class);
+        addView(CapsLockWarningView.NAME, CapsLockWarningView.class);
         setContent(content);
     }
 

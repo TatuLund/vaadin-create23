@@ -8,7 +8,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.client.ComponentConnector;
 import com.vaadin.client.ServerConnector;
-import com.vaadin.client.VConsole;
 import com.vaadin.client.annotations.OnStateChange;
 import com.vaadin.client.extensions.AbstractExtensionConnector;
 import com.vaadin.client.ui.VOverlay;
@@ -27,9 +26,10 @@ public class CapsLockWarningConnector extends AbstractExtensionConnector {
         passwordWidget = ((ComponentConnector) target).getWidget();
 
         warning = new VOverlay();
-        warning.setStyleName("v-tooltip");
+        warning.setStyleName("v-tooltip capslock");
         warning.setOwner(passwordWidget);
         messageElement = new HTML(getState().message);
+        messageElement.setStyleName("capslock-message");
         warning.add(messageElement);
         addKeyDownListener(passwordWidget.getElement());
     }

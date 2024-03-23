@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate;
+package org.vaadin.tatu.vaadincreate.uiunittest;
 
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinRequest;

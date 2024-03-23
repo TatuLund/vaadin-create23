@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate;
+package org.vaadin.tatu.vaadincreate.uiunittest;
 
 import java.util.HashMap;
 import java.util.Map;

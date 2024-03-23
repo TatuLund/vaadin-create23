@@ -17,7 +17,7 @@ import com.vaadin.ui.UI;
 public class LoginViewTest extends UIUnitTest {
 
     @Test
-    public void loginEvent() throws ServiceException {
+    public void loginEventFired() throws ServiceException {
         mockVaadin();
 
         var count = new AtomicInteger(0);
@@ -31,4 +31,19 @@ public class LoginViewTest extends UIUnitTest {
         login.login.click();
         Assert.assertEquals(1, count.get());
     }
-}
+
+    @Test
+    public void loginEventNotFired() throws ServiceException {
+        mockVaadin();
+
+        var count = new AtomicInteger(0);
+        var login = new LoginView(new MockAccessControl("Admin"),
+                e -> count.addAndGet(1));
+        var ui = UI.getCurrent();
+        ui.setContent(login);
+
+        login.username.setValue("Admin");
+        login.password.setValue("Wrong");
+        login.login.click();
+        Assert.assertEquals(0, count.get());
+    }}

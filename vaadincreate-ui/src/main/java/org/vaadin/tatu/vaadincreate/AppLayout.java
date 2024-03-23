@@ -129,6 +129,7 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
                 setSelected(event.getViewName());
                 logger.info("User '{}' navigated to view '{}'",
                         CurrentUser.get().get().getName(), event.getViewName());
+                menu.removeStyleName(ValoTheme.MENU_VISIBLE);
             }
 
             @Override

@@ -36,6 +36,8 @@ import com.vaadin.util.ReflectTools;
 @SuppressWarnings("serial")
 public class LoginView extends CssLayout implements HasI18N {
 
+    private static final String LOGIN_FAILED = "login-failed";
+    private static final String LOGIN_FAILED_DESC = "login-failed-desc";
     private static final String LOGIN_INFO = "login-info";
     private static final String LOGIN_INFO_TEXT = "login-info-text";
     private static final String LOGIN_BUTTON = "login-button";
@@ -191,8 +193,8 @@ public class LoginView extends CssLayout implements HasI18N {
         if (accessControl.signIn(username.getValue(), password.getValue())) {
             fireEvent(new LoginEvent(this));
         } else {
-            showNotification(new Notification("Login failed",
-                    "Please check your username and password and try again.",
+            showNotification(new Notification(getTranslation(LOGIN_FAILED),
+                    getTranslation(LOGIN_FAILED_DESC),
                     Notification.Type.HUMANIZED_MESSAGE));
             username.focus();
         }

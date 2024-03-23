@@ -25,6 +25,7 @@ public class CategoryManagementViewIT extends AbstractViewTest {
     @Test
     public void addAndRemoveCategory() {
         waitForElementPresent(By.id("new-category"));
+
         var grid = $(GridElement.class).first();
         var count = grid.getRowCount();
         $(ButtonElement.class).id("new-category").click();

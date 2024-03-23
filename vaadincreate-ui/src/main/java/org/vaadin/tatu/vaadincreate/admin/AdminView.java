@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate.admin;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
@@ -40,9 +42,10 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
         tabSheet.addStyleNames(ValoTheme.TABSHEET_PADDED_TABBAR,
                 ValoTheme.TABSHEET_CENTERED_TABS);
         tabSheet.addSelectedTabChangeListener(e -> {
-            setFragmentParameter(
-                    ((TabView) tabSheet.getSelectedTab()).getTabName());
+            var tabName = ((TabView) tabSheet.getSelectedTab()).getTabName();
+            setFragmentParameter(tabName);
             ((TabView) tabSheet.getSelectedTab()).enter();
+            logger.info("Tab '{}' selected.", tabName);
         });
         if (params.equals(UserManagementView.VIEW_NAME)) {
             tabSheet.setSelectedTab(users);
@@ -53,6 +56,7 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
         removeAllComponents();
         addComponent(tabSheet);
         categories.enter();
+        logger.info("Tab 'categories' selected.");
         setSizeFull();
     }
 
@@ -74,4 +78,6 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
         page.setUriFragment("!" + AdminView.VIEW_NAME + "/" + fragmentParameter,
                 false);
     }
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

@@ -67,12 +67,16 @@ public class UserManagementView extends VerticalLayout
         userSelect.setEmptySelectionAllowed(false);
         userSelect.setItemCaptionGenerator(user -> user.getName());
         userSelect.setPlaceholder(getTranslation(SEARCH));
+        userSelect.setId("user-select");
         userSelect.addValueChangeListener(event -> {
-            user = event.getValue();
-            populateForm(buttons, form);
+            if (event.isUserOriginated()) {
+                user = event.getValue();
+                populateForm(buttons, form);
+            }
         });
         var newUser = new Button(getTranslation(NEW_USER));
         newUser.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+        newUser.setId("new-button");
         newUser.addClickListener(event -> {
             user = new User();
             populateForm(buttons, form);
@@ -81,13 +85,16 @@ public class UserManagementView extends VerticalLayout
         var save = new Button(getTranslation(SAVE));
         save.addStyleName(ValoTheme.BUTTON_PRIMARY);
         save.setClickShortcut(KeyCode.ENTER);
+        save.setId("save-button");
         var delete = new Button(getTranslation(DELETE));
         delete.addStyleName(ValoTheme.BUTTON_DANGER);
+        delete.setId("delete-button");
         save.addClickListener(event -> {
             try {
                 binder.writeBean(user);
                 presenter.updateUser(user);
                 clearForm(buttons, form);
+                userSelect.setValue(null);
             } catch (ValidationException e1) {
             }
         });
@@ -101,6 +108,7 @@ public class UserManagementView extends VerticalLayout
             dialog.addConfirmedListener(e -> {
                 presenter.removeUser(user.getId());
                 clearForm(buttons, form);
+                userSelect.setValue(null);
             });
         });
         binder.addStatusChangeListener(event -> {
@@ -137,15 +145,19 @@ public class UserManagementView extends VerticalLayout
     private FormLayout createUserForm() {
         var form = new FormLayout();
         var username = new TextField(getTranslation(USERNAME));
+        username.setId("user-field");
         var userNameExt = new AttributeExtension();
         userNameExt.extend(username);
         userNameExt.setAttribute("autocomplete", "242343243");
         var password = new PasswordField(getTranslation(PASSWD));
+        password.setId("password-field");
         password2 = new PasswordField(getTranslation(PASSWD_REPEAT));
+        password2.setId("password-repeat");
         var role = new ComboBox<Role>(getTranslation(ROLE));
         role.setItems(Role.values());
         role.setEmptySelectionAllowed(false);
         role.setTextInputAllowed(false);
+        role.setId("role-field");
         form.addComponents(username, password, password2, role);
         form.addStyleName(ValoTheme.FORMLAYOUT_LIGHT);
 
@@ -180,15 +192,16 @@ public class UserManagementView extends VerticalLayout
     /**
      * Sets the list of users for the user select component.
      *
-     * @param allUsers the list of users to be set
+     * @param allUsers
+     *            the list of users to be set
      */
     public void setUsers(List<User> allUsers) {
         userSelect.setItems(allUsers);
     }
 
     /**
-     * Shows an error notification indicating that the user is a duplicate.
-     * The notification message is constructed using the user's name.
+     * Shows an error notification indicating that the user is a duplicate. The
+     * notification message is constructed using the user's name.
      */
     public void showDuplicateError() {
         Notification.show(getTranslation(USER_IS_DUPLICATE, user.getName()),

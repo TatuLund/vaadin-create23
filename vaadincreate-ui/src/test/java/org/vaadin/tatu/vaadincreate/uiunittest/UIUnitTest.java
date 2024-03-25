@@ -127,25 +127,25 @@ public abstract class UIUnitTest {
         return result;
     }
 
-    public Component $(String id) {
-        assert (id != null);
-        return $(UI.getCurrent(), id);
-    }
-
-    public Component $(HasComponents container, String id) {
-        assert (id != null);
-        var iter = container.iterator();
-        while (iter.hasNext()) {
-            var component = iter.next();
-            if (component.getId() != null && component.getId().equals(id)) {
-                return component;
-            }
-            if (component instanceof HasComponents) {
-                return $((HasComponents) component, id);
-            }
-        }
-        return null;
-    }
+//    public Component $(String id) {
+//        assert (id != null);
+//        return $(UI.getCurrent(), id);
+//    }
+//
+//    public Component $(HasComponents container, String id) {
+//        assert (id != null);
+//        var iter = container.iterator();
+//        while (iter.hasNext()) {
+//            var component = iter.next();
+//            if (component.getId() != null && component.getId().equals(id)) {
+//                return component;
+//            }
+//            if (component instanceof HasComponents) {
+//                return $((HasComponents) component, id);
+//            }
+//        }
+//        return null;
+//    }
 
     public <T> Object getGridCell(Grid<T> grid, int column, int row) {
         assert (grid != null);

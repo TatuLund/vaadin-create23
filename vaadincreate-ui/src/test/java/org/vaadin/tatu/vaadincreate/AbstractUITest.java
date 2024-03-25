@@ -10,11 +10,11 @@ import com.vaadin.ui.UI;
 public abstract class AbstractUITest extends UIUnitTest {
 
     protected void login() {
-        var username = (TextField) $("login-username-field");
+        var username = $(TextField.class).id("login-username-field");
         username.setValue("Admin");
-        var password = (PasswordField) $("login-password-field");
+        var password = $(PasswordField.class).id("login-password-field");
         password.setValue("admin");
-        var loginButton = (Button) $("login-button");
+        var loginButton = $(Button.class).id("login-button");
         loginButton.click();
     }
 }

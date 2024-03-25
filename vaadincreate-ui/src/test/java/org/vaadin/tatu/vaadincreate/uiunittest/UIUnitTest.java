@@ -95,6 +95,14 @@ public abstract class UIUnitTest {
         }
     }
 
+    public void tearDown() {
+        var session = VaadinSession.getCurrent();
+        var ui = UI.getCurrent();
+        ui.detach();
+        ui.close();
+        session.close();
+    }
+
     public Component navigate(String name) {
         assert (name != null);
         var nav = UI.getCurrent().getNavigator();

@@ -56,6 +56,8 @@ public class CategoryManagementViewTest extends AbstractUITest {
 
         assertFalse(
                 ProductDataService.get().getAllCategories().contains(newCat));
+
+        tearDown();
     }
 
 }

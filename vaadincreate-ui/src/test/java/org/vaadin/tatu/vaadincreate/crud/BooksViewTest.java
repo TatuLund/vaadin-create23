@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Locale;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
@@ -42,6 +43,11 @@ public class BooksViewTest extends AbstractUITest {
         waitForGrid(layout, grid);
         form = $(view, BookForm.class).first();
 
+    }
+
+    @After
+    public void cleanUp() {
+        tearDown();
     }
 
     @Test

@@ -5,6 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Locale;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
@@ -12,7 +14,6 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 
-import com.vaadin.data.ValueContext;
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.VerticalLayout;
@@ -24,12 +25,14 @@ public class BooksViewTest extends AbstractUITest {
     private BooksView view;
     private BookGrid grid;
     private BookForm form;
+    private String tenEuros;
 
     @Before
     public void setup() throws ServiceException {
         ui = new VaadinCreateUI();
         mockVaadin(ui);
         login();
+        ui.setLocale(Locale.US);
 
         view = (BooksView) navigate(BooksView.VIEW_NAME);
 
@@ -48,11 +51,7 @@ public class BooksViewTest extends AbstractUITest {
 
             assertEquals(book.getProductName(), form.productName.getValue());
             var price = form.price;
-            var converter = new EuroConverter("");
-            assertEquals(
-                    converter.convertToPresentation(book.getPrice(),
-                            new ValueContext(null, price, ui.getLocale())),
-                    price.getValue());
+            assertEquals("10.00 €", price.getValue());
             assertEquals("" + book.getStockCount(), form.stockCount.getValue());
 
             assertEquals(book.getAvailability(), form.availability.getValue());

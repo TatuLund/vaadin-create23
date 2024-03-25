@@ -28,14 +28,14 @@ public class CategoryManagementViewTest extends AbstractUITest {
 
         var admin = (AdminView) navigate(AdminView.VIEW_NAME);
 
-        var tabs = (TabSheet) $(admin, TabSheet.class);
+        var tabs = $(admin, TabSheet.class).first();
         var cats = (CategoryManagementView) tabs.getSelectedTab();
         var newCategory = (Button) $(cats, "new-category");
         newCategory.click();
-        var grid = (Grid<Category>) $(cats, Grid.class);
+        var grid = (Grid<Category>) $(cats, Grid.class).first();
         var gridSize = getGridSize(grid);
         var horiz = (HorizontalLayout) getGridCell(grid, 0, gridSize - 1);
-        var catField = $(horiz, TextField.class);
+        var catField = $(horiz, TextField.class).first();
         catField.setValue("Tech horror");
 
         var cat = (Category) getGridItem(grid, gridSize - 1);
@@ -49,10 +49,10 @@ public class CategoryManagementViewTest extends AbstractUITest {
                 .get();
 
         horiz = (HorizontalLayout) getGridCell(grid, 0, gridSize - 1);
-        var deleteButton = $(horiz, Button.class);
+        var deleteButton = $(horiz, Button.class).first();
         deleteButton.click();
-        var dialog = (Window) ui.getWindows().stream().findFirst().get();
-        var confirm = (Button) $(dialog, "confirm-button");
+        var dialog = $(Window.class).id("confirm-dialog").get();
+        var confirm = $(dialog, Button.class).id("confirm-button").get();
         confirm.click();
 
         assertFalse(

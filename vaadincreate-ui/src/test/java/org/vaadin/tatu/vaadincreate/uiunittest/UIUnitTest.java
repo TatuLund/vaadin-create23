@@ -2,9 +2,13 @@ package org.vaadin.tatu.vaadincreate.uiunittest;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +27,7 @@ import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.Window;
 
 /**
  * Base class for unit testing complex Vaadin components.
@@ -97,21 +102,29 @@ public abstract class UIUnitTest {
         return (Component) nav.getCurrentView();
     }
 
-    public <T> T $(Class<T> clazz) {
+    public <T extends Component> Result<T> $(Class<T> clazz) {
         assert (clazz != null);
+        if (clazz.equals(Window.class)) {
+            return new Result<T>((Collection<T>) UI.getCurrent().getWindows());
+        }
         return $(UI.getCurrent(), clazz);
     }
 
-    public <T> T $(HasComponents container, Class<T> clazz) {
+    public <T extends Component> Result<T> $(HasComponents container,
+            Class<T> clazz) {
         assert (container != null && clazz != null);
         var iter = container.iterator();
+        var result = new Result<T>();
         while (iter.hasNext()) {
             var component = iter.next();
             if (component.getClass().equals(clazz)) {
-                return (T) component;
+                result.add((T) component);
+            }
+            if (component instanceof HasComponents) {
+                result.addAll($((HasComponents) component, clazz));
             }
         }
-        return null;
+        return result;
     }
 
     public Component $(String id) {
@@ -170,6 +183,34 @@ public abstract class UIUnitTest {
             } while (condition.test(param) && i < 10);
         } finally {
             VaadinSession.getCurrent().lock();
+        }
+    }
+
+    public static class Result<T extends Component> extends ArrayList<T> {
+        public Result(Collection<T> list) {
+            super(list);
+        }
+
+        public Result() {
+            super();
+        }
+
+        public Optional<T> id(String id) {
+            return stream().filter(c -> c.getId().equals(id)).findFirst();
+        }
+
+        public Result<T> styleName(String styleName) {
+            return new Result<>(
+                    stream().filter(c -> c.getStyleName().contains(styleName))
+                            .collect(Collectors.toList()));
+        }
+
+        public T first() {
+            return get(0);
+        }
+
+        public T last() {
+            return get(size() - 1);
         }
     }
 }

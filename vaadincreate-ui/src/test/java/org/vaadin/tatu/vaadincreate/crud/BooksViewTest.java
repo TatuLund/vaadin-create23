@@ -33,10 +33,10 @@ public class BooksViewTest extends AbstractUITest {
 
         view = (BooksView) navigate(BooksView.VIEW_NAME);
 
-        var layout = (VerticalLayout) $(view, VerticalLayout.class);
-        grid = $(layout, BookGrid.class);
+        var layout = $(view, VerticalLayout.class).get(0);
+        grid = $(layout, BookGrid.class).get(0);
         waitForGrid(layout, grid);
-        form = $(view, BookForm.class);
+        form = $(view, BookForm.class).get(0);
 
     }
 
@@ -63,7 +63,7 @@ public class BooksViewTest extends AbstractUITest {
 
     @Test
     public void addProduct() throws ServiceException {
-        var newButton = (Button) $(view, "new-product");
+        var newButton = $(view, Button.class).id("new-product").get();
         newButton.click();
 
         form.productName.setValue("New book");
@@ -80,7 +80,7 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(ProductDataService.get().getAllProducts().stream()
                 .anyMatch(b -> b.getProductName().equals("New book")));
 
-        int row = getGridSize(grid)-1;
+        int row = getGridSize(grid) - 1;
         assertEquals("New book", getGridCell(grid, 1, row));
         assertEquals("10.00 €", getGridCell(grid, 2, row));
         assertEquals("10", getGridCell(grid, 4, row));
@@ -97,8 +97,8 @@ public class BooksViewTest extends AbstractUITest {
 
         form.delete.click();
 
-        var dialog = (Window) ui.getWindows().stream().findFirst().get();
-        var confirm = (Button) $(dialog, "confirm-button");
+        var dialog = $(Window.class).id("confirm-dialog").get();
+        var confirm = $(dialog, Button.class).id("confirm-button").get();
         confirm.click();
 
         assertEquals(null, ProductDataService.get().getProductById(id));
@@ -128,7 +128,7 @@ public class BooksViewTest extends AbstractUITest {
     private void waitForGrid(VerticalLayout layout, BookGrid grid) {
         assertFalse(grid.isVisible());
 
-        var fake = $(layout, FakeGrid.class);
+        var fake = $(layout, FakeGrid.class).get(0);
         waitWhile(fake, f -> f.isVisible());
         assertTrue(grid.isVisible());
     }

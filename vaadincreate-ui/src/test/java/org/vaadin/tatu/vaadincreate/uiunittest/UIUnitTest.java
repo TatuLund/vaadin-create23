@@ -195,8 +195,12 @@ public abstract class UIUnitTest {
             super();
         }
 
-        public Optional<T> id(String id) {
-            return stream().filter(c -> c.getId().equals(id)).findFirst();
+        public T id(String id) {
+            var res = stream().filter(c -> c.getId().equals(id)).findFirst();
+            if (res.isPresent()) {
+                return res.get();
+            }
+            return null;
         }
 
         public Result<T> styleName(String styleName) {

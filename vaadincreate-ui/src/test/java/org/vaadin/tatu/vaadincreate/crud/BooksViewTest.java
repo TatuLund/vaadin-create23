@@ -33,10 +33,10 @@ public class BooksViewTest extends AbstractUITest {
 
         view = (BooksView) navigate(BooksView.VIEW_NAME);
 
-        var layout = $(view, VerticalLayout.class).get(0);
-        grid = $(layout, BookGrid.class).get(0);
+        var layout = $(view, VerticalLayout.class).first();
+        grid = $(layout, BookGrid.class).first();
         waitForGrid(layout, grid);
-        form = $(view, BookForm.class).get(0);
+        form = $(view, BookForm.class).first();
 
     }
 
@@ -63,8 +63,7 @@ public class BooksViewTest extends AbstractUITest {
 
     @Test
     public void addProduct() throws ServiceException {
-        var newButton = $(view, Button.class).id("new-product").get();
-        newButton.click();
+        $(view, Button.class).id("new-product").click();
 
         form.productName.setValue("New book");
         form.price.setValue("10.0 €");
@@ -97,9 +96,8 @@ public class BooksViewTest extends AbstractUITest {
 
         form.delete.click();
 
-        var dialog = $(Window.class).id("confirm-dialog").get();
-        var confirm = $(dialog, Button.class).id("confirm-button").get();
-        confirm.click();
+        var dialog = $(Window.class).id("confirm-dialog");
+        $(dialog, Button.class).id("confirm-button").click();
 
         assertEquals(null, ProductDataService.get().getProductById(id));
 
@@ -128,7 +126,7 @@ public class BooksViewTest extends AbstractUITest {
     private void waitForGrid(VerticalLayout layout, BookGrid grid) {
         assertFalse(grid.isVisible());
 
-        var fake = $(layout, FakeGrid.class).get(0);
+        var fake = $(layout, FakeGrid.class).first();
         waitWhile(fake, f -> f.isVisible());
         assertTrue(grid.isVisible());
     }

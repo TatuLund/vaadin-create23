@@ -51,9 +51,8 @@ public class CategoryManagementViewTest extends AbstractUITest {
         horiz = (HorizontalLayout) getGridCell(grid, 0, gridSize - 1);
         var deleteButton = $(horiz, Button.class).first();
         deleteButton.click();
-        var dialog = $(Window.class).id("confirm-dialog").get();
-        var confirm = $(dialog, Button.class).id("confirm-button").get();
-        confirm.click();
+        var dialog = $(Window.class).id("confirm-dialog");
+        $(dialog, Button.class).id("confirm-button").click();
 
         assertFalse(
                 ProductDataService.get().getAllCategories().contains(newCat));

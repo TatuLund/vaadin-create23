@@ -57,7 +57,7 @@ public class MockVaadinService extends VaadinServletService {
 
     @Override
     protected boolean isAtmosphereAvailable() {
-        return false;
+        return true;
     }
 
     

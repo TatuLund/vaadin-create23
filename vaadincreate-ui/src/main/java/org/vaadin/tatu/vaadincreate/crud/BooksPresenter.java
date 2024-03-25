@@ -51,6 +51,7 @@ public class BooksPresenter implements Serializable {
 
     public void requestUpdateProducts() {
         future = loadProductsAsync().thenAccept(products -> {
+            logger.info("Fetching products complete");
             view.setProductsAsync(products);
             future = null;
         });

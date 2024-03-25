@@ -139,6 +139,7 @@ public class CategoryManagementView extends VerticalLayout
                     dataProvider.getItems().add(newCategory);
                     dataProvider.refreshItem(newCategory);
                 }
+                presenter.requestUpdateCategories();
                 deleteButton.setEnabled(true);
                 newCategoryButton.setEnabled(true);
                 Notification.show(

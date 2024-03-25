@@ -188,6 +188,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
     public void setProductsAsync(Collection<Product> products) {
         try {
             getUI().access(() -> {
+                logger.info("Updating products");
                 dataProvider = new ListDataProvider<>(products);
                 grid.setDataProvider(dataProvider);
                 grid.setVisible(true);

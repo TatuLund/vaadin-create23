@@ -1,13 +1,27 @@
 package org.vaadin.tatu.vaadincreate.uiunittest;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.mockito.Mockito;
 
+import com.vaadin.data.ValueProvider;
 import com.vaadin.server.ServiceException;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServletRequest;
+import com.vaadin.server.VaadinServletResponse;
 import com.vaadin.server.VaadinServletService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.UI;
 
 /**
@@ -23,18 +37,139 @@ public abstract class UIUnitTest {
      *
      * @throws ServiceException
      */
-    public void mockVaadin() throws ServiceException {
-        var session = new MockVaadinSession(new MockVaadinService());
+    public UI mockVaadin() throws ServiceException {
+        var service = new MockVaadinService();
+        var session = new MockVaadinSession(service);
         session.lock();
         VaadinSession.setCurrent(session);
-        var ui = new MockUI();
+        var ui = new MockUI(session);
         UI.setCurrent(ui);
         var request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getParameter("v-loc")).thenReturn("");
         Mockito.when(request.getParameter("v-cw")).thenReturn("1280");
         Mockito.when(request.getParameter("v-ch")).thenReturn("800");
         Mockito.when(request.getParameter("v-wn")).thenReturn("window");
-        ui.getPage().init(new VaadinServletRequest(request,
-                (VaadinServletService) session.getService()));
+        var vaadinRequest = new VaadinServletRequest(request,
+                (VaadinServletService) session.getService());
+        var response = Mockito.mock(HttpServletResponse.class);
+        service.setCurrentInstances(vaadinRequest,
+                new VaadinServletResponse(response, service));
+        ui.getPage().init(vaadinRequest);
+        return ui;
+    }
+
+    public void mockVaadin(UI ui) throws ServiceException {
+        var service = new MockVaadinService();
+        var session = new MockVaadinSession(service);
+        session.lock();
+        VaadinSession.setCurrent(session);
+        ui.setSession(session);
+        UI.setCurrent(ui);
+        var request = Mockito.mock(HttpServletRequest.class);
+        Mockito.when(request.getParameter("v-loc")).thenReturn("");
+        Mockito.when(request.getParameter("v-cw")).thenReturn("1280");
+        Mockito.when(request.getParameter("v-ch")).thenReturn("800");
+        Mockito.when(request.getParameter("v-wn")).thenReturn("window");
+        var vaadinRequest = new VaadinServletRequest(request,
+                (VaadinServletService) session.getService());
+        var response = Mockito.mock(HttpServletResponse.class);
+        service.setCurrentInstances(vaadinRequest,
+                new VaadinServletResponse(response, service));
+        ui.getPage().init(vaadinRequest);
+        Method initMethod;
+        var clazz = ui.getClass();
+        try {
+            initMethod = clazz.getDeclaredMethod("init", VaadinRequest.class);
+            initMethod.setAccessible(true);
+            initMethod.invoke(ui, vaadinRequest);
+        } catch (NoSuchMethodException | SecurityException
+                | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            System.out.println("Cannot call UI.init(VaadinRequest)");
+            e.printStackTrace();
+        }
+    }
+
+    public Component navigate(String name) {
+        assert (name != null);
+        var nav = UI.getCurrent().getNavigator();
+        nav.navigateTo(name);
+        return (Component) nav.getCurrentView();
+    }
+
+    public <T> T $(Class<T> clazz) {
+        assert (clazz != null);
+        return $(UI.getCurrent(), clazz);
+    }
+
+    public <T> T $(HasComponents container, Class<T> clazz) {
+        assert (container != null && clazz != null);
+        var iter = container.iterator();
+        while (iter.hasNext()) {
+            var component = iter.next();
+            if (component.getClass().equals(clazz)) {
+                return (T) component;
+            }
+        }
+        return null;
+    }
+
+    public Component $(String id) {
+        assert (id != null);
+        return $(UI.getCurrent(), id);
+    }
+
+    public Component $(HasComponents container, String id) {
+        assert (id != null);
+        var iter = container.iterator();
+        while (iter.hasNext()) {
+            var component = iter.next();
+            if (component.getId() != null && component.getId().equals(id)) {
+                return component;
+            }
+            if (component instanceof HasComponents) {
+                return $((HasComponents) component, id);
+            }
+        }
+        return null;
+    }
+
+    public <T> Object getGridCell(Grid<T> grid, int column, int row) {
+        assert (grid != null);
+        assert (column > -1 && column < grid.getColumns().size());
+        assert (row > -1 && row < getGridSize(grid));
+        var cat = (T) getGridItem(grid, row);
+        var vp = (ValueProvider<T, ?>) grid.getColumns().get(column)
+                .getValueProvider();
+        return vp.apply(cat);
+    }
+
+    public <T> T getGridItem(Grid<T> grid, int index) {
+        assert (grid != null);
+        return grid.getDataCommunicator().fetchItemsWithRange(index, 1).get(0);
+    }
+
+    public <T> int getGridSize(Grid<T> grid) {
+        assert (grid != null);
+        return grid.getDataCommunicator().getDataProviderSize();
+    }
+
+    public <T> void waitWhile(T param, Predicate<T> condition) {
+        assert (param != null);
+        assert (condition != null);
+        assert (VaadinSession.getCurrent().hasLock());
+        VaadinSession.getCurrent().unlock();
+        try {
+            int i = 0;
+            do {
+                try {
+                    Thread.sleep(1000);
+                    i++;
+                } catch (InterruptedException e) {
+                }
+            } while (condition.test(param) && i < 10);
+        } finally {
+            VaadinSession.getCurrent().lock();
+        }
     }
 }

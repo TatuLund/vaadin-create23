@@ -18,7 +18,7 @@ import com.vaadin.testbench.elements.VerticalLayoutElement;
 import com.vaadin.testbench.elements.WindowElement;
 import com.vaadin.ui.themes.ValoTheme;
 
-public class CrudViewIT extends AbstractViewTest {
+public class BooksViewIT extends AbstractViewTest {
 
     private final static String PRICE_EN = "10.00 €";
     private final static String PRICE_FI = "10,00 €";

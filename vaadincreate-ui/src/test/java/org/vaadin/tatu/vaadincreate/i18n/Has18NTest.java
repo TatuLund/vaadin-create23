@@ -2,20 +2,18 @@ package org.vaadin.tatu.vaadincreate.i18n;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.vaadin.tatu.vaadincreate.uiunittest.MockVaadinSession;
 import org.vaadin.tatu.vaadincreate.uiunittest.UIUnitTest;
 
 import com.vaadin.server.ServiceException;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Label;
 
 public class Has18NTest extends UIUnitTest {
 
     @Test
     public void testLocalization() throws ServiceException {
-        mockVaadin();
+        var ui = mockVaadin();
 
-        var session = VaadinSession.getCurrent();
+        var session = ui.getSession();
 
         session.setLocale(DefaultI18NProvider.LOCALE_EN);
         var label = new LocalizedLabel("save");

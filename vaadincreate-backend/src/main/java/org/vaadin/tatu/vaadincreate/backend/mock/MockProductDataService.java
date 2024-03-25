@@ -110,9 +110,11 @@ public class MockProductDataService extends ProductDataService {
         if (newCategory.getId() < 0) {
             newCategory.setId(nextCategoryId++);
             categories.add(newCategory);
+            logger.info("Category {} created", newCategory.getId());
         } else {
-            deleteCategory(category.getId());
+            deleteCategoryInternal(category.getId());
             categories.add(newCategory);
+            logger.info("Category {} updated", newCategory.getId());
         }
         return newCategory;
     }
@@ -120,6 +122,15 @@ public class MockProductDataService extends ProductDataService {
     @Override
     public void deleteCategory(int categoryId) {
         randomWait(1);
+        if (!getAllProducts().stream().anyMatch(c -> c.getId() == categoryId)) {
+            throw new IllegalArgumentException(
+                    "Category with id " + categoryId + " not found");
+        }
+        deleteCategoryInternal(categoryId);
+        logger.info("Category {} deleted", categoryId);
+    }
+
+    public void deleteCategoryInternal(int categoryId) {
         if (categories.removeIf(category -> category.getId() == categoryId)) {
             getAllProducts().forEach(product -> {
                 product.getCategory()

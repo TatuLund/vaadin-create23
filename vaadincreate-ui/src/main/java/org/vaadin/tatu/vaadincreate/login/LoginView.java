@@ -134,18 +134,21 @@ public class LoginView extends CssLayout implements HasI18N {
         loginForm.addComponent(
                 username = new TextField(getTranslation(USERNAME), "Admin"));
         username.setWidth(15, Unit.EM);
+        username.setId("login-username-field");
         loginForm.addComponent(
                 password = new PasswordField(getTranslation(PASSWORD)));
         capsLockWarning = CapsLockWarning.warnFor(password);
         capsLockWarning.setMessage(getTranslation(CAPSLOCK));
         password.setWidth(15, Unit.EM);
         password.setDescription(getTranslation(HINT));
+        password.setId("login-password-field");
         CssLayout buttons = new CssLayout();
         buttons.setStyleName("buttons");
         loginForm.addComponent(buttons);
 
         buttons.addComponent(login = new Button(getTranslation(LOGIN_BUTTON)));
         login.setDisableOnClick(true);
+        login.setId("login-button");
         login.addClickListener(event -> {
             try {
                 login();

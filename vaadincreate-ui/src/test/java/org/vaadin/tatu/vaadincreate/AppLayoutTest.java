@@ -20,8 +20,7 @@ public class AppLayoutTest extends UIUnitTest {
     @Test
     public void testAppLayoutAccessControlAdminPass() throws ServiceException {
         // Vaadin mocks
-        mockVaadin();
-        var ui = UI.getCurrent();
+        var ui = mockVaadin();
 
         // App mocks
         var accessControl = new MockAccessControl("Admin");

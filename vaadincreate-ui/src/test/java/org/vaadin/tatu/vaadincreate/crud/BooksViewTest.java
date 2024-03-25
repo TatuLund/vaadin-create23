@@ -14,6 +14,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 
+import com.vaadin.data.ValueContext;
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.VerticalLayout;
@@ -51,7 +52,11 @@ public class BooksViewTest extends AbstractUITest {
 
             assertEquals(book.getProductName(), form.productName.getValue());
             var price = form.price;
-            assertEquals("10.00 €", price.getValue());
+            var converter = new EuroConverter("");
+            assertEquals(
+                    converter.convertToPresentation(book.getPrice(),
+                            new ValueContext(null, price, ui.getLocale())),
+                    price.getValue());
             assertEquals("" + book.getStockCount(), form.stockCount.getValue());
 
             assertEquals(book.getAvailability(), form.availability.getValue());

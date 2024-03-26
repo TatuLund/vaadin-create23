@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Locale;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
@@ -27,7 +28,6 @@ public class BooksViewTest extends AbstractUITest {
     private BooksView view;
     private BookGrid grid;
     private BookForm form;
-    private String tenEuros;
 
     @Before
     public void setup() throws ServiceException {
@@ -75,14 +75,14 @@ public class BooksViewTest extends AbstractUITest {
     public void addProduct() throws ServiceException {
         $(view, Button.class).id("new-product").click();
 
-        form.productName.setValue("New book");
-        form.price.setValue("10.0 €");
-        form.availability.setValue(Availability.AVAILABLE);
-        form.stockCount.setValue("10");
+        test(form.productName).setValue("New book");
+        test(form.price).setValue("10.0 €");
+        test(form.availability).setValue(Availability.AVAILABLE);
+        test(form.stockCount).setValue("10");
 
         var cat = ProductDataService.get().getAllCategories().stream()
                 .findFirst().get();
-        form.category.select(cat);
+        test(form.category).setValue(Set.of(cat)); // . select(cat);
 
         form.save.click();
 
@@ -122,7 +122,7 @@ public class BooksViewTest extends AbstractUITest {
 
         var id = book.getId();
 
-        form.productName.setValue("Edited book");
+        test(form.productName).setValue("Edited book");
         form.save.click();
 
         var edited = ProductDataService.get().getProductById(id);

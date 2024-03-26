@@ -22,10 +22,14 @@ import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.server.VaadinServletResponse;
 import com.vaadin.server.VaadinServletService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.AbstractMultiSelect;
+import com.vaadin.ui.AbstractSingleSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HasComponents;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
@@ -113,7 +117,8 @@ public abstract class UIUnitTest {
     public <T extends Component> QueryResult<T> $(Class<T> clazz) {
         assert (clazz != null);
         if (clazz.equals(Window.class)) {
-            return new QueryResult<T>((Collection<T>) UI.getCurrent().getWindows());
+            return new QueryResult<T>(
+                    (Collection<T>) UI.getCurrent().getWindows());
         }
         return $(UI.getCurrent(), clazz);
     }
@@ -137,6 +142,20 @@ public abstract class UIUnitTest {
 
     public <T> GridTester<T> test(Grid<T> component) {
         return new GridTester<>(component);
+    }
+
+    public <T> AbstractFieldTester<T> test(AbstractField<T> component) {
+        return new AbstractFieldTester<>(component);
+    }
+
+    public <T> AbstractSingleSelectTester<T> test(
+            AbstractSingleSelect<T> component) {
+        return new AbstractSingleSelectTester<>(component);
+    }
+
+    public <T> AbstractMultiSelectTester<T> test(
+            AbstractMultiSelect<T> component) {
+        return new AbstractMultiSelectTester<>(component);
     }
 
     public <T> void waitWhile(T param, Predicate<T> condition) {
@@ -178,6 +197,12 @@ public abstract class UIUnitTest {
         public QueryResult<T> styleName(String styleName) {
             return new QueryResult<>(
                     stream().filter(c -> c.getStyleName().contains(styleName))
+                            .collect(Collectors.toList()));
+        }
+
+        public QueryResult<T> caption(String caption) {
+            return new QueryResult<>(
+                    stream().filter(c -> c.getCaption().contains(caption))
                             .collect(Collectors.toList()));
         }
 

@@ -29,6 +29,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HasComponents;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
@@ -138,6 +139,10 @@ public abstract class UIUnitTest {
             }
         }
         return result;
+    }
+
+    public TabSheetTester test(TabSheet component) {
+        return new TabSheetTester(component);
     }
 
     public <T> GridTester<T> test(Grid<T> component) {

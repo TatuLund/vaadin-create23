@@ -29,7 +29,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var admin = (AdminView) navigate(AdminView.VIEW_NAME);
 
         var tabs = $(admin, TabSheet.class).first();
-        var cats = (CategoryManagementView) tabs.getSelectedTab();
+        var cats = (CategoryManagementView) test(tabs).current();
         var newCategory = $(cats, Button.class).id("new-category");
         newCategory.click();
         var grid = (Grid<Category>) $(cats, Grid.class).first();

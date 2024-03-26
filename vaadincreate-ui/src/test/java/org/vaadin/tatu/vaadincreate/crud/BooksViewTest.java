@@ -109,7 +109,7 @@ public class BooksViewTest extends AbstractUITest {
     @Test
     public void deleteProduct() {
         var book = test(grid).item(0);
-        grid.select(book);
+        test(grid).click(0,0);
 
         var id = book.getId();
         var name = book.getProductName();
@@ -128,7 +128,7 @@ public class BooksViewTest extends AbstractUITest {
     @Test
     public void editProduct() {
         var book = test(grid).item(0);
-        grid.select(book);
+        test(grid).click(0,0);
 
         var id = book.getId();
 

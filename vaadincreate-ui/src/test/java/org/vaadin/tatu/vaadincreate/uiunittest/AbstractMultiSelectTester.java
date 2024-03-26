@@ -14,6 +14,7 @@ public class AbstractMultiSelectTester<T>
     private AbstractMultiSelect<T> field;
 
     public AbstractMultiSelectTester(AbstractMultiSelect<T> field) {
+        super(field);
         this.field = field;
     }
 

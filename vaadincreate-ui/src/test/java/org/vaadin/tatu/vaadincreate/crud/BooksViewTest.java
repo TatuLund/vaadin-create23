@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
@@ -53,9 +54,10 @@ public class BooksViewTest extends AbstractUITest {
     @Test
     public void selectProduct() throws ServiceException {
         for (int i = 0; i < test(grid).size(); i += 10) {
-            var book = test(grid).item(i);
-            grid.select(book);
 
+            test(grid).click(0, i);
+
+            var book = test(grid).item(i);
             assertEquals(book.getProductName(), form.productName.getValue());
             var price = form.price;
             var converter = new EuroConverter("");
@@ -67,6 +69,14 @@ public class BooksViewTest extends AbstractUITest {
 
             assertEquals(book.getAvailability(), form.availability.getValue());
             assertEquals(book.getCategory(), form.category.getValue());
+
+            test(grid).click(0, i);
+
+            assertEquals("", form.productName.getValue());
+            assertEquals("0", form.stockCount.getValue());
+            assertEquals("0.00 €", form.price.getValue());
+            assertEquals(Availability.COMING, form.availability.getValue());
+            assertEquals(Collections.emptySet(), form.category.getValue());
         }
 
     }

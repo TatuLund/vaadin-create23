@@ -10,6 +10,7 @@ public class AbstractSingleSelectTester<T>
     private AbstractSingleSelect<T> field;
 
     public AbstractSingleSelectTester(AbstractSingleSelect<T> field) {
+        super(field);
         this.field = field;
     }
 

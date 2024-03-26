@@ -9,6 +9,7 @@ public class AbstractFieldTester<T> extends Tester<AbstractField<T>> {
     private AbstractField<T> field;
 
     public AbstractFieldTester(AbstractField<T> field) {
+        super(field);
         this.field = field;
     }
 

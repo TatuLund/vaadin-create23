@@ -52,8 +52,8 @@ public class BooksViewTest extends AbstractUITest {
 
     @Test
     public void selectProduct() throws ServiceException {
-        for (int i = 0; i < getGridSize(grid); i += 10) {
-            var book = getGridItem(grid, i);
+        for (int i = 0; i < test(grid).size(); i += 10) {
+            var book = test(grid).item(i);
             grid.select(book);
 
             assertEquals(book.getProductName(), form.productName.getValue());
@@ -89,16 +89,16 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(ProductDataService.get().getAllProducts().stream()
                 .anyMatch(b -> b.getProductName().equals("New book")));
 
-        int row = getGridSize(grid) - 1;
-        assertEquals("New book", getGridCell(grid, 1, row));
-        assertEquals("10.00 €", getGridCell(grid, 2, row));
-        assertEquals("10", getGridCell(grid, 4, row));
-        assertEquals(cat.getName(), getGridCell(grid, 5, row));
+        int row = test(grid).size() - 1;
+        assertEquals("New book", test(grid).cell(1, row));
+        assertEquals("10.00 €", test(grid).cell(2, row));
+        assertEquals("10", test(grid).cell(4, row));
+        assertEquals(cat.getName(), test(grid).cell(5, row));
     }
 
     @Test
     public void deleteProduct() {
-        var book = getGridItem(grid, 0);
+        var book = test(grid).item(0);
         grid.select(book);
 
         var id = book.getId();
@@ -111,13 +111,13 @@ public class BooksViewTest extends AbstractUITest {
 
         assertEquals(null, ProductDataService.get().getProductById(id));
 
-        var newName = getGridCell(grid, 1, 0);
+        var newName = test(grid).cell(1, 0);
         assertNotEquals(name, newName);
     }
 
     @Test
     public void editProduct() {
-        var book = getGridItem(grid, 0);
+        var book = test(grid).item(0);
         grid.select(book);
 
         var id = book.getId();
@@ -127,7 +127,7 @@ public class BooksViewTest extends AbstractUITest {
 
         var edited = ProductDataService.get().getProductById(id);
 
-        var name = (String) getGridCell(grid, 1, 0);
+        var name = (String) test(grid).cell(1, 0);
 
         assertEquals("Edited book", name);
         assertEquals("Edited book", edited.getProductName());

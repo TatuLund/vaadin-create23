@@ -110,19 +110,19 @@ public abstract class UIUnitTest {
         return (Component) nav.getCurrentView();
     }
 
-    public <T extends Component> Result<T> $(Class<T> clazz) {
+    public <T extends Component> QueryResult<T> $(Class<T> clazz) {
         assert (clazz != null);
         if (clazz.equals(Window.class)) {
-            return new Result<T>((Collection<T>) UI.getCurrent().getWindows());
+            return new QueryResult<T>((Collection<T>) UI.getCurrent().getWindows());
         }
         return $(UI.getCurrent(), clazz);
     }
 
-    public <T extends Component> Result<T> $(HasComponents container,
+    public <T extends Component> QueryResult<T> $(HasComponents container,
             Class<T> clazz) {
         assert (container != null && clazz != null);
         var iter = container.iterator();
-        var result = new Result<T>();
+        var result = new QueryResult<T>();
         while (iter.hasNext()) {
             var component = iter.next();
             if (component.getClass().equals(clazz)) {
@@ -135,44 +135,8 @@ public abstract class UIUnitTest {
         return result;
     }
 
-//    public Component $(String id) {
-//        assert (id != null);
-//        return $(UI.getCurrent(), id);
-//    }
-//
-//    public Component $(HasComponents container, String id) {
-//        assert (id != null);
-//        var iter = container.iterator();
-//        while (iter.hasNext()) {
-//            var component = iter.next();
-//            if (component.getId() != null && component.getId().equals(id)) {
-//                return component;
-//            }
-//            if (component instanceof HasComponents) {
-//                return $((HasComponents) component, id);
-//            }
-//        }
-//        return null;
-//    }
-
-    public <T> Object getGridCell(Grid<T> grid, int column, int row) {
-        assert (grid != null);
-        assert (column > -1 && column < grid.getColumns().size());
-        assert (row > -1 && row < getGridSize(grid));
-        var cat = (T) getGridItem(grid, row);
-        var vp = (ValueProvider<T, ?>) grid.getColumns().get(column)
-                .getValueProvider();
-        return vp.apply(cat);
-    }
-
-    public <T> T getGridItem(Grid<T> grid, int index) {
-        assert (grid != null);
-        return grid.getDataCommunicator().fetchItemsWithRange(index, 1).get(0);
-    }
-
-    public <T> int getGridSize(Grid<T> grid) {
-        assert (grid != null);
-        return grid.getDataCommunicator().getDataProviderSize();
+    public <T> GridTester<T> test(Grid<T> component) {
+        return new GridTester<>(component);
     }
 
     public <T> void waitWhile(T param, Predicate<T> condition) {
@@ -194,12 +158,12 @@ public abstract class UIUnitTest {
         }
     }
 
-    public static class Result<T extends Component> extends ArrayList<T> {
-        public Result(Collection<T> list) {
+    public static class QueryResult<T extends Component> extends ArrayList<T> {
+        public QueryResult(Collection<T> list) {
             super(list);
         }
 
-        public Result() {
+        public QueryResult() {
             super();
         }
 
@@ -211,8 +175,8 @@ public abstract class UIUnitTest {
             return null;
         }
 
-        public Result<T> styleName(String styleName) {
-            return new Result<>(
+        public QueryResult<T> styleName(String styleName) {
+            return new QueryResult<>(
                     stream().filter(c -> c.getStyleName().contains(styleName))
                             .collect(Collectors.toList()));
         }

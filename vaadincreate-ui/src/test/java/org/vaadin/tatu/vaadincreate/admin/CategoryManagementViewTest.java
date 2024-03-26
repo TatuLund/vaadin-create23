@@ -33,12 +33,12 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var newCategory = $(cats, Button.class).id("new-category");
         newCategory.click();
         var grid = (Grid<Category>) $(cats, Grid.class).first();
-        var gridSize = getGridSize(grid);
-        var horiz = (HorizontalLayout) getGridCell(grid, 0, gridSize - 1);
+        var gridSize = test(grid).size();
+        var horiz = (HorizontalLayout) test(grid).cell(0, gridSize - 1);
         var catField = $(horiz, TextField.class).first();
         catField.setValue("Tech horror");
 
-        var cat = (Category) getGridItem(grid, gridSize - 1);
+        var cat = (Category) test(grid).item(gridSize - 1);
         assertEquals("Tech horror", cat.getName());
 
         assertTrue(ProductDataService.get().getAllCategories().stream()
@@ -48,7 +48,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
                 .filter(c -> c.getName().equals("Tech horror")).findFirst()
                 .get();
 
-        horiz = (HorizontalLayout) getGridCell(grid, 0, gridSize - 1);
+        horiz = (HorizontalLayout) test(grid).cell(0, gridSize - 1);
         var deleteButton = $(horiz, Button.class).first();
         deleteButton.click();
         var dialog = $(Window.class).id("confirm-dialog");

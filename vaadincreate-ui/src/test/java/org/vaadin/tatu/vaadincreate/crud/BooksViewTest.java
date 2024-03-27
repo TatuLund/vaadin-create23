@@ -92,7 +92,7 @@ public class BooksViewTest extends AbstractUITest {
 
         var cat = ProductDataService.get().getAllCategories().stream()
                 .findFirst().get();
-        test(form.category).setValue(Set.of(cat)); // . select(cat);
+        test(form.category).setValue(Set.of(cat));
 
         form.save.click();
 

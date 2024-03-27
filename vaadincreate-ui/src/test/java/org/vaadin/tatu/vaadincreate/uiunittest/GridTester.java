@@ -152,12 +152,11 @@ public class GridTester<T> extends Tester<Grid<T>> {
      * Select given item. Grid needs to be singleselect.
      *
      * @param item
-     *            Item to select.
+     *            Item to select, null to deselect existing.
      */
     public void select(T item) {
         assert (grid
                 .getSelectionModel() instanceof SingleSelectionModel) : "Grid is not singleselect";
-        assert (item != null) : "Item can't be null";
         var key = grid.getDataCommunicator().getKeyMapper().key(item);
         var model = (SingleSelectionModelImpl<T>) grid.getSelectionModel();
         Class<?> clazz = model.getClass();

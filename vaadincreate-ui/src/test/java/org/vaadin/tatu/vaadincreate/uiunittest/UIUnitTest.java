@@ -35,16 +35,16 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
 /**
- * Base class for unit testing complex Vaadin components.
+ * Base class for unit testing complex Vaadin Components and UIs.
  */
 public abstract class UIUnitTest {
 
     /**
-     * Create mocked Vaadin environment without Atmosphere support. This is
-     * enough for common use cases. In Vaadin 23/24 version of the TestBench
-     * there is more complete Vaadin environment mock together with component
-     * helpers. Will set UI and Session thread locals.
+     * Create mocked Vaadin environment with blank UI without Atmosphere
+     * support. This is enough for common use cases testing standalone server
+     * side components. Session is locked.
      *
+     * @see tearDown()
      * @throws ServiceException
      */
     public UI mockVaadin() throws ServiceException {
@@ -68,7 +68,18 @@ public abstract class UIUnitTest {
         return ui;
     }
 
+    /**
+     * Create mocked Vaadin environment with given UI without Atmosphere
+     * support. This is makes possible to test more complex UI logic. Session is
+     * locked. UI and VaadinSession threadlocals are set.
+     *
+     * @see tearDown()
+     * @param ui
+     *            UI instance
+     * @throws ServiceException
+     */
     public void mockVaadin(UI ui) throws ServiceException {
+        assert (ui != null) : "UI can't be null";
         var service = new MockVaadinService();
         var session = new MockVaadinSession(service);
         session.lock();
@@ -100,23 +111,58 @@ public abstract class UIUnitTest {
         }
     }
 
+    /**
+     * Do clean-up of the mocked Vaadin created with mockVaadin methods.
+     *
+     * @see mockVaadin(ui
+     * @see mockVaadin(UI)
+     */
     public void tearDown() {
         var session = VaadinSession.getCurrent();
         var ui = UI.getCurrent();
         ui.detach();
         ui.close();
         session.close();
+        VaadinSession.setCurrent(null);
+        UI.setCurrent(null);
     }
 
-    public Component navigate(String name) {
+    /**
+     * Navigate to a view
+     *
+     * @param <T>
+     *            Target type
+     * @param name
+     *            The navigation path as a String, can include url parameters
+     * @param clazz
+     *            The class of the target view
+     * @return
+     */
+    public <T> T navigate(String name, Class<T> clazz) {
         assert (name != null);
+        assert (clazz != null);
         var nav = UI.getCurrent().getNavigator();
+        assert (nav != null) : "Navigator does not exists";
         nav.navigateTo(name);
-        return (Component) nav.getCurrentView();
+        var view = nav.getCurrentView();
+        assert (view.getClass().equals(clazz));
+        return (T) view;
     }
 
+    /**
+     * Find all components of given type recursively within the UI.
+     * 
+     * @see QueryResult
+     *
+     * @param <T>
+     *            Component type
+     * @param clazz
+     *            Component class
+     * @return QueryResult of components
+     */
     public <T extends Component> QueryResult<T> $(Class<T> clazz) {
         assert (clazz != null);
+        assert (UI.getCurrent() != null) : "UI has not been setup";
         if (clazz.equals(Window.class)) {
             return new QueryResult<T>(
                     (Collection<T>) UI.getCurrent().getWindows());
@@ -124,6 +170,20 @@ public abstract class UIUnitTest {
         return $(UI.getCurrent(), clazz);
     }
 
+    /**
+     * Find all components of given type recursively within the given component
+     * container.
+     * 
+     * @see QueryResult
+     *
+     * @param <T>
+     *            Component type
+     * @param container
+     *            Component container to search
+     * @param clazz
+     *            Component class
+     * @return QueryResult of components
+     */
     public <T extends Component> QueryResult<T> $(HasComponents container,
             Class<T> clazz) {
         assert (container != null && clazz != null);
@@ -141,29 +201,85 @@ public abstract class UIUnitTest {
         return result;
     }
 
+    /**
+     * Perform operations with the component as a user. E.g. if the operation
+     * fires an event as an side effect, it has isUserOriginated = true.
+     *
+     * @param component
+     *            The component
+     * @return Tester for operations
+     */
     public TabSheetTester test(TabSheet component) {
         return new TabSheetTester(component);
     }
 
+    /**
+     * Perform operations with the component as a user. E.g. if the operation
+     * fires an event as an side effect, it has isUserOriginated = true.
+     *
+     * @param component
+     *            The component
+     * @return Tester for operations
+     */
     public <T> GridTester<T> test(Grid<T> component) {
         return new GridTester<>(component);
     }
 
+    /**
+     * Perform operations with the component as a user. E.g. if the operation
+     * fires an event as an side effect, it has isUserOriginated = true.
+     *
+     * @param component
+     *            The component
+     * @return Tester for operations
+     */
     public <T> AbstractFieldTester<T> test(AbstractField<T> component) {
         return new AbstractFieldTester<>(component);
     }
 
+    /**
+     * Perform operations with the component as a user. E.g. if the operation
+     * fires an event as an side effect, it has isUserOriginated = true.
+     *
+     * @param component
+     *            The component
+     * @return Tester for operations
+     */
     public <T> AbstractSingleSelectTester<T> test(
             AbstractSingleSelect<T> component) {
         return new AbstractSingleSelectTester<>(component);
     }
 
+    /**
+     * Perform operations with the component as a user. E.g. if the operation
+     * fires an event as an side effect, it has isUserOriginated = true.
+     *
+     * @param component
+     *            The component
+     * @return Tester for operations
+     */
     public <T> AbstractMultiSelectTester<T> test(
             AbstractMultiSelect<T> component) {
         return new AbstractMultiSelectTester<>(component);
     }
 
-    public <T> void waitWhile(T param, Predicate<T> condition) {
+    /**
+     * Utility mehtod that waits while condition is true. Unlocks the mocked
+     * session and returns lock after wait ends. This is useful when waiting
+     * background thread activity to complete and letting ui.access to happen.
+     *
+     * @see UI#access(Runnable)
+     *
+     * @param <T>
+     *            Parameter type
+     * @param param
+     *            Parameter for the predicate
+     * @param condition
+     *            Boolean predicate, can be lambda expression
+     * @param timeout
+     *            Wait maximum seconds
+     */
+    public <T> void waitWhile(T param, Predicate<T> condition, int timeout) {
         assert (param != null);
         assert (condition != null);
         assert (VaadinSession.getCurrent().hasLock());
@@ -176,12 +292,21 @@ public abstract class UIUnitTest {
                     i++;
                 } catch (InterruptedException e) {
                 }
-            } while (condition.test(param) && i < 10);
+            } while (condition.test(param) && i < timeout);
         } finally {
             VaadinSession.getCurrent().lock();
         }
     }
 
+    /**
+     * Result type for component searches.
+     *
+     * @see $(Class)
+     * @see $(HasComponents, Class)
+     *
+     * @param <T>
+     *            Component type
+     */
     public static class QueryResult<T extends Component> extends ArrayList<T> {
         public QueryResult(Collection<T> list) {
             super(list);
@@ -191,6 +316,15 @@ public abstract class UIUnitTest {
             super();
         }
 
+        /**
+         * Find the component by id using exact match. Returns the first
+         * matching component by id within the search results assuming ids are
+         * unique.
+         *
+         * @param id
+         *            The id as String
+         * @return Component instance, can be null
+         */
         public T id(String id) {
             var res = stream().filter(c -> c.getId().equals(id)).findFirst();
             if (res.isPresent()) {
@@ -199,23 +333,55 @@ public abstract class UIUnitTest {
             return null;
         }
 
+        /**
+         * Find components by matching style name, using partial matching.
+         * Result can contain many components.
+         *
+         * @param styleName
+         *            Style name as String
+         * @return Result set of components
+         */
         public QueryResult<T> styleName(String styleName) {
             return new QueryResult<>(
                     stream().filter(c -> c.getStyleName().contains(styleName))
                             .collect(Collectors.toList()));
         }
 
+        /**
+         * Find components by matching caption, using partial matching. Result
+         * can contain many components.
+         *
+         * @param caption
+         *            Caption as String
+         * @return Result set of components
+         */
         public QueryResult<T> caption(String caption) {
             return new QueryResult<>(
                     stream().filter(c -> c.getCaption().contains(caption))
                             .collect(Collectors.toList()));
         }
 
+        /**
+         * Return the first component in the list.
+         *
+         * @return Component, null if the list was empty.
+         */
         public T first() {
+            if (isEmpty()) {
+                return null;
+            }
             return get(0);
         }
 
+        /**
+         * Return the last component in the list.
+         *
+         * @return Component, null if the list was empty.
+         */
         public T last() {
+            if (isEmpty()) {
+                return null;
+            }
             return get(size() - 1);
         }
     }

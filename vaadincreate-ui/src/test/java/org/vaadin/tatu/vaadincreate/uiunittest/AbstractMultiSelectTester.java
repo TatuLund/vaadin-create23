@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import com.vaadin.ui.AbstractMultiSelect;
 
-public class AbstractMultiSelectTester<T>
-        extends Tester<AbstractMultiSelect<T>> {
+public class AbstractMultiSelectTester<T> extends Tester<AbstractMultiSelect<T>>
+        implements HasValue<Set<T>> {
 
     private AbstractMultiSelect<T> field;
 
@@ -18,6 +18,7 @@ public class AbstractMultiSelectTester<T>
         this.field = field;
     }
 
+    @Override
     public void setValue(Set<T> value) {
         Set<T> copy = value.stream().map(Objects::requireNonNull)
                 .collect(Collectors.toCollection(LinkedHashSet::new));

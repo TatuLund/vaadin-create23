@@ -26,7 +26,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
         mockVaadin(ui);
         login();
 
-        var admin = (AdminView) navigate(AdminView.VIEW_NAME);
+        var admin = navigate(AdminView.VIEW_NAME, AdminView.class);
 
         var tabs = $(admin, TabSheet.class).first();
         var cats = (CategoryManagementView) test(tabs).current();

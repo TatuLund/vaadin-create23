@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import com.vaadin.ui.AbstractSingleSelect;
 
 public class AbstractSingleSelectTester<T>
-        extends Tester<AbstractSingleSelect<T>> {
+        extends Tester<AbstractSingleSelect<T>> implements HasValue<T> {
 
     private AbstractSingleSelect<T> field;
 
@@ -14,6 +14,7 @@ public class AbstractSingleSelectTester<T>
         this.field = field;
     }
 
+    @Override
     public void setValue(T value) {
         Class<?> clazz = field.getClass();
         while (!clazz.equals(AbstractSingleSelect.class)) {

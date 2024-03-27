@@ -14,6 +14,11 @@ public abstract class Tester<T extends Component> {
         this.component = component;
     }
 
+    /**
+     * Utility method to fire a fabricated event.
+     * 
+     * @param event The event to be fired
+     */
     protected void fireSimulatedEvent(EventObject event) {
         Class<?> clazz = component.getClass();
         while (!clazz.equals(AbstractClientConnector.class)) {

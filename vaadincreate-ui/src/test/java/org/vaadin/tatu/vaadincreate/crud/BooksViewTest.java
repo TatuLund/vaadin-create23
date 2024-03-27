@@ -37,7 +37,7 @@ public class BooksViewTest extends AbstractUITest {
         login();
         ui.setLocale(Locale.US);
 
-        view = (BooksView) navigate(BooksView.VIEW_NAME);
+        view = navigate(BooksView.VIEW_NAME, BooksView.class);
 
         var layout = $(view, VerticalLayout.class).first();
         grid = $(layout, BookGrid.class).first();
@@ -109,7 +109,7 @@ public class BooksViewTest extends AbstractUITest {
     @Test
     public void deleteProduct() {
         var book = test(grid).item(0);
-        test(grid).click(0,0);
+        test(grid).click(0, 0);
 
         var id = book.getId();
         var name = book.getProductName();
@@ -128,7 +128,7 @@ public class BooksViewTest extends AbstractUITest {
     @Test
     public void editProduct() {
         var book = test(grid).item(0);
-        test(grid).click(0,0);
+        test(grid).click(0, 0);
 
         var id = book.getId();
 
@@ -147,7 +147,7 @@ public class BooksViewTest extends AbstractUITest {
         assertFalse(grid.isVisible());
 
         var fake = $(layout, FakeGrid.class).first();
-        waitWhile(fake, f -> f.isVisible());
+        waitWhile(fake, f -> f.isVisible(), 10);
         assertTrue(grid.isVisible());
     }
 

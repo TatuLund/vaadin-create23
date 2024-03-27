@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import com.vaadin.ui.AbstractField;
 
-public class AbstractFieldTester<T> extends Tester<AbstractField<T>> {
+public class AbstractFieldTester<T> extends Tester<AbstractField<T>> implements HasValue<T> {
 
     private AbstractField<T> field;
 
@@ -13,6 +13,7 @@ public class AbstractFieldTester<T> extends Tester<AbstractField<T>> {
         this.field = field;
     }
 
+    @Override
     public void setValue(T value) {
         Class<?> clazz = field.getClass();
         while (!clazz.equals(AbstractField.class)) {

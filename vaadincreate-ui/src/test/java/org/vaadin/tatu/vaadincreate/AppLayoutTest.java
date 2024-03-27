@@ -1,6 +1,8 @@
 package org.vaadin.tatu.vaadincreate;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.auth.MockAccessControl;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
@@ -17,35 +19,35 @@ import com.vaadin.ui.VerticalLayout;
 
 public class AppLayoutTest extends UIUnitTest {
 
-    @Test
-    public void testAppLayoutAccessControlAdminPass() throws ServiceException {
-        // Vaadin mocks
-        var ui = mockVaadin();
+    UI ui;
 
+    @Before
+    public void setup() throws ServiceException {
+        // Vaadin mocks
+        ui = mockVaadin();
+    }
+
+    @After
+    public void cleanup() {
+        tearDown();
+    }
+
+    @Test
+    public void testAppLayoutAccessControlAdminPass() {
         // App mocks
         var accessControl = new MockAccessControl("Admin");
         mockApp(ui, accessControl);
 
         // Test
         accessControl.signIn("Admin", "Admin");
-        ui.getNavigator().navigateTo("test");
-        var view = (MockView) ui.getNavigator().getCurrentView();
+        var view = navigate("test", MockView.class);
+
         Assert.assertTrue(view.label != null);
         Assert.assertEquals("View", view.label.getValue());
     }
 
-    private void mockApp(UI ui, MockAccessControl accessControl) {
-        var appLayout = new AppLayout(ui, accessControl);
-        appLayout.addView(MockView.class, "Test", VaadinIcons.INFO, "test");
-        ui.setContent(appLayout);
-    }
-
     @Test
     public void testAppLayoutAccessControlUserFail() throws ServiceException {
-        // Vaadin Mocks
-        mockVaadin();
-        var ui = UI.getCurrent();
-
         // App mocks
         var accessControl = new MockAccessControl("User");
         mockApp(ui, accessControl);
@@ -54,6 +56,12 @@ public class AppLayoutTest extends UIUnitTest {
         accessControl.signIn("User", "User");
         ui.getNavigator().navigateTo("test");
         var view = (ErrorView) ui.getNavigator().getCurrentView();
+    }
+
+    private void mockApp(UI ui, MockAccessControl accessControl) {
+        var appLayout = new AppLayout(ui, accessControl);
+        appLayout.addView(MockView.class, "Test", VaadinIcons.INFO, "test");
+        ui.setContent(appLayout);
     }
 
     @SuppressWarnings("serial")

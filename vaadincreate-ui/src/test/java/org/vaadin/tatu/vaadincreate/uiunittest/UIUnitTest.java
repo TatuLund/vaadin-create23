@@ -46,6 +46,7 @@ public abstract class UIUnitTest {
      *
      * @see tearDown()
      * @throws ServiceException
+     * @return Plank mock UI instance
      */
     public UI mockVaadin() throws ServiceException {
         var service = new MockVaadinService();
@@ -383,6 +384,17 @@ public abstract class UIUnitTest {
                 return null;
             }
             return get(size() - 1);
+        }
+
+        /**
+         * Return the only component in the list if it exists, otherwise fail
+         * with assertion.
+         *
+         * @return Component.
+         */
+        public T single() {
+            assert (size() == 1) : "There are more than one components";
+            return get(0);
         }
     }
 }

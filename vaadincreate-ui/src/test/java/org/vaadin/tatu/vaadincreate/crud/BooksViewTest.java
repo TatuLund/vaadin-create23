@@ -40,9 +40,9 @@ public class BooksViewTest extends AbstractUITest {
         view = navigate(BooksView.VIEW_NAME, BooksView.class);
 
         var layout = $(view, VerticalLayout.class).first();
-        grid = $(layout, BookGrid.class).first();
+        grid = $(layout, BookGrid.class).single();
         waitForGrid(layout, grid);
-        form = $(view, BookForm.class).first();
+        form = $(view, BookForm.class).single();
 
     }
 

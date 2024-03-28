@@ -121,7 +121,7 @@ public class BooksViewTest extends AbstractUITest {
         test(form.delete).click();
 
         var dialog = $(Window.class).id("confirm-dialog");
-        $(dialog, Button.class).id("confirm-button").click();
+        test($(dialog, Button.class).id("confirm-button")).click();
 
         assertTrue($(Notification.class).last().getCaption()
                 .contains(book.getProductName()));

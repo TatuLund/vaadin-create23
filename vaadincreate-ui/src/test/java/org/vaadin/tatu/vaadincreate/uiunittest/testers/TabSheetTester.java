@@ -1,4 +1,6 @@
-package org.vaadin.tatu.vaadincreate.uiunittest;
+package org.vaadin.tatu.vaadincreate.uiunittest.testers;
+
+import org.vaadin.tatu.vaadincreate.uiunittest.Tester;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.TabSheet;
@@ -6,16 +8,13 @@ import com.vaadin.ui.TabSheet.Tab;
 
 public class TabSheetTester extends Tester<TabSheet> {
 
-    private TabSheet tabSheet;
-
     public TabSheetTester(TabSheet tabSheet) {
         super(tabSheet);
-        this.tabSheet = tabSheet;
     }
 
     public Tab tab(String caption) {
-        for (int i = 0; i < tabSheet.getComponentCount(); i++) {
-            Tab tab = tabSheet.getTab(i);
+        for (int i = 0; i < getComponent().getComponentCount(); i++) {
+            Tab tab = getComponent().getTab(i);
             if (tab.getCaption().contains(caption)) {
                 return tab;
             }
@@ -25,8 +24,8 @@ public class TabSheetTester extends Tester<TabSheet> {
 
     public void click(Tab tab) {
         int index = 0;
-        for (int i = 0; i < tabSheet.getComponentCount(); i++) {
-            Tab t = tabSheet.getTab(i);
+        for (int i = 0; i < getComponent().getComponentCount(); i++) {
+            Tab t = getComponent().getTab(i);
             if (t.equals(tab)) {
                 index = i;
                 break;
@@ -36,7 +35,7 @@ public class TabSheetTester extends Tester<TabSheet> {
     }
 
     public void click(int index) {
-        var iter = tabSheet.iterator();
+        var iter = getComponent().iterator();
         Component comp = null;
         int i = 0;
         while (iter.hasNext()) {
@@ -47,10 +46,15 @@ public class TabSheetTester extends Tester<TabSheet> {
             }
             i++;
         }
-        tabSheet.setSelectedTab(comp, true);
+        getComponent().setSelectedTab(comp, true);
     }
 
     public Component current() {
-        return tabSheet.getSelectedTab();
+        return getComponent().getSelectedTab();
+    }
+
+    @Override
+    protected TabSheet getComponent() {
+        return super.getComponent();
     }
 }

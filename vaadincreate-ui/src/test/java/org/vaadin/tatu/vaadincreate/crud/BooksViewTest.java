@@ -82,8 +82,8 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void addProduct() throws ServiceException {
-        $(view, Button.class).id("new-product").click();
+    public void addProduct() {
+        test($(view, Button.class).id("new-product")).click();
 
         test(form.productName).setValue("New book");
         test(form.price).setValue("10.0 €");
@@ -94,7 +94,7 @@ public class BooksViewTest extends AbstractUITest {
                 .findFirst().get();
         test(form.category).setValue(Set.of(cat));
 
-        form.save.click();
+        test(form.save).click();
 
         assertTrue(ProductDataService.get().getAllProducts().stream()
                 .anyMatch(b -> b.getProductName().equals("New book")));
@@ -114,7 +114,7 @@ public class BooksViewTest extends AbstractUITest {
         var id = book.getId();
         var name = book.getProductName();
 
-        form.delete.click();
+        test(form.delete).click();
 
         var dialog = $(Window.class).id("confirm-dialog");
         $(dialog, Button.class).id("confirm-button").click();
@@ -133,7 +133,7 @@ public class BooksViewTest extends AbstractUITest {
         var id = book.getId();
 
         test(form.productName).setValue("Edited book");
-        form.save.click();
+        test(form.save).click();
 
         var edited = ProductDataService.get().getProductById(id);
 

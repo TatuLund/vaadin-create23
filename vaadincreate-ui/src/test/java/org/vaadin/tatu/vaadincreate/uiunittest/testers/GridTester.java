@@ -1,10 +1,12 @@
-package org.vaadin.tatu.vaadincreate.uiunittest;
+package org.vaadin.tatu.vaadincreate.uiunittest.testers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.vaadin.tatu.vaadincreate.uiunittest.Tester;
 
 import com.vaadin.data.ValueProvider;
 import com.vaadin.shared.MouseEventDetails;
@@ -16,11 +18,9 @@ import com.vaadin.ui.components.grid.SingleSelectionModel;
 import com.vaadin.ui.components.grid.SingleSelectionModelImpl;
 
 public class GridTester<T> extends Tester<Grid<T>> {
-    private Grid<T> grid;
 
     public GridTester(Grid<T> grid) {
         super(grid);
-        this.grid = grid;
     }
 
     /**
@@ -34,11 +34,11 @@ public class GridTester<T> extends Tester<Grid<T>> {
      * @return Cell content
      */
     public Object cell(int column, int row) {
-        assert (column > -1
-                && column < grid.getColumns().size()) : "Column out of bounds";
+        assert (column > -1 && column < getComponent().getColumns()
+                .size()) : "Column out of bounds";
         assert (row > -1 && row < size()) : "Row out of bounds";
         var cat = (T) item(row);
-        var vp = (ValueProvider<T, ?>) grid.getColumns().get(column)
+        var vp = (ValueProvider<T, ?>) getComponent().getColumns().get(column)
                 .getValueProvider();
         return vp.apply(cat);
     }
@@ -52,7 +52,8 @@ public class GridTester<T> extends Tester<Grid<T>> {
      */
     public T item(int row) {
         assert (row > -1 && row < size()) : "Row out of bounds";
-        return grid.getDataCommunicator().fetchItemsWithRange(row, 1).get(0);
+        return getComponent().getDataCommunicator().fetchItemsWithRange(row, 1)
+                .get(0);
     }
 
     /**
@@ -61,7 +62,7 @@ public class GridTester<T> extends Tester<Grid<T>> {
      * @return int value
      */
     public int size() {
-        return grid.getDataCommunicator().getDataProviderSize();
+        return getComponent().getDataCommunicator().getDataProviderSize();
     }
 
     /**
@@ -74,22 +75,25 @@ public class GridTester<T> extends Tester<Grid<T>> {
      *            Row index
      */
     public void click(int column, int row) {
-        assert (column > -1
-                && column < grid.getColumns().size()) : "Column out of bounds";
+        assert (!getComponent().isReadOnly() && getComponent()
+                .isEnabled()) : "Can't interact to readOnly or disabled Grid";
+        assert (column > -1 && column < getComponent().getColumns()
+                .size()) : "Column out of bounds";
         assert (row > -1 && row < size()) : "Row out of bounds";
         T i = item(row);
         var details = new MouseEventDetails();
         details.setButton(MouseButton.LEFT);
-        var event = new Grid.ItemClick<T>(grid, grid.getColumns().get(column),
-                i, details, row);
+        var event = new Grid.ItemClick<T>(getComponent(),
+                getComponent().getColumns().get(column), i, details, row);
         fireSimulatedEvent(event);
-        if (grid.getSelectionModel() instanceof MultiSelectionModel) {
-            if (grid.getSelectedItems().contains(i)) {
+        if (getComponent().getSelectionModel() instanceof MultiSelectionModel) {
+            if (getComponent().getSelectedItems().contains(i)) {
             } else {
                 select(Set.of(i));
             }
-        } else if (grid.getSelectionModel() instanceof SingleSelectionModel) {
-            if (grid.getSelectedItems().contains(i)) {
+        } else if (getComponent()
+                .getSelectionModel() instanceof SingleSelectionModel) {
+            if (getComponent().getSelectedItems().contains(i)) {
                 deselect(i);
             } else {
                 select(i);
@@ -104,14 +108,16 @@ public class GridTester<T> extends Tester<Grid<T>> {
      *            Items to be added into selection.
      */
     public void select(Set<T> items) {
-        assert (grid
+        assert (!getComponent().isReadOnly() && getComponent()
+                .isEnabled()) : "Can't interact to readOnly or disabled Grid";
+        assert (getComponent()
                 .getSelectionModel() instanceof MultiSelectionModel) : "Grid is not multiselect";
         assert (items != null) : "Items can't be null";
-        Set<T> copy = grid.getSelectedItems().stream()
+        Set<T> copy = getComponent().getSelectedItems().stream()
                 .map(Objects::requireNonNull)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         copy.addAll(items);
-        var removed = new LinkedHashSet<>(grid.getSelectedItems());
+        var removed = new LinkedHashSet<>(getComponent().getSelectedItems());
         updateSelection(copy, removed);
     }
 
@@ -122,19 +128,22 @@ public class GridTester<T> extends Tester<Grid<T>> {
      *            Items to be removed from the selection.
      */
     public void deselect(Set<T> items) {
-        assert (grid
+        assert (!getComponent().isReadOnly() && getComponent()
+                .isEnabled()) : "Can't interact to readOnly or disabled Grid";
+        assert (getComponent()
                 .getSelectionModel() instanceof MultiSelectionModel) : "Grid is not multiselect";
         assert (items != null) : "Items can't be null";
-        Set<T> copy = grid.getSelectedItems().stream()
+        Set<T> copy = getComponent().getSelectedItems().stream()
                 .map(Objects::requireNonNull)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         copy.removeAll(items);
-        var removed = new LinkedHashSet<>(grid.getSelectedItems());
+        var removed = new LinkedHashSet<>(getComponent().getSelectedItems());
         updateSelection(copy, removed);
     }
 
     private void updateSelection(Set<T> copy, LinkedHashSet<T> removed) {
-        var model = (MultiSelectionModelImpl<T>) grid.getSelectionModel();
+        var model = (MultiSelectionModelImpl<T>) getComponent()
+                .getSelectionModel();
         Class<?> clazz = model.getClass();
         try {
             var updateSelectionMethod = clazz.getDeclaredMethod(
@@ -155,10 +164,13 @@ public class GridTester<T> extends Tester<Grid<T>> {
      *            Item to select, null to deselect existing.
      */
     public void select(T item) {
-        assert (grid
+        assert (!getComponent().isReadOnly() && getComponent()
+                .isEnabled()) : "Can't interact to readOnly or disabled Grid";
+        assert (getComponent()
                 .getSelectionModel() instanceof SingleSelectionModel) : "Grid is not singleselect";
-        var key = grid.getDataCommunicator().getKeyMapper().key(item);
-        var model = (SingleSelectionModelImpl<T>) grid.getSelectionModel();
+        var key = getComponent().getDataCommunicator().getKeyMapper().key(item);
+        var model = (SingleSelectionModelImpl<T>) getComponent()
+                .getSelectionModel();
         Class<?> clazz = model.getClass();
         try {
             var setSelectedFromClientMethod = clazz
@@ -181,5 +193,10 @@ public class GridTester<T> extends Tester<Grid<T>> {
     public void deselect(T item) {
         item = null;
         select(item);
+    }
+
+    @Override
+    protected Grid<T> getComponent() {
+        return super.getComponent();
     }
 }

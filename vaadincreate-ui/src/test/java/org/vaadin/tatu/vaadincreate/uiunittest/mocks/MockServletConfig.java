@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate.uiunittest;
+package org.vaadin.tatu.vaadincreate.uiunittest.mocks;
 
 import java.util.Enumeration;
 import java.util.Properties;

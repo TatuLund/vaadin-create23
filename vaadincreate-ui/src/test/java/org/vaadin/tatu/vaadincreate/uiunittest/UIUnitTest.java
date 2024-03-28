@@ -4,9 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -14,8 +11,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.mockito.Mockito;
+import org.vaadin.tatu.vaadincreate.uiunittest.mocks.MockUI;
+import org.vaadin.tatu.vaadincreate.uiunittest.mocks.MockVaadinService;
+import org.vaadin.tatu.vaadincreate.uiunittest.mocks.MockVaadinSession;
+import org.vaadin.tatu.vaadincreate.uiunittest.testers.AbstractFieldTester;
+import org.vaadin.tatu.vaadincreate.uiunittest.testers.AbstractMultiSelectTester;
+import org.vaadin.tatu.vaadincreate.uiunittest.testers.AbstractSingleSelectTester;
+import org.vaadin.tatu.vaadincreate.uiunittest.testers.ButtonTester;
+import org.vaadin.tatu.vaadincreate.uiunittest.testers.ComboBoxTester;
+import org.vaadin.tatu.vaadincreate.uiunittest.testers.GridTester;
+import org.vaadin.tatu.vaadincreate.uiunittest.testers.TabSheetTester;
 
-import com.vaadin.data.ValueProvider;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServletRequest;
@@ -25,12 +31,12 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractMultiSelect;
 import com.vaadin.ui.AbstractSingleSelect;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
@@ -200,6 +206,30 @@ public abstract class UIUnitTest {
             }
         }
         return result;
+    }
+
+    /**
+     * Perform operations with the component as a user. E.g. if the operation
+     * fires an event as an side effect, it has isUserOriginated = true.
+     *
+     * @param component
+     *            The component
+     * @return Tester for operations
+     */
+    public ButtonTester test(Button component) {
+        return new ButtonTester(component);
+    }
+
+    /**
+     * Perform operations with the component as a user. E.g. if the operation
+     * fires an event as an side effect, it has isUserOriginated = true.
+     *
+     * @param component
+     *            The component
+     * @return Tester for operations
+     */
+    public <T> ComboBoxTester<T> test(ComboBox<T> component) {
+        return new ComboBoxTester<>(component);
     }
 
     /**

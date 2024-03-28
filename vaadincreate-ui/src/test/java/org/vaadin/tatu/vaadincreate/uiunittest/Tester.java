@@ -8,7 +8,7 @@ import com.vaadin.ui.Component;
 
 public abstract class Tester<T extends Component> {
 
-    private Component component;
+    private T component;
 
     public Tester(T component) {
         this.component = component;
@@ -17,7 +17,8 @@ public abstract class Tester<T extends Component> {
     /**
      * Utility method to fire a fabricated event.
      * 
-     * @param event The event to be fired
+     * @param event
+     *            The event to be fired
      */
     protected void fireSimulatedEvent(EventObject event) {
         Class<?> clazz = component.getClass();
@@ -36,4 +37,7 @@ public abstract class Tester<T extends Component> {
         }
     }
 
+    protected T getComponent() {
+        return component;
+    }
 }

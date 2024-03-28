@@ -30,14 +30,15 @@ public class CategoryManagementViewTest extends AbstractUITest {
 
         var tabs = $(admin, TabSheet.class).first();
         var cats = (CategoryManagementView) test(tabs).current();
-        var newCategory = $(cats, Button.class).id("new-category");
-        newCategory.click();
-        var grid = (Grid<Category>) $(cats, Grid.class).first();
+
+        test($(cats, Button.class).id("new-category")).click();
+
+        var grid = (Grid<Category>) $(cats, Grid.class).single();
         var gridSize = test(grid).size();
         var horiz = (HorizontalLayout) test(grid).cell(0, gridSize - 1);
         test($(horiz, TextField.class).first()).setValue("Tech horror");
 
-        var cat = (Category) test(grid).item(gridSize - 1);
+        var cat = test(grid).item(gridSize - 1);
         assertEquals("Tech horror", cat.getName());
 
         assertTrue(ProductDataService.get().getAllCategories().stream()
@@ -48,9 +49,9 @@ public class CategoryManagementViewTest extends AbstractUITest {
                 .get();
 
         horiz = (HorizontalLayout) test(grid).cell(0, gridSize - 1);
-        $(horiz, Button.class).first().click();
+        test($(horiz, Button.class).first()).click();
         var dialog = $(Window.class).id("confirm-dialog");
-        $(dialog, Button.class).id("confirm-button").click();
+        test($(dialog, Button.class).id("confirm-button")).click();
 
         assertFalse(
                 ProductDataService.get().getAllCategories().contains(newCat));

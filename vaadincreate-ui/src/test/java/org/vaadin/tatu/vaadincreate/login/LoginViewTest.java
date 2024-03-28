@@ -36,7 +36,7 @@ public class LoginViewTest extends UIUnitTest {
 
         test(login.username).setValue("Admin");
         test(login.password).setValue("Admin");
-        login.login.click();
+        test(login.login).click();
         Assert.assertEquals(1, count.get());
     }
 
@@ -49,6 +49,6 @@ public class LoginViewTest extends UIUnitTest {
 
         test(login.username).setValue("Admin");
         test(login.password).setValue("Wrong");
-        login.login.click();
+        test(login.login).click();
         Assert.assertEquals(0, count.get());
     }}

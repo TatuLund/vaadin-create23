@@ -22,6 +22,7 @@ import org.vaadin.tatu.vaadincreate.uiunittest.testers.ComboBoxTester;
 import org.vaadin.tatu.vaadincreate.uiunittest.testers.GridTester;
 import org.vaadin.tatu.vaadincreate.uiunittest.testers.TabSheetTester;
 
+import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServletRequest;
@@ -36,6 +37,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HasComponents;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
@@ -167,12 +169,19 @@ public abstract class UIUnitTest {
      *            Component class
      * @return QueryResult of components
      */
-    public <T extends Component> QueryResult<T> $(Class<T> clazz) {
+    public <T extends AbstractClientConnector> QueryResult<T> $(
+            Class<T> clazz) {
         assert (clazz != null);
         assert (UI.getCurrent() != null) : "UI has not been setup";
-        if (clazz.equals(Window.class)) {
+        if (clazz.isAssignableFrom(Window.class)) {
             return new QueryResult<T>(
                     (Collection<T>) UI.getCurrent().getWindows());
+        }
+        if (clazz.equals(Notification.class)) {
+            return new QueryResult<T>(
+                    (Collection<T>) UI.getCurrent().getExtensions().stream()
+                            .filter(ext -> ext instanceof Notification)
+                            .collect(Collectors.toList()));
         }
         return $(UI.getCurrent(), clazz);
     }
@@ -191,8 +200,8 @@ public abstract class UIUnitTest {
      *            Component class
      * @return QueryResult of components
      */
-    public <T extends Component> QueryResult<T> $(HasComponents container,
-            Class<T> clazz) {
+    public <T extends AbstractClientConnector> QueryResult<T> $(
+            HasComponents container, Class<T> clazz) {
         assert (container != null && clazz != null);
         var iter = container.iterator();
         var result = new QueryResult<T>();
@@ -338,7 +347,8 @@ public abstract class UIUnitTest {
      * @param <T>
      *            Component type
      */
-    public static class QueryResult<T extends Component> extends ArrayList<T> {
+    public static class QueryResult<T extends AbstractClientConnector>
+            extends ArrayList<T> {
         public QueryResult(Collection<T> list) {
             super(list);
         }
@@ -357,7 +367,10 @@ public abstract class UIUnitTest {
          * @return Component instance, can be null
          */
         public T id(String id) {
-            var res = stream().filter(c -> c.getId().equals(id)).findFirst();
+            assert (isEmpty() ? first() instanceof Component
+                    : true) : "Id matching can be done with Components only";
+            var res = stream().filter(c -> ((Component) c).getId().equals(id))
+                    .findFirst();
             if (res.isPresent()) {
                 return res.get();
             }
@@ -373,9 +386,11 @@ public abstract class UIUnitTest {
          * @return Result set of components
          */
         public QueryResult<T> styleName(String styleName) {
-            return new QueryResult<>(
-                    stream().filter(c -> c.getStyleName().contains(styleName))
-                            .collect(Collectors.toList()));
+            assert (isEmpty() ? first() instanceof Component
+                    : true) : "Stylename filtering can be done with Components only";
+            return new QueryResult<>(stream().filter(
+                    c -> ((Component) c).getStyleName().contains(styleName))
+                    .collect(Collectors.toList()));
         }
 
         /**
@@ -387,9 +402,11 @@ public abstract class UIUnitTest {
          * @return Result set of components
          */
         public QueryResult<T> caption(String caption) {
-            return new QueryResult<>(
-                    stream().filter(c -> c.getCaption().contains(caption))
-                            .collect(Collectors.toList()));
+            assert (isEmpty() ? first() instanceof Component
+                    : true) : "Caption filtering can be done with Components only";
+            return new QueryResult<>(stream()
+                    .filter(c -> ((Component) c).getCaption().contains(caption))
+                    .collect(Collectors.toList()));
         }
 
         /**

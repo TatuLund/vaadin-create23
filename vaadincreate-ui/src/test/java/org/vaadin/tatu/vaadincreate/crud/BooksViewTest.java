@@ -20,6 +20,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import com.vaadin.data.ValueContext;
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -96,6 +97,9 @@ public class BooksViewTest extends AbstractUITest {
 
         test(form.save).click();
 
+        assertTrue(
+                $(Notification.class).last().getCaption().contains("New book"));
+
         assertTrue(ProductDataService.get().getAllProducts().stream()
                 .anyMatch(b -> b.getProductName().equals("New book")));
 
@@ -118,6 +122,9 @@ public class BooksViewTest extends AbstractUITest {
 
         var dialog = $(Window.class).id("confirm-dialog");
         $(dialog, Button.class).id("confirm-button").click();
+
+        assertTrue($(Notification.class).last().getCaption()
+                .contains(book.getProductName()));
 
         assertEquals(null, ProductDataService.get().getProductById(id));
 

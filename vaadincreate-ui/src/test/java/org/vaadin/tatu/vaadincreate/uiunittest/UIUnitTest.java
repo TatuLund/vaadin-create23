@@ -180,7 +180,7 @@ public abstract class UIUnitTest {
         if (clazz.equals(Notification.class)) {
             return new QueryResult<T>(
                     (Collection<T>) UI.getCurrent().getExtensions().stream()
-                            .filter(ext -> ext instanceof Notification)
+                            .filter(ext -> ext.getClass().equals(Notification.class))
                             .collect(Collectors.toList()));
         }
         return $(UI.getCurrent(), clazz);

@@ -25,7 +25,6 @@ public class Utils {
         VaadinServletRequest request = (VaadinServletRequest) VaadinService
                 .getCurrentRequest();
         request.getHttpServletRequest().changeSessionId();
-//        VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
     }
 }

@@ -108,6 +108,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.vaadin.testbench</groupId>
+			<artifactId>vaadin-uiunittest</artifactId>
+			<version>5.0.0-alpha1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>io.github.bonigarcia</groupId>
 			<artifactId>webdrivermanager</artifactId>
 			<version>${webdrivermanager.version}</version>

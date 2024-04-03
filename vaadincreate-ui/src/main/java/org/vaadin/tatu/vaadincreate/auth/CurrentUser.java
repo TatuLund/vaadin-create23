@@ -34,7 +34,7 @@ public final class CurrentUser {
      *             if the current session cannot be accessed.
      */
     public static Optional<User> get() {
-        var currentUser = (User) VaadinSession.getCurrent()
+        var currentUser = (User) VaadinSession.getCurrent().getSession()
                 .getAttribute(CURRENT_USER_SESSION_ATTRIBUTE_KEY);
         if (currentUser == null) {
             return Optional.empty();
@@ -52,10 +52,10 @@ public final class CurrentUser {
      */
     public static void set(User currentUser) {
         if (currentUser == null) {
-            VaadinSession.getCurrent()
+            VaadinSession.getCurrent().getSession()
                     .setAttribute(CURRENT_USER_SESSION_ATTRIBUTE_KEY, null);
         } else {
-            VaadinSession.getCurrent().setAttribute(
+            VaadinSession.getCurrent().getSession().setAttribute(
                     CURRENT_USER_SESSION_ATTRIBUTE_KEY, currentUser);
         }
     }

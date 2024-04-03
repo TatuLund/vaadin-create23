@@ -6,8 +6,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
-import java.util.Locale;
-import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
@@ -36,7 +34,6 @@ public class BooksViewTest extends AbstractUITest {
         ui = new VaadinCreateUI();
         mockVaadin(ui);
         login();
-        ui.setLocale(Locale.US);
 
         view = navigate(BooksView.VIEW_NAME, BooksView.class);
 
@@ -49,6 +46,7 @@ public class BooksViewTest extends AbstractUITest {
 
     @After
     public void cleanUp() {
+        logout();
         tearDown();
     }
 
@@ -88,12 +86,12 @@ public class BooksViewTest extends AbstractUITest {
 
         test(form.productName).setValue("New book");
         test(form.price).setValue("10.0 €");
-        test(form.availability).setValue(Availability.AVAILABLE);
+        test(form.availability).clickItem(Availability.AVAILABLE);
         test(form.stockCount).setValue("10");
 
         var cat = ProductDataService.get().getAllCategories().stream()
                 .findFirst().get();
-        test(form.category).setValue(Set.of(cat));
+        test(form.category).clickItem(cat);
 
         test(form.save).click();
 
@@ -148,6 +146,30 @@ public class BooksViewTest extends AbstractUITest {
 
         assertEquals("Edited book", name);
         assertEquals("Edited book", edited.getProductName());
+    }
+
+    @Test
+    public void editProductDiscardChanges() {
+        test(grid).click(0, 0);
+
+        test(form.productName).setValue("Edited book");
+        test(form.stockCount).setValue("100");
+
+        test(grid).click(0, 1);
+
+        var dialog = $(Window.class).id("confirm-dialog");
+        test($(dialog, Button.class).id("confirm-button")).click();
+
+        assertFalse(form.isShown());
+    }
+
+    @Test
+    public void validationError() {
+        test(grid).click(0, 0);
+
+        test(form.productName).setValue("");
+        test(form.stockCount).focus();
+        assertTrue(test(form.productName).isInvalid());
     }
 
     private void waitForGrid(VerticalLayout layout, BookGrid grid) {

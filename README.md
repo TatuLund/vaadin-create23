@@ -46,6 +46,16 @@ Notes
 - Backend module has mock data service only with simulated latency
 - Dependency injection framework such as CDI or Spring is not being used, the demo has neutral stance on purpose
 
+## This project uses commercial Vaadin products
+
+This is intentional to demonstrate the current state of Vaadin 8 extended maintenance
+The following commercial products are used.
+
+- Vaadin 8.24.0, The latest free version 8.14.3
+- Vaadin Charts in stats dashboard view
+- TestBench and TestBench UI Unit Test add-on for testing 
+- AppSecKit for SBOM vulnerability analysis
+
 ## Building and running the application
 
 git clone <url of the repository>

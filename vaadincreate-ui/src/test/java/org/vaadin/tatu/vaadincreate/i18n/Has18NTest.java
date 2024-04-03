@@ -2,7 +2,7 @@ package org.vaadin.tatu.vaadincreate.i18n;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.vaadin.tatu.vaadincreate.uiunittest.UIUnitTest;
+import com.vaadin.testbench.uiunittest.UIUnitTest;
 
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Label;

@@ -1,20 +1,31 @@
 package org.vaadin.tatu.vaadincreate;
 
-import org.vaadin.tatu.vaadincreate.uiunittest.UIUnitTest;
+import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
+import org.vaadin.tatu.vaadincreate.i18n.I18NProvider;
+import org.vaadin.tatu.vaadincreate.login.LanguageSelect;
+
+import com.vaadin.testbench.uiunittest.UIUnitTest;
 
 import com.vaadin.ui.Button;
+import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
 
 public abstract class AbstractUITest extends UIUnitTest {
 
     protected void login() {
-        var username = $(TextField.class).id("login-username-field");
-        test(username).setValue("Admin");
-        var password = $(PasswordField.class).id("login-password-field");
-        test(password).setValue("admin");
-        var loginButton = $(Button.class).id("login-button");
-        loginButton.click();
+        test($(TextField.class).id("login-username-field")).setValue("Admin");
+        test($(PasswordField.class).id("login-password-field"))
+                .setValue("admin");
+        test($(LanguageSelect.class).first())
+                .clickItem(DefaultI18NProvider.LOCALE_EN);
+        test($(Button.class).id("login-button")).click();
+
+    }
+
+    protected void logout() {
+        var menu = $(MenuBar.class).single();
+        var menuItem = test(menu).item(2);
+        test(menu).click(menuItem);
     }
 }

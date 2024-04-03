@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.auth.MockAccessControl;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
-import org.vaadin.tatu.vaadincreate.uiunittest.UIUnitTest;
+import com.vaadin.testbench.uiunittest.UIUnitTest;
 
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;

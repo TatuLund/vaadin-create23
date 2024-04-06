@@ -28,6 +28,7 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.ui.Transport;
@@ -118,44 +119,50 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         protected void servletInitialized() {
             getService().addSessionInitListener(event -> {
                 VaadinSession s = event.getSession();
-                s.addRequestHandler((session, request, response) -> {
-                    var locale = new StringBuilder();
-
-                    Cookie localeCookie = CookieUtil.getCookieByName("language",
-                            request);
-
-                    session.accessSynchronously(() -> {
-                        var l = (String) session.getAttribute("locale");
-                        if (l != null) {
-                            locale.append(l);
-                        }
-                    });
-
-                    if (locale.length() != 0) {
-                        boolean toSave = false;
-                        if (localeCookie == null) {
-                            localeCookie = new Cookie("language",
-                                    locale.toString());
-                            localeCookie.setPath(request.getContextPath());
-                            localeCookie.setMaxAge(60 * 60);
-                            toSave = true;
-                        } else {
-                            var newValue = locale.toString();
-                            var oldValue = localeCookie.getValue();
-                            if (!newValue.equals(oldValue)) {
-                                localeCookie.setValue(locale.toString());
-                                toSave = true;
-                            }
-                        }
-                        if (toSave == true) {
-                            logger.info("Saving language '{}' in cookie",
-                                    locale);
-                            response.addCookie(localeCookie);
-                        }
-                    }
-                    return false;
-                });
+                s.addRequestHandler((session, request,
+                        response) -> handleRequest(session, request, response));
             });
+        }
+
+        private boolean handleRequest(VaadinSession session,
+                VaadinRequest request, VaadinResponse response) {
+            var locale = new StringBuilder();
+            Cookie localeCookie = CookieUtil.getCookieByName("language",
+                    request);
+            session.accessSynchronously(() -> {
+                var l = (String) session.getAttribute("locale");
+                if (l != null) {
+                    locale.append(l);
+                }
+            });
+            if (locale.length() != 0) {
+                boolean toSave = false;
+                if (localeCookie == null) {
+                    localeCookie = createNewCookie(request, locale);
+                    toSave = true;
+                } else {
+                    var newValue = locale.toString();
+                    var oldValue = localeCookie.getValue();
+                    if (!newValue.equals(oldValue)) {
+                        localeCookie.setValue(locale.toString());
+                        toSave = true;
+                    }
+                }
+                if (toSave == true) {
+                    logger.info("Saving language '{}' in cookie", locale);
+                    response.addCookie(localeCookie);
+                }
+            }
+            return false;
+        }
+
+        private Cookie createNewCookie(VaadinRequest request,
+                StringBuilder locale) {
+            Cookie localeCookie;
+            localeCookie = new Cookie("language", locale.toString());
+            localeCookie.setPath(request.getContextPath());
+            localeCookie.setMaxAge(60 * 60);
+            return localeCookie;
         }
 
         private Logger logger = LoggerFactory.getLogger(this.getClass());

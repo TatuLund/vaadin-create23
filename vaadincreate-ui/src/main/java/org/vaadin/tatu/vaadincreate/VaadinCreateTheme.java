@@ -13,6 +13,8 @@ public class VaadinCreateTheme {
     public static final String ABOUT_VIEW = "about-view";
     public static final String ABOUTVIEW_ABOUTCONTENT = "aboutview-aboutcontent";
 
+    public static final String ADMINVIEW_CATEGORY_GRID = "adminview-categorygrid";
+
     public static final String BOOKVIEW_GRID = "bookview-grid";
     public static final String BOOKVIEW_TOOLBAR = "bookview-toolbar";
     public static final String BOOKVIEW_FILTER = "bookview-filter";

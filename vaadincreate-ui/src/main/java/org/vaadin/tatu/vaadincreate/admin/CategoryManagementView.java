@@ -72,7 +72,9 @@ public class CategoryManagementView extends VerticalLayout
         categoriesListing.setHeaderRowHeight(1);
         categoriesListing.setSizeFull();
         categoriesListing.setSelectionMode(SelectionMode.NONE);
-        categoriesListing.addStyleNames(VaadinCreateTheme.GRID_NO_STRIPES,
+        categoriesListing.addStyleNames(
+                VaadinCreateTheme.ADMINVIEW_CATEGORY_GRID,
+                VaadinCreateTheme.GRID_NO_STRIPES,
                 VaadinCreateTheme.GRID_NO_BORDERS,
                 VaadinCreateTheme.GRID_NO_FOCUS);
     }

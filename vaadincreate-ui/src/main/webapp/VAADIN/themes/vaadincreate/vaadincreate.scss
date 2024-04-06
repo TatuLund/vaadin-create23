@@ -503,4 +503,8 @@ $fake-grid-background-color: white;
 	  border: unset;
 	}  
   }
+ 
+  .adminview-categorygrid {
+    box-shadow: $light-shadow;
+  }
 }

@@ -105,7 +105,7 @@ public class StatsPresenter implements Serializable {
         }
 
         public String toString() {
-            return (max - 10) + " to " + max + " €";
+            return (max - 10) + " - " + max + " €";
         }
     }
 

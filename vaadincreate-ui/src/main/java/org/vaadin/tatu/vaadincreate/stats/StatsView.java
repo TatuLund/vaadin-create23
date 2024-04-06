@@ -38,6 +38,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     private static final String CATEGORIES = "categories";
     private static final String AVAILABILITIES = "availabilities";
     private static final String PRICES = "prices";
+    private static final String COUNT = "count";
 
     private StatsPresenter presenter = new StatsPresenter(this);
 
@@ -110,6 +111,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
                 var cConf = categoryChart.getConfiguration();
                 cConf.setSeries(categorySeries);
                 cConf.getLegend().setEnabled(false);
+                cConf.getyAxis().setTitle(getTranslation(COUNT));
                 categoryStats.keySet()
                         .forEach(cat -> cConf.getxAxis().addCategory(cat));
 

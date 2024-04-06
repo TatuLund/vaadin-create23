@@ -7,6 +7,7 @@ import org.vaadin.tatu.vaadincreate.backend.AppDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.icons.VaadinIcons;
@@ -26,9 +27,12 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @AllPermitted
 @SuppressWarnings("serial")
-public class AboutView extends VerticalLayout implements View {
+public class AboutView extends VerticalLayout implements View, HasI18N {
 
     public static final String VIEW_NAME = "about";
+
+    private static final String VAADIN = "vaadin";
+
     private Button editButton;
     private Label adminsNote;
     private EventBus eventBus = EventBus.get();
@@ -39,9 +43,10 @@ public class AboutView extends VerticalLayout implements View {
 
         // you can add Vaadin components in predefined slots in the custom
         // layout
-        aboutContent.addComponent(new Label(VaadinIcons.INFO_CIRCLE.getHtml()
-                + " This application is using Vaadin "
-                + Version.getFullVersion(), ContentMode.HTML), "info");
+        aboutContent.addComponent(new Label(
+                VaadinIcons.INFO_CIRCLE.getHtml()
+                        + getTranslation(VAADIN, Version.getFullVersion()),
+                ContentMode.HTML), "info");
 
         var textArea = new TextArea();
         textArea.setId("admins-text-area");

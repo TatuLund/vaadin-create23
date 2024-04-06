@@ -388,6 +388,18 @@ $fake-grid-background-color: white;
         @include box-shadow(none);
       }
     }
+
+	.dashboard {
+      width: 100%;
+	}
+
+    .dashboard-chart {
+      width: 95%;
+    }
+
+    .dashboard-chart-wide {
+      width: 95%;
+    }
   }
 
   // Adjust icon to show nicely when menubar is small
@@ -455,7 +467,7 @@ $fake-grid-background-color: white;
 	  }
   }
   
-  .v-ui[width-range~="0-1000px"] {
+  .v-ui[width-range~="551px-1000px"] {
 	  .dashboard {
 		  width: 500px;
 	  }

@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 
@@ -71,8 +72,9 @@ public class CategoryManagementView extends VerticalLayout
         categoriesListing.setHeaderRowHeight(1);
         categoriesListing.setSizeFull();
         categoriesListing.setSelectionMode(SelectionMode.NONE);
-        categoriesListing.addStyleNames("no-stripes", "no-borders",
-                "no-cell-focus");
+        categoriesListing.addStyleNames(VaadinCreateTheme.GRID_NO_STRIPES,
+                VaadinCreateTheme.GRID_NO_BORDERS,
+                VaadinCreateTheme.GRID_NO_FOCUS);
     }
 
     @Override
@@ -83,7 +85,8 @@ public class CategoryManagementView extends VerticalLayout
     /**
      * Sets the categories for the CategoryManagementView.
      * 
-     * @param categories the collection of categories to be set
+     * @param categories
+     *            the collection of categories to be set
      */
     public void setCategories(Collection<Category> categories) {
         dataProvider = new ListDataProvider<Category>(

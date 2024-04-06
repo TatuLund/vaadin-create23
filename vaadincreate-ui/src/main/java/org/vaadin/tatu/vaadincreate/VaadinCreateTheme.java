@@ -37,8 +37,7 @@ public class VaadinCreateTheme {
     public static final String COLOR_COMING = "var(--color-coming)";
     public static final String COLOR_DISCONTINUED = "var(--color-discontinued)";
 
-    // public static final String COLOR_AVAILABLE = "#2dd085";
-    // public static final String COLOR_COMING = "#ffc66e";
-    // public static final String COLOR_DISCONTINUED = "#f54993";
-
+    public static final String GRID_NO_STRIPES = "no-stripes";
+    public static final String GRID_NO_BORDERS = "no-borders";
+    public static final String GRID_NO_FOCUS = "no-cell-focus";
 }

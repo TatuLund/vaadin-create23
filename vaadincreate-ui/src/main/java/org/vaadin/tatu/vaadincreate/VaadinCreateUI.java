@@ -132,16 +132,26 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                     });
 
                     if (locale.length() != 0) {
+                        boolean toSave = false;
                         if (localeCookie == null) {
                             localeCookie = new Cookie("language",
                                     locale.toString());
                             localeCookie.setPath(request.getContextPath());
                             localeCookie.setMaxAge(60 * 60);
+                            toSave = true;
                         } else {
-                            localeCookie.setValue(locale.toString());
+                            var newValue = locale.toString();
+                            var oldValue = localeCookie.getValue();
+                            if (!newValue.equals(oldValue)) {
+                                localeCookie.setValue(locale.toString());
+                                toSave = true;
+                            }
                         }
-                        logger.info("Saving language '{}' in cookie", locale);
-                        response.addCookie(localeCookie);
+                        if (toSave == true) {
+                            logger.info("Saving language '{}' in cookie",
+                                    locale);
+                            response.addCookie(localeCookie);
+                        }
                     }
                     return false;
                 });

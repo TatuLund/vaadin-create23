@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
-import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 
 import com.vaadin.server.ServiceException;
@@ -41,10 +40,10 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var cat = test(grid).item(gridSize - 1);
         assertEquals("Tech horror", cat.getName());
 
-        assertTrue(ProductDataService.get().getAllCategories().stream()
+        assertTrue(ui.getProductService().getAllCategories().stream()
                 .anyMatch(c -> c.getName().equals("Tech horror")));
 
-        var newCat = ProductDataService.get().getAllCategories().stream()
+        var newCat = ui.getProductService().getAllCategories().stream()
                 .filter(c -> c.getName().equals("Tech horror")).findFirst()
                 .get();
 
@@ -54,7 +53,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
         test($(dialog, Button.class).id("confirm-button")).click();
 
         assertFalse(
-                ProductDataService.get().getAllCategories().contains(newCat));
+                ui.getProductService().getAllCategories().contains(newCat));
 
         tearDown();
     }

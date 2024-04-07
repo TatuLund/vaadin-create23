@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 
@@ -11,6 +12,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.User;
 public class UserManagementPresenter implements Serializable {
 
     private UserManagementView view;
+    private UserService service = VaadinCreateUI.get().getUserService();
 
     public UserManagementPresenter(UserManagementView view) {
         this.view = view;
@@ -22,7 +24,7 @@ public class UserManagementPresenter implements Serializable {
     }
 
     public void removeUser(int id) {
-        UserService.get().removeUser(id);
+        service.removeUser(id);
         logger.info("User '{}' removed.", id);
         view.showUserRemoved();
         requestUpdateUsers();
@@ -30,7 +32,7 @@ public class UserManagementPresenter implements Serializable {
 
     public void updateUser(User user) {
         try {
-            UserService.get().updateUser(user);
+            service.updateUser(user);
             view.showUserUpdated();
             requestUpdateUsers();
             logger.info("User {}/'{}' updated.", user.getId(), user.getName());

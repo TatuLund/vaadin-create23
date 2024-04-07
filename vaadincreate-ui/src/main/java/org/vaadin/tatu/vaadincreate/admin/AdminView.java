@@ -14,6 +14,8 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+// This is an example of a possible sub-navigation pattern in Vaadin 8
+// using url parameters.
 @SuppressWarnings("serial")
 @RolesPermitted({ Role.ADMIN })
 public class AdminView extends VerticalLayout implements View, HasI18N {

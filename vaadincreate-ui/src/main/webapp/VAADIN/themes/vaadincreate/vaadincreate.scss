@@ -234,7 +234,12 @@ $fake-grid-background-color: white;
 
   .aboutview {
     overflow: auto;
+  }
 
+  .aboutview-aboutlabel {
+  	.v-icon {
+      margin-right: 5px;
+    }
   }
 
   .aboutview-aboutcontent {

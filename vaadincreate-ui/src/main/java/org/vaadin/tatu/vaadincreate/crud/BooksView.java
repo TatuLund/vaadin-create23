@@ -61,6 +61,8 @@ public class BooksView extends CssLayout implements View, HasI18N {
     private TextField filter;
 
     private BooksPresenter presenter = new BooksPresenter(this);
+    private AccessControl accessControl = VaadinCreateUI.get().getAccessControl();
+
     private Button newProduct;
 
     private ListDataProvider<Product> dataProvider;
@@ -153,7 +155,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
     @Override
     public void enter(ViewChangeEvent event) {
         params = event.getParameters();
-        if (!AccessControl.get().isUserInRole(Role.ADMIN)) {
+        if (!accessControl.isUserInRole(Role.ADMIN)) {
             grid.setSelectionMode(SelectionMode.NONE);
         }
         presenter.requestUpdateProducts();

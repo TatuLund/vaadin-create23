@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.admin.AdminView;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.BasicAccessControl;
+import org.vaadin.tatu.vaadincreate.backend.AppDataService;
+import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
+import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
@@ -45,6 +48,9 @@ import com.vaadin.ui.UI;
 public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     private AccessControl accessControl = new BasicAccessControl();
+    private ProductDataService productService = ProductDataService.get();
+    private UserService userService = UserService.get();
+    private AppDataService appService = AppDataService.get();
 
     private EventBus eventBus = EventBus.get();
 
@@ -87,6 +93,18 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     public AccessControl getAccessControl() {
         return accessControl;
+    }
+
+    public ProductDataService getProductService() {
+        return productService;
+    }
+
+    public UserService getUserService() {
+        return userService;
+    }
+
+    public AppDataService getAppService() {
+        return appService;
     }
 
     @Override

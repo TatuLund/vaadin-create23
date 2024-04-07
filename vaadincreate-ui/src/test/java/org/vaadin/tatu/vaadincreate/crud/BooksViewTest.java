@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
-import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 
 import com.vaadin.data.ValueContext;
@@ -89,8 +88,8 @@ public class BooksViewTest extends AbstractUITest {
         test(form.availability).clickItem(Availability.AVAILABLE);
         test(form.stockCount).setValue("10");
 
-        var cat = ProductDataService.get().getAllCategories().stream()
-                .findFirst().get();
+        var cat = ui.getProductService().getAllCategories().stream().findFirst()
+                .get();
         test(form.category).clickItem(cat);
 
         test(form.save).click();
@@ -98,7 +97,7 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(
                 $(Notification.class).last().getCaption().contains("New book"));
 
-        assertTrue(ProductDataService.get().getAllProducts().stream()
+        assertTrue(ui.getProductService().getAllProducts().stream()
                 .anyMatch(b -> b.getProductName().equals("New book")));
 
         int row = test(grid).size() - 1;
@@ -124,7 +123,7 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue($(Notification.class).last().getCaption()
                 .contains(book.getProductName()));
 
-        assertEquals(null, ProductDataService.get().getProductById(id));
+        assertEquals(null, ui.getProductService().getProductById(id));
 
         var newName = test(grid).cell(1, 0);
         assertNotEquals(name, newName);
@@ -140,7 +139,7 @@ public class BooksViewTest extends AbstractUITest {
         test(form.productName).setValue("Edited book");
         test(form.save).click();
 
-        var edited = ProductDataService.get().getProductById(id);
+        var edited = ui.getProductService().getProductById(id);
 
         var name = (String) test(grid).cell(1, 0);
 

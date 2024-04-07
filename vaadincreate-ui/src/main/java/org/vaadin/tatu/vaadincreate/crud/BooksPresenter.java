@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.crud;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
@@ -29,6 +30,8 @@ public class BooksPresenter implements Serializable {
     private BooksView view;
     private final ExecutorService executor = Executors.newCachedThreadPool();
     private CompletableFuture<Void> future;
+    private ProductDataService service = VaadinCreateUI.get()
+            .getProductService();
 
     public BooksPresenter(BooksView simpleCrudView) {
         view = simpleCrudView;
@@ -36,13 +39,13 @@ public class BooksPresenter implements Serializable {
 
     private CompletableFuture<Collection<Product>> loadProductsAsync() {
         logger.info("Fetching products");
-        return CompletableFuture.supplyAsync(
-                () -> ProductDataService.get().getAllProducts(), executor);
+        return CompletableFuture.supplyAsync(() -> service.getAllProducts(),
+                executor);
     }
 
     private CompletableFuture<Collection<Category>> loadCategoriesAsync() {
-        return CompletableFuture.supplyAsync(
-                () -> ProductDataService.get().getAllCategories(), executor);
+        return CompletableFuture.supplyAsync(() -> service.getAllCategories(),
+                executor);
     }
 
     public void updateProduct(Product product) {
@@ -116,7 +119,7 @@ public class BooksPresenter implements Serializable {
         view.showDeleteNotification(product.getProductName());
         view.clearSelection();
         logger.info("Deleting product: {}", product.getId());
-        ProductDataService.get().deleteProduct(product.getId());
+        service.deleteProduct(product.getId());
         view.removeProduct(product);
         view.setFragmentParameter("");
     }
@@ -140,10 +143,6 @@ public class BooksPresenter implements Serializable {
     }
 
     public void rowSelected(Product product) {
-        // if (product == null) {
-        // view.editProduct(null);
-        // return;
-        // }
         if (AccessControl.get().isUserInRole(Role.ADMIN)) {
             editProduct(product);
         }

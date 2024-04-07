@@ -512,4 +512,11 @@ $fake-grid-background-color: white;
   .adminview-categorygrid {
     box-shadow: $light-shadow;
   }
+
+  // IMHO: It is possibly framework bug that these are missing
+  .v-formlayout-light {
+    .v-caption-v-disabled {
+      opacity: $v-disabled-opacity;
+    }
+  }
 }

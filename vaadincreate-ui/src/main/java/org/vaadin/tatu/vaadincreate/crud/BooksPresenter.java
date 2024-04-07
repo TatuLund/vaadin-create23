@@ -32,6 +32,7 @@ public class BooksPresenter implements Serializable {
     private CompletableFuture<Void> future;
     private ProductDataService service = VaadinCreateUI.get()
             .getProductService();
+    private AccessControl accessControl = VaadinCreateUI.get().getAccessControl();
 
     public BooksPresenter(BooksView simpleCrudView) {
         view = simpleCrudView;
@@ -71,7 +72,7 @@ public class BooksPresenter implements Serializable {
     public void init() {
         editProduct(null);
         // Hide and disable if not admin
-        if (!AccessControl.get().isUserInRole(Role.ADMIN)) {
+        if (!accessControl.isUserInRole(Role.ADMIN)) {
             view.setNewProductEnabled(false);
         }
     }
@@ -143,7 +144,7 @@ public class BooksPresenter implements Serializable {
     }
 
     public void rowSelected(Product product) {
-        if (AccessControl.get().isUserInRole(Role.ADMIN)) {
+        if (accessControl.isUserInRole(Role.ADMIN)) {
             editProduct(product);
         }
     }

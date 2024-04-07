@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
@@ -25,14 +26,16 @@ public class StatsPresenter implements Serializable {
     private StatsView view;
     private final ExecutorService executor = Executors.newCachedThreadPool();
     private CompletableFuture<Void> future;
+    private ProductDataService service = VaadinCreateUI.get()
+            .getProductService();
 
     public StatsPresenter(StatsView view) {
         this.view = view;
     }
 
     private CompletableFuture<Collection<Product>> loadProductsAsync() {
-        return CompletableFuture.supplyAsync(
-                () -> ProductDataService.get().getAllProducts(), executor);
+        return CompletableFuture.supplyAsync(() -> service.getAllProducts(),
+                executor);
     }
 
     /**
@@ -52,7 +55,7 @@ public class StatsPresenter implements Serializable {
             }
 
             Map<String, Long> categoryStats = new HashMap<>();
-            var categories = ProductDataService.get().getAllCategories();
+            var categories = service.getAllCategories();
             for (Category category : categories) {
                 var count = products.stream().filter(
                         product -> product.getCategory().contains(category))

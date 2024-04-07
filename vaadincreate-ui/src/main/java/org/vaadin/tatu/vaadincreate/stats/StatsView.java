@@ -45,45 +45,26 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     private CssLayout dashboard;
 
     private Chart availabilityChart;
-
     private Chart categoryChart;
-
     private Chart priceChart;
+
+    private Lang lang;
 
     public StatsView() {
         addStyleNames(VaadinCreateTheme.STATSVIEW, ValoTheme.SCROLLABLE);
         dashboard = new CssLayout();
         dashboard.addStyleName(VaadinCreateTheme.DASHBOARD);
 
-        var availabilityChartWrapper = new CssLayout();
-        availabilityChart = new Chart(ChartType.COLUMN);
-        availabilityChartWrapper
-                .addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
-        Lang lang = new Lang();
+        lang = new Lang();
         // Set loading label to Chart no data as loading of data is done
         // asynchronously
         lang.setNoData(getTranslation(NO_DATA));
-        var conf = availabilityChart.getConfiguration();
-        conf.setTitle(getTranslation(AVAILABILITIES));
-        conf.setLang(lang);
-        availabilityChartWrapper.addComponent(availabilityChart);
 
-        categoryChart = new Chart(ChartType.BAR);
-        var categoryChartWrapper = new CssLayout();
-        categoryChartWrapper
-                .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_WIDE);
-        var cConf = categoryChart.getConfiguration();
-        cConf.setTitle(getTranslation(CATEGORIES));
-        cConf.setLang(lang);
-        categoryChartWrapper.addComponent(categoryChart);
+        var availabilityChartWrapper = createAvailabilityChart();
 
-        var priceChartWrapper = new CssLayout();
-        priceChart = new Chart(ChartType.PIE);
-        priceChartWrapper.addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
-        var pConf = priceChart.getConfiguration();
-        pConf.setTitle(getTranslation(PRICES));
-        pConf.setLang(lang);
-        priceChartWrapper.addComponent(priceChart);
+        var categoryChartWrapper = createCategoryChart();
+
+        var priceChartWrapper = createPriceChart();
 
         dashboard.addComponents(availabilityChartWrapper, priceChartWrapper,
                 categoryChartWrapper);
@@ -93,31 +74,48 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         setComponentAlignment(dashboard, Alignment.MIDDLE_CENTER);
     }
 
+    private CssLayout createPriceChart() {
+        var priceChartWrapper = new CssLayout();
+        priceChart = new Chart(ChartType.PIE);
+        priceChartWrapper.addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
+        var conf = priceChart.getConfiguration();
+        conf.setTitle(getTranslation(PRICES));
+        conf.setLang(lang);
+        priceChartWrapper.addComponent(priceChart);
+        return priceChartWrapper;
+    }
+
+    private CssLayout createCategoryChart() {
+        var categoryChartWrapper = new CssLayout();
+        categoryChartWrapper
+                .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_WIDE);
+        categoryChart = new Chart(ChartType.BAR);
+        var conf = categoryChart.getConfiguration();
+        conf.setTitle(getTranslation(CATEGORIES));
+        conf.setLang(lang);
+        categoryChartWrapper.addComponent(categoryChart);
+        return categoryChartWrapper;
+    }
+
+    private CssLayout createAvailabilityChart() {
+        var availabilityChartWrapper = new CssLayout();
+        availabilityChart = new Chart(ChartType.COLUMN);
+        availabilityChartWrapper
+                .addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
+        var conf = availabilityChart.getConfiguration();
+        conf.setTitle(getTranslation(AVAILABILITIES));
+        conf.setLang(lang);
+        availabilityChartWrapper.addComponent(availabilityChart);
+        return availabilityChartWrapper;
+    }
+
     public void updateStatsAsync(Map<Availability, Long> availabilityStats,
             Map<String, Long> categoryStats, Map<String, Long> priceStats) {
         try {
             getUI().access(() -> {
-                var availabilitySeries = availabilitySeries(availabilityStats);
-                var conf = availabilityChart.getConfiguration();
-                conf.setSeries(availabilitySeries);
-                conf.getLegend().setEnabled(false);
-                var categories = (String[]) availabilitySeries.getData()
-                        .stream().map(item -> item.getName())
-                        .toArray(String[]::new);
-                var axis = conf.getxAxis();
-                axis.setCategories(categories);
-
-                var categorySeries = categorySeries(categoryStats);
-                var cConf = categoryChart.getConfiguration();
-                cConf.setSeries(categorySeries);
-                cConf.getLegend().setEnabled(false);
-                cConf.getyAxis().setTitle(getTranslation(COUNT));
-                categoryStats.keySet()
-                        .forEach(cat -> cConf.getxAxis().addCategory(cat));
-
-                var priceSeries = priceSeries(priceStats);
-                var pConf = priceChart.getConfiguration();
-                pConf.setSeries(priceSeries);
+                updateAvailabilityChart(availabilityStats);
+                updateCategoryChart(categoryStats);
+                updatePriceChart(priceStats);
 
                 availabilityChart.drawChart();
                 categoryChart.drawChart();
@@ -126,6 +124,33 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         } catch (UIDetachedException e) {
             logger.info("Browser was closed, updates not pushed");
         }
+    }
+
+    private void updatePriceChart(Map<String, Long> priceStats) {
+        var priceSeries = priceSeries(priceStats);
+        var conf = priceChart.getConfiguration();
+        conf.setSeries(priceSeries);
+    }
+
+    private void updateCategoryChart(Map<String, Long> categoryStats) {
+        var categorySeries = categorySeries(categoryStats);
+        var conf = categoryChart.getConfiguration();
+        conf.setSeries(categorySeries);
+        conf.getLegend().setEnabled(false);
+        conf.getyAxis().setTitle(getTranslation(COUNT));
+        categoryStats.keySet().forEach(cat -> conf.getxAxis().addCategory(cat));
+    }
+
+    private void updateAvailabilityChart(
+            Map<Availability, Long> availabilityStats) {
+        var availabilitySeries = availabilitySeries(availabilityStats);
+        var conf = availabilityChart.getConfiguration();
+        conf.setSeries(availabilitySeries);
+        conf.getLegend().setEnabled(false);
+        var categories = (String[]) availabilitySeries.getData().stream()
+                .map(item -> item.getName()).toArray(String[]::new);
+        var axis = conf.getxAxis();
+        axis.setCategories(categories);
     }
 
     private DataSeries categorySeries(Map<String, Long> categories) {

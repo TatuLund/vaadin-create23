@@ -96,6 +96,7 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
         menuItems.addStyleName(ValoTheme.MENU_ITEMS);
 
         var logout = new MenuBar();
+        logout.setId("logout");
         var item = logout.addItem(getTranslation(LOGOUT), e -> {
             logger.info("User '{}' logout", CurrentUser.get().get().getName());
             ui.getSession().getSession().invalidate();

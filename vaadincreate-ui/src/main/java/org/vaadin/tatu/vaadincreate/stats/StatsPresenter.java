@@ -54,13 +54,17 @@ public class StatsPresenter implements Serializable {
                 availabilityStats.put(availability, count);
             }
 
-            Map<String, Long> categoryStats = new HashMap<>();
+            Map<String, Long[]> categoryStats = new HashMap<>();
             var categories = service.getAllCategories();
             for (Category category : categories) {
-                var count = products.stream().filter(
+                var titles = products.stream().filter(
                         product -> product.getCategory().contains(category))
                         .count();
-                categoryStats.put(category.getName(), count);
+                var instock = products.stream().filter(
+                        product -> product.getCategory().contains(category))
+                        .mapToLong(prod -> prod.getStockCount()).sum();
+                Long[] counts = {titles, instock};
+                categoryStats.put(category.getName(), counts);
             }
 
             Map<String, Long> priceStats = new HashMap<>();

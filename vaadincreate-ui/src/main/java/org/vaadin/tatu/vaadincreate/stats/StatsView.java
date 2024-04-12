@@ -19,6 +19,7 @@ import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.Lang;
 import com.vaadin.addon.charts.model.Legend;
+import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -39,6 +40,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     private static final String AVAILABILITIES = "availabilities";
     private static final String PRICES = "prices";
     private static final String COUNT = "count";
+    private static final String IN_STOCK = "in-stock";
 
     private StatsPresenter presenter = new StatsPresenter(this);
 
@@ -89,7 +91,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         var categoryChartWrapper = new CssLayout();
         categoryChartWrapper
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_WIDE);
-        categoryChart = new Chart(ChartType.BAR);
+        categoryChart = new Chart(ChartType.COLUMN);
         var conf = categoryChart.getConfiguration();
         conf.setTitle(getTranslation(CATEGORIES));
         conf.setLang(lang);
@@ -110,7 +112,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     }
 
     public void updateStatsAsync(Map<Availability, Long> availabilityStats,
-            Map<String, Long> categoryStats, Map<String, Long> priceStats) {
+            Map<String, Long[]> categoryStats, Map<String, Long> priceStats) {
         try {
             getUI().access(() -> {
                 updateAvailabilityChart(availabilityStats);
@@ -120,6 +122,8 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
                 availabilityChart.drawChart();
                 categoryChart.drawChart();
                 priceChart.drawChart();
+
+                lang.setNoData("");
             });
         } catch (UIDetachedException e) {
             logger.info("Browser was closed, updates not pushed");
@@ -132,12 +136,22 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         conf.setSeries(priceSeries);
     }
 
-    private void updateCategoryChart(Map<String, Long> categoryStats) {
-        var categorySeries = categorySeries(categoryStats);
+    private void updateCategoryChart(Map<String, Long[]> categoryStats) {
         var conf = categoryChart.getConfiguration();
-        conf.setSeries(categorySeries);
-        conf.getLegend().setEnabled(false);
+
+        var titles = categorySeries(categoryStats, 0);
+        titles.setName(getTranslation(COUNT));
+        conf.setSeries(titles);
         conf.getyAxis().setTitle(getTranslation(COUNT));
+
+        var stockAxis = new YAxis();
+        stockAxis.setOpposite(true);
+        conf.addyAxis(stockAxis);
+        var stockCounts = categorySeries(categoryStats, 1);
+        stockCounts.setName(getTranslation(IN_STOCK));
+        stockCounts.setyAxis(1);
+        conf.addSeries(stockCounts);
+        stockAxis.setTitle(getTranslation(IN_STOCK));
         categoryStats.keySet().forEach(cat -> conf.getxAxis().addCategory(cat));
     }
 
@@ -153,10 +167,11 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         axis.setCategories(categories);
     }
 
-    private DataSeries categorySeries(Map<String, Long> categories) {
+    private DataSeries categorySeries(Map<String, Long[]> categories,
+            int index) {
         var series = new DataSeries();
         categories.forEach((category, count) -> {
-            var item = new DataSeriesItem(category, count);
+            var item = new DataSeriesItem(category, count[index]);
             series.setName(getTranslation(CATEGORIES));
             series.add(item);
         });

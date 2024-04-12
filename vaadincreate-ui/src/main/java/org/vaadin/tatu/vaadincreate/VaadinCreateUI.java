@@ -47,6 +47,11 @@ import com.vaadin.ui.UI;
 @Viewport("width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no")
 public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
+    // Inject the default services. This demo application does not include real
+    // database backend, only a mock, which is used here. This works well also
+    // in the unit tests included. Supposed these were the real production
+    // services this UI can be extended and getters for the services overriden
+    // for creating test UI for unit tests.
     private AccessControl accessControl = new BasicAccessControl();
     private ProductDataService productService = ProductDataService.get();
     private UserService userService = UserService.get();
@@ -91,18 +96,38 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         return (VaadinCreateUI) UI.getCurrent();
     }
 
+    /**
+     * Get AccessControl in use
+     *
+     * @return Instance of AccessControl
+     */
     public AccessControl getAccessControl() {
         return accessControl;
     }
 
+    /**
+     * Get ProductDataService in use
+     * 
+     * @return Instance of ProductDataService
+     */
     public ProductDataService getProductService() {
         return productService;
     }
 
+    /**
+     * Get UserService in use
+     *
+     * @return Instance of UserService
+     */
     public UserService getUserService() {
         return userService;
     }
 
+    /**
+     * Get AppDataService in use
+     *
+     * @return Instance of AppAdataService
+     */
     public AppDataService getAppService() {
         return appService;
     }
@@ -142,6 +167,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             });
         }
 
+        // Use request handler to persist the selected language to Cookie
         private boolean handleRequest(VaadinSession session,
                 VaadinRequest request, VaadinResponse response) {
             var locale = new StringBuilder();

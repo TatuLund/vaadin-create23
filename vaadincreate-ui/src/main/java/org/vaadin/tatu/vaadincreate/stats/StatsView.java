@@ -136,6 +136,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
 
     private void updatePriceChart(Map<String, Long> priceStats) {
         var priceSeries = priceSeries(priceStats);
+        priceSeries.setName(getTranslation(COUNT));
         var conf = priceChart.getConfiguration();
         conf.setSeries(priceSeries);
     }

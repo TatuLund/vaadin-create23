@@ -23,8 +23,10 @@ import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.shared.Registration;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.UIDetachedException;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -51,6 +53,8 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     private Chart priceChart;
 
     private Lang lang;
+
+    private Registration resizeListener;
 
     public StatsView() {
         addStyleNames(VaadinCreateTheme.STATSVIEW, ValoTheme.SCROLLABLE);
@@ -139,11 +143,14 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     private void updateCategoryChart(Map<String, Long[]> categoryStats) {
         var conf = categoryChart.getConfiguration();
 
+        // Show count of titles on primary axis
         var titles = categorySeries(categoryStats, 0);
         titles.setName(getTranslation(COUNT));
         conf.setSeries(titles);
         conf.getyAxis().setTitle(getTranslation(COUNT));
 
+        // Create secondary axis for counts in stock
+        // and position it to the right side
         var stockAxis = new YAxis();
         stockAxis.setOpposite(true);
         conf.addyAxis(stockAxis);
@@ -220,8 +227,20 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     }
 
     @Override
+    public void attach() {
+        super.attach();
+        resizeListener = getUI().getPage().addBrowserWindowResizeListener(e -> {
+            // Vaadin responsive forces layout only when break point changes,
+            // however Chart requires re-layout also when window size changes
+            // when using non-fixed sizes.
+            JavaScript.eval("vaadin.forceLayout()");
+        });
+    }
+
+    @Override
     public void detach() {
         super.detach();
+        resizeListener.remove();
         presenter.cancelUpdateStats();
     }
 

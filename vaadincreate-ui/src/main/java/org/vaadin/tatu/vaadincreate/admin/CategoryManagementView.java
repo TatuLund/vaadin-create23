@@ -13,6 +13,7 @@ import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.ValueChangeMode;
+import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
@@ -53,6 +54,8 @@ public class CategoryManagementView extends VerticalLayout
                     Category category = new Category();
                     dataProvider.getItems().add(category);
                     dataProvider.refreshAll();
+                    categoriesListing
+                            .setHeightByRows(dataProvider.getItems().size());
                     categoriesListing.scrollToEnd();
                 });
         newCategoryButton.setDisableOnClick(true);
@@ -77,6 +80,7 @@ public class CategoryManagementView extends VerticalLayout
                 VaadinCreateTheme.GRID_NO_STRIPES,
                 VaadinCreateTheme.GRID_NO_BORDERS,
                 VaadinCreateTheme.GRID_NO_FOCUS);
+        categoriesListing.setHeightMode(HeightMode.ROW);
     }
 
     @Override
@@ -99,6 +103,7 @@ public class CategoryManagementView extends VerticalLayout
             }
         };
         categoriesListing.setDataProvider(dataProvider);
+        categoriesListing.setHeightByRows(categories.size());
     }
 
     private Component createCategoryEditor(Category category) {
@@ -121,6 +126,8 @@ public class CategoryManagementView extends VerticalLayout
                 presenter.removeCategory(category);
                 dataProvider.getItems().remove(category);
                 dataProvider.refreshAll();
+                categoriesListing
+                        .setHeightByRows(dataProvider.getItems().size());
                 Notification.show(
                         getTranslation(CATEGORY_DELETED, category.getName()));
             });

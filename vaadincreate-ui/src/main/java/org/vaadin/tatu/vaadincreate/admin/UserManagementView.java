@@ -151,6 +151,7 @@ public class UserManagementView extends VerticalLayout
 
     private FormLayout createUserForm() {
         var form = new FormLayout();
+        form.addStyleName("user-form");
         var username = new TextField(getTranslation(USERNAME));
         username.setId("user-field");
         var userNameExt = new AttributeExtension();

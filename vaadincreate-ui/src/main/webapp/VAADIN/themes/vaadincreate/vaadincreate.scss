@@ -407,6 +407,12 @@ $fake-grid-background-color: white;
     }
   }
 
+  .user-form {
+    box-shadow: $light-shadow;
+    background: white;
+    border: $v-grid-border;
+  }
+
   // Adjust icon to show nicely when menubar is small
   .v-ui[width-range~="0-500px"] {
     .valo-menu .v-menubar-menuitem-caption .v-icon {
@@ -443,43 +449,45 @@ $fake-grid-background-color: white;
   }
 
   .valo-menu-item {
-     padding: 4px 32px 4px 16px;	  
+    padding: 4px 32px 4px 16px;	  
   }
 
   .fakegrid {
-	  background: $fake-grid-background-color;
-	  border: 1px solid $fake-grid-border-color;
+    background: $fake-grid-background-color;
+    border: $v-grid-border;
 	  
-	  .fakegrid-header {
-		  background: $fake-grid-header-background-color;
-		  height: 33px;
-		  width: 100%;
-		  border: 1px solid $fake-grid-border-color;
-	  }
+    .fakegrid-header {
+      background: $fake-grid-header-background-color;
+      height: 33px;
+      width: 100%;
+      border: $v-grid-border;
+    }
   }
 
   .dashboard {
-	  .dashboard-chart {
-		  margin: 10px;
-		  width: 430px;
-          box-shadow: $chart-shadow;
-	  }
+    width: 100%;
 
-	  .dashboard-chart-wide {
-		  margin: 10px;
-		  width: 880px;
-          box-shadow: $chart-shadow;
-	  }
+    .dashboard-chart {
+      margin: 10px;
+      width: calc(50% - 20px);
+      box-shadow: $chart-shadow;
+    }
+
+    .dashboard-chart-wide {
+      margin: 10px;
+      width: calc(100% - 20px);
+      box-shadow: $chart-shadow;
+    }
   }
   
   .v-ui[width-range~="551px-1000px"] {
-	  .dashboard {
-		  width: 500px;
-	  }
+    .dashboard-chart {
+      width: calc(100% - 20px);
+    }
 
-	  .dashboard-chart-wide {
-		  width: 430px;
-	  }
+	.dashboard-chart-wide {
+      width: calc(100% - 20px);
+    }
   }
 
   .v-spacing {
@@ -511,6 +519,10 @@ $fake-grid-background-color: white;
  
   .adminview-categorygrid {
     box-shadow: $light-shadow;
+
+    thead {
+      display: none;
+    }
   }
 
   // IMHO: It is possibly framework bug that these are missing

@@ -58,6 +58,8 @@ public class CategoryManagementView extends VerticalLayout
                             .setHeightByRows(dataProvider.getItems().size());
                     categoriesListing.scrollToEnd();
                 });
+        newCategoryButton.setIcon(VaadinIcons.PLUS_CIRCLE);
+        newCategoryButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         newCategoryButton.setDisableOnClick(true);
         newCategoryButton.setId("new-category");
 
@@ -115,7 +117,7 @@ public class CategoryManagementView extends VerticalLayout
             nameField.focus();
         }
 
-        var deleteButton = new Button(VaadinIcons.MINUS_CIRCLE_O, event -> {
+        var deleteButton = new Button(VaadinIcons.TRASH, event -> {
             var dialog = new ConfirmDialog(
                     getTranslation(WILL_DELETE, category.getName()),
                     Type.ALERT);

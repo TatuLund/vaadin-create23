@@ -11,6 +11,7 @@ import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -84,6 +85,7 @@ public class UserManagementView extends VerticalLayout
         var newUser = new Button(getTranslation(NEW_USER));
         newUser.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         newUser.setId("new-button");
+        newUser.setIcon(VaadinIcons.PLUS_CIRCLE);
         newUser.addClickListener(event -> {
             user = new User();
             populateForm(form);

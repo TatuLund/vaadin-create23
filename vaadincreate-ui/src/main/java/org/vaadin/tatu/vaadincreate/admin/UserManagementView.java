@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -153,7 +154,7 @@ public class UserManagementView extends VerticalLayout
 
     private FormLayout createUserForm() {
         var form = new FormLayout();
-        form.addStyleName("user-form");
+        form.addStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM);
         var username = new TextField(getTranslation(USERNAME));
         username.setId("user-field");
         var userNameExt = new AttributeExtension();

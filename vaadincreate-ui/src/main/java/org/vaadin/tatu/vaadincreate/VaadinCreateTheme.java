@@ -15,6 +15,7 @@ public class VaadinCreateTheme {
     public static final String ABOUTVIEW_ABOUTLABEL = "aboutview-aboutlabel";
 
     public static final String ADMINVIEW_CATEGORY_GRID = "adminview-categorygrid";
+    public static final String ADMINVIEW_USERFORM = "adminview-userform";
 
     public static final String BOOKVIEW_GRID = "bookview-grid";
     public static final String BOOKVIEW_TOOLBAR = "bookview-toolbar";

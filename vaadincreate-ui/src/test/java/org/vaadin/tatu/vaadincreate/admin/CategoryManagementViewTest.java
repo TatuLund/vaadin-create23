@@ -31,6 +31,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var cats = (CategoryManagementView) test(tabs).current();
 
         test($(cats, Button.class).id("new-category")).click();
+        assertFalse($(cats, Button.class).id("new-category").isEnabled());
 
         var grid = (Grid<Category>) $(cats, Grid.class).single();
         var gridSize = test(grid).size();

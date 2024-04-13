@@ -7,9 +7,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.auth.MockAccessControl;
+import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
+
 import com.vaadin.testbench.uiunittest.UIUnitTest;
 
 import com.vaadin.server.ServiceException;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 
 public class LoginViewTest extends UIUnitTest {
@@ -28,7 +31,7 @@ public class LoginViewTest extends UIUnitTest {
     }
 
     @Test
-    public void loginEventFired() throws ServiceException {
+    public void loginEventFired() {
         var count = new AtomicInteger(0);
         var login = new LoginView(new MockAccessControl("Admin"),
                 e -> count.addAndGet(1));
@@ -41,14 +44,19 @@ public class LoginViewTest extends UIUnitTest {
     }
 
     @Test
-    public void loginEventNotFired() throws ServiceException {
+    public void loginEventNotFired() {
         var count = new AtomicInteger(0);
         var login = new LoginView(new MockAccessControl("Admin"),
                 e -> count.addAndGet(1));
         ui.setContent(login);
+        test($(login, LanguageSelect.class).single())
+                .clickItem(DefaultI18NProvider.LOCALE_EN);
 
         test(login.username).setValue("Admin");
         test(login.password).setValue("Wrong");
         test(login.login).click();
         Assert.assertEquals(0, count.get());
-    }}
+        Assert.assertEquals("Login failed",
+                $(Notification.class).last().getCaption());
+    }
+}

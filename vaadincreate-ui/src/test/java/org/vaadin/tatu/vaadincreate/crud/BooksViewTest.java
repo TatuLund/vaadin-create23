@@ -104,7 +104,7 @@ public class BooksViewTest extends AbstractUITest {
         assertEquals("New book", test(grid).cell(1, row));
         assertEquals("10.00 €", test(grid).cell(2, row));
         assertEquals("10", test(grid).cell(4, row));
-//        assertEquals(cat.getName(), test(grid).cell(5, row));
+        // assertEquals(cat.getName(), test(grid).cell(5, row));
     }
 
     @Test
@@ -169,6 +169,84 @@ public class BooksViewTest extends AbstractUITest {
         test(form.productName).setValue("");
         test(form.stockCount).focus();
         assertTrue(test(form.productName).isInvalid());
+    }
+
+    @Test
+    public void resizeTest() {
+        ui.getPage().updateBrowserWindowSize(1600, 1024, true);
+
+        grid.getColumns().forEach(col -> {
+            assertFalse(col.isHidden());
+        });
+
+        ui.getPage().updateBrowserWindowSize(1200, 1024, true);
+
+        assertTrue(grid.getColumns().get(0).isHidden());
+        assertFalse(grid.getColumns().get(1).isHidden());
+        assertFalse(grid.getColumns().get(2).isHidden());
+        assertFalse(grid.getColumns().get(3).isHidden());
+        assertFalse(grid.getColumns().get(4).isHidden());
+        assertTrue(grid.getColumns().get(5).isHidden());
+
+        ui.getPage().updateBrowserWindowSize(900, 1024, true);
+
+        assertTrue(grid.getColumns().get(0).isHidden());
+        assertFalse(grid.getColumns().get(1).isHidden());
+        assertFalse(grid.getColumns().get(2).isHidden());
+        assertFalse(grid.getColumns().get(3).isHidden());
+        assertTrue(grid.getColumns().get(4).isHidden());
+        assertTrue(grid.getColumns().get(5).isHidden());
+
+        ui.getPage().updateBrowserWindowSize(500, 1024, true);
+
+        assertTrue(grid.getColumns().get(0).isHidden());
+        assertFalse(grid.getColumns().get(1).isHidden());
+        assertFalse(grid.getColumns().get(2).isHidden());
+        assertTrue(grid.getColumns().get(3).isHidden());
+        assertTrue(grid.getColumns().get(4).isHidden());
+        assertTrue(grid.getColumns().get(5).isHidden());
+    }
+
+    @Test
+    public void sortingByPrice() {
+        int size = grid.getDataCommunicator().getDataProviderSize();
+
+        test(grid).toggleColumnSorting(2);
+
+        for (int i = 1; i < size; i++) {
+            var result = test(grid).item(i - 1).getPrice()
+                    .compareTo(test(grid).item(i).getPrice());
+            assertTrue(result <= 0);
+        }
+
+        test(grid).toggleColumnSorting(2);
+
+        for (int i = 1; i < size; i++) {
+            var result = test(grid).item(i - 1).getPrice()
+                    .compareTo(test(grid).item(i).getPrice());
+            assertTrue(result >= 0);
+        }
+    }
+
+    @Test
+    public void sortingByName() {
+        int size = grid.getDataCommunicator().getDataProviderSize();
+
+        test(grid).toggleColumnSorting(1);
+
+        for (int i = 1; i < size; i++) {
+            var result = ((String) test(grid).cell(1, i - 1))
+                    .compareToIgnoreCase((String) test(grid).cell(1, i));
+            assertTrue(result <= 0);
+        }
+
+        test(grid).toggleColumnSorting(1);
+
+        for (int i = 1; i < size; i++) {
+            var result = ((String) test(grid).cell(1, i - 1))
+                    .compareToIgnoreCase((String) test(grid).cell(1, i));
+            assertTrue(result >= 0);
+        }
     }
 
     private void waitForGrid(VerticalLayout layout, BookGrid grid) {

@@ -54,7 +54,9 @@ public class BookGrid extends Grid<Product> implements HasI18N {
 
         addColumn(Product::getId, new NumberRenderer()).setCaption("Id");
         addColumn(Product::getProductName).setId("name")
-                .setCaption(getTranslation(PRODUCT_NAME));
+                .setCaption(getTranslation(PRODUCT_NAME))
+                .setComparator((p1, p2) -> p1.getProductName()
+                        .compareToIgnoreCase(p2.getProductName()));
 
         // Format and add " €" to price
         addColumn(product -> decimalFormat.format(product.getPrice()) + " €")

@@ -61,7 +61,8 @@ public class BooksView extends CssLayout implements View, HasI18N {
     private TextField filter;
 
     private BooksPresenter presenter = new BooksPresenter(this);
-    private AccessControl accessControl = VaadinCreateUI.get().getAccessControl();
+    private AccessControl accessControl = VaadinCreateUI.get()
+            .getAccessControl();
 
     private Button newProduct;
 
@@ -113,8 +114,8 @@ public class BooksView extends CssLayout implements View, HasI18N {
     }
 
     private boolean filterCondition(Object object, String filterText) {
-        return object != null
-                && object.toString().toLowerCase().contains(filterText);
+        return object != null && object.toString().toLowerCase()
+                .contains(filterText.toLowerCase());
     }
 
     private boolean passesFilter(Product book, String filterText) {

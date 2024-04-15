@@ -166,6 +166,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     private void updateAvailabilityChart(
             Map<Availability, Long> availabilityStats) {
         var availabilitySeries = availabilitySeries(availabilityStats);
+        availabilitySeries.setName(getTranslation(COUNT));
         var conf = availabilityChart.getConfiguration();
         conf.setSeries(availabilitySeries);
         conf.getLegend().setEnabled(false);

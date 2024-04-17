@@ -1,9 +1,13 @@
 package org.vaadin.tatu.vaadincreate.login;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
-import org.junit.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.auth.MockAccessControl;
@@ -33,20 +37,25 @@ public class LoginViewTest extends UIUnitTest {
     @Test
     public void loginEventFired() {
         var count = new AtomicInteger(0);
-        var login = new LoginView(new MockAccessControl("Admin"),
+        var accessControl = new MockAccessControl("Admin");
+        assertFalse(accessControl.isUserSignedIn());
+        var login = new LoginView(accessControl,
                 e -> count.addAndGet(1));
         ui.setContent(login);
 
         test(login.username).setValue("Admin");
         test(login.password).setValue("Admin");
         test(login.login).click();
-        Assert.assertEquals(1, count.get());
+        assertEquals(1, count.get());
+        assertTrue(accessControl.isUserSignedIn());
     }
 
     @Test
     public void loginEventNotFired() {
         var count = new AtomicInteger(0);
-        var login = new LoginView(new MockAccessControl("Admin"),
+        var accessControl = new MockAccessControl("Admin");
+        assertFalse(accessControl.isUserSignedIn());
+        var login = new LoginView(accessControl,
                 e -> count.addAndGet(1));
         ui.setContent(login);
         test($(login, LanguageSelect.class).single())
@@ -55,8 +64,9 @@ public class LoginViewTest extends UIUnitTest {
         test(login.username).setValue("Admin");
         test(login.password).setValue("Wrong");
         test(login.login).click();
-        Assert.assertEquals(0, count.get());
-        Assert.assertEquals("Login failed",
+        assertEquals(0, count.get());
+        assertEquals("Login failed",
                 $(Notification.class).last().getCaption());
+        assertFalse(accessControl.isUserSignedIn());
     }
 }

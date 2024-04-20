@@ -26,15 +26,13 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 /**
- * This is a responsive application shell with Navigator build wiht ValoMenu
+ * This is a responsive application shell with Navigator build with ValoMenu
  */
 @SuppressWarnings("serial")
 public class AppLayout extends HorizontalLayout implements HasI18N {
 
     private static final String LOGOUT = "logout";
     private static final String MENU = "menu";
-    private static final String BOOKSTORE = "bookstore";
-    private static final String SHOW_TABS = "show-tabs";
 
     private final VerticalLayout content = new VerticalLayout();
     private final CssLayout menu = new CssLayout();
@@ -98,9 +96,15 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
         var logout = new MenuBar();
         logout.setId("logout");
         var item = logout.addItem(getTranslation(LOGOUT), e -> {
-            logger.info("User '{}' logout", CurrentUser.get().get().getName());
-            ui.getSession().getSession().invalidate();
-            ui.getPage().reload();
+            // Use runAfterLeaveConfirmation wrapper to run the logout in based
+            // on beforeLeave of the current view. E.g. if BooksView has changes
+            // ConfirmDialog is shown.
+            nav.runAfterLeaveConfirmation(() -> {
+                logger.info("User '{}' logout",
+                        CurrentUser.get().get().getName());
+                ui.getSession().getSession().invalidate();
+                ui.getPage().reload();
+            });
         });
         item.setIcon(VaadinIcons.KEY);
         item.setDescription(getTranslation(LOGOUT));

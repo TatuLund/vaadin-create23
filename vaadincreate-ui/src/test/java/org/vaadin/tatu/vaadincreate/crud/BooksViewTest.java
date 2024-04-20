@@ -10,6 +10,7 @@ import java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.tatu.vaadincreate.AboutView;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
@@ -160,6 +161,38 @@ public class BooksViewTest extends AbstractUITest {
         test($(dialog, Button.class).id("confirm-button")).click();
 
         assertFalse(form.isShown());
+    }
+
+    @Test
+    public void editProductDiscardChangesWhenNavigate() {
+        test(grid).click(1, 0);
+
+        test(form.productName).setValue("Edited book");
+        test(form.stockCount).setValue("100");
+
+        $(Button.class).caption("About").single().click();
+
+        var dialog = $(Window.class).id("confirm-dialog");
+        test($(dialog, Button.class).id("confirm-button")).click();
+
+        assertTrue($(AboutView.class).size() == 1);
+        assertTrue($(BooksView.class).size() == 0);
+    }
+
+    @Test
+    public void editProductDiscardChangesWhenLogout() {
+        test(grid).click(1, 0);
+
+        test(form.productName).setValue("Edited book");
+        test(form.stockCount).setValue("100");
+
+        logout();
+
+        var dialog = $(Window.class).id("confirm-dialog");
+        test($(dialog, Button.class).id("cancel-button")).click();
+
+        assertTrue($(BooksView.class).size() == 1);
+        assertTrue(form.isShown());
     }
 
     @Test

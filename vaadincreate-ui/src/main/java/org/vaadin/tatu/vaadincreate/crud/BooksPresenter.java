@@ -32,7 +32,8 @@ public class BooksPresenter implements Serializable {
     private CompletableFuture<Void> future;
     private ProductDataService service = VaadinCreateUI.get()
             .getProductService();
-    private AccessControl accessControl = VaadinCreateUI.get().getAccessControl();
+    private AccessControl accessControl = VaadinCreateUI.get()
+            .getAccessControl();
 
     public BooksPresenter(BooksView simpleCrudView) {
         view = simpleCrudView;
@@ -91,15 +92,20 @@ public class BooksPresenter implements Serializable {
                 try {
                     int pid = Integer.parseInt(productId);
                     Product product = findProduct(pid);
-                    view.selectRow(product);
+                    if (product != null) {
+                        view.selectRow(product);
+                    } else {
+                        view.showNotValidId(productId);
+                    }
                 } catch (NumberFormatException e) {
+                    view.showNotValidId(productId);
                 }
             }
         }
     }
 
     private Product findProduct(int productId) {
-        return ProductDataService.get().getProductById(productId);
+        return service.getProductById(productId);
     }
 
     public void saveProduct(Product product) {

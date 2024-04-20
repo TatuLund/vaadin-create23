@@ -19,6 +19,7 @@ import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewBeforeLeaveEvent;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -46,10 +47,8 @@ public class BooksView extends CssLayout implements View, HasI18N {
     public static final String VIEW_NAME = "inventory";
 
     private static final String UPDATED = "updated";
-    private static final String CREATED = "created";
     private static final String REMOVED = "removed";
     private static final String CONFIRM = "confirm";
-    private static final String DELETE = "delete";
     private static final String NEW_PRODUCT = "new-product";
     private static final String FILTER = "filter";
     private static final String NOT_VALID_PID = "not-valid-pid";
@@ -165,10 +164,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
 
     public void cancelProduct() {
         if (form.hasChanges()) {
-            var dialog = new ConfirmDialog(getTranslation(UNSAVED_CHANGES),
-                    ConfirmDialog.Type.ALERT);
-            dialog.setConfirmText(getTranslation(CONFIRM));
-            dialog.setCancelText(getTranslation(CANCEL));
+            var dialog = createDiscardChangesConfirmDialog();
             dialog.open();
             dialog.addConfirmedListener(e -> {
                 form.showForm(false);
@@ -206,6 +202,10 @@ public class BooksView extends CssLayout implements View, HasI18N {
 
     public void showError(String msg) {
         Notification.show(msg, Type.ERROR_MESSAGE);
+    }
+
+    public void showNotValidId(String productId) {
+        showError(getTranslation(NOT_VALID_PID, productId));
     }
 
     public void showSaveNotification(String book) {
@@ -286,9 +286,37 @@ public class BooksView extends CssLayout implements View, HasI18N {
         }
 
         var page = VaadinCreateUI.get().getPage();
-        page.setUriFragment("!" + BooksView.VIEW_NAME + "/" + fragmentParameter,
-                false);
+        var path = "!" + BooksView.VIEW_NAME + "/" + fragmentParameter;
+        page.setUriFragment(path, false);
+    }
+
+    @Override
+    public void beforeLeave(ViewBeforeLeaveEvent event) {
+        if (form.hasChanges()) {
+            var dialog = createDiscardChangesConfirmDialog();
+            dialog.open();
+            dialog.addConfirmedListener(e -> {
+                event.navigate();
+            });
+            // IMHO: Navigator clears url too early and this workaround
+            // shouldn't be necessary. This is a possible bug.
+            var book = grid.asSingleSelect().getValue();
+            getUI().access(() -> {
+                setFragmentParameter("" + book.getId());
+            });
+        } else {
+            event.navigate();
+        }
+    }
+
+    private ConfirmDialog createDiscardChangesConfirmDialog() {
+        var dialog = new ConfirmDialog(getTranslation(UNSAVED_CHANGES),
+                ConfirmDialog.Type.ALERT);
+        dialog.setConfirmText(getTranslation(CONFIRM));
+        dialog.setCancelText(getTranslation(CANCEL));
+        return dialog;
     }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
 }

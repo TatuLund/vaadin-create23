@@ -50,10 +50,6 @@ public class BooksPresenter implements Serializable {
                 executor);
     }
 
-    public void updateProduct(Product product) {
-        ProductDataService.get().updateProduct(product);
-    }
-
     public void requestUpdateProducts() {
         future = loadProductsAsync().thenAccept(products -> {
             logger.info("Fetching products complete");
@@ -113,11 +109,11 @@ public class BooksPresenter implements Serializable {
         view.clearSelection();
         boolean newBook = product.getId() == -1;
         logger.info("Saving product: {}", newBook ? "new" : product.getId());
-        var p = ProductDataService.get().updateProduct(product);
+        var savedProduct = service.updateProduct(product);
         if (newBook) {
-            view.updateGrid(p);
+            view.updateGrid(savedProduct);
         } else {
-            view.updateProduct(p);
+            view.updateProduct(savedProduct);
         }
         view.setFragmentParameter("");
     }

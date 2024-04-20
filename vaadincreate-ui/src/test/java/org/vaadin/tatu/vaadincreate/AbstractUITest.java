@@ -1,5 +1,10 @@
 package org.vaadin.tatu.vaadincreate;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.vaadin.tatu.vaadincreate.crud.BookGrid;
+import org.vaadin.tatu.vaadincreate.crud.FakeGrid;
 import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
 import org.vaadin.tatu.vaadincreate.i18n.I18NProvider;
 import org.vaadin.tatu.vaadincreate.login.LanguageSelect;
@@ -10,6 +15,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 
 public abstract class AbstractUITest extends UIUnitTest {
 
@@ -27,5 +33,13 @@ public abstract class AbstractUITest extends UIUnitTest {
         var menu = $(MenuBar.class).single();
         var menuItem = test(menu).item(2);
         test(menu).click(menuItem);
+    }
+
+    protected void waitForGrid(VerticalLayout layout, BookGrid grid) {
+        assertFalse(grid.isVisible());
+
+        var fake = $(layout, FakeGrid.class).first();
+        waitWhile(fake, f -> f.isVisible(), 10);
+        assertTrue(grid.isVisible());
     }
 }

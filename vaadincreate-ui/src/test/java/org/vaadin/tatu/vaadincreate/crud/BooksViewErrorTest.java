@@ -47,12 +47,4 @@ public class BooksViewErrorTest extends AbstractUITest {
         assertEquals("Product id \"badnumber\" not valid or found.",
                 $(Notification.class).last().getCaption());
     }
-
-    private void waitForGrid(VerticalLayout layout, BookGrid grid) {
-        assertFalse(grid.isVisible());
-
-        var fake = $(layout, FakeGrid.class).first();
-        waitWhile(fake, f -> f.isVisible(), 10);
-        assertTrue(grid.isVisible());
-    }
 }

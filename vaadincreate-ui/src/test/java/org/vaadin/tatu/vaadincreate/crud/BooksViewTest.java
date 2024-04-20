@@ -19,6 +19,7 @@ import com.vaadin.data.ValueContext;
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -101,11 +102,18 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(ui.getProductService().getAllProducts().stream()
                 .anyMatch(b -> b.getProductName().equals("New book")));
 
+        // New book is added to the end
         int row = test(grid).size() - 1;
         assertEquals("New book", test(grid).cell(1, row));
         assertEquals("10.00 €", test(grid).cell(2, row));
         assertEquals("10", test(grid).cell(4, row));
-        // assertEquals(cat.getName(), test(grid).cell(5, row));
+        
+        // Find by filter and its the first row
+        test($(TextField.class).id("filter-field")).setValue("New book");
+        assertEquals(1, test(grid).size());
+        assertEquals("New book", test(grid).cell(1, 0));
+        assertEquals("10.00 €", test(grid).cell(2, 0));
+        assertEquals("10", test(grid).cell(4, 0));
     }
 
     @Test
@@ -281,13 +289,4 @@ public class BooksViewTest extends AbstractUITest {
             assertTrue(result >= 0);
         }
     }
-
-    private void waitForGrid(VerticalLayout layout, BookGrid grid) {
-        assertFalse(grid.isVisible());
-
-        var fake = $(layout, FakeGrid.class).first();
-        waitWhile(fake, f -> f.isVisible(), 10);
-        assertTrue(grid.isVisible());
-    }
-
 }

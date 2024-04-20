@@ -58,20 +58,33 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     private AppDataService appService = AppDataService.get();
 
     private EventBus eventBus = EventBus.get();
+    private String target;
 
     @Override
     protected void init(VaadinRequest request) {
         getPage().setTitle("Vaadin Create 23'");
         if (!getAccessControl().isUserSignedIn()) {
             setContent(new LoginView(getAccessControl(), e -> {
+                target = getInitialTarget();
+                logger.info("Initial target '{}'", target);
                 Utils.sessionFixation();
                 getPage().reload();
                 showAppLayout();
             }));
         } else {
+            target = getInitialTarget();
             showAppLayout();
         }
         eventBus.registerEventBusListener(this);
+    }
+
+    private String getInitialTarget() {
+        if (getPage().getUriFragment() == null) {
+            return AboutView.VIEW_NAME;
+        }
+        var location = getPage().getLocation().toString();
+        var index = location.indexOf("#!") + 2;
+        return location.substring(index);
     }
 
     protected void showAppLayout() {
@@ -89,7 +102,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         appLayout.addView(AdminView.class, getTranslation(AdminView.VIEW_NAME),
                 VaadinIcons.USERS, AdminView.VIEW_NAME);
 
-        getNavigator().navigateTo(AboutView.VIEW_NAME);
+        getNavigator().navigateTo(target);
     }
 
     public static VaadinCreateUI get() {
@@ -150,6 +163,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         super.detach();
         eventBus.unregisterEventBusListener(this);
     }
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // Set maxIdleTime because of Jetty 10, see:
     // https://github.com/vaadin/flow/issues/17215

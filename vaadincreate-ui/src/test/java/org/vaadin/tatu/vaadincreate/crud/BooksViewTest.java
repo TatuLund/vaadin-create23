@@ -107,13 +107,40 @@ public class BooksViewTest extends AbstractUITest {
         assertEquals("New book", test(grid).cell(1, row));
         assertEquals("10.00 €", test(grid).cell(2, row));
         assertEquals("10", test(grid).cell(4, row));
-        
+
         // Find by filter and its the first row
         test($(TextField.class).id("filter-field")).setValue("New book");
         assertEquals(1, test(grid).size());
         assertEquals("New book", test(grid).cell(1, 0));
         assertEquals("10.00 €", test(grid).cell(2, 0));
         assertEquals("10", test(grid).cell(4, 0));
+    }
+
+    @Test
+    public void addAndCancel() {
+        test($(view, Button.class).id("new-product")).click();
+        assertTrue(form.isShown());
+
+        test(form.productName).setValue("New book");
+        test(form.price).setValue("10.0 €");
+        test(form.availability).clickItem(Availability.AVAILABLE);
+        test(form.stockCount).setValue("10");
+
+        test($(form, Button.class).caption("Cancel").single()).click();
+
+        var dialog = $(Window.class).id("confirm-dialog");
+        test($(dialog, Button.class).id("confirm-button")).click();
+
+        assertFalse(form.isShown());
+    }
+
+    @Test
+    public void addAndCancelEmpty() {
+        test($(view, Button.class).id("new-product")).click();
+        assertTrue(form.isShown());
+
+        test($(form, Button.class).caption("Cancel").single()).click();
+        assertFalse(form.isShown());
     }
 
     @Test

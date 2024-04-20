@@ -173,6 +173,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
                 setFragmentParameter("");
             });
         } else {
+            form.showForm(false);
             clearSelection();
         }
     }

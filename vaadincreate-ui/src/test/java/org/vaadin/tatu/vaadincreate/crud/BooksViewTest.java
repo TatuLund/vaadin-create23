@@ -82,6 +82,44 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
+    public void crossValidationAndDiscard() {
+        test($(view, Button.class).id("new-product")).click();
+
+        test(form.productName).setValue("Te");
+        test(form.availability).clickItem(Availability.COMING);
+        test(form.price).setValue("10.0 €");
+        test(form.stockCount).setValue("10");
+        var cat = ui.getProductService().getAllCategories().stream().findFirst()
+                .get();
+        test(form.category).clickItem(cat);
+
+        test(form.save).click();
+        assertFalse(form.save.isEnabled());
+        assertTrue(test(form.availability).isInvalid());
+        assertTrue(test(form.stockCount).isInvalid());
+
+        test(form.stockCount).setValue("0");
+        assertFalse(test(form.availability).isInvalid());
+        assertFalse(test(form.stockCount).isInvalid());
+        assertTrue(form.save.isEnabled());
+
+        test($(form, Button.class).caption("Cancel").single()).click();
+
+        var dialog = $(Window.class).id("confirm-dialog");
+        test($(dialog, Button.class).id("cancel-button")).click();
+
+        assertTrue(form.isShown());
+
+        test($(form, Button.class).caption("Discard").single()).click();
+        assertEquals("", form.productName.getValue());
+        assertEquals("0.00 €", form.price.getValue());
+        assertTrue(form.category.getValue().isEmpty());
+
+        test($(form, Button.class).caption("Cancel").single()).click();
+        assertFalse(form.isShown());
+    }
+
+    @Test
     public void addProduct() {
         test($(view, Button.class).id("new-product")).click();
 

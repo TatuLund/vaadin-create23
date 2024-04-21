@@ -77,10 +77,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
         grid = new BookGrid();
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (form.hasChanges()) {
-                var dialog = new ConfirmDialog(getTranslation(UNSAVED_CHANGES),
-                        ConfirmDialog.Type.ALERT);
-                dialog.setConfirmText(getTranslation(CONFIRM));
-                dialog.setCancelText(getTranslation(CANCEL));
+                var dialog = createDiscardChangesConfirmDialog();
                 dialog.open();
                 dialog.addConfirmedListener(e -> {
                     form.showForm(false);
@@ -302,7 +299,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
             });
             // IMHO: Navigator clears url too early and this workaround
             // shouldn't be necessary. This is a possible bug.
-            var book = grid.asSingleSelect().getValue();
+            var book = getSelectedRow();
             getUI().access(() -> {
                 setFragmentParameter("" + book.getId());
             });

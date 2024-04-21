@@ -70,9 +70,9 @@ public class BookForm extends Composite implements HasI18N {
     private Product currentProduct;
     private CssLayout layout = new CssLayout();
     
-    private static class StockPriceConverter extends StringToIntegerConverter {
+    private static class StockCountConverter extends StringToIntegerConverter {
 
-        public StockPriceConverter(String message) {
+        public StockCountConverter(String message) {
             super(message);
         }
 
@@ -111,7 +111,7 @@ public class BookForm extends Composite implements HasI18N {
                 .bind("price");
         binder.forField(stockCount)
                 .withConverter(
-                        new StockPriceConverter(getTranslation(CANNOT_CONVERT)))
+                        new StockCountConverter(getTranslation(CANNOT_CONVERT)))
                 .bind("stockCount");
 
         category.setItemCaptionGenerator(Category::getName);

@@ -121,7 +121,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
                 || filterCondition(book.getCategory(), filterText);
     }
 
-    public HorizontalLayout createTopBar() {
+    private HorizontalLayout createTopBar() {
         filter = new TextField();
         filter.setId("filter-field");
         filter.setStyleName(VaadinCreateTheme.BOOKVIEW_FILTER);

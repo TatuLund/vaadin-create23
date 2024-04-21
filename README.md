@@ -8,29 +8,40 @@ The demo app covers various use cases you may encounter in real life application
 
 - Multi-module project setup (backend, components and ui)
 - AppLayout uses ValoMenu to create responsive application shell
-	- Setup also navigator and combine building of the menu and registrations of the views,
-	- Implements per view role based access control
+	- Setup also navigator and combine building of the menu and registrations of the views.
+	- Implements per view role based access control.
 - The main application views have been implemented using Model View Presenter pattern
+	- VaadinCreateUI acts as a proxy for services and services are used only in the Presenters. This pattern allows to extend and override VaadinCreateUI for alternate set of services for testing.	
 - StatsView and BooksView load data from backend asynchronously and use push to update the view
-	- StatsView uses fake grid as placeholder,
+	- BooksView uses FakeGrid component as placeholder while loading.
 - StatsView
-	- Responsive dashboard layout of Charts using Vaadin responsive CSS
+	- Responsive dashboard layout of Charts using Vaadin responsive CSS.
+	- Async loading and showing no data label during loading.
+	- Multi-axis Chart example.
 - BooksView
 	- Responsive Grid using BrowserResizeListener, 
-	- Responsive CSS in Grid column,
-	- Responsive CRUD editor,
+	- Responsive CSS in Grid column
+	- Responsive CRUD editor design
 	- Highlight last edited item
+	- Implement beforeLeave to confirm unsaved changes
+	- Highlight changed fields
+	- Bean level validation example
+	- Bookmarkable editor
+	- Description generator showing details in compact mode
 - Simplified example of access control
 - AdminView
 	- Example of nested sub-navigation using url-parameters and TabSheet component,
-	- Category management view,
-	- User management view
+	- Category management view, use Grid as list editor
+	- User management view, use FormLayout light variant
 - AboutView
 	- Demo how to correctly sanitize user input with Jsoup in order to avoid XSS,
 	- CustomLayout example
 - How to use logger in UI module
-- How to create application scoped EventBus
+- How to create and use application scoped EventBus
+	- Implementation shows how to avoid common caveats of memory leaks, see unit test for proof
 - The custom theme is using BEM (Block Element Modifier) naming scheme to avoid class name conflicts in CSS
+- Example of how to localize / provide translations for texts used in UI
+- Comprehensive set of unit, compomnent, integration and end to end tests
 
 - Components module has examples of GWT and JavaScript extensions
 	- Reset button for text field extension with client side GWT,
@@ -39,7 +50,6 @@ The demo app covers various use cases you may encounter in real life application
 	- Java 11 code used in widgets,
 	- ConfirmDialog server side composition component,
 	- Suite of unit and integration tests for the components and standalone test UI for them
-- Example of how to localize / provide translations for texts used in UI
 
 Notes
 
@@ -51,7 +61,7 @@ Notes
 This is intentional to demonstrate the current state of Vaadin 8 extended maintenance
 The following commercial products are used.
 
-- Vaadin 8.24.0, The latest free version 8.14.3
+- Vaadin 8.25.0, The latest free version 8.14.3
 - Vaadin Charts in stats dashboard view
 - TestBench and TestBench UI Unit Test add-on for testing 
 - AppSecKit for SBOM vulnerability analysis
@@ -78,12 +88,12 @@ To see the demo, navigate to http://localhost:8080/
 
 ## Development with Eclipse IDE
 
-For further development of this add-on, the following tool-chain is recommended:
+For further development of this project, the following tool-chain is recommended:
 - Eclipse IDE
 - m2e wtp plug-in (install it from Eclipse Marketplace)
 - Vaadin Eclipse plug-in (install it from Eclipse Marketplace)
-- JRebel Eclipse plug-in (install it from Eclipse Marketplace)
-- Chrome browser
+- For Java hotswapping setup HotSwapAgent with JBR 17 or use JRebel Eclipse plug-in (install it from Eclipse Marketplace)
+- Chrome/Edge/Firefox browser
 
 ### Importing project
 

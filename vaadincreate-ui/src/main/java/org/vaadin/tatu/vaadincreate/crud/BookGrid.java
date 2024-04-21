@@ -48,6 +48,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         setId("book-grid");
         setSizeFull();
 
+        // Set highlight color to last edited row with style generator.
         setStyleGenerator(book -> book.getId() == edited
                 ? VaadinCreateTheme.BOOKVIEW_GRID_EDITED
                 : "");
@@ -146,10 +147,14 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     @Override
     public void attach() {
         super.attach();
+        // Replace caption with Label component so that it is possible to
+        // control its visibility with CSS in the theme.
         getHeader().getDefaultRow().getCell("availability")
                 .setComponent(availabilityCaption);
+        // Get initial width and set visible columns based on that.
         var width = getUI().getPage().getBrowserWindowWidth();
         adjustColumns(width);
+        // Add resize listener to update visible columns based on width
         resizeReg = getUI().getPage().addBrowserWindowResizeListener(e -> {
             adjustColumns(e.getWidth());
         });
@@ -185,6 +190,10 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     }
 
     private String createTooltip(Product book) {
+        // This is not actually a tooltip, but on hover popup. Vaadin 8 allows
+        // to use HTML in tooltips. which makes it possible to use them like
+        // this. When migrating to newer generations of Vaadin, this kind of
+        // Tooltips need to be refactored to use for example Popup component.
         var converter = new EuroConverter(getTranslation(CANNOT_CONVERT));
         StringBuilder unsanitized = new StringBuilder();
         unsanitized
@@ -214,6 +223,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
 
     @Override
     public void detach() {
+        // It is necessary to remove resize listener upon detach to avoid
+        // resource leakage.
         resizeReg.remove();
         super.detach();
     }
@@ -222,6 +233,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         if (edited != -1) {
             edited = -1;
             if (editedProduct != null) {
+                // Apply style generator
                 getDataProvider().refreshItem(editedProduct);
             }
         }

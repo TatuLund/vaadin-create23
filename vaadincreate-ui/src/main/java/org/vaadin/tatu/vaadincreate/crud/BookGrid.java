@@ -53,21 +53,23 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                 ? VaadinCreateTheme.BOOKVIEW_GRID_EDITED
                 : "");
 
-        addColumn(Product::getId, new NumberRenderer()).setCaption("Id");
+        addColumn(Product::getId, new NumberRenderer()).setCaption("Id")
+                .setResizable(false);
         addColumn(Product::getProductName).setId("name")
-                .setCaption(getTranslation(PRODUCT_NAME))
+                .setCaption(getTranslation(PRODUCT_NAME)).setResizable(false)
                 .setComparator((p1, p2) -> p1.getProductName()
                         .compareToIgnoreCase(p2.getProductName()));
 
         // Format and add " €" to price
         addColumn(product -> decimalFormat.format(product.getPrice()) + " €")
-                .setCaption(getTranslation(PRICE)).setComparator((p1, p2) -> {
+                .setCaption(getTranslation(PRICE)).setResizable(true)
+                .setComparator((p1, p2) -> {
                     return p1.getPrice().compareTo(p2.getPrice());
                 }).setStyleGenerator(product -> "align-right").setId("price");
 
         // Add an traffic light icon in front of availability
         addColumn(this::htmlFormatAvailability, new HtmlRenderer())
-                .setComparator((p1, p2) -> {
+                .setResizable(false).setComparator((p1, p2) -> {
                     return p1.getAvailability().toString()
                             .compareTo(p2.getAvailability().toString());
                 }).setId("availability");
@@ -81,15 +83,18 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                 return "-";
             }
             return Integer.toString(product.getStockCount());
-        }).setCaption(getTranslation(IN_STOCK)).setComparator((p1, p2) -> {
-            return Integer.compare(p1.getStockCount(), p2.getStockCount());
-        }).setStyleGenerator(
-                product -> VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT)
+        }).setCaption(getTranslation(IN_STOCK)).setResizable(false)
+                .setComparator((p1, p2) -> {
+                    return Integer.compare(p1.getStockCount(),
+                            p2.getStockCount());
+                })
+                .setStyleGenerator(
+                        product -> VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT)
                 .setId("stock");
 
         // Show all categories the product is in, separated by commas
         addColumn(this::formatCategories).setCaption(getTranslation(CATEGORIES))
-                .setSortable(false);
+                .setResizable(false).setSortable(false);
     }
 
     public Product getSelectedRow() {

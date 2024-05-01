@@ -11,6 +11,9 @@
 	<!-- Widget styles in public -directory -->
 	<stylesheet src="resetbuttonfortextfield/styles.css"/>
 
+	<!-- Widget styles in public -directory -->
+	<stylesheet src="confirmdialog/styles.css"/>
+
 	<source path="shared/" />
 	<source path="client/" />
 

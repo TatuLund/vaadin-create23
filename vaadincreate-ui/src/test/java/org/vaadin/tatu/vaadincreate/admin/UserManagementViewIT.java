@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -15,6 +17,7 @@ import com.vaadin.testbench.elements.LabelElement;
 import com.vaadin.testbench.elements.NotificationElement;
 import com.vaadin.testbench.elements.PasswordFieldElement;
 import com.vaadin.testbench.elements.TextFieldElement;
+import com.vaadin.testbench.elements.UIElement;
 import com.vaadin.testbench.elements.WindowElement;
 
 public class UserManagementViewIT extends AbstractViewTest {
@@ -103,5 +106,13 @@ public class UserManagementViewIT extends AbstractViewTest {
         assertEquals("", password.getValue());
         assertEquals("", passwordRepeat.getValue());
         assertEquals("", role.getValue());
+    }
+
+    @Test
+    public void visual() throws IOException {
+        if (visualTests()) {
+            assertTrue(
+                    $(UIElement.class).first().compareScreen("user.png"));
+        }
     }
 }

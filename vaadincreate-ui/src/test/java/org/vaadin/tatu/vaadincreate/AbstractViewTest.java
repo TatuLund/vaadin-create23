@@ -126,14 +126,18 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
         getDriver().get(getURL(urlFragment));
 
         // We do screenshot testing, adjust settings to ensure less flakiness
-//        Parameters.setScreenshotComparisonTolerance(0.1);
-//        Parameters.setScreenshotComparisonCursorDetection(true);
-//        testBench().resizeViewPortTo(1280, 900);
-//        Parameters.setMaxScreenshotRetries(3);
-//        Parameters.setScreenshotRetryDelay(1000);
+        Parameters.setScreenshotComparisonTolerance(0.1);
+        Parameters.setScreenshotComparisonCursorDetection(true);
+        // testBench().resizeViewPortTo(1280, 900);
+        Parameters.setMaxScreenshotRetries(3);
+        Parameters.setScreenshotRetryDelay(1000);
 
         // Wait for widgetset loaded before testing
         waitForAppLoaded();
+    }
+
+    protected boolean visualTests() {
+        return false;
     }
 
     public void waitForAppLoaded() {

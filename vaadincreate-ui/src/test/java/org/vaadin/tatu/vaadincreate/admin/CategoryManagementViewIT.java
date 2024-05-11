@@ -1,5 +1,9 @@
 package org.vaadin.tatu.vaadincreate.admin;
 
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -10,6 +14,7 @@ import com.vaadin.testbench.elements.GridElement;
 import com.vaadin.testbench.elements.LabelElement;
 import com.vaadin.testbench.elements.NotificationElement;
 import com.vaadin.testbench.elements.TextFieldElement;
+import com.vaadin.testbench.elements.UIElement;
 import com.vaadin.testbench.elements.WindowElement;
 
 public class CategoryManagementViewIT extends AbstractViewTest {
@@ -46,5 +51,13 @@ public class CategoryManagementViewIT extends AbstractViewTest {
         notification = $(NotificationElement.class).last();
         Assert.assertTrue(notification.getText().contains("Sports"));
         Assert.assertEquals(count, grid.getRowCount());
+    }
+
+    @Test
+    public void visual() throws IOException {
+        if (visualTests()) {
+            assertTrue(
+                    $(UIElement.class).first().compareScreen("category.png"));
+        }
     }
 }

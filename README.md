@@ -69,19 +69,33 @@ The following commercial products are used.
 ## Building and running the application
 
 git clone <url of the repository>
+
 mvn clean install
+
     (or use "mvn clean install -Pit" to run also the TestBench tests)
+
 cd vaadincreate-ui
+
 mvn jetty:run
+
+Alternatively run application with AppSecKit
+
+mvn jetty:run -Pappsec
 
 To see the demo, navigate to http://localhost:8080/
 
 ## Building and running the component tests
 
+The components module has test UI of its own for running the integration tests of the components.
+
 git clone <url of the repository>
+
 mvn clean install
+
     (or use "mvn clean install -Pit" to run also the TestBench tests)
+
 cd vaadincreate-components
+
 mvn jetty:run
 
 To see the demo, navigate to http://localhost:8080/

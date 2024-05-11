@@ -3,9 +3,13 @@ package org.vaadin.tatu.vaadincreate.stats;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
+
+import com.vaadin.testbench.elements.UIElement;
 
 public class StatsViewIT extends AbstractViewTest {
 
@@ -27,5 +31,13 @@ public class StatsViewIT extends AbstractViewTest {
             var chart = chartWidget.findElement(By.tagName("svg"));
             assertTrue(chart.isDisplayed());
         });
+    }
+
+    @Test
+    public void visual() throws IOException {
+        if (visualTests()) {
+            waitForElementPresent(By.className("loaded"));
+            assertTrue($(UIElement.class).first().compareScreen("stats.png"));
+        }
     }
 }

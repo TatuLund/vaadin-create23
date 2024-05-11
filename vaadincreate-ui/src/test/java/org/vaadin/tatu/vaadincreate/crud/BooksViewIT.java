@@ -1,5 +1,9 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -14,6 +18,7 @@ import com.vaadin.testbench.elements.GridElement;
 import com.vaadin.testbench.elements.LabelElement;
 import com.vaadin.testbench.elements.NotificationElement;
 import com.vaadin.testbench.elements.TextFieldElement;
+import com.vaadin.testbench.elements.UIElement;
 import com.vaadin.testbench.elements.VerticalLayoutElement;
 import com.vaadin.testbench.elements.WindowElement;
 import com.vaadin.ui.themes.ValoTheme;
@@ -246,6 +251,18 @@ public class BooksViewIT extends AbstractViewTest {
         Assert.assertEquals(
                 form.$(TextFieldElement.class).id("stock-count").getValue(),
                 stockCount(row.getCell(3).getText()));
+    }
+
+    @Test
+    public void visual() throws IOException {
+        if (visualTests()) {
+            waitForElementPresent(By.id("book-grid"));
+            $(ButtonElement.class).id("new-product").click();
+            var form = $(CssLayoutElement.class).id("book-form");
+            form.$(ComboBoxElement.class).id("availability").openPopup();
+            assertTrue(
+                    $(UIElement.class).first().compareScreen("inventory.png"));
+        }
     }
 
     private static String stockCount(String count) {

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
@@ -19,7 +20,8 @@ public class BasicAccessControl implements AccessControl {
     @Override
     public boolean signIn(String username, String password) {
         Objects.requireNonNull(username, password);
-        Optional<User> user = UserService.get().findByName(username);
+        Optional<User> user = VaadinCreateUI.get().getUserService()
+                .findByName(username);
         if (!user.isPresent()) {
             logger.warn("User '" + username + "' unknown");
             return false;

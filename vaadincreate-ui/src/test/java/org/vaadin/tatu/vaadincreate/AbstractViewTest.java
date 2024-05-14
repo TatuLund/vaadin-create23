@@ -122,20 +122,29 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
     public void setup() throws Exception {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
+        options.addArguments("--window-size=1280,900");
         setDriver(TestBench.createDriver(new ChromeDriver(options)));
         getDriver().get(getURL(urlFragment));
 
         // We do screenshot testing, adjust settings to ensure less flakiness
         Parameters.setScreenshotComparisonTolerance(0.1);
         Parameters.setScreenshotComparisonCursorDetection(true);
-        // testBench().resizeViewPortTo(1280, 900);
         Parameters.setMaxScreenshotRetries(3);
         Parameters.setScreenshotRetryDelay(1000);
+
+        // Dynamic sizing seems not work when @Viewport used in UI
+        // Thus using ChromeOptions argument instead
+        // testBench().resizeViewPortTo(1280, 900);
 
         // Wait for widgetset loaded before testing
         waitForAppLoaded();
     }
 
+    // Return true to enable visual tests. They depend on used OS and Browser
+    // version, hence disabled by default. Run tests once, screenshot tests
+    // will fail, and new reference pictures will be generated in
+    // error-screenshots folder. Check if they are ok and move to
+    // reference-screenshots folder. Rerun the tests to verify,
     protected boolean visualTests() {
         return false;
     }

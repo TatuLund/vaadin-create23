@@ -42,6 +42,12 @@ The demo app covers various use cases you may encounter in real life application
 - The custom theme is using BEM (Block Element Modifier) naming scheme to avoid class name conflicts in CSS
 - Example of how to localize / provide translations for texts used in UI
 - Comprehensive set of unit, compomnent, integration and end to end tests
+    - The project demonstrates testing approach I would recommend for typical Vaadin application:
+    - Test custom components in isolation
+    - Test as much as possible with unit tests
+    - Prefer UI Unit Testing for testing UI logic including non-happy paths
+    - Verify the most important parts with end to end tests using TestBench
+    - Include few Screenshot tests to verify visuals
 
 - Components module has examples of GWT and JavaScript extensions
 	- Reset button for text field extension with client side GWT,

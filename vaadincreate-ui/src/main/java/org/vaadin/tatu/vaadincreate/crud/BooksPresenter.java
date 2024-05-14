@@ -29,7 +29,7 @@ public class BooksPresenter implements Serializable {
 
     private BooksView view;
     private final ExecutorService executor = Executors.newCachedThreadPool();
-    private CompletableFuture<Void> future;
+    private transient CompletableFuture<Void> future;
     private ProductDataService service = VaadinCreateUI.get()
             .getProductService();
     private AccessControl accessControl = VaadinCreateUI.get()

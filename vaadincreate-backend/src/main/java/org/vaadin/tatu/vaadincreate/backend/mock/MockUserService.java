@@ -26,7 +26,7 @@ public class MockUserService implements UserService {
         return INSTANCE;
     }
 
-    public MockUserService() {
+    private MockUserService() {
         users = MockDataGenerator.createUsers();
         nextUserId = users.get(users.size() - 1).getId() + 1;
         logger.info("Generated mock user data");

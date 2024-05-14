@@ -25,7 +25,7 @@ public class StatsPresenter implements Serializable {
 
     private StatsView view;
     private final ExecutorService executor = Executors.newCachedThreadPool();
-    private CompletableFuture<Void> future;
+    private transient CompletableFuture<Void> future;
     private ProductDataService service = VaadinCreateUI.get()
             .getProductService();
 

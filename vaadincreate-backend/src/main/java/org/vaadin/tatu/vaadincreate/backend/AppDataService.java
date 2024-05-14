@@ -1,11 +1,9 @@
 package org.vaadin.tatu.vaadincreate.backend;
 
-import java.io.Serializable;
-
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.mock.MockAppDataService;
 
-public interface AppDataService extends Serializable {
+public interface AppDataService {
 
     public abstract Message updateMessage(String message);
 

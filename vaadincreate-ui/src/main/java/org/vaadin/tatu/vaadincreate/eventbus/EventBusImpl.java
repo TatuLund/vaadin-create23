@@ -1,6 +1,5 @@
 package org.vaadin.tatu.vaadincreate.eventbus;
 
-import java.io.Serializable;
 import java.util.WeakHashMap;
 
 import org.slf4j.Logger;
@@ -10,8 +9,7 @@ import org.slf4j.LoggerFactory;
  * Super simple event bus to be used with CDI, e.g. as application scoped
  * broadcaster.
  */
-@SuppressWarnings("serial")
-public class EventBusImpl implements EventBus, Serializable {
+public class EventBusImpl implements EventBus {
 
     private static EventBusImpl INSTANCE;
 
@@ -29,7 +27,7 @@ public class EventBusImpl implements EventBus, Serializable {
         return INSTANCE;
     }
 
-    public EventBusImpl() {
+    private EventBusImpl() {
     }
 
     public void post(Object event) {

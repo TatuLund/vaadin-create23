@@ -83,6 +83,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     private CssLayout createPriceChart() {
         var priceChartWrapper = new CssLayout();
         priceChart = new Chart(ChartType.PIE);
+        priceChart.setId("price-chart");
         priceChartWrapper.addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
         var conf = priceChart.getConfiguration();
         conf.setTitle(getTranslation(PRICES));
@@ -96,6 +97,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         categoryChartWrapper
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_WIDE);
         categoryChart = new Chart(ChartType.COLUMN);
+        categoryChart.setId("category-chart");
         var conf = categoryChart.getConfiguration();
         conf.setTitle(getTranslation(CATEGORIES));
         conf.setLang(lang);
@@ -106,6 +108,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     private CssLayout createAvailabilityChart() {
         var availabilityChartWrapper = new CssLayout();
         availabilityChart = new Chart(ChartType.COLUMN);
+        availabilityChart.setId("availability-chart");
         availabilityChartWrapper
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
         var conf = availabilityChart.getConfiguration();
@@ -167,7 +170,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     private void updateAvailabilityChart(
             Map<Availability, Long> availabilityStats) {
         var availabilitySeries = availabilitySeries(availabilityStats);
-        availabilitySeries      .setName(getTranslation(COUNT));
+        availabilitySeries.setName(getTranslation(COUNT));
         var conf = availabilityChart.getConfiguration();
         conf.setSeries(availabilitySeries);
         conf.getLegend().setEnabled(false);

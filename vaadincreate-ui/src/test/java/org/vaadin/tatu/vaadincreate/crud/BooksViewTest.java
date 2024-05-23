@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
 import java.util.Collections;
 
 import org.junit.After;
@@ -14,6 +15,7 @@ import org.vaadin.tatu.vaadincreate.AboutView;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
+import org.vaadin.tatu.vaadincreate.backend.data.Product;
 
 import com.vaadin.data.ValueContext;
 import com.vaadin.server.ServiceException;
@@ -29,12 +31,15 @@ public class BooksViewTest extends AbstractUITest {
     private BooksView view;
     private BookGrid grid;
     private BookForm form;
+    private Collection<Product> backup;
 
     @Before
     public void setup() throws ServiceException {
         ui = new VaadinCreateUI();
         mockVaadin(ui);
         login();
+
+        backup = ui.getProductService().backup();
 
         view = navigate(BooksView.VIEW_NAME, BooksView.class);
 
@@ -47,6 +52,7 @@ public class BooksViewTest extends AbstractUITest {
 
     @After
     public void cleanUp() {
+        ui.getProductService().restore(backup);
         logout();
         tearDown();
     }

@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.backend.mock;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -144,6 +145,19 @@ public class MockProductDataService extends ProductDataService {
         return categories.stream()
                 .filter(cat -> categoryIds.contains(cat.getId()))
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Collection<Product> backup() {
+        return products.stream().map(product -> new Product(product))
+                .collect(Collectors.toList());
+    }
+
+    public void restore(Collection<Product> data) {
+        products.clear();
+        data.forEach(product -> {
+            products.add(new Product(product));
+        });
     }
 
     private void randomWait(int count) {

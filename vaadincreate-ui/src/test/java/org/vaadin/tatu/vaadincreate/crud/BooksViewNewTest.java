@@ -4,12 +4,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
+import org.vaadin.tatu.vaadincreate.backend.data.Product;
 
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Notification;
@@ -21,12 +24,15 @@ public class BooksViewNewTest extends AbstractUITest {
     private BooksView view;
     private BookGrid grid;
     private BookForm form;
+    private Collection<Product> backup;
 
     @Before
     public void setup() throws ServiceException {
         ui = new VaadinCreateUI();
         mockVaadin(ui);
         login();
+
+        backup = ui.getProductService().backup();
 
         view = navigate(BooksView.VIEW_NAME + "/new", BooksView.class);
 
@@ -39,6 +45,7 @@ public class BooksViewNewTest extends AbstractUITest {
 
     @After
     public void cleanUp() {
+        ui.getProductService().restore(backup);
         logout();
         tearDown();
     }
@@ -56,8 +63,8 @@ public class BooksViewNewTest extends AbstractUITest {
 
         test(form.save).click();
 
-        assertTrue(
-                $(Notification.class).last().getCaption().contains("A new product"));
+        assertTrue($(Notification.class).last().getCaption()
+                .contains("A new product"));
 
         assertTrue(ui.getProductService().getAllProducts().stream()
                 .anyMatch(b -> b.getProductName().equals("A new product")));

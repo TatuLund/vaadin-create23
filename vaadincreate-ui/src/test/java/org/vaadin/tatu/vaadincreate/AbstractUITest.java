@@ -13,6 +13,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.testbench.uiunittest.UIUnitTest;
 
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
@@ -45,4 +46,10 @@ public abstract class AbstractUITest extends UIUnitTest {
         waitWhile(fake, f -> f.isVisible(), 10);
         assertTrue(grid.isVisible());
     }
+
+    protected void waitForCharts(VerticalLayout layout, CssLayout dashboard) {
+        assertFalse(dashboard.getStyleName().contains("loaded"));
+        waitWhile(dashboard, d -> !d.getStyleName().contains("loaded"), 10);
+    }
+
 }

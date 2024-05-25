@@ -1,9 +1,8 @@
 package org.vaadin.tatu.vaadincreate;
 
+import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
-
-import javax.servlet.annotation.WebInitParam;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,7 +125,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     /**
      * Get ProductDataService in use
-     * 
+     *
      * @return Instance of ProductDataService
      */
     public ProductDataService getProductService() {
@@ -213,7 +212,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                         toSave = true;
                     }
                 }
-                if (toSave == true) {
+                if (toSave) {
                     logger.info("Saving language '{}' in cookie", locale);
                     response.addCookie(localeCookie);
                 }

@@ -92,7 +92,7 @@ public class CategoryManagementView extends VerticalLayout
 
     /**
      * Sets the categories for the CategoryManagementView.
-     * 
+     *
      * @param categories
      *            the collection of categories to be set
      */
@@ -137,7 +137,7 @@ public class CategoryManagementView extends VerticalLayout
         deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
         deleteButton.setDescription(getTranslation(DELETE));
 
-        var binder = new BeanValidationBinder<Category>(Category.class);
+        var binder = new BeanValidationBinder<>(Category.class);
         binder.forField(nameField).bind("name");
         binder.setBean(category);
         binder.addValueChangeListener(event -> {

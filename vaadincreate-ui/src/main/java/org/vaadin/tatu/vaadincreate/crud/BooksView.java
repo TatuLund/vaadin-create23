@@ -1,10 +1,5 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
-import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
-import org.vaadin.tatu.vaadincreate.backend.data.Product;
-import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
-import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
-
 import java.util.Collection;
 
 import org.slf4j.Logger;
@@ -15,6 +10,10 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
+import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
+import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
@@ -179,7 +178,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
      * Set Grid's DataProvider to use collection of products as data. The update
      * is done in {@link UI#access(Runnable)} wrapping in order to be thread
      * safe and ensure locking of the UI during update.
-     * 
+     *
      * @param products
      *            Collection of Product
      */
@@ -272,7 +271,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
 
     /**
      * Update the fragment without causing navigator to change view
-     * 
+     *
      * @param productId
      *            The parameter
      */

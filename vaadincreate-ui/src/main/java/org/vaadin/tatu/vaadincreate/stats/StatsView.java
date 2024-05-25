@@ -1,14 +1,11 @@
 package org.vaadin.tatu.vaadincreate.stats;
 
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
-import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -18,7 +15,6 @@ import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.Lang;
-import com.vaadin.addon.charts.model.Legend;
 import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.navigator.View;
@@ -174,7 +170,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         var conf = availabilityChart.getConfiguration();
         conf.setSeries(availabilitySeries);
         conf.getLegend().setEnabled(false);
-        var categories = (String[]) availabilitySeries.getData().stream()
+        var categories = availabilitySeries.getData().stream()
                 .map(item -> item.getName()).toArray(String[]::new);
         var axis = conf.getxAxis();
         axis.setCategories(categories);

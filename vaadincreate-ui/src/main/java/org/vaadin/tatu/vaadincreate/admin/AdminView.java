@@ -64,7 +64,7 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
 
     /**
      * Update the fragment without causing navigator to change view
-     * 
+     *
      * @param tabName
      *            The name of the tab to show
      */

@@ -30,6 +30,7 @@ public class EventBusImpl implements EventBus {
     private EventBusImpl() {
     }
 
+    @Override
     public void post(Object event) {
         synchronized (eventListeners) {
             logger.info("EventBus ({}) event fired for {} recipients.",
@@ -40,6 +41,7 @@ public class EventBusImpl implements EventBus {
         }
     }
 
+    @Override
     public void registerEventBusListener(EventBusListener listener) {
         synchronized (eventListeners) {
             logger.info("EventBus ({}) listenerer registered", this.hashCode());
@@ -47,6 +49,7 @@ public class EventBusImpl implements EventBus {
         }
     }
 
+    @Override
     public void unregisterEventBusListener(EventBusListener listener) {
         synchronized (eventListeners) {
             logger.info("EventBus ({}) listenerer un-registered",

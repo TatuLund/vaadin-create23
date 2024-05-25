@@ -11,8 +11,8 @@ import com.vaadin.server.VaadinSession;
  * Class for retrieving and setting the name of the current user of the current
  * session (without using JAAS). All methods of this class require that a
  * {@link VaadinRequest} is bound to the current thread.
- * 
- * 
+ *
+ *
  * @see com.vaadin.server.VaadinService#getCurrentRequest()
  */
 public final class CurrentUser {
@@ -29,7 +29,7 @@ public final class CurrentUser {
     /**
      * Returns the name of the current user stored in the current session, or an
      * empty string if no user name is stored.
-     * 
+     *
      * @throws IllegalStateException
      *             if the current session cannot be accessed.
      */
@@ -46,7 +46,7 @@ public final class CurrentUser {
     /**
      * Sets the name of the current user and stores it in the current session.
      * Using a {@code null} username will remove the username from the session.
-     * 
+     *
      * @throws IllegalStateException
      *             if the current session cannot be accessed.
      */

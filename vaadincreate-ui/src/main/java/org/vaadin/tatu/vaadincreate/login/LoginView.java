@@ -212,7 +212,7 @@ public class LoginView extends CssLayout implements HasI18N {
 
     /**
      * Add event listener for login event. Event is fired when user logged in.
-     * 
+     *
      * @param listener
      *            The listener, can be Lambda expression.
      * @return Registration Use Registration#remove() for listener removal.

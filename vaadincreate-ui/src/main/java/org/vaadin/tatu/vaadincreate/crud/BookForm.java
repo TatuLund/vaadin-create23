@@ -8,8 +8,8 @@ import java.util.Locale;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
-import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -18,12 +18,12 @@ import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.Binder;
 import com.vaadin.data.Result;
-import com.vaadin.data.converter.StringToIntegerConverter;
 import com.vaadin.data.ValueContext;
+import com.vaadin.data.converter.StringToIntegerConverter;
+import com.vaadin.server.AbstractErrorMessage.ContentMode;
 import com.vaadin.server.Page;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.ui.ErrorLevel;
-import com.vaadin.server.AbstractErrorMessage.ContentMode;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
@@ -69,7 +69,7 @@ public class BookForm extends Composite implements HasI18N {
     private Binder<Product> binder;
     private Product currentProduct;
     private CssLayout layout = new CssLayout();
-    
+
     private static class StockCountConverter extends StringToIntegerConverter {
 
         public StockCountConverter(String message) {

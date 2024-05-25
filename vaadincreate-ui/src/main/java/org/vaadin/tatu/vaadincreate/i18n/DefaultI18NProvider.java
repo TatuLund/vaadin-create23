@@ -31,10 +31,12 @@ public class DefaultI18NProvider implements I18NProvider {
         return INSTANCE;
     }
 
+    @Override
     public List<Locale> getLocales() {
         return locales;
     }
 
+    @Override
     public String getTranslation(String key, Locale locale, Object... params) {
         if (key == null) {
             logger.warn("Got lang request for key with null value!");

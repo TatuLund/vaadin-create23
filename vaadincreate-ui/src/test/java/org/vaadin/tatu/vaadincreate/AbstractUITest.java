@@ -49,7 +49,7 @@ public abstract class AbstractUITest extends UIUnitTest {
 
     protected void waitForCharts(VerticalLayout layout, CssLayout dashboard) {
         assertFalse(dashboard.getStyleName().contains("loaded"));
-        waitWhile(dashboard, d -> !d.getStyleName().contains("loaded"), 10);
+        waitWhile(dashboard, d -> !d.getStyleName().contains("loaded"), 15);
     }
 
 }

@@ -5,14 +5,20 @@ import java.text.NumberFormat;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.crud.LockedBooks.BookEvent;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.ValueContext;
+import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
@@ -28,7 +34,8 @@ import com.vaadin.ui.renderers.NumberRenderer;
  * data sets.
  */
 @SuppressWarnings("serial")
-public class BookGrid extends Grid<Product> implements HasI18N {
+public class BookGrid extends Grid<Product>
+        implements HasI18N, EventBusListener {
 
     private static final String CATEGORIES = "categories";
     private static final String IN_STOCK = "in-stock";
@@ -39,6 +46,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
 
     private Registration resizeReg;
     private Label availabilityCaption;
+    private LockedBooks lockedBooks = LockedBooks.get();
+    private EventBus eventBus = EventBus.get();
 
     private Product editedProduct;
     private int edited;
@@ -49,9 +58,15 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         setSizeFull();
 
         // Set highlight color to last edited row with style generator.
-        setStyleGenerator(book -> book.getId() == edited
-                ? VaadinCreateTheme.BOOKVIEW_GRID_EDITED
-                : "");
+        setStyleGenerator(book -> {
+            if (book.getId() == edited) {
+                return VaadinCreateTheme.BOOKVIEW_GRID_EDITED;
+            }
+            if (lockedBooks.lockedBooks().contains(book.getId())) {
+                return VaadinCreateTheme.BOOKVIEW_GRID_LOCKED;
+            }
+            return "";
+        });
 
         addColumn(Product::getId, new NumberRenderer()).setCaption("Id")
                 .setResizable(false);
@@ -95,6 +110,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         // Show all categories the product is in, separated by commas
         addColumn(this::formatCategories).setCaption(getTranslation(CATEGORIES))
                 .setResizable(false).setSortable(false);
+
+        eventBus.registerEventBusListener(this);
     }
 
     public Product getSelectedRow() {
@@ -231,6 +248,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         // It is necessary to remove resize listener upon detach to avoid
         // resource leakage.
         resizeReg.remove();
+        eventBus.unregisterEventBusListener(this);
         super.detach();
     }
 
@@ -245,4 +263,22 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         edited = product != null ? product.getId() : -1;
         editedProduct = product;
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void eventFired(Object event) {
+        if (event instanceof BookEvent && isAttached()) {
+            logger.info("Book locking update");
+            var bookEvent = (BookEvent) event;
+            getUI().access(() -> {
+                ListDataProvider<Product> dataProvider = (ListDataProvider<Product>) getDataProvider();
+                dataProvider.getItems().stream()
+                        .filter(book -> book.getId() == bookEvent.getId())
+                        .findFirst().ifPresent(
+                                product -> dataProvider.refreshItem(product));
+            });
+        }
+    }
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

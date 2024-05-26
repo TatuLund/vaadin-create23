@@ -24,6 +24,7 @@ public class VaadinCreateTheme {
 
     public static final String BOOKVIEW_GRID_ALIGNRIGHT = "bookview-grid-alignright";
     public static final String BOOKVIEW_GRID_EDITED = "bookview-grid-edited";
+    public static final String BOOKVIEW_GRID_LOCKED = "bookview-grid-locked";
     public static final String BOOKVIEW_AVAILABILITYLABEL = "bookview-availabilitylabel";
 
     public static final String BOOKFORM_FORM = "bookform-form";

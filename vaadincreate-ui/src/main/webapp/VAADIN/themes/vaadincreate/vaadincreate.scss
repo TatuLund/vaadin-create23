@@ -78,6 +78,7 @@ $fake-grid-background-color: white;
 
 @import "../valo/valo.scss";
 
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 @mixin vaadincreate {
   @include valo;
@@ -435,9 +436,15 @@ $fake-grid-background-color: white;
   .bookview-grid-edited {
   	color: $v-focus-color;
   }
+ 
+  .bookview-grid-locked:not(.v-grid-row-selected) { 
+    opacity: $v-disabled-opacity;
+    pointer-events: none;
+    animation: fadeIn 1s ease-in-out 0s;
+  }
 
   .bookview-grid-descriptioncaption {
-	  color: $highlight-contrast-color;
+    color: $highlight-contrast-color;
   }
 
   .whitespace-pre {

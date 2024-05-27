@@ -268,7 +268,6 @@ public class BookGrid extends Grid<Product>
     @Override
     public void eventFired(Object event) {
         if (event instanceof BookEvent && isAttached()) {
-            logger.info("Book locking update");
             var bookEvent = (BookEvent) event;
             getUI().access(() -> {
                 ListDataProvider<Product> dataProvider = (ListDataProvider<Product>) getDataProvider();

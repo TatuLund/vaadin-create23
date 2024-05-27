@@ -228,6 +228,16 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
+    public void editLockedProduct() {
+        var book = test(grid).item(0);
+        LockedBooks.get().lock(book.getId());
+
+        test(grid).click(1, 0);
+        assertFalse(form.isShown());
+        LockedBooks.get().unlock(book.getId());
+    }
+
+    @Test
     public void editProductDiscardChanges() {
         test(grid).click(1, 0);
 

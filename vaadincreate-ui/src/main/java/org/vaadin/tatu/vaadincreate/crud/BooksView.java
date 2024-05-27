@@ -130,9 +130,8 @@ public class BooksView extends CssLayout implements View, HasI18N {
         ResetButtonForTextField.extend(filter);
         // Apply the filter to grid's data provider. TextField value is never
         // null
-        filter.addValueChangeListener(
-                event -> dataProvider
-                    .setFilter(book -> passesFilter(book, event.getValue())));
+        filter.addValueChangeListener(event -> dataProvider
+                .setFilter(book -> passesFilter(book, event.getValue())));
 
         newProduct = new Button(getTranslation(NEW_PRODUCT));
         newProduct.setId("new-product");
@@ -299,9 +298,11 @@ public class BooksView extends CssLayout implements View, HasI18N {
             // IMHO: Navigator clears url too early and this workaround
             // shouldn't be necessary. This is a possible bug.
             var book = getSelectedRow();
-            getUI().access(() -> {
-                setFragmentParameter("" + book.getId());
-            });
+            if (book != null) {
+                getUI().access(() -> {
+                    setFragmentParameter("" + book.getId());
+                });
+            }
         } else {
             event.navigate();
         }

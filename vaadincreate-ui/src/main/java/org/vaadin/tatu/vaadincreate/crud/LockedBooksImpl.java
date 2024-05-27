@@ -34,12 +34,16 @@ public class LockedBooksImpl implements LockedBooks {
 
     @Override
     public void lock(Integer id) {
+        if (id != null && id < 0) {
+            throw new IllegalArgumentException(
+                    "Id can't be null and must be positive");
+        }
         synchronized (books) {
             var match = books.keySet().stream().filter(i -> i.equals(id))
                     .findFirst();
             if (match.isPresent()) {
                 throw new IllegalStateException(
-                        "Can't open book already opened: " + id);
+                        "Can't locked book already locked: " + id);
             }
             books.put(id, null);
             eventBus.post(new BookEvent(id));

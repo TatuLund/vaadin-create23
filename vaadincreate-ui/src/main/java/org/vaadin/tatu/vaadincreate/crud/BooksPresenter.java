@@ -153,6 +153,8 @@ public class BooksPresenter implements Serializable {
         if (product == null) {
             view.setFragmentParameter("");
             unlockBook();
+        } else if (product.getId() == -1) {
+            view.setFragmentParameter("new");
         } else {
             view.setFragmentParameter(product.getId() + "");
             lockBook(product.getId());

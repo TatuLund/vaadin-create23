@@ -4,7 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
 
-import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.ui.UI;
@@ -20,10 +20,9 @@ public class Utils {
         return text;
     }
 
-    public static void sessionFixation() {
+    public static void sessionFixation(VaadinRequest vaadinRequest) {
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.DISABLED);
-        VaadinServletRequest request = (VaadinServletRequest) VaadinService
-                .getCurrentRequest();
+        VaadinServletRequest request = (VaadinServletRequest) vaadinRequest;
         request.getHttpServletRequest().changeSessionId();
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
     }

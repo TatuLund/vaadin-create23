@@ -238,6 +238,38 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
+    public void lockBookUnlockBook() {
+        assertTrue(LockedBooks.get().lockedBooks().isEmpty());
+        var book = test(grid).item(0);
+
+        test(grid).click(1, 0);
+        assertTrue(form.isShown());
+        assertTrue(LockedBooks.get().lockedBooks().contains(book.getId()));
+
+        test(grid).click(1, 1);
+        assertTrue(form.isShown());
+        assertFalse(LockedBooks.get().lockedBooks().contains(book.getId()));
+        assertFalse(LockedBooks.get().lockedBooks().isEmpty());
+
+        test(grid).click(1, 1);
+        assertFalse(form.isShown());
+        assertTrue(LockedBooks.get().lockedBooks().isEmpty());
+    }
+
+    @Test
+    public void lockBookUnlockOnNavigate() {
+        assertTrue(LockedBooks.get().lockedBooks().isEmpty());
+        var book = test(grid).item(0);
+
+        test(grid).click(1, 0);
+        assertTrue(form.isShown());
+        assertTrue(LockedBooks.get().lockedBooks().contains(book.getId()));
+
+        $(Button.class).caption("About").single().click();
+        assertTrue(LockedBooks.get().lockedBooks().isEmpty());
+    }
+
+    @Test
     public void editProductDiscardChanges() {
         test(grid).click(1, 0);
 

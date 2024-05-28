@@ -22,8 +22,11 @@ public class Utils {
 
     public static void sessionFixation() {
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.DISABLED);
-        VaadinServletRequest request = (VaadinServletRequest) VaadinRequest.getCurrent();
-        request.getHttpServletRequest().changeSessionId();
+        VaadinServletRequest request = (VaadinServletRequest) VaadinRequest
+                .getCurrent();
+        if (request != null) {
+            request.getHttpServletRequest().changeSessionId();
+        }
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
     }
 }

@@ -20,9 +20,9 @@ public class Utils {
         return text;
     }
 
-    public static void sessionFixation(VaadinRequest vaadinRequest) {
+    public static void sessionFixation() {
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.DISABLED);
-        VaadinServletRequest request = (VaadinServletRequest) vaadinRequest;
+        VaadinServletRequest request = (VaadinServletRequest) VaadinRequest.getCurrent();
         request.getHttpServletRequest().changeSessionId();
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
     }

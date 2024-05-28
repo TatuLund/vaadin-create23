@@ -72,13 +72,13 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     }
 
     private void showLoginView(VaadinRequest request) {
-        setContent(new LoginView(getAccessControl(), e -> onLogin(request)));
+        setContent(new LoginView(getAccessControl(), e -> onLogin()));
     }
 
-    private void onLogin(VaadinRequest request) {
+    private void onLogin() {
         target = getInitialTarget();
         logger.info("Initial target '{}'", target);
-        Utils.sessionFixation(request);
+        Utils.sessionFixation();
         getPage().reload();
         showAppLayout();
     }

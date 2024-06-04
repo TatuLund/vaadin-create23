@@ -439,7 +439,6 @@ $fake-grid-background-color: white;
  
   .bookview-grid-locked:not(.v-grid-row-selected) { 
     opacity: $v-disabled-opacity;
-    pointer-events: none;
     animation: fadeIn 1s ease-in-out 0s;
   }
 

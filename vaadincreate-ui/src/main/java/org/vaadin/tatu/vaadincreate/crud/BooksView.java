@@ -300,6 +300,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
             var book = getSelectedRow();
             if (book != null) {
                 getUI().access(() -> {
+                    logger.debug("Set fragment: "+book.getId());
                     setFragmentParameter("" + book.getId());
                 });
             }

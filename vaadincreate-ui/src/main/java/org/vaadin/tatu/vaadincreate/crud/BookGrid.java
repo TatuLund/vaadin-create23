@@ -11,10 +11,11 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
-import org.vaadin.tatu.vaadincreate.crud.LockedBooks.BookEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
+import org.vaadin.tatu.vaadincreate.locking.LockedObjects.LockingEvent;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.ValueContext;
@@ -43,10 +44,11 @@ public class BookGrid extends Grid<Product>
     private static final String PRICE = "price";
     private static final String PRODUCT_NAME = "product-name";
     private static final String CANNOT_CONVERT = "cannot-convert";
+    private static final String EDITED_BY = "edited-by";
 
     private Registration resizeReg;
     private Label availabilityCaption;
-    private LockedBooks lockedBooks = LockedBooks.get();
+    private LockedObjects lockedBooks = LockedObjects.get();
     private EventBus eventBus = EventBus.get();
 
     private Product editedProduct;
@@ -62,7 +64,7 @@ public class BookGrid extends Grid<Product>
             if (book.getId() == edited) {
                 return VaadinCreateTheme.BOOKVIEW_GRID_EDITED;
             }
-            if (lockedBooks.lockedBooks().contains(book.getId())) {
+            if (lockedBooks.isLocked(Product.class, book.getId()) != null) {
                 return VaadinCreateTheme.BOOKVIEW_GRID_LOCKED;
             }
             return "";
@@ -189,7 +191,13 @@ public class BookGrid extends Grid<Product>
     }
 
     private void adjustColumns(int width) {
-        setDescriptionGenerator(null);
+        setDescriptionGenerator(book -> {
+            var user = lockedBooks.isLocked(Product.class, book.getId());
+            if (user != null) {
+                return getTranslation(EDITED_BY, user.getName());
+            }
+            return null;
+        });
         getColumns().forEach(c -> c.setHidden(true));
         if (width < 650) {
             getColumn("name").setHidden(false).setWidth(300);
@@ -267,8 +275,8 @@ public class BookGrid extends Grid<Product>
     @SuppressWarnings("unchecked")
     @Override
     public void eventFired(Object event) {
-        if (event instanceof BookEvent && isAttached()) {
-            var bookEvent = (BookEvent) event;
+        if (event instanceof LockingEvent && isAttached()) {
+            var bookEvent = (LockingEvent) event;
             getUI().access(() -> {
                 ListDataProvider<Product> dataProvider = (ListDataProvider<Product>) getDataProvider();
                 dataProvider.getItems().stream()

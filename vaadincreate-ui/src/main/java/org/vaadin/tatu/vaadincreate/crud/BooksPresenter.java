@@ -15,6 +15,7 @@ import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 
 /**
  * This class provides an interface for the logical operations between the CRUD
@@ -35,7 +36,7 @@ public class BooksPresenter implements Serializable {
             .getProductService();
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
-    private LockedBooks lockedBooks = LockedBooks.get();
+    private LockedObjects lockedBooks = LockedObjects.get();
     private Integer editing;
 
     public BooksPresenter(BooksView simpleCrudView) {
@@ -85,7 +86,7 @@ public class BooksPresenter implements Serializable {
 
     private void unlockBook() {
         if (editing != null) {
-            lockedBooks.unlock(editing);
+            lockedBooks.unlock(Product.class, editing);
             editing = null;
         }
     }
@@ -94,7 +95,7 @@ public class BooksPresenter implements Serializable {
         if (editing != null) {
             unlockBook();
         }
-        lockedBooks.lock(id);
+        lockedBooks.lock(Product.class, id, CurrentUser.get().get());
         editing = id;
     }
 
@@ -173,8 +174,8 @@ public class BooksPresenter implements Serializable {
 
     public void rowSelected(Product product) {
         if (accessControl.isUserInRole(Role.ADMIN)) {
-            if (product != null
-                    && lockedBooks.lockedBooks().contains(product.getId())) {
+            if (product != null && lockedBooks.isLocked(Product.class,
+                    product.getId()) != null) {
                 view.clearSelection();
             } else {
                 editProduct(product);

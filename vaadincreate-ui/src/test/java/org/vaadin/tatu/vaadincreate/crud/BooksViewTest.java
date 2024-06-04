@@ -13,9 +13,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AboutView;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 
 import com.vaadin.data.ValueContext;
 import com.vaadin.server.ServiceException;
@@ -225,48 +228,60 @@ public class BooksViewTest extends AbstractUITest {
 
         assertEquals("Edited book", name);
         assertEquals("Edited book", edited.getProductName());
+        assertEquals(VaadinCreateTheme.BOOKVIEW_GRID_EDITED,
+                test(grid).styleName(0));
     }
 
     @Test
     public void editLockedProduct() {
         var book = test(grid).item(0);
-        LockedBooks.get().lock(book.getId());
+        LockedObjects.get().lock(Product.class, book.getId(),
+                CurrentUser.get().get());
 
+        assertEquals("Edited by Admin", test(grid).description(0));
         test(grid).click(1, 0);
         assertFalse(form.isShown());
-        LockedBooks.get().unlock(book.getId());
+        LockedObjects.get().unlock(Product.class, book.getId());
     }
 
     @Test
     public void lockBookUnlockBook() {
-        assertTrue(LockedBooks.get().lockedBooks().isEmpty());
         var book = test(grid).item(0);
+        assertTrue(LockedObjects.get().isLocked(Product.class,
+                book.getId()) == null);
 
         test(grid).click(1, 0);
         assertTrue(form.isShown());
-        assertTrue(LockedBooks.get().lockedBooks().contains(book.getId()));
+        assertTrue(LockedObjects.get().isLocked(Product.class,
+                book.getId()) != null);
 
         test(grid).click(1, 1);
         assertTrue(form.isShown());
-        assertFalse(LockedBooks.get().lockedBooks().contains(book.getId()));
-        assertFalse(LockedBooks.get().lockedBooks().isEmpty());
+        assertTrue(LockedObjects.get().isLocked(Product.class,
+                book.getId()) == null);
+        assertTrue(LockedObjects.get().isLocked(Product.class,
+                test(grid).item(1).getId()) != null);
 
         test(grid).click(1, 1);
         assertFalse(form.isShown());
-        assertTrue(LockedBooks.get().lockedBooks().isEmpty());
+        assertTrue(LockedObjects.get().isLocked(Product.class,
+                test(grid).item(1).getId()) == null);
     }
 
     @Test
     public void lockBookUnlockOnNavigate() {
-        assertTrue(LockedBooks.get().lockedBooks().isEmpty());
         var book = test(grid).item(0);
+        assertTrue(LockedObjects.get().isLocked(Product.class,
+                book.getId()) == null);
 
         test(grid).click(1, 0);
         assertTrue(form.isShown());
-        assertTrue(LockedBooks.get().lockedBooks().contains(book.getId()));
+        assertTrue(LockedObjects.get().isLocked(Product.class,
+                book.getId()) != null);
 
         $(Button.class).caption("About").single().click();
-        assertTrue(LockedBooks.get().lockedBooks().isEmpty());
+        assertTrue(LockedObjects.get().isLocked(Product.class,
+                book.getId()) == null);
     }
 
     @Test

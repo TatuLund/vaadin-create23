@@ -33,8 +33,9 @@ public class EventBusImpl implements EventBus {
     @Override
     public void post(Object event) {
         synchronized (eventListeners) {
-            logger.info("EventBus ({}) event fired for {} recipients.",
-                    this.hashCode(), eventListeners.size());
+            logger.debug(
+                    "EventBus event fired for {} recipients.",
+                    eventListeners.size());
             eventListeners.forEach((listener, o) -> {
                 listener.eventFired(event);
             });
@@ -44,7 +45,7 @@ public class EventBusImpl implements EventBus {
     @Override
     public void registerEventBusListener(EventBusListener listener) {
         synchronized (eventListeners) {
-            logger.info("EventBus ({}) listenerer registered", this.hashCode());
+            logger.debug("EventBus ({}) listenerer registered", listener.hashCode());
             eventListeners.put(listener, null);
         }
     }
@@ -52,8 +53,8 @@ public class EventBusImpl implements EventBus {
     @Override
     public void unregisterEventBusListener(EventBusListener listener) {
         synchronized (eventListeners) {
-            logger.info("EventBus ({}) listenerer un-registered",
-                    this.hashCode());
+            logger.debug("EventBus ({}) listenerer un-registered",
+                    listener.hashCode());
             eventListeners.remove(listener);
         }
     }

@@ -21,11 +21,26 @@ import com.vaadin.ui.VerticalLayout;
 
 public abstract class AbstractUITest extends UIUnitTest {
 
+    /**
+     * Login as "Admin"
+     */
     protected void login() {
+        login("Admin", "admin");
+    }
+
+    /**
+     * Login as user
+     *
+     * @param username
+     *            The username
+     * @param password
+     *            The password
+     */
+    protected void login(String username, String password) {
         var sessionId = VaadinSession.getCurrent().getSession().getId();
-        test($(TextField.class).id("login-username-field")).setValue("Admin");
+        test($(TextField.class).id("login-username-field")).setValue(username);
         test($(PasswordField.class).id("login-password-field"))
-                .setValue("admin");
+                .setValue(password);
         test($(LanguageSelect.class).first())
                 .clickItem(DefaultI18NProvider.LOCALE_EN);
         test($(Button.class).id("login-button")).click();
@@ -33,12 +48,23 @@ public abstract class AbstractUITest extends UIUnitTest {
                 VaadinSession.getCurrent().getSession().getId());
     }
 
+    /**
+     * Trigger logout by clicking logout menu.
+     */
     protected void logout() {
         var menu = $(MenuBar.class).single();
         var menuItem = test(menu).item(2);
         test(menu).click(menuItem);
     }
 
+    /**
+     * Wait until Grid is present in the layout
+     *
+     * @param layout
+     *            The layout
+     * @param grid
+     *            BookGrid grid
+     */
     protected void waitForGrid(VerticalLayout layout, BookGrid grid) {
         assertFalse(grid.isVisible());
 
@@ -47,7 +73,13 @@ public abstract class AbstractUITest extends UIUnitTest {
         assertTrue(grid.isVisible());
     }
 
-    protected void waitForCharts(VerticalLayout layout, CssLayout dashboard) {
+    /**
+     * Wait until charts have been loaded in the dashboard.
+     *
+     * @param dashboard
+     *            The dashboard
+     */
+    protected void waitForCharts(CssLayout dashboard) {
         assertFalse(dashboard.getStyleName().contains("loaded"));
         waitWhile(dashboard, d -> !d.getStyleName().contains("loaded"), 15);
     }

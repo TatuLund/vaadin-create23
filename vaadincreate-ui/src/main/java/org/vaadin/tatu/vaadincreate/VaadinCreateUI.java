@@ -22,7 +22,6 @@ import org.vaadin.tatu.vaadincreate.stats.StatsView;
 import org.vaadin.tatu.vaadincreate.util.CookieUtil;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
-import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.annotations.Theme;
@@ -42,7 +41,6 @@ import com.vaadin.ui.UI;
 @StyleSheet("vaadin://styles/additional-styles.css")
 @SuppressWarnings("serial")
 @Push(transport = Transport.WEBSOCKET_XHR)
-@PreserveOnRefresh
 @Viewport("width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no")
 public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
@@ -63,7 +61,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     protected void init(VaadinRequest request) {
         getPage().setTitle("Vaadin Create 23'");
         if (!getAccessControl().isUserSignedIn()) {
-            showLoginView(request);
+            showLoginView();
         } else {
             target = getInitialTarget();
             showAppLayout();
@@ -71,7 +69,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         eventBus.registerEventBusListener(this);
     }
 
-    private void showLoginView(VaadinRequest request) {
+    private void showLoginView() {
         setContent(new LoginView(getAccessControl(), e -> onLogin()));
     }
 

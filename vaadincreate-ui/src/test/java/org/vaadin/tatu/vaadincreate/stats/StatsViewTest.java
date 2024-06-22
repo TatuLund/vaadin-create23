@@ -33,10 +33,9 @@ public class StatsViewTest extends AbstractUITest {
 
         view = navigate(StatsView.VIEW_NAME, StatsView.class);
 
-        var layout = $(view, VerticalLayout.class).first();
         var dashboard = $(CssLayout.class)
                 .styleName(VaadinCreateTheme.DASHBOARD).first();
-        waitForCharts(layout, dashboard);
+        waitForCharts(dashboard);
     }
 
     @Test

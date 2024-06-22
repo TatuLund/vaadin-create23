@@ -11,15 +11,11 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
-import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
-import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
-import org.vaadin.tatu.vaadincreate.locking.LockedObjects.LockingEvent;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.ValueContext;
-import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
@@ -36,7 +32,7 @@ import com.vaadin.ui.renderers.NumberRenderer;
  */
 @SuppressWarnings("serial")
 public class BookGrid extends Grid<Product>
-        implements HasI18N, EventBusListener {
+        implements HasI18N {
 
     private static final String CATEGORIES = "categories";
     private static final String IN_STOCK = "in-stock";
@@ -49,7 +45,6 @@ public class BookGrid extends Grid<Product>
     private Registration resizeReg;
     private Label availabilityCaption;
     private LockedObjects lockedBooks = LockedObjects.get();
-    private EventBus eventBus = EventBus.get();
 
     private Product editedProduct;
     private int edited;
@@ -112,8 +107,6 @@ public class BookGrid extends Grid<Product>
         // Show all categories the product is in, separated by commas
         addColumn(this::formatCategories).setCaption(getTranslation(CATEGORIES))
                 .setResizable(false).setSortable(false);
-
-        eventBus.registerEventBusListener(this);
     }
 
     public Product getSelectedRow() {
@@ -256,7 +249,6 @@ public class BookGrid extends Grid<Product>
         // It is necessary to remove resize listener upon detach to avoid
         // resource leakage.
         resizeReg.remove();
-        eventBus.unregisterEventBusListener(this);
         super.detach();
     }
 
@@ -270,21 +262,6 @@ public class BookGrid extends Grid<Product>
         }
         edited = product != null ? product.getId() : -1;
         editedProduct = product;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void eventFired(Object event) {
-        if (event instanceof LockingEvent && isAttached()) {
-            var bookEvent = (LockingEvent) event;
-            getUI().access(() -> {
-                ListDataProvider<Product> dataProvider = (ListDataProvider<Product>) getDataProvider();
-                dataProvider.getItems().stream()
-                        .filter(book -> book.getId() == bookEvent.getId())
-                        .findFirst().ifPresent(
-                                product -> dataProvider.refreshItem(product));
-            });
-        }
     }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());

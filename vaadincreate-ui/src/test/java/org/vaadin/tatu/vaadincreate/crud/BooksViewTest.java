@@ -50,7 +50,6 @@ public class BooksViewTest extends AbstractUITest {
         grid = $(layout, BookGrid.class).single();
         waitForGrid(layout, grid);
         form = $(view, BookForm.class).single();
-
     }
 
     @After
@@ -297,6 +296,8 @@ public class BooksViewTest extends AbstractUITest {
         test($(dialog, Button.class).id("confirm-button")).click();
 
         assertFalse(form.isShown());
+        assertFalse(test(grid).styleName(0)
+                .contains(VaadinCreateTheme.BOOKVIEW_GRID_LOCKED));
     }
 
     @Test

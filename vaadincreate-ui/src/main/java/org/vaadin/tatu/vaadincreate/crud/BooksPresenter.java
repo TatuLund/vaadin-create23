@@ -84,7 +84,7 @@ public class BooksPresenter implements Serializable {
         unlockBook();
     }
 
-    private void unlockBook() {
+    public void unlockBook() {
         if (editing != null) {
             lockedBooks.unlock(Product.class, editing);
             editing = null;
@@ -121,7 +121,8 @@ public class BooksPresenter implements Serializable {
         }
     }
 
-    private Product findProduct(int productId) {
+    public Product findProduct(int productId) {
+        logger.info("Fetching product {}", productId);
         return service.getProductById(productId);
     }
 

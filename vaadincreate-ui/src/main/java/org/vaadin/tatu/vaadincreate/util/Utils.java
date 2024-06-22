@@ -24,9 +24,7 @@ public class Utils {
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.DISABLED);
         VaadinServletRequest request = (VaadinServletRequest) VaadinRequest
                 .getCurrent();
-        if (request != null) {
-            request.getHttpServletRequest().changeSessionId();
-        }
+        request.getHttpServletRequest().changeSessionId();
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
     }
 }

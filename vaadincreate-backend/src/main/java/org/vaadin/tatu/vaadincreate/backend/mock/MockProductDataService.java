@@ -46,92 +46,107 @@ public class MockProductDataService extends ProductDataService {
 
     @Override
     public synchronized List<Product> getAllProducts() {
-        randomWait(12);
-        return products.stream().map(p -> new Product(p))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public synchronized List<Category> getAllCategories() {
-        randomWait(2);
-        return categories;
-    }
-
-    @Override
-    public synchronized Product updateProduct(Product product) {
-        randomWait(1);
-        var p = new Product(product);
-        if (p.getId() < 0) {
-            // New product
-            p.setId(nextProductId++);
-            products.add(p);
-            logger.info("Saved a new product ({}) {}", p.getId(),
-                    p.getProductName());
-            return p;
+        synchronized (products) {
+            randomWait(12);
+            return products.stream().map(p -> new Product(p))
+                    .collect(Collectors.toList());
         }
-        for (int i = 0; i < products.size(); i++) {
-            if (products.get(i).getId() == p.getId()) {
-                products.set(i, p);
-                logger.info("Updated the product ({}) {}", p.getId(),
+    }
+
+    @Override
+    public List<Category> getAllCategories() {
+        synchronized (categories) {
+            randomWait(2);
+            return categories;
+        }
+    }
+
+    @Override
+    public Product updateProduct(Product product) {
+        synchronized (products) {
+            randomWait(1);
+            var p = new Product(product);
+            if (p.getId() < 0) {
+                // New product
+                p.setId(nextProductId++);
+                products.add(p);
+                logger.info("Saved a new product ({}) {}", p.getId(),
                         p.getProductName());
                 return p;
             }
-        }
-
-        throw new IllegalArgumentException(
-                "No product with id " + p.getId() + " found");
-    }
-
-    @Override
-    public synchronized Product getProductById(int productId) {
-        randomWait(1);
-        for (int i = 0; i < products.size(); i++) {
-            if (products.get(i).getId() == productId) {
-                return new Product(products.get(i));
+            for (int i = 0; i < products.size(); i++) {
+                if (products.get(i).getId() == p.getId()) {
+                    products.set(i, p);
+                    logger.info("Updated the product ({}) {}", p.getId(),
+                            p.getProductName());
+                    return p;
+                }
             }
+
+            throw new IllegalArgumentException(
+                    "No product with id " + p.getId() + " found");
         }
-        return null;
     }
 
     @Override
-    public synchronized void deleteProduct(int productId) {
-        randomWait(1);
-        Product p = getProductById(productId);
-        if (p == null) {
-            throw new IllegalArgumentException(
-                    "Product with id " + productId + " not found");
+    public Product getProductById(int productId) {
+        synchronized (products) {
+            randomWait(1);
+            for (int i = 0; i < products.size(); i++) {
+                if (products.get(i).getId() == productId) {
+                    return new Product(products.get(i));
+                }
+            }
+            return null;
         }
-        products.remove(p);
+    }
+
+    @Override
+    public void deleteProduct(int productId) {
+        synchronized (products) {
+            randomWait(1);
+            Product p = getProductById(productId);
+            if (p == null) {
+                throw new IllegalArgumentException(
+                        "Product with id " + productId + " not found");
+            }
+            products.remove(p);
+        }
     }
 
     @Override
     public Category updateCategory(Category category) {
-        randomWait(1);
-        var newCategory = new Category(category);
-        if (newCategory.getId() < 0) {
-            newCategory.setId(nextCategoryId++);
-            categories.add(newCategory);
-            logger.info("Category {} created", newCategory.getId());
-        } else {
-            deleteCategoryInternal(category.getId());
-            categories.add(newCategory);
-            logger.info("Category {} updated", newCategory.getId());
+        synchronized (categories) {
+            randomWait(1);
+            var newCategory = new Category(category);
+            if (newCategory.getId() < 0) {
+                newCategory.setId(nextCategoryId++);
+                categories.add(newCategory);
+                logger.info("Category {} created", newCategory.getId());
+            } else {
+                deleteCategoryInternal(category.getId());
+                categories.add(newCategory);
+                logger.info("Category {} updated", newCategory.getId());
+            }
+            return newCategory;
         }
-        return newCategory;
     }
 
     @Override
     public void deleteCategory(int categoryId) {
-        randomWait(1);
-        if (!getAllProducts().stream().anyMatch(c -> c.getId() == categoryId)) {
-            throw new IllegalArgumentException(
-                    "Category with id " + categoryId + " not found");
+        synchronized (categories) {
+            randomWait(1);
+            if (!getAllProducts().stream()
+                    .anyMatch(c -> c.getId() == categoryId)) {
+                throw new IllegalArgumentException(
+                        "Category with id " + categoryId + " not found");
+            }
+            deleteCategoryInternal(categoryId);
         }
-        deleteCategoryInternal(categoryId);
         logger.info("Category {} deleted", categoryId);
     }
 
-    public void deleteCategoryInternal(int categoryId) {
+    private void deleteCategoryInternal(int categoryId) {
         if (categories.removeIf(category -> category.getId() == categoryId)) {
             getAllProducts().forEach(product -> {
                 product.getCategory()
@@ -142,9 +157,11 @@ public class MockProductDataService extends ProductDataService {
 
     @Override
     public Set<Category> findCategoriesByIds(Set<Integer> categoryIds) {
-        return categories.stream()
-                .filter(cat -> categoryIds.contains(cat.getId()))
-                .collect(Collectors.toSet());
+        synchronized (categories) {
+            return categories.stream()
+                    .filter(cat -> categoryIds.contains(cat.getId()))
+                    .collect(Collectors.toSet());
+        }
     }
 
     @Override
@@ -161,7 +178,7 @@ public class MockProductDataService extends ProductDataService {
     }
 
     private void randomWait(int count) {
-        int wait = 50 + random.nextInt(150);
+        int wait = 50 + random.nextInt(100);
         try {
             Thread.sleep(wait * count);
         } catch (InterruptedException e) {

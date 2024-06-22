@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,10 @@ import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.locking.LockedObjects.LockingEvent;
 
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
@@ -41,7 +45,8 @@ import com.vaadin.ui.themes.ValoTheme;
  */
 @SuppressWarnings("serial")
 @RolesPermitted({ Role.USER, Role.ADMIN })
-public class BooksView extends CssLayout implements View, HasI18N {
+public class BooksView extends CssLayout
+        implements View, HasI18N, EventBusListener {
 
     public static final String VIEW_NAME = "inventory";
 
@@ -61,6 +66,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
     private BooksPresenter presenter = new BooksPresenter(this);
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
+    private EventBus eventBus = EventBus.get();
 
     private Button newProduct;
 
@@ -79,6 +85,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
                 var dialog = createDiscardChangesConfirmDialog();
                 dialog.open();
                 dialog.addConfirmedListener(e -> {
+                    presenter.unlockBook();
                     form.showForm(false);
                     setFragmentParameter("");
                 });
@@ -105,6 +112,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
         addComponent(barAndGridLayout);
         addComponent(form);
 
+        eventBus.registerEventBusListener(this);
         presenter.init();
     }
 
@@ -254,6 +262,9 @@ public class BooksView extends CssLayout implements View, HasI18N {
     public void editProduct(Product product) {
         grid.setEdited(null);
         if (product != null) {
+            if (product.getId() > 0) {
+                product = refreshProduct(dataProvider, product);
+            }
             form.showForm(true);
         } else {
             form.showForm(false);
@@ -264,6 +275,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
     @Override
     public void detach() {
         super.detach();
+        eventBus.unregisterEventBusListener(this);
         // If detach happens before completion of data fetch, cancel the fetch
         presenter.cancelUpdateProducts();
     }
@@ -300,7 +312,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
             var book = getSelectedRow();
             if (book != null) {
                 getUI().access(() -> {
-                    logger.debug("Set fragment: "+book.getId());
+                    logger.debug("Set fragment: " + book.getId());
                     setFragmentParameter("" + book.getId());
                 });
             }
@@ -315,6 +327,33 @@ public class BooksView extends CssLayout implements View, HasI18N {
         dialog.setConfirmText(getTranslation(CONFIRM));
         dialog.setCancelText(getTranslation(CANCEL));
         return dialog;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void eventFired(Object event) {
+        if (event instanceof LockingEvent && isAttached()) {
+            var bookEvent = (LockingEvent) event;
+            getUI().access(() -> {
+                ListDataProvider<Product> dataProvider = (ListDataProvider<Product>) grid
+                        .getDataProvider();
+                dataProvider.getItems().stream()
+                        .filter(book -> book.getId() == bookEvent.getId())
+                        .findFirst().ifPresent(product -> {
+                            dataProvider.refreshItem(product);
+                        });
+            });
+        }
+    }
+
+    private Product refreshProduct(ListDataProvider<Product> dataProvider,
+            Product product) {
+        var list = ((List<Product>) dataProvider.getItems());
+        var updatedProduct = presenter.findProduct(product.getId());
+        list.set(list.indexOf(product), updatedProduct);
+        logger.info("Refreshed {}", product.getId());
+        dataProvider.refreshItem(updatedProduct);
+        return updatedProduct;
     }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());

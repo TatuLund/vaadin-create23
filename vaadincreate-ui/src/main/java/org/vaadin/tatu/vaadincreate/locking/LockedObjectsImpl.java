@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.locking;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
@@ -29,6 +30,8 @@ public class LockedObjectsImpl implements LockedObjects {
 
     @Override
     public User isLocked(Class<?> type, Integer id) {
+        Objects.requireNonNull(type);
+        Objects.requireNonNull(id);
         synchronized (lockedObjects) {
             var match = findObject(type, id);
             if (match.isPresent()) {
@@ -40,6 +43,8 @@ public class LockedObjectsImpl implements LockedObjects {
 
     @Override
     public void lock(Class<?> type, Integer id, User user) {
+        Objects.requireNonNull(type);
+        Objects.requireNonNull(user);
         if (id != null && id < 0) {
             throw new IllegalArgumentException(
                     "Id can't be null and must be positive");
@@ -48,24 +53,28 @@ public class LockedObjectsImpl implements LockedObjects {
             var match = findObject(type, id);
             if (match.isPresent()) {
                 throw new IllegalStateException(
-                        "Can't locked book already locked: " + id);
+                        "Can't lock object already locked: " + id);
             }
             lockedObjects.put(new LockedObject(type, id, user), null);
-            eventBus.post(new LockingEvent(type, id, user));
-            logger.debug("Locked book {}", id);
+            eventBus.post(new LockingEvent(type, id, user, true));
+            logger.debug("{} locked {} ({})", user.getName(),
+                    type.getSimpleName(), id);
         }
     }
 
     @Override
     public void unlock(Class<?> type, Integer id) {
+        Objects.requireNonNull(type);
+        Objects.requireNonNull(id);
         synchronized (lockedObjects) {
             var match = findObject(type, id);
             if (match.isPresent()) {
                 var object = match.get();
                 lockedObjects.remove(object);
-                eventBus.post(new LockingEvent(type, id, object.user));
+                eventBus.post(new LockingEvent(type, id, object.user, false));
+                logger.debug("{} unlocked {} ({})", object.user.getName(),
+                        type.getSimpleName(), id);
             }
-            logger.debug("Unlocked book {}", id);
         }
     }
 

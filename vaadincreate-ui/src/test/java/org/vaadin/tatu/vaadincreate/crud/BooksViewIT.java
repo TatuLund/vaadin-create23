@@ -1,7 +1,5 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 
 import org.junit.Assert;
@@ -63,6 +61,8 @@ public class BooksViewIT extends AbstractViewTest {
         // Part I: Create and save a new book
         $(ButtonElement.class).id("new-product").click();
         var form = $(CssLayoutElement.class).id("book-form");
+        Assert.assertTrue(form.getClassNames()
+                .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
         Assert.assertFalse(
                 form.$(ButtonElement.class).id("save-button").isEnabled());
 
@@ -124,6 +124,8 @@ public class BooksViewIT extends AbstractViewTest {
                 .contains("Test book"));
 
         Assert.assertEquals(0, $(GridElement.class).first().getRowCount());
+
+        $(TextFieldElement.class).id("filter-field").clear();
     }
 
     @Test
@@ -149,8 +151,11 @@ public class BooksViewIT extends AbstractViewTest {
     public void editDiscardChangesWarningOnSelect() {
         waitForElementPresent(By.id("book-grid"));
 
-        $(GridElement.class).first().getRow(0).click();
+        var row = $(GridElement.class).first().getRow(0);
+        row.click();
         var form = $(CssLayoutElement.class).id("book-form");
+        Assert.assertTrue(form.getClassNames()
+                .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
         Assert.assertFalse(
                 form.$(ButtonElement.class).id("discard-button").isEnabled());
 
@@ -164,6 +169,13 @@ public class BooksViewIT extends AbstractViewTest {
         Assert.assertTrue(dialog.$(LabelElement.class).first().getClassNames()
                 .contains("failure"));
         dialog.$(ButtonElement.class).id("confirm-button").click();
+        Assert.assertFalse(form.getClassNames()
+                .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
+
+        row = $(GridElement.class).first().getRow(0);
+        Assert.assertFalse(row.getClassNames()
+                .contains(VaadinCreateTheme.BOOKVIEW_GRID_LOCKED));
+
     }
 
     @Test
@@ -174,6 +186,8 @@ public class BooksViewIT extends AbstractViewTest {
         var row = $(GridElement.class).first().getRow(0);
         row.click();
         var form = $(CssLayoutElement.class).id("book-form");
+        Assert.assertTrue(form.getClassNames()
+                .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
         Assert.assertTrue(
                 form.$(ButtonElement.class).id("delete-button").isEnabled());
         Assert.assertFalse(
@@ -217,8 +231,12 @@ public class BooksViewIT extends AbstractViewTest {
 
         // Click first book and pick the name of it
         var row = $(GridElement.class).first().getRow(0);
+        Assert.assertFalse(row.getClassNames()
+                .contains(VaadinCreateTheme.BOOKVIEW_GRID_LOCKED));
         row.click();
         var form = $(CssLayoutElement.class).id("book-form");
+        Assert.assertTrue(form.getClassNames()
+                .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
         var nameField = form.$(TextFieldElement.class).id("product-name");
         var oldName = nameField.getValue();
         // Compare values to Grid row
@@ -260,7 +278,7 @@ public class BooksViewIT extends AbstractViewTest {
             $(ButtonElement.class).id("new-product").click();
             var form = $(CssLayoutElement.class).id("book-form");
             form.$(ComboBoxElement.class).id("availability").openPopup();
-            assertTrue(
+            Assert.assertTrue(
                     $(UIElement.class).first().compareScreen("inventory.png"));
         }
     }

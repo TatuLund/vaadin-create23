@@ -121,6 +121,16 @@ public class BooksView extends CssLayout
                 .contains(filterText.toLowerCase());
     }
 
+    /**
+     * Checks if a given book passes the filter based on the filter text.
+     *
+     * @param book
+     *            The book to be checked.
+     * @param filterText
+     *            The filter text to be applied.
+     * @return {@code true} if the book passes the filter, {@code false}
+     *         otherwise.
+     */
     private boolean passesFilter(Product book, String filterText) {
         filterText = filterText.trim();
         return filterCondition(book.getProductName(), filterText)
@@ -128,6 +138,14 @@ public class BooksView extends CssLayout
                 || filterCondition(book.getCategory(), filterText);
     }
 
+    /**
+     * Creates a horizontal layout for the top bar of the BooksView. The top bar
+     * contains a filter TextField and a newProduct Button. The filter TextField
+     * is used to filter the data in the grid. The newProduct Button is used to
+     * create a new product.
+     *
+     * @return the created HorizontalLayout for the top bar
+     */
     private HorizontalLayout createTopBar() {
         filter = new TextField();
         filter.setId("filter-field");
@@ -166,6 +184,13 @@ public class BooksView extends CssLayout
         form.setCategories(ProductDataService.get().getAllCategories());
     }
 
+    /**
+     * Cancels the product editing and discards any changes made. If there are
+     * unsaved changes, a confirmation dialog is displayed. If the changes are
+     * confirmed, the form is hidden, the selection is cleared, and the fragment
+     * parameter is set to an empty string. If there are no unsaved changes, the
+     * form is hidden and the selection is cleared.
+     */
     public void cancelProduct() {
         if (form.hasChanges()) {
             var dialog = createDiscardChangesConfirmDialog();
@@ -205,40 +230,93 @@ public class BooksView extends CssLayout
         }
     }
 
+    /**
+     * Displays an error message using a Vaadin notification.
+     *
+     * @param msg
+     *            the error message to be displayed
+     */
     public void showError(String msg) {
         Notification.show(msg, Type.ERROR_MESSAGE);
     }
 
+    /**
+     * Displays an error message indicating that the provided product ID is not
+     * valid.
+     *
+     * @param productId
+     *            the invalid product ID
+     */
     public void showNotValidId(String productId) {
         showError(getTranslation(NOT_VALID_PID, productId));
     }
 
+    /**
+     * Shows a notification indicating that a book has been saved.
+     *
+     * @param book
+     *            the name of the saved book
+     */
     public void showSaveNotification(String book) {
         Notification.show(getTranslation(UPDATED, book),
                 Type.TRAY_NOTIFICATION);
     }
 
+    /**
+     * Shows a notification indicating that a book has been deleted.
+     *
+     * @param book
+     *            the name of the book that has been deleted
+     */
     public void showDeleteNotification(String book) {
         Notification.show(getTranslation(REMOVED, book),
                 Type.TRAY_NOTIFICATION);
     }
 
+    /**
+     * Sets the enabled state of the "New Product" button.
+     *
+     * @param enabled
+     *            true to enable the button, false to disable it
+     */
     public void setNewProductEnabled(boolean enabled) {
         newProduct.setEnabled(enabled);
     }
 
+    /**
+     * Clears the selection in the grid.
+     */
     public void clearSelection() {
         grid.getSelectionModel().deselectAll();
     }
 
+    /**
+     * Selects the specified row in the grid.
+     *
+     * @param row
+     *            the row to be selected
+     */
     public void selectRow(Product row) {
         grid.getSelectionModel().select(row);
     }
 
+    /**
+     * Returns the selected row from the grid as a {@link Product} object.
+     *
+     * @return the selected row as a {@link Product} object, or null if no row
+     *         is selected
+     */
     public Product getSelectedRow() {
         return grid.getSelectedRow();
     }
 
+    /**
+     * Updates the specified product in the grid and refreshes the data
+     * provider. After updating the product, the form is hidden.
+     *
+     * @param product
+     *            the product to be updated
+     */
     public void updateProduct(Product product) {
         logger.info("Refresh item");
         grid.setEdited(product);
@@ -246,6 +324,12 @@ public class BooksView extends CssLayout
         form.showForm(false);
     }
 
+    /**
+     * Updates the grid with a new product and performs necessary UI actions.
+     *
+     * @param product
+     *            the product to be added to the grid
+     */
     public void updateGrid(Product product) {
         logger.info("Refresh grid");
         dataProvider.getItems().add(product);
@@ -254,14 +338,27 @@ public class BooksView extends CssLayout
         grid.scrollToEnd();
     }
 
+    /**
+     * Removes a product from the data provider and refreshes the view.
+     *
+     * @param product
+     *            the product to be removed
+     */
     public void removeProduct(Product product) {
         dataProvider.getItems().remove(product);
         dataProvider.refreshAll();
     }
 
+    /**
+     * Edits the specified product.
+     *
+     * @param product
+     *            the product to be edited
+     */
     public void editProduct(Product product) {
         grid.setEdited(null);
         if (product != null) {
+            // Ensure the product is up-to-date
             if (product.getId() > 0) {
                 product = refreshProduct(dataProvider, product);
             }
@@ -321,6 +418,11 @@ public class BooksView extends CssLayout
         }
     }
 
+    /**
+     * Creates a confirmation dialog for displaying unsaved changes.
+     *
+     * @return The created ConfirmDialog instance.
+     */
     private ConfirmDialog createDiscardChangesConfirmDialog() {
         var dialog = new ConfirmDialog(getTranslation(UNSAVED_CHANGES),
                 ConfirmDialog.Type.ALERT);
@@ -351,7 +453,7 @@ public class BooksView extends CssLayout
         var list = ((List<Product>) dataProvider.getItems());
         var updatedProduct = presenter.findProduct(product.getId());
         list.set(list.indexOf(product), updatedProduct);
-        logger.info("Refreshed {}", product.getId());
+        logger.debug("Refreshed {}", product.getId());
         dataProvider.refreshItem(updatedProduct);
         return updatedProduct;
     }

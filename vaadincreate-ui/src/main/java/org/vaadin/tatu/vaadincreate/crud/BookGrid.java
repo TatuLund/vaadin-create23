@@ -31,8 +31,7 @@ import com.vaadin.ui.renderers.NumberRenderer;
  * data sets.
  */
 @SuppressWarnings("serial")
-public class BookGrid extends Grid<Product>
-        implements HasI18N {
+public class BookGrid extends Grid<Product> implements HasI18N {
 
     private static final String CATEGORIES = "categories";
     private static final String IN_STOCK = "in-stock";
@@ -50,6 +49,13 @@ public class BookGrid extends Grid<Product>
     private int edited;
     private DecimalFormat decimalFormat;
 
+    /**
+     * The BookGrid class represents a grid component that displays a list of
+     * books. It provides various columns to display different properties of the
+     * books, such as id, name, price, availability, stock count, and
+     * categories. The grid also supports highlighting the last edited row and
+     * showing a traffic light icon for availability.
+     */
     public BookGrid() {
         setId("book-grid");
         setSizeFull();
@@ -183,6 +189,13 @@ public class BookGrid extends Grid<Product>
         decimalFormat.setMinimumFractionDigits(2);
     }
 
+    /**
+     * Adjusts the visibility and width of columns in the book grid based on the
+     * specified width.
+     *
+     * @param width
+     *            the width of the grid
+     */
     private void adjustColumns(int width) {
         setDescriptionGenerator(book -> {
             var user = lockedBooks.isLocked(Product.class, book.getId());

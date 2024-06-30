@@ -54,6 +54,9 @@ public class BooksPresenter implements Serializable {
                 executor);
     }
 
+    /**
+     * Requests an update of the products and updates the view asynchronously.
+     */
     public void requestUpdateProducts() {
         future = loadProductsAsync().thenAccept(products -> {
             logger.info("Fetching products complete");
@@ -62,6 +65,11 @@ public class BooksPresenter implements Serializable {
         });
     }
 
+    /**
+     * Cancels the update of products and unlocks the book. If there is a future
+     * task running, it will be cancelled and the future reference will be set
+     * to null.
+     */
     public void cancelUpdateProducts() {
         unlockBook();
         if (future != null) {
@@ -71,6 +79,15 @@ public class BooksPresenter implements Serializable {
         }
     }
 
+    /**
+     * Initializes the BooksPresenter.
+     *
+     * This method is responsible for initializing the presenter and setting up
+     * the initial state of the view. It calls the editProduct method with a
+     * null parameter to ensure that the view is in an editable state. If the
+     * current user is not an admin, it disables the ability to create new
+     * products.
+     */
     public void init() {
         editProduct(null);
         // Hide and disable if not admin
@@ -79,11 +96,21 @@ public class BooksPresenter implements Serializable {
         }
     }
 
+    /**
+     * Cancels the current product operation. This method calls the
+     * `cancelProduct` method of the view and unlocks the book.
+     */
     public void cancelProduct() {
         view.cancelProduct();
         unlockBook();
     }
 
+    /**
+     * Unlocks the currently editing book. If there is a book currently being
+     * edited, it will be unlocked by calling the `unlock` method of the
+     * `lockedBooks` object. After unlocking the book, the `editing` variable is
+     * set to null.
+     */
     public void unlockBook() {
         if (editing != null) {
             lockedBooks.unlock(Product.class, editing);
@@ -91,6 +118,13 @@ public class BooksPresenter implements Serializable {
         }
     }
 
+    /**
+     * Locks a book with the specified ID for editing. If there is already a
+     * book being edited, it will be unlocked first.
+     *
+     * @param id
+     *            the ID of the book to lock for editing
+     */
     private void lockBook(Integer id) {
         if (editing != null) {
             unlockBook();
@@ -99,6 +133,16 @@ public class BooksPresenter implements Serializable {
         editing = id;
     }
 
+    /**
+     * Handles the navigation to the view with the specified product ID. If the
+     * product ID is "new", it creates a new product. Otherwise, it attempts to
+     * find the product with the given ID and selects it in the view. If the
+     * product ID is not valid or cannot be parsed as an integer, an error
+     * message is shown in the view.
+     *
+     * @param productId
+     *            the ID of the product to navigate to
+     */
     public void enter(String productId) {
         if (productId != null && !productId.isEmpty()) {
             if (productId.equals("new")) {
@@ -121,11 +165,24 @@ public class BooksPresenter implements Serializable {
         }
     }
 
+    /**
+     * Finds a product by its ID.
+     *
+     * @param productId
+     *            the ID of the product to find
+     * @return the product with the specified ID, or null if not found
+     */
     public Product findProduct(int productId) {
         logger.info("Fetching product {}", productId);
         return service.getProductById(productId);
     }
 
+    /**
+     * Saves the given product.
+     *
+     * @param product
+     *            The product to be saved.
+     */
     public void saveProduct(Product product) {
         view.showSaveNotification(product.getProductName());
         view.clearSelection();
@@ -141,6 +198,12 @@ public class BooksPresenter implements Serializable {
         view.setFragmentParameter("");
     }
 
+    /**
+     * Deletes a product from the system.
+     *
+     * @param product
+     *            the product to be deleted
+     */
     public void deleteProduct(Product product) {
         view.showDeleteNotification(product.getProductName());
         view.clearSelection();
@@ -151,6 +214,15 @@ public class BooksPresenter implements Serializable {
         view.setFragmentParameter("");
     }
 
+    /**
+     * Edits the specified product. If the product is null, it sets the fragment
+     * parameter to an empty string and unlocks the book. If the product's ID is
+     * -1, it sets the fragment parameter to "new". Otherwise, it sets the
+     * fragment parameter to the product's ID and locks the book.
+     *
+     * @param product
+     *            the product to be edited
+     */
     public void editProduct(Product product) {
         if (product == null) {
             view.setFragmentParameter("");
@@ -166,6 +238,11 @@ public class BooksPresenter implements Serializable {
         view.editProduct(product);
     }
 
+    /**
+     * Creates a new product. This method clears the selection, sets the
+     * fragment parameter to "new", logs an info message, and edits a new
+     * product in the view.
+     */
     public void newProduct() {
         view.clearSelection();
         view.setFragmentParameter("new");
@@ -173,6 +250,14 @@ public class BooksPresenter implements Serializable {
         view.editProduct(new Product());
     }
 
+    /**
+     * Handles the event when a row is selected in the UI. If the user has the
+     * role of ADMIN and the selected product is not locked, the product is
+     * edited. Otherwise, the selection is cleared.
+     *
+     * @param product
+     *            the selected product
+     */
     public void rowSelected(Product product) {
         if (accessControl.isUserInRole(Role.ADMIN)) {
             if (product != null && lockedBooks.isLocked(Product.class,

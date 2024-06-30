@@ -14,6 +14,10 @@ public class FakeGrid extends Composite {
     private static final String FAKEGRID_SPINNERWRAPPER = "fakegrid-spinnerwrapper";
     private static final String FAKEGRID = "fakegrid";
 
+    /**
+     * This class represents a fake grid component. It is used to display a
+     * loading spinner while the actual grid data is being fetched.
+     */
     public FakeGrid() {
         VerticalLayout layout = new VerticalLayout();
         setCompositionRoot(layout);
@@ -35,6 +39,6 @@ public class FakeGrid extends Composite {
         spinnerWrapper.addComponent(spinner);
         spinnerWrapper.setComponentAlignment(spinner, Alignment.MIDDLE_CENTER);
         layout.addComponents(fakeHeader, spinnerWrapper);
-        layout. setExpandRatio(spinnerWrapper, 1);
+        layout.setExpandRatio(spinnerWrapper, 1);
     }
 }

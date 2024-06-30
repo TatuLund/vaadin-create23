@@ -40,7 +40,6 @@ public class BookForm extends Composite implements HasI18N {
 
     // Localization constants
     private static final String AVAILABILITY_MISMATCH = "availability-mismatch";
-    private static final String DISCARD_CHANGES = "discard-changes";
     private static final String SAVE = "save";
     private static final String CANCEL = "cancel";
     private static final String CANNOT_CONVERT = "cannot-convert";
@@ -99,6 +98,15 @@ public class BookForm extends Composite implements HasI18N {
 
     }
 
+    /**
+     * Represents a form for creating or editing a book. This form is used in
+     * the Vaadin Create application. It allows users to enter information about
+     * a book, such as its price, stock count, and category. The form includes
+     * validation for the entered data and provides buttons for saving,
+     * discarding, canceling, and deleting the book. The form is bound to a
+     * presenter, which handles the business logic for saving, editing, and
+     * deleting books.
+     */
     public BookForm(BooksPresenter presenter) {
         setCompositionRoot(layout);
         buildForm();

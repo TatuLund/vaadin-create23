@@ -231,6 +231,29 @@ public class BooksViewTest extends AbstractUITest {
         assertEquals("Edited book", edited.getProductName());
         assertEquals(VaadinCreateTheme.BOOKVIEW_GRID_EDITED,
                 test(grid).styleName(0));
+
+    }
+
+    @Test
+    public void editAndCancel() {
+        var book = test(grid).item(0);
+        test(grid).click(1, 0);
+        assertTrue(form.isShown());
+
+        test(form.productName).setValue("Edited book");
+
+        test($(form, Button.class).caption("Cancel").single()).click();
+        assertTrue(form.productName.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertTrue(LockedObjects.get().isLocked(Product.class,
+                book.getId()) != null);
+
+        var dialog = $(Window.class).id("confirm-dialog");
+        test($(dialog, Button.class).id("confirm-button")).click();
+
+        assertFalse(form.isShown());
+        assertFalse(LockedObjects.get().isLocked(Product.class,
+                book.getId()) != null);
     }
 
     @Test

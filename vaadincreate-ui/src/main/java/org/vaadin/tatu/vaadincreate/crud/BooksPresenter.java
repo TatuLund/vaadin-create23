@@ -102,7 +102,6 @@ public class BooksPresenter implements Serializable {
      */
     public void cancelProduct() {
         view.cancelProduct();
-        unlockBook();
     }
 
     /**

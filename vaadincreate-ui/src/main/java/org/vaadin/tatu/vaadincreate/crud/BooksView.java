@@ -199,10 +199,12 @@ public class BooksView extends CssLayout
                 form.showForm(false);
                 clearSelection();
                 setFragmentParameter("");
+                presenter.unlockBook();
             });
         } else {
             form.showForm(false);
             clearSelection();
+            presenter.unlockBook();
         }
     }
 

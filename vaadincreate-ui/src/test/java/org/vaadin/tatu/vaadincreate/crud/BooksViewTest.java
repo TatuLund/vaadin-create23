@@ -215,11 +215,13 @@ public class BooksViewTest extends AbstractUITest {
     public void editProduct() {
         var book = test(grid).item(0);
         test(grid).click(1, 0);
+        assertTrue(form.isShown());
 
         var id = book.getId();
 
         test(form.productName).setValue("Edited book");
         test(form.save).click();
+        assertFalse(form.isShown());
 
         var edited = ui.getProductService().getProductById(id);
 
@@ -229,6 +231,25 @@ public class BooksViewTest extends AbstractUITest {
         assertEquals("Edited book", edited.getProductName());
         assertEquals(VaadinCreateTheme.BOOKVIEW_GRID_EDITED,
                 test(grid).styleName(0));
+    }
+
+    @Test
+    public void openProductChangedByOtherUser() {
+        var book = test(grid).item(0);
+
+        // Simulate other user persisting a change to the database
+        var edited = ui.getProductService().getProductById(book.getId());
+        edited.setProductName("Touched book");
+        ui.getProductService().updateProduct(edited);
+
+        test(grid).click(1, 0);
+        assertTrue(form.isShown());
+
+        // Assert that change is visible when product is opened
+        assertEquals("Touched book", form.productName.getValue());
+
+        var name = (String) test(grid).cell(1, 0);
+        assertEquals("Touched book", name);
     }
 
     @Test
@@ -379,7 +400,7 @@ public class BooksViewTest extends AbstractUITest {
 
     @Test
     public void sortingByPrice() {
-        int size = grid.getDataCommunicator().getDataProviderSize();
+        int size = test(grid).size();
 
         test(grid).toggleColumnSorting(2);
 
@@ -400,7 +421,7 @@ public class BooksViewTest extends AbstractUITest {
 
     @Test
     public void sortingByName() {
-        int size = grid.getDataCommunicator().getDataProviderSize();
+        int size = test(grid).size();
 
         test(grid).toggleColumnSorting(1);
 

@@ -360,7 +360,7 @@ public class BooksView extends CssLayout
         if (product != null) {
             // Ensure the product is up-to-date
             if (product.getId() > 0) {
-                product = refreshProduct(dataProvider, product);
+                product = refreshProduct(product);
             }
             form.showForm(true);
         } else {
@@ -448,8 +448,7 @@ public class BooksView extends CssLayout
         }
     }
 
-    private Product refreshProduct(ListDataProvider<Product> dataProvider,
-            Product product) {
+    private Product refreshProduct(Product product) {
         var list = ((List<Product>) dataProvider.getItems());
         var updatedProduct = presenter.findProduct(product.getId());
         list.set(list.indexOf(product), updatedProduct);

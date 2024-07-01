@@ -173,7 +173,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     // https://github.com/vaadin/flow/issues/17215
     @WebServlet(value = "/*", asyncSupported = true, initParams = {
             @WebInitParam(name = "org.atmosphere.websocket.maxIdleTime", value = "300000") })
-    @VaadinServletConfiguration(productionMode = false, ui = VaadinCreateUI.class)
+    @VaadinServletConfiguration(productionMode = false, ui = VaadinCreateUI.class, closeIdleSessions = true)
     public static class Servlet extends VaadinServlet {
 
         @Override

@@ -60,6 +60,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     @Override
     protected void init(VaadinRequest request) {
         getPage().setTitle("Vaadin Create 23'");
+        addFirefoxBrowserCloseWorkaround();
         if (!getAccessControl().isUserSignedIn()) {
             showLoginView();
         } else {
@@ -67,6 +68,21 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             showAppLayout();
         }
         eventBus.registerEventBusListener(this);
+    }
+
+    // Vaadin 8 actually has page hide listener and eager closing of UI's, but
+    // there is a bug in Firefox's sending Beacon upon browser close, hence
+    // adding a workaround to detect closing of the Browser old fashioned way.
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1609653
+    private void addFirefoxBrowserCloseWorkaround() {
+        if (getPage().getWebBrowser().isFirefox()) {
+            getPage().getJavaScript()
+                    .execute("function closeListener() { catchClose(); } "
+                            + "window.addEventListener('beforeunload', closeListener);");
+            getPage().getJavaScript().addFunction("catchClose", arguments -> {
+                close();
+            });
+        }
     }
 
     private void showLoginView() {

@@ -81,16 +81,21 @@ public class BooksView extends CssLayout
 
         grid = new BookGrid();
         grid.asSingleSelect().addValueChangeListener(event -> {
-            if (form.hasChanges()) {
-                var dialog = createDiscardChangesConfirmDialog();
-                dialog.open();
-                dialog.addConfirmedListener(e -> {
-                    presenter.unlockBook();
-                    form.showForm(false);
-                    setFragmentParameter("");
-                });
-            } else {
-                presenter.rowSelected(event.getValue());
+            if (event.isUserOriginated()) {
+                if (form.hasChanges()) {
+                    var dialog = createDiscardChangesConfirmDialog();
+                    dialog.open();
+                    dialog.addConfirmedListener(e -> {
+                        presenter.unlockBook();
+                        form.showForm(false);
+                        setFragmentParameter("");
+                    });
+                    dialog.addCancelListener(e -> {
+                        grid.select(form.getProduct());
+                    });
+                } else {
+                    presenter.rowSelected(event.getValue());
+                }
             }
         });
         grid.setVisible(false);

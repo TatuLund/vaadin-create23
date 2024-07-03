@@ -257,6 +257,51 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
+    public void editAndSelectAndConfirmCancel() {
+        test(grid).click(1, 0);
+        assertTrue(form.isShown());
+
+        test(form.productName).setValue("Changed book");
+
+        test(grid).click(1, 1);
+        assertTrue(form.productName.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        var dialog = $(Window.class).id("confirm-dialog");
+        test($(dialog, Button.class).id("confirm-button")).click();
+        assertFalse(form.isShown());
+
+        test(grid).click(1, 0);
+        assertTrue(form.isShown());
+        assertFalse(form.productName.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+    }
+
+    @Test
+    public void editAndSelectAndCancelCancel() {
+        var book = test(grid).item(0);
+        test(grid).click(1, 0);
+        assertTrue(form.isShown());
+
+        test(form.productName).setValue("Changed book");
+
+        test(grid).click(1, 1);
+        assertTrue(form.productName.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        var dialog = $(Window.class).id("confirm-dialog");
+        test($(dialog, Button.class).id("cancel-button")).click();
+
+        assertTrue(form.isShown());
+        assertTrue(form.productName.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+
+        assertEquals(book, grid.getSelectedRow());
+
+        test(form.discard).click();
+        assertFalse(form.productName.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+    }
+
+    @Test
     public void openProductChangedByOtherUser() {
         var book = test(grid).item(0);
 

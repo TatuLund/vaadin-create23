@@ -204,12 +204,16 @@ public class BookForm extends Composite implements HasI18N {
 
     public void showForm(boolean visible) {
         if (visible) {
-            updateDirtyIndicators();
+            clearDirtyIndicators();
             layout.addStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
         } else {
             layout.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
         }
         setEnabled(visible);
+    }
+
+    public Product getProduct() {
+        return currentProduct;
     }
 
     public boolean isShown() {
@@ -230,11 +234,15 @@ public class BookForm extends Composite implements HasI18N {
     }
 
     public void updateDirtyIndicators() {
-        binder.getFields().forEach(field -> ((Component) field)
-                .removeStyleName(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        clearDirtyIndicators();
         binder.getChangedBindings()
                 .forEach(binding -> ((Component) binding.getField())
                         .addStyleName(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+    }
+
+    private void clearDirtyIndicators() {
+        binder.getFields().forEach(field -> ((Component) field)
+                .removeStyleName(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
     }
 
     private void buildForm() {

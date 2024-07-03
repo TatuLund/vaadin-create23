@@ -298,13 +298,14 @@ public class BooksView extends CssLayout
     }
 
     /**
-     * Selects the specified row in the grid.
+     * Selects the specified row in the grid. And open editor for it.
      *
      * @param row
      *            the row to be selected
      */
     public void selectRow(Product row) {
         grid.getSelectionModel().select(row);
+        editProduct(row);
     }
 
     /**

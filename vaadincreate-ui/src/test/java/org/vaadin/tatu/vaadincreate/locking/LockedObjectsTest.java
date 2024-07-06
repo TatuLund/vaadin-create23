@@ -60,6 +60,31 @@ public class LockedObjectsTest {
     }
 
     @Test
+    public void lockLedgerIsWeak() {
+        var listener = new TestListener();
+        var user = userService.getAllUsers().get(0);
+        var id = objects.get(0).getId();
+        lockedObjects.lock(MockObject.class, id, user);
+
+        assertEquals(user, lockedObjects.isLocked(MockObject.class, id));
+        var event = listener.getLastEvent();
+        assertEquals(1, listener.getEventCount());
+        assertEquals(user, event.getUser());
+        assertEquals(id, (int) event.getId());
+        assertEquals(MockObject.class, event.getType());
+        assertTrue(event.isLocked());
+
+        System.gc();
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+        }
+
+        assertEquals(null, lockedObjects.isLocked(MockObject.class, id));
+
+        listener.remove();
+    }
+
     public void lockingTwiceThrows() {
         boolean thrown = false;
         var user = userService.getAllUsers().get(0);

@@ -56,6 +56,7 @@ public class BooksView extends CssLayout
     private static final String NEW_PRODUCT = "new-product";
     private static final String FILTER = "filter";
     private static final String NOT_VALID_PID = "not-valid-pid";
+    private static final String PRODUCT_LOCKED = "product-locked";
     private static final String UNSAVED_CHANGES = "unsaved-changes";
     private static final String CANCEL = "cancel";
 
@@ -259,6 +260,16 @@ public class BooksView extends CssLayout
     }
 
     /**
+     * Displays an error message indicating that the provided product is locked.
+     *
+     * @param productId
+     *            the lccked product ID
+     */
+    public void showProductLocked(String productId) {
+        showError(getTranslation(PRODUCT_LOCKED, productId));
+    }
+
+    /**
      * Shows a notification indicating that a book has been saved.
      *
      * @param book
@@ -445,13 +456,15 @@ public class BooksView extends CssLayout
         if (event instanceof LockingEvent && isAttached()) {
             var bookEvent = (LockingEvent) event;
             getUI().access(() -> {
-                ListDataProvider<Product> dataProvider = (ListDataProvider<Product>) grid
-                        .getDataProvider();
-                dataProvider.getItems().stream()
-                        .filter(book -> book.getId() == bookEvent.getId())
-                        .findFirst().ifPresent(product -> {
-                            dataProvider.refreshItem(product);
-                        });
+                if (grid.getDataProvider() instanceof ListDataProvider) {
+                    ListDataProvider<Product> dataProvider = (ListDataProvider<Product>) grid
+                            .getDataProvider();
+                    dataProvider.getItems().stream()
+                            .filter(book -> book.getId() == bookEvent.getId())
+                            .findFirst().ifPresent(product -> {
+                                dataProvider.refreshItem(product);
+                            });
+                }
             });
         }
     }

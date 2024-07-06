@@ -153,12 +153,21 @@ public class BooksPresenter implements Serializable {
                     int pid = Integer.parseInt(productId);
                     Product product = findProduct(pid);
                     if (product != null) {
-                        view.selectRow(product);
+                        if (lockedBooks.isLocked(Product.class, pid) == null) {
+                            view.selectRow(product);
+                        } else {
+                            view.showProductLocked(productId);
+                            logger.warn("Attempt to edit locked product '{}'",
+                                    productId);
+                        }
                     } else {
                         view.showNotValidId(productId);
+                        logger.warn("Attempt to edit invalid id '{}'",
+                                productId);
                     }
                 } catch (NumberFormatException e) {
                     view.showNotValidId(productId);
+                    logger.warn("Attempt to edit invalid id '{}'", productId);
                 }
             }
         }

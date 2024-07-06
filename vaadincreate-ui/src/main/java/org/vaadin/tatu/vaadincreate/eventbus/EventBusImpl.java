@@ -45,7 +45,7 @@ public class EventBusImpl implements EventBus {
     @Override
     public void registerEventBusListener(EventBusListener listener) {
         synchronized (eventListeners) {
-            logger.debug("EventBus ({}) listenerer registered", listener.hashCode());
+            logger.debug("EventBus listenerer ({}) registered", listener.hashCode());
             eventListeners.put(listener, null);
         }
     }
@@ -53,7 +53,7 @@ public class EventBusImpl implements EventBus {
     @Override
     public void unregisterEventBusListener(EventBusListener listener) {
         synchronized (eventListeners) {
-            logger.debug("EventBus ({}) listenerer un-registered",
+            logger.debug("EventBus listenerer ({}) un-registered",
                     listener.hashCode());
             eventListeners.remove(listener);
         }

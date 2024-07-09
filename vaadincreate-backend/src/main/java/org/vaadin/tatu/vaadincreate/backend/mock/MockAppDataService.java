@@ -19,7 +19,7 @@ public class MockAppDataService implements AppDataService {
         return INSTANCE;
     }
 
-     private MockAppDataService() {
+    private MockAppDataService() {
         message = new Message(MockDataGenerator.createMessage(),
                 LocalDateTime.now());
         logger.info("Generated mock app data");

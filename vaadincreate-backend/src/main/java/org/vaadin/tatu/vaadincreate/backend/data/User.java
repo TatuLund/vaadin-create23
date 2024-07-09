@@ -1,21 +1,14 @@
 package org.vaadin.tatu.vaadincreate.backend.data;
 
-import java.io.Serializable;
-import java.util.Objects;
-
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @SuppressWarnings("serial")
-public class User implements Serializable {
+public class User extends AbstractEntity {
 
     public enum Role {
         USER, ADMIN;
     }
-
-    @Min(0)
-    private int id;
 
     @NotNull(message = "{user.name.required}")
     @Size(min = 5, max = 20, message = "{user.length}")
@@ -40,14 +33,15 @@ public class User implements Serializable {
         this.name = name;
         this.passwd = passwd;
         this.setRole(role);
+        this.version = 0;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
+    public User(int id, String name, String passwd, Role role, int version) {
         this.id = id;
+        this.name = name;
+        this.passwd = passwd;
+        this.setRole(role);
+        this.version = version;
     }
 
     public String getName() {
@@ -72,22 +66,5 @@ public class User implements Serializable {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        User other = (User) obj;
-        return id == other.id;
     }
 }

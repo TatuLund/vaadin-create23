@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
 import com.vaadin.server.ServiceException;
@@ -87,9 +88,25 @@ public class UserManagementViewTest extends AbstractUITest {
                 $(Notification.class).last().getCaption());
         assertFalse($(FormLayout.class).single().isEnabled());
 
+        // Check that new user is there
         test($(ComboBox.class).id("user-select")).setInput("Tester");
         assertTrue($(FormLayout.class).single().isEnabled());
         assertEquals("Tester", $(TextField.class).id("user-field").getValue());
+
+        // Simulate other user editing the user
+        var user = ui.getUserService().findByName("Tester").get();
+        ui.getUserService().updateUser(user);
+
+        // Edit the user again
+        test($(ComboBox.class).id("user-select")).setInput("Tester");
+        test($(TextField.class).id("user-field")).setValue("Mocker");
+        test(save).click();
+
+        // Assert that optimistic locking is thrown and cought
+        assertEquals("Save conflict, try again.",
+                $(Notification.class).last().getCaption());
+        assertFalse($(FormLayout.class).single().isEnabled());
+
     }
 
     @Test

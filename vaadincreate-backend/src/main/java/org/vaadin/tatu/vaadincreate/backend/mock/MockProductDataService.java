@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.backend.mock;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -76,6 +77,7 @@ public class MockProductDataService extends ProductDataService {
             }
             for (int i = 0; i < products.size(); i++) {
                 if (products.get(i).getId() == p.getId()) {
+                    p.setVersion(products.get(i).getVersion() + 1);
                     products.set(i, p);
                     logger.info("Updated the product ({}) {}", p.getId(),
                             p.getProductName());
@@ -116,6 +118,7 @@ public class MockProductDataService extends ProductDataService {
 
     @Override
     public Category updateCategory(Category category) {
+        Objects.requireNonNull(category);
         synchronized (categories) {
             randomWait(1);
             var newCategory = new Category(category);
@@ -124,8 +127,9 @@ public class MockProductDataService extends ProductDataService {
                 categories.add(newCategory);
                 logger.info("Category {} created", newCategory.getId());
             } else {
-                deleteCategoryInternal(category.getId());
-                categories.add(newCategory);
+                var index = categories.indexOf(newCategory);
+                newCategory.setVersion(categories.get(index).getVersion() + 1);
+                categories.set(index, newCategory);
                 logger.info("Category {} updated", newCategory.getId());
             }
             return newCategory;

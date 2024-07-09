@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.admin;
 
 import java.util.List;
 
+import javax.persistence.OptimisticLockException;
+
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
@@ -47,6 +49,7 @@ public class UserManagementView extends VerticalLayout
     private static final String NEW_USER = "new-user";
     private static final String EDIT_USERS = "edit-users";
     private static final String WILL_DELETE = "will-delete";
+    private static final String SAVE_CONFLICT = "save-conflict";
 
     private BeanValidationBinder<User> binder = new BeanValidationBinder<>(
             User.class);
@@ -106,6 +109,14 @@ public class UserManagementView extends VerticalLayout
                 save.setEnabled(false);
                 userSelect.setValue(null);
             } catch (ValidationException e1) {
+            } catch (OptimisticLockException e) {
+                Notification.show(getTranslation(SAVE_CONFLICT),
+                        Notification.Type.WARNING_MESSAGE);
+                presenter.requestUpdateUsers();
+                clearForm(form);
+                delete.setEnabled(false);
+                save.setEnabled(false);
+                userSelect.setValue(null);
             }
         });
         delete.addClickListener(event -> {

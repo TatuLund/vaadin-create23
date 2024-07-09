@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
+import javax.persistence.OptimisticLockException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
@@ -31,8 +33,10 @@ public class UserServiceTest {
     public void updateTheUser() throws Exception {
         var oldSize = service.getAllUsers().size();
         var user = service.getAllUsers().iterator().next();
+        var version = user.getVersion();
         user.setName("Test1");
         User user2 = service.updateUser(user);
+        assertEquals(version + 1, user2.getVersion());
         assertEquals("Test1", user2.getName());
         assertEquals(oldSize, service.getAllUsers().size());
     }
@@ -44,11 +48,19 @@ public class UserServiceTest {
         service.updateUser(user);
     }
 
+    @Test(expected = OptimisticLockException.class)
+    public void optimisticLocking() {
+        var user = service.findByName("User5").get();
+        var u = service.updateUser(user);
+        service.updateUser(user);
+    }
+
     @Test
     public void addNewUser() throws Exception {
         var oldSize = service.getAllUsers().size();
-        User user = new User(20, "Test2", "test2", Role.USER);
+        User user = new User(20, "Test2", "test2", Role.USER, 0);
         var newUser = service.updateUser(user);
+        assertEquals(0, newUser.getVersion());
         assertEquals(oldSize + 1, service.getAllUsers().size());
 
         var foundUser = service.findByName("Test2");
@@ -57,7 +69,7 @@ public class UserServiceTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void addNewUserByDuplicateName() throws Exception {
-        User user = new User(20, "Admin", "admin", Role.USER);
+        User user = new User(20, "Admin", "admin", Role.USER, 0);
         service.updateUser(user);
     }
 

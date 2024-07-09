@@ -3,8 +3,9 @@ package org.vaadin.tatu.vaadincreate.admin;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.persistence.OptimisticLockException;
+
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
-import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -38,6 +39,7 @@ public class CategoryManagementView extends VerticalLayout
     private static final String ADD_NEW_CATEGORY = "add-new-category";
     private static final String EDIT_CATEGORIES = "edit-categories";
     private static final String WILL_DELETE = "will-delete";
+    private static final String SAVE_CONFLICT = "save-conflict";
 
     private CategoryManagementPresenter presenter = new CategoryManagementPresenter(
             this);
@@ -120,7 +122,7 @@ public class CategoryManagementView extends VerticalLayout
         var deleteButton = new Button(VaadinIcons.TRASH, event -> {
             var dialog = new ConfirmDialog(
                     getTranslation(WILL_DELETE, category.getName()),
-                    Type.ALERT);
+                    ConfirmDialog.Type.ALERT);
             dialog.setConfirmText(getTranslation(DELETE));
             dialog.setCancelText(getTranslation(CANCEL));
             dialog.open();
@@ -142,22 +144,28 @@ public class CategoryManagementView extends VerticalLayout
         binder.setBean(category);
         binder.addValueChangeListener(event -> {
             if (binder.isValid()) {
-                var newCategory = presenter.updateCategory(category);
-                if (category.getId() == -1) {
-                    dataProvider.getItems().remove(category);
-                    dataProvider.getItems().add(newCategory);
-                    dataProvider.refreshAll();
-                    nameField.focus();
-                } else {
-                    dataProvider.getItems().remove(category);
-                    dataProvider.getItems().add(newCategory);
-                    dataProvider.refreshItem(newCategory);
+                try {
+                    var newCategory = presenter.updateCategory(category);
+                    if (category.getId() == -1) {
+                        dataProvider.getItems().remove(category);
+                        dataProvider.getItems().add(newCategory);
+                        dataProvider.refreshAll();
+                        nameField.focus();
+                    } else {
+                        dataProvider.getItems().remove(category);
+                        dataProvider.getItems().add(newCategory);
+                        dataProvider.refreshItem(newCategory);
+                    }
+                    presenter.requestUpdateCategories();
+                    deleteButton.setEnabled(true);
+                    newCategoryButton.setEnabled(true);
+                    Notification.show(getTranslation(CATEGORY_SAVED,
+                            newCategory.getName()));
+                } catch (OptimisticLockException e) {
+                    Notification.show(getTranslation(SAVE_CONFLICT),
+                            Notification.Type.WARNING_MESSAGE);
+                    presenter.requestUpdateCategories();
                 }
-                presenter.requestUpdateCategories();
-                deleteButton.setEnabled(true);
-                newCategoryButton.setEnabled(true);
-                Notification.show(
-                        getTranslation(CATEGORY_SAVED, newCategory.getName()));
             }
         });
         deleteButton.setEnabled(category.getId() > 0);

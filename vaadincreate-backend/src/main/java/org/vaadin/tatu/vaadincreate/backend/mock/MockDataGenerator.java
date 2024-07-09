@@ -68,10 +68,11 @@ public class MockDataGenerator implements Serializable {
     static List<User> createUsers() {
         List<User> users = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            User user = new User(i + 1, "User" + i, "user" + i, Role.USER);
+            User user = new User(i + 1, "User" + i, "user" + i, Role.USER, 0);
             users.add(user);
         }
-        User admin = new User(users.size() + 1, "Admin", "admin", Role.ADMIN);
+        User admin = new User(users.size() + 1, "Admin", "admin", Role.ADMIN,
+                0);
         users.add(admin);
         return users;
     }

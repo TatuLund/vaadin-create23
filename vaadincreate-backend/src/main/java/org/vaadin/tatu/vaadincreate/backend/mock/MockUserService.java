@@ -40,7 +40,7 @@ public class MockUserService implements UserService {
         if (optUser.isPresent()) {
             var user = optUser.get();
             return Optional.of(new User(user.getId(), user.getName(),
-                    user.getPasswd(), user.getRole()));
+                    user.getPasswd(), user.getRole(), user.getVersion()));
         } else {
             return Optional.empty();
         }
@@ -49,6 +49,7 @@ public class MockUserService implements UserService {
     @Override
     public synchronized User updateUser(User user) {
         randomWait(3);
+        User newUser = null;
         int index = -1;
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).equals(user)) {
@@ -62,10 +63,12 @@ public class MockUserService implements UserService {
                             && user.getId() != u.getId())
                     .findFirst();
             if (result.isEmpty()) {
-                users.remove(index);
-                users.add(user);
-                logger.info("Updated the user ({}) {}", user.getId(),
-                        user.getName());
+                newUser = new User(user.getId(), user.getName(),
+                        user.getPasswd(), user.getRole(), user.getVersion());
+                newUser.setVersion(users.get(index).getVersion() + 1);
+                users.set(index, newUser);
+                logger.info("Updated the user ({}) {}", newUser.getId(),
+                        newUser.getName());
             } else {
                 throw new IllegalArgumentException(
                         "Can't add user with duplicate name");
@@ -75,17 +78,19 @@ public class MockUserService implements UserService {
                     .filter(u -> user.getName().equals(u.getName()))
                     .findFirst();
             if (result.isEmpty()) {
-                user.setId(nextUserId);
+                newUser = new User(-1, user.getName(), user.getPasswd(),
+                        user.getRole(), 0);
+                newUser.setId(nextUserId);
                 nextUserId++;
-                users.add(user);
-                logger.info("Saved a new user ({}) {}", user.getId(),
-                        user.getName());
+                users.add(newUser);
+                logger.info("Saved a new user ({}) {}", newUser.getId(),
+                        newUser.getName());
             } else {
                 throw new IllegalArgumentException(
                         "Can't add user with duplicate name");
             }
         }
-        return getUserById(user.getId());
+        return newUser;
     }
 
     @Override
@@ -95,7 +100,7 @@ public class MockUserService implements UserService {
             if (users.get(i).getId() == userId) {
                 var user = users.get(i);
                 return new User(user.getId(), user.getName(), user.getPasswd(),
-                        user.getRole());
+                        user.getRole(), user.getVersion());
             }
         }
         return null;

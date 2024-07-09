@@ -14,6 +14,8 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.util.Set;
 
+import javax.persistence.OptimisticLockException;
+
 /**
  * Simple unit test for the back-end data service.
  */
@@ -40,9 +42,11 @@ public class ProductDataServiceTest {
     public void updateTheProduct() throws Exception {
         var oldSize = service.getAllProducts().size();
         var p = service.getAllProducts().iterator().next();
+        var version = p.getVersion();
         p.setProductName("My Test Name");
         service.updateProduct(p);
         var p2 = service.getProductById(p.getId());
+        assertEquals(version + 1, p2.getVersion());
         assertEquals("My Test Name", p2.getProductName());
         assertEquals(oldSize, service.getAllProducts().size());
     }
@@ -55,6 +59,7 @@ public class ProductDataServiceTest {
         p.setPrice(new BigDecimal(10));
         assertEquals(-1, p.getId());
         var newProduct = service.updateProduct(p);
+        assertEquals(0, newProduct.getVersion());
         assertNotEquals(-1, newProduct.getId());
         assertEquals(oldSize + 1, service.getAllProducts().size());
 
@@ -96,6 +101,20 @@ public class ProductDataServiceTest {
         service.deleteProduct(1000);
     }
 
+    @Test(expected = OptimisticLockException.class)
+    public void optimisticLocking() {
+        var product = service.getProductById(1);
+        service.updateProduct(product);
+        service.updateProduct(product);
+    }
+
+    @Test(expected = OptimisticLockException.class)
+    public void optimisticLockingCategory() {
+        var category = service.getAllCategories().stream().skip(2).findFirst().get();
+        service.updateCategory(category);
+        service.updateCategory(category);
+    }
+
     @Test
     public void addUpdateRemoveCategory() {
         var category = new Category();
@@ -105,10 +124,12 @@ public class ProductDataServiceTest {
         assertTrue(newCategory.getId() > 0);
         assertEquals("Sports books", newCategory.getName());
         assertFalse(category == newCategory);
+        assertEquals(0, newCategory.getVersion());
         assertTrue(service.getAllCategories().contains(newCategory));
 
         newCategory.setName("Athletics");
         var updatedCategory = service.updateCategory(newCategory);
+        assertEquals(1, updatedCategory.getVersion());
         assertTrue(updatedCategory.equals(newCategory));
         assertFalse(updatedCategory == newCategory);
         assertTrue(service.getAllCategories().contains(updatedCategory));

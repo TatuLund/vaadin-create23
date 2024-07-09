@@ -1,12 +1,9 @@
 package org.vaadin.tatu.vaadincreate.backend.data;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -15,11 +12,8 @@ import javax.validation.constraints.Size;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 
 @SuppressWarnings("serial")
-public class Product implements Serializable {
+public class Product extends AbstractEntity {
 
-    @NotNull
-    @Min(0)
-    private int id = -1;
     @NotNull(message = "{product.name.required}")
     @Size(min = 2, max = 100, message = "{product.name.min2max200}")
     private String productName = "";
@@ -42,14 +36,7 @@ public class Product implements Serializable {
         setStockCount(other.getStockCount());
         setAvailability(other.getAvailability());
         setCategory(other.getCategory());
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        version = other.version;
     }
 
     public String getProductName() {
@@ -92,22 +79,5 @@ public class Product implements Serializable {
 
     public void setAvailability(Availability availability) {
         this.availability = availability;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Product other = (Product) obj;
-        return id == other.id;
     }
 }

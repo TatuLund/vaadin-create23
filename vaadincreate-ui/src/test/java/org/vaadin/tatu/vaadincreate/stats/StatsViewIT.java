@@ -5,10 +5,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 
+import com.vaadin.testbench.elements.MenuBarElement;
 import com.vaadin.testbench.elements.UIElement;
 
 public class StatsViewIT extends AbstractViewTest {
@@ -18,6 +20,11 @@ public class StatsViewIT extends AbstractViewTest {
         super.setup();
         login("Admin", "admin");
         open("#!" + StatsView.VIEW_NAME);
+    }
+
+    @After
+    public void cleanup() {
+        $(MenuBarElement.class).first().findElement(By.id("logout-2")).click();
     }
 
     @Test

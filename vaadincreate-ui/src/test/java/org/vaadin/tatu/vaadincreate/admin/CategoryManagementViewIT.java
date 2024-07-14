@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -12,6 +13,7 @@ import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.GridElement;
 import com.vaadin.testbench.elements.LabelElement;
+import com.vaadin.testbench.elements.MenuBarElement;
 import com.vaadin.testbench.elements.NotificationElement;
 import com.vaadin.testbench.elements.TextFieldElement;
 import com.vaadin.testbench.elements.UIElement;
@@ -25,6 +27,11 @@ public class CategoryManagementViewIT extends AbstractViewTest {
         login("Admin", "admin");
         open("#!" + AdminView.VIEW_NAME + "/"
                 + CategoryManagementView.VIEW_NAME);
+    }
+
+    @After
+    public void cleanup() {
+        $(MenuBarElement.class).first().findElement(By.id("logout-2")).click();
     }
 
     @Test

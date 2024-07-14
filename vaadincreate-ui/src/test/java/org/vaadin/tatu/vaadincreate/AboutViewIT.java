@@ -1,11 +1,13 @@
 package org.vaadin.tatu.vaadincreate;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.LabelElement;
+import com.vaadin.testbench.elements.MenuBarElement;
 import com.vaadin.testbench.elements.TextAreaElement;
 
 public class AboutViewIT extends AbstractViewTest {
@@ -15,6 +17,11 @@ public class AboutViewIT extends AbstractViewTest {
         super.setup();
         login("Admin", "admin");
         open("#!" + AboutView.VIEW_NAME);
+    }
+
+    @After
+    public void cleanup() {
+        $(MenuBarElement.class).first().findElement(By.id("logout-2")).click();
     }
 
     @Test

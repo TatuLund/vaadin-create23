@@ -4,19 +4,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDateTime;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.vaadin.tatu.vaadincreate.crud.BookForm;
-import org.vaadin.tatu.vaadincreate.crud.BookGrid;
-import org.vaadin.tatu.vaadincreate.crud.BooksView;
+import org.vaadin.tatu.vaadincreate.backend.data.Message;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
 import com.vaadin.server.ServiceException;
-import com.vaadin.testbench.elements.ButtonElement;
-import com.vaadin.testbench.elements.LabelElement;
-import com.vaadin.testbench.elements.TextAreaElement;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -76,4 +72,12 @@ public class AboutViewTest extends AbstractUITest {
         assertFalse(area.isVisible());
     }
 
+    @Test
+    public void messageFromEventShown() {
+        EventBus.get().post(new Message("Hello", LocalDateTime.now()));
+
+        waitWhile(view, n -> $(Notification.class).last() == null, 2);
+        var notification = $(Notification.class).last();
+        assertEquals("Hello", notification.getDescription());
+    }
 }

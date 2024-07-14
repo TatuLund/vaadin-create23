@@ -1,5 +1,10 @@
 package org.vaadin.tatu.vaadincreate.util;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
@@ -26,5 +31,11 @@ public class Utils {
                 .getCurrent();
         request.getHttpServletRequest().changeSessionId();
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
+    }
+
+    public static String formatDate(LocalDateTime dateTime, Locale locale) {
+        var formatter = DateTimeFormatter
+                .ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(locale);
+        return dateTime.format(formatter);
     }
 }

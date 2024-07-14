@@ -170,7 +170,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             Message message = (Message) event;
 
             access(() -> {
-                var note = new Notification(message.getDateStamp().toString(),
+                var note = new Notification(
+                        Utils.formatDate(message.getDateStamp(), getLocale()),
                         message.getMessage(), Type.TRAY_NOTIFICATION, true);
                 note.show(getPage());
             });

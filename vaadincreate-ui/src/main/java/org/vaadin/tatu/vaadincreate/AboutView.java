@@ -1,9 +1,5 @@
 package org.vaadin.tatu.vaadincreate;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
@@ -94,7 +90,8 @@ public class AboutView extends VerticalLayout implements View, HasI18N {
             // vulnerabilities
             var text = Utils.sanitize(unsanitized);
             Message mes = service.updateMessage(text);
-            adminsNote.setCaption(mes.getDateStamp().toString());
+            adminsNote.setCaption(
+                    Utils.formatDate(mes.getDateStamp(), getLocale()));
             adminsNote.setValue(mes.getMessage());
             eventBus.post(mes);
             logger.info("Admin message updated");
@@ -147,15 +144,9 @@ public class AboutView extends VerticalLayout implements View, HasI18N {
     @Override
     public void enter(ViewChangeEvent event) {
         Message message = service.getMessage();
-        adminsNote.setCaption(formatDate(message.getDateStamp()));
+        adminsNote.setCaption(
+                Utils.formatDate(message.getDateStamp(), getLocale()));
         adminsNote.setValue(message.getMessage());
-    }
-
-    private String formatDate(LocalDateTime dateTime) {
-        var formatter = DateTimeFormatter
-                .ofLocalizedDateTime(FormatStyle.MEDIUM)
-                .withLocale(getLocale());
-        return dateTime.format(formatter);
     }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());

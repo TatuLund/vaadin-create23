@@ -192,6 +192,7 @@
                 <configuration>
                     <excludes>
                         <exclude>org/vaadin/tatu/**/*IT.*</exclude>
+                        <exclude>org/vaadin/tatu/**/*Test.*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

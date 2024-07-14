@@ -57,6 +57,7 @@ public class BooksView extends CssLayout
     private static final String FILTER = "filter";
     private static final String NOT_VALID_PID = "not-valid-pid";
     private static final String PRODUCT_LOCKED = "product-locked";
+    private static final String PRODUCT_DELETED = "product-deleted";
     private static final String UNSAVED_CHANGES = "unsaved-changes";
     private static final String CANCEL = "cancel";
 
@@ -380,6 +381,10 @@ public class BooksView extends CssLayout
             // Ensure the product is up-to-date
             if (product.getId() > 0) {
                 product = refreshProduct(product);
+                if (product == null) {
+                    showError(getTranslation(PRODUCT_DELETED));
+                    return;
+                }
             }
             form.showForm(true);
         } else {
@@ -472,9 +477,14 @@ public class BooksView extends CssLayout
     private Product refreshProduct(Product product) {
         var list = ((List<Product>) dataProvider.getItems());
         var updatedProduct = presenter.findProduct(product.getId());
-        list.set(list.indexOf(product), updatedProduct);
-        logger.debug("Refreshed {}", product.getId());
-        dataProvider.refreshItem(updatedProduct);
+        if (updatedProduct != null) {
+            list.set(list.indexOf(product), updatedProduct);
+            logger.debug("Refreshed {}", product.getId());
+            dataProvider.refreshItem(updatedProduct);
+        } else {
+            dataProvider.getItems().remove(product);
+            dataProvider.refreshAll();
+        }
         return updatedProduct;
     }
 

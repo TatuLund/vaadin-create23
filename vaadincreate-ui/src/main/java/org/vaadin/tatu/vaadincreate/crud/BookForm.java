@@ -169,6 +169,7 @@ public class BookForm extends Composite implements HasI18N {
                 dialog.open();
                 dialog.addConfirmedListener(e -> {
                     presenter.deleteProduct(currentProduct);
+                    showForm(false);
                 });
             }
         });

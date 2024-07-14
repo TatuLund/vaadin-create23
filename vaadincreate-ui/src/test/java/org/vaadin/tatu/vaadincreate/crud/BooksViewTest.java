@@ -204,8 +204,25 @@ public class BooksViewTest extends AbstractUITest {
 
         assertTrue($(Notification.class).last().getCaption()
                 .contains(book.getProductName()));
+        assertFalse(form.isShown());
 
         assertEquals(null, ui.getProductService().getProductById(id));
+
+        var newName = test(grid).cell(1, 0);
+        assertNotEquals(name, newName);
+    }
+
+    @Test
+    public void concurrentDelete() {
+        // Simulate other user deleting the book
+        var book = test(grid).item(0);
+        var name = book.getProductName();
+        ui.getProductService().deleteProduct(book.getId());
+
+        test(grid).click(1, 0);
+        assertEquals("Product was deleted.",
+                $(Notification.class).last().getCaption());
+        assertFalse(form.isShown());
 
         var newName = test(grid).cell(1, 0);
         assertNotEquals(name, newName);

@@ -8,6 +8,7 @@ import org.vaadin.tatu.vaadincreate.backend.AppDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
@@ -29,7 +30,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @AllPermitted
 @SuppressWarnings("serial")
-public class AboutView extends VerticalLayout implements View, HasI18N {
+public class AboutView extends VerticalLayout
+        implements View, EventBusListener, HasI18N {
 
     public static final String VIEW_NAME = "about";
 
@@ -41,12 +43,14 @@ public class AboutView extends VerticalLayout implements View, HasI18N {
 
     private Button editButton;
     private Label adminsNote;
+    private TextArea textArea;
+
     private EventBus eventBus = EventBus.get();
 
     public AboutView() {
         var aboutContent = createAboutContent();
 
-        var textArea = createTextArea();
+        textArea = createTextArea();
         textArea.setVisible(false);
 
         var adminsContent = new HorizontalLayout();
@@ -81,6 +85,7 @@ public class AboutView extends VerticalLayout implements View, HasI18N {
         addComponents(aboutContent, adminsContent);
         setComponentAlignment(aboutContent, Alignment.MIDDLE_CENTER);
         setComponentAlignment(adminsContent, Alignment.MIDDLE_CENTER);
+        eventBus.registerEventBusListener(this);
     }
 
     private void handleValueChange(ValueChangeEvent<String> e) {
@@ -147,6 +152,29 @@ public class AboutView extends VerticalLayout implements View, HasI18N {
         adminsNote.setCaption(
                 Utils.formatDate(message.getDateStamp(), getLocale()));
         adminsNote.setValue(message.getMessage());
+    }
+
+    @Override
+    public void eventFired(Object event) {
+        if (event instanceof Message) {
+            getUI().access(() -> {
+                if (textArea.isVisible()) {
+                    textArea.setVisible(false);
+                    adminsNote.setVisible(true);
+                    editButton.setVisible(true);
+                }
+                Message mes = (Message) event;
+                adminsNote.setCaption(
+                        Utils.formatDate(mes.getDateStamp(), getLocale()));
+                adminsNote.setValue(mes.getMessage());
+            });
+        }
+    }
+
+    @Override
+    public void detach() {
+        super.detach();
+        eventBus.unregisterEventBusListener(this);
     }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());

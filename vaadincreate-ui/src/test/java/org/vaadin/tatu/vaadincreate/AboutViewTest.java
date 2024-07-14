@@ -63,6 +63,7 @@ public class AboutViewTest extends AbstractUITest {
         var notification = $(Notification.class).last();
         assertEquals("<b><img>A new message</b>",
                 notification.getDescription());
+        assertEquals(note.getCaption(), notification.getCaption());
 
         // Return the old value
         test($(Button.class).id("admin-edit")).click();
@@ -74,10 +75,21 @@ public class AboutViewTest extends AbstractUITest {
 
     @Test
     public void messageFromEventShown() {
+        test($(Button.class).id("admin-edit")).click();
+        var area = $(TextArea.class).id("admins-text-area");
+        assertTrue(area.isVisible());
+
         EventBus.get().post(new Message("Hello", LocalDateTime.now()));
 
         waitWhile(view, n -> $(Notification.class).last() == null, 2);
         var notification = $(Notification.class).last();
+
+        assertFalse(area.isVisible());
+
         assertEquals("Hello", notification.getDescription());
+        var note = $(Label.class).id("admins-note");
+        assertEquals("Hello", note.getValue());
+        assertEquals(note.getCaption(), notification.getCaption());
     }
+
 }

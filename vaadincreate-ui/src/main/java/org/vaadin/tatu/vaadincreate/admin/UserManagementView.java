@@ -134,11 +134,11 @@ public class UserManagementView extends VerticalLayout
                 userSelect.setValue(null);
             });
         });
-        binder.addStatusChangeListener(event -> {
-            if (event.hasValidationErrors()) {
-                save.setEnabled(false);
-            } else {
+        binder.addValueChangeListener(event -> {
+            if (binder.isValid()) {
                 save.setEnabled(true);
+            } else {
+                save.setEnabled(false);
             }
         });
         buttons.addComponents(delete, save);

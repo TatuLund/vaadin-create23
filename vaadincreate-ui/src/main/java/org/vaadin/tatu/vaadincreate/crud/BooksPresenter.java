@@ -154,6 +154,7 @@ public class BooksPresenter implements Serializable {
                     Product product = findProduct(pid);
                     if (product != null) {
                         if (lockedBooks.isLocked(Product.class, pid) == null) {
+                            lockBook(pid);
                             view.selectRow(product);
                         } else {
                             view.showProductLocked(productId);

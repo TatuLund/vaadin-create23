@@ -104,7 +104,10 @@ public class BooksViewTest extends AbstractUITest {
         test(form.save).click();
         assertFalse(form.save.isEnabled());
         assertTrue(test(form.availability).isInvalid());
+        var errorMessage = "Mismatch between availability and stock count";
+        assertEquals(errorMessage, test(form.availability).errorMessage());
         assertTrue(test(form.stockCount).isInvalid());
+        assertEquals(errorMessage, test(form.stockCount).errorMessage());
 
         test(form.stockCount).setValue("0");
         assertFalse(test(form.availability).isInvalid());
@@ -445,6 +448,9 @@ public class BooksViewTest extends AbstractUITest {
         test(form.productName).setValue("");
         test(form.stockCount).focus();
         assertTrue(test(form.productName).isInvalid());
+        assertEquals(
+                "Product name must have at least two characters and maximum of 100",
+                test(form.productName).errorMessage());
     }
 
     @Test

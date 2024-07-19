@@ -14,6 +14,7 @@ import org.vaadin.tatu.vaadincreate.i18n.I18NProvider;
 import com.vaadin.event.ConnectorEventListener;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.Page;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -173,11 +174,13 @@ public class LoginView extends CssLayout implements HasI18N {
             // Set the locale to session attribute, request handler will persist
             // it to the cookie from there.
             ui.getSession().setAttribute("locale", e.getValue().getLanguage());
+            Locale.setDefault(e.getValue());
             ui.getSession().setLocale(e.getValue());
             updateTranslations();
             logger.info("Changing locale to {}", e.getValue().getLanguage());
         });
-        lang.setValue(I18NProvider.fetchLocaleFromCookie());
+        var locale = I18NProvider.fetchLocaleFromCookie();
+        lang.setValue(locale);
 
         return loginForm;
     }

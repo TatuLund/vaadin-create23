@@ -17,6 +17,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
+import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 
@@ -451,6 +452,24 @@ public class BooksViewTest extends AbstractUITest {
         assertEquals(
                 "Product name must have at least two characters and maximum of 100",
                 test(form.productName).errorMessage());
+    }
+
+    @Test
+    public void categoriesValid() {
+        var category = new Category();
+        category.setName("Science");
+        category = ui.getProductService().updateCategory(category);
+
+        test(grid).click(1, 0);
+
+        // Simulate other user deleting the category while editor is open
+        ui.getProductService().deleteCategory(category.getId());
+
+        test(form.category).clickItem(category);
+        test(form.save).click();
+
+        assertEquals("One or more of the selected categories were deleted.",
+                $(Notification.class).last().getCaption());
     }
 
     @Test

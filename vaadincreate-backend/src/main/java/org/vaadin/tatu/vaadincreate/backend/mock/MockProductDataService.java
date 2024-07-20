@@ -58,7 +58,8 @@ public class MockProductDataService extends ProductDataService {
     public List<Category> getAllCategories() {
         synchronized (categories) {
             randomWait(2);
-            return categories;
+            return categories.stream().map(cat -> new Category(cat))
+                    .collect(Collectors.toList());
         }
     }
 
@@ -164,7 +165,7 @@ public class MockProductDataService extends ProductDataService {
         synchronized (categories) {
             return categories.stream()
                     .filter(cat -> categoryIds.contains(cat.getId()))
-                    .collect(Collectors.toSet());
+                    .map(cat -> new Category(cat)).collect(Collectors.toSet());
         }
     }
 

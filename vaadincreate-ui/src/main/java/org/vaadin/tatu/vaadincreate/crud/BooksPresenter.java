@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.crud;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -52,6 +53,22 @@ public class BooksPresenter implements Serializable {
     private CompletableFuture<Collection<Category>> loadCategoriesAsync() {
         return CompletableFuture.supplyAsync(() -> service.getAllCategories(),
                 executor);
+    }
+
+    public void requestUpdateCategories() {
+        logger.info("Fetching categories");
+        var categories = service.getAllCategories();
+        view.setCategories(categories);
+    }
+
+    public boolean validateCategories(Set<Category> categories) {
+        var allCategories = service.getAllCategories();
+        var valid = allCategories.containsAll(categories);
+        if (!valid) {
+            view.showCategoriesDeleted();
+            view.setCategories(allCategories);
+        }
+        return valid;
     }
 
     /**

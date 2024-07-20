@@ -12,6 +12,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
+import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
@@ -60,6 +61,7 @@ public class BooksView extends CssLayout
     private static final String PRODUCT_DELETED = "product-deleted";
     private static final String UNSAVED_CHANGES = "unsaved-changes";
     private static final String CANCEL = "cancel";
+    private static final String CATEGORIES_DELETED = "categories-deleted";
 
     private BookGrid grid;
     private BookForm form;
@@ -188,7 +190,10 @@ public class BooksView extends CssLayout
             grid.setSelectionMode(SelectionMode.NONE);
         }
         presenter.requestUpdateProducts();
-        form.setCategories(ProductDataService.get().getAllCategories());
+    }
+
+    public void setCategories(Collection<Category> categories) {
+        form.setCategories(categories);
     }
 
     /**
@@ -268,6 +273,14 @@ public class BooksView extends CssLayout
      */
     public void showProductLocked(String productId) {
         showError(getTranslation(PRODUCT_LOCKED, productId));
+    }
+
+    /**
+     * Displays an error message indicating that some of the selected categories
+     * were deleted.
+     */
+    public void showCategoriesDeleted() {
+        showError(getTranslation(CATEGORIES_DELETED));
     }
 
     /**

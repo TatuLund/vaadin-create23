@@ -73,6 +73,7 @@ public class BookForm extends Composite implements HasI18N {
     private Binder<Product> binder;
     private Product currentProduct;
     private CssLayout layout = new CssLayout();
+    private BooksPresenter presenter;
 
     private static class StockCountConverter extends StringToIntegerConverter {
 
@@ -113,6 +114,7 @@ public class BookForm extends Composite implements HasI18N {
      * deleting books.
      */
     public BookForm(BooksPresenter presenter) {
+        this.presenter = presenter;
         setCompositionRoot(layout);
         buildForm();
         layout.setId("book-form");
@@ -147,14 +149,7 @@ public class BookForm extends Composite implements HasI18N {
             }
         });
 
-        save.addClickListener(event -> {
-            if (currentProduct != null
-                    && binder.writeBeanIfValid(currentProduct)) {
-                presenter.saveProduct(currentProduct);
-            } else if (binderHasInvalidFieldsBound()) {
-                flagStockCountAndAvailabilityInvalid(true);
-            }
-        });
+        save.addClickListener(event -> handleSave());
 
         discard.addClickListener(event -> {
             presenter.editProduct(currentProduct);
@@ -165,19 +160,32 @@ public class BookForm extends Composite implements HasI18N {
             presenter.cancelProduct();
         });
 
-        delete.addClickListener(event -> {
-            if (currentProduct != null) {
-                var dialog = new ConfirmDialog(getTranslation(WILL_DELETE,
-                        currentProduct.getProductName()), Type.ALERT);
-                dialog.setConfirmText(getTranslation(DELETE));
-                dialog.setCancelText(getTranslation(CANCEL));
-                dialog.open();
-                dialog.addConfirmedListener(e -> {
-                    presenter.deleteProduct(currentProduct);
-                    showForm(false);
-                });
+        delete.addClickListener(event -> handleDelete());
+    }
+
+    private void handleSave() {
+        if (presenter.validateCategories(category.getValue())) {
+            if (currentProduct != null
+                    && binder.writeBeanIfValid(currentProduct)) {
+                presenter.saveProduct(currentProduct);
+            } else if (binderHasInvalidFieldsBound()) {
+                flagStockCountAndAvailabilityInvalid(true);
             }
-        });
+        }
+    }
+
+    private void handleDelete() {
+        if (currentProduct != null) {
+            var dialog = new ConfirmDialog(getTranslation(WILL_DELETE,
+                    currentProduct.getProductName()), Type.ALERT);
+            dialog.setConfirmText(getTranslation(DELETE));
+            dialog.setCancelText(getTranslation(CANCEL));
+            dialog.open();
+            dialog.addConfirmedListener(e -> {
+                presenter.deleteProduct(currentProduct);
+                showForm(false);
+            });
+        }
     }
 
     private boolean binderHasInvalidFieldsBound() {
@@ -304,10 +312,14 @@ public class BookForm extends Composite implements HasI18N {
 
     public void setCategories(Collection<Category> categories) {
         category.setItems(categories);
+        if (getProduct() != null) {
+            category.setValue(getProduct().getCategory());
+        }
     }
 
     public void editProduct(Product product) {
         accessControl.assertAdmin();
+        presenter.requestUpdateCategories();
         if (product == null) {
             product = new Product();
         }

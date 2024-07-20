@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 
@@ -14,6 +15,8 @@ public class CategoryManagementPresenter implements Serializable {
     private CategoryManagementView view;
     private ProductDataService service = VaadinCreateUI.get()
             .getProductService();
+    private AccessControl accessControl = VaadinCreateUI.get()
+            .getAccessControl();
 
     public CategoryManagementPresenter(CategoryManagementView view) {
         this.view = view;
@@ -25,11 +28,13 @@ public class CategoryManagementPresenter implements Serializable {
     }
 
     public void removeCategory(Category category) {
+        accessControl.assertAdmin();
         service.deleteCategory(category.getId());
         logger.info("Category '{}' removed.", category.getName());
     }
 
     public Category updateCategory(Category category) {
+        accessControl.assertAdmin();
         var newCat = service.updateCategory(category);
         logger.info("Category '{}' updated.", category.getName());
         return newCat;

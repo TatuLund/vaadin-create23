@@ -376,6 +376,9 @@ public class BooksView extends CssLayout
      *            the product to be edited
      */
     public void editProduct(Product product) {
+        if (!accessControl.isUserInRole(Role.ADMIN)) {
+            return;
+        }
         grid.setEdited(null);
         if (product != null) {
             // Ensure the product is up-to-date

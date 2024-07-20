@@ -51,4 +51,14 @@ public interface AccessControl extends Serializable {
     public static AccessControl get() {
         return VaadinCreateUI.get().getAccessControl();
     }
+
+    /**
+     * Utility method, which throws exception if the user is not in Admin role.
+     */
+    public default void assertAdmin() {
+        if (!isUserInRole(Role.ADMIN)) {
+            throw new IllegalStateException(
+                    "Operation allowed only with ADMIN role.");
+        }
+    }
 }

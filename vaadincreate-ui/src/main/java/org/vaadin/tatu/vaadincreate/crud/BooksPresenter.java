@@ -143,6 +143,10 @@ public class BooksPresenter implements Serializable {
      *            the ID of the product to navigate to
      */
     public void enter(String productId) {
+        if (!accessControl.isUserInRole(Role.ADMIN)) {
+            view.setFragmentParameter("");
+            return;
+        }
         if (productId != null && !productId.isEmpty()) {
             if (productId.equals("new")) {
                 newProduct();
@@ -193,6 +197,7 @@ public class BooksPresenter implements Serializable {
      *            The product to be saved.
      */
     public void saveProduct(Product product) {
+        accessControl.assertAdmin();
         view.showSaveNotification(product.getProductName());
         view.clearSelection();
         boolean newBook = product.getId() == -1;
@@ -214,6 +219,7 @@ public class BooksPresenter implements Serializable {
      *            the product to be deleted
      */
     public void deleteProduct(Product product) {
+        accessControl.assertAdmin();
         view.showDeleteNotification(product.getProductName());
         view.clearSelection();
         logger.info("Deleting product: {}", product.getId());
@@ -253,10 +259,14 @@ public class BooksPresenter implements Serializable {
      * product in the view.
      */
     public void newProduct() {
-        view.clearSelection();
-        view.setFragmentParameter("new");
-        logger.info("New product");
-        view.editProduct(new Product());
+        if (accessControl.isUserInRole(Role.ADMIN)) {
+            view.clearSelection();
+            view.setFragmentParameter("new");
+            logger.info("New product");
+            view.editProduct(new Product());
+        } else {
+            view.setFragmentParameter("");
+        }
     }
 
     /**

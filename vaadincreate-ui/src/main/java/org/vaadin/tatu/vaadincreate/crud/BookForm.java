@@ -9,10 +9,13 @@ import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
+import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 
 import com.vaadin.data.BeanValidationBinder;
@@ -65,6 +68,8 @@ public class BookForm extends Composite implements HasI18N {
     protected Button cancel = new Button(getTranslation(CANCEL));
     protected Button delete = new Button(getTranslation(DELETE));
 
+    private AccessControl accessControl = VaadinCreateUI.get()
+            .getAccessControl();
     private Binder<Product> binder;
     private Product currentProduct;
     private CssLayout layout = new CssLayout();
@@ -204,6 +209,7 @@ public class BookForm extends Composite implements HasI18N {
     }
 
     public void showForm(boolean visible) {
+        accessControl.assertAdmin();
         if (visible) {
             clearDirtyIndicators();
             layout.addStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
@@ -301,6 +307,7 @@ public class BookForm extends Composite implements HasI18N {
     }
 
     public void editProduct(Product product) {
+        accessControl.assertAdmin();
         if (product == null) {
             product = new Product();
         }

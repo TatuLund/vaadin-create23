@@ -22,16 +22,16 @@ public class BasicAccessControl implements AccessControl {
         Optional<User> user = VaadinCreateUI.get().getUserService()
                 .findByName(username);
         if (!user.isPresent()) {
-            logger.warn("User '" + username + "' unknown");
+            logger.warn("User '{}}' unknown", username);
             return false;
         } else {
             if (user.get().getPasswd().equals(password)) {
                 CurrentUser.set(user.get());
-                logger.info("User '" + username + "' logged in");
+                logger.info("User '{}}' logged in", username);
                 return true;
             }
         }
-        logger.warn("User '" + username + "' logging failed");
+        logger.warn("User '{}}' logging failed", username);
         return false;
     }
 

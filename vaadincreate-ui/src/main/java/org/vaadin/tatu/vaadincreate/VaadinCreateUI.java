@@ -244,7 +244,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             return localeCookie;
         }
 
-        private Logger logger = LoggerFactory.getLogger(this.getClass());
+        private final Logger logger = LoggerFactory.getLogger(this.getClass());
     }
 
 }

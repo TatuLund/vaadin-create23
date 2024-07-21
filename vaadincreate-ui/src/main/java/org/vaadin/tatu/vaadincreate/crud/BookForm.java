@@ -15,7 +15,6 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
-import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 
 import com.vaadin.data.BeanValidationBinder;
@@ -332,10 +331,5 @@ public class BookForm extends Composite implements HasI18N {
         var scrollScript = "window.document.getElementById('" + getId()
                 + "').scrollTop = 0;";
         Page.getCurrent().getJavaScript().execute(scrollScript);
-    }
-
-    @Override
-    public void attach() {
-        super.attach();
     }
 }

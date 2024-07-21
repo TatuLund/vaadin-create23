@@ -180,7 +180,7 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
      *            The name / uri path
      */
     public void addView(Class<? extends View> view, String viewName,
-            Resource Icon, String path) {
+            Resource icon, String path) {
         if (!hasAccessToView(view)) {
             return;
         }
@@ -195,7 +195,7 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
             menuItem.addStyleName(ValoTheme.MENU_SELECTED);
         }
         ui.getNavigator().addView(path, view);
-        menuItem.setIcon(Icon);
+        menuItem.setIcon(icon);
         menuItems.addComponent(menuItem);
     }
 

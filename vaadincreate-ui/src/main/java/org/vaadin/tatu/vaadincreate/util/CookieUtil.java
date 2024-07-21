@@ -6,6 +6,10 @@ import com.vaadin.server.VaadinRequest;
 
 public class CookieUtil {
 
+    private CookieUtil() {
+        // private constructor to hide the implicit public one
+    }
+
     public static Cookie getCookieByName(String name, VaadinRequest request) {
         // Fetch all cookies from the request
         Cookie[] cookies = request.getCookies();

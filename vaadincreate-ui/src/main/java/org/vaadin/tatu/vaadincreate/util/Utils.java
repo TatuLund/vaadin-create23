@@ -16,13 +16,16 @@ import com.vaadin.ui.UI;
 
 public class Utils {
 
+    private Utils() {
+        // private constructor to hide the implicit public one
+    }
+
     public static String sanitize(String unsanitized) {
         var settings = new OutputSettings();
         settings.prettyPrint(false);
-        var text = Jsoup.clean(unsanitized, "", Safelist.relaxed()
+        return Jsoup.clean(unsanitized, "", Safelist.relaxed()
                 .addAttributes("span", "style").addAttributes("span", "class"),
                 settings);
-        return text;
     }
 
     public static void sessionFixation() {

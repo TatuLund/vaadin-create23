@@ -449,7 +449,7 @@ public class BooksView extends CssLayout
             var book = getSelectedRow();
             if (book != null) {
                 getUI().access(() -> {
-                    logger.debug("Set fragment: " + book.getId());
+                    logger.debug("Set fragment: {}", book.getId());
                     setFragmentParameter("" + book.getId());
                 });
             }

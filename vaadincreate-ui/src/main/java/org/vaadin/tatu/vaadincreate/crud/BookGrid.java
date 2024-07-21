@@ -5,8 +5,6 @@ import java.text.NumberFormat;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
@@ -150,12 +148,11 @@ public class BookGrid extends Grid<Product> implements HasI18N {
             break;
         }
 
-        var iconCode = "<span class=\"v-icon\" style=\"font-family: "
+        return "<span class=\"v-icon\" style=\"font-family: "
                 + VaadinIcons.CIRCLE.getFontFamily() + ";color:" + color
                 + "\">&#x"
                 + Integer.toHexString(VaadinIcons.CIRCLE.getCodepoint())
                 + ";</span>";
-        return iconCode;
     }
 
     private String formatCategories(Product product) {
@@ -208,8 +205,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         if (width < 650) {
             getColumn("name").setHidden(false).setWidth(300);
             getColumn("price").setHidden(false);
-            setDescriptionGenerator(book -> createTooltip(book),
-                    ContentMode.HTML);
+            setDescriptionGenerator(this::createTooltip, ContentMode.HTML);
         } else if (width < 920) {
             getColumn("name").setHidden(false).setWidthUndefined();
             getColumn("price").setHidden(false);
@@ -232,24 +228,27 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         // Tooltips need to be refactored to use for example Popup component.
         var converter = new EuroConverter(getTranslation(CANNOT_CONVERT));
         StringBuilder unsanitized = new StringBuilder();
-        unsanitized
-                .append("<div><span class='bookview-grid-descriptioncaption'>")
-                .append(getTranslation(PRODUCT_NAME)).append(":</span> <b>")
-                .append(book.getProductName())
-                .append("</b><br><span class='bookview-grid-descriptioncaption'>")
-                .append(getTranslation(PRICE)).append("</span> ")
+        unsanitized.append("<div>")
+                .append(getDescriptionCaptionSpan(getTranslation(PRODUCT_NAME)))
+                .append(" <b>").append(book.getProductName()).append("</b><br>")
+                .append(getDescriptionCaptionSpan(getTranslation(PRICE)))
                 .append(converter.convertToPresentation(book.getPrice(),
                         createValueContext()))
-                .append("<br><span class='bookview-grid-descriptioncaption'>")
-                .append(getTranslation(AVAILABILITY)).append(":</span> ")
+                .append("<br>")
+                .append(getDescriptionCaptionSpan(getTranslation(AVAILABILITY)))
                 .append(createAvailabilityIcon(book.getAvailability()))
-                .append("<br><span class='bookview-grid-descriptioncaption'>")
-                .append(getTranslation(IN_STOCK)).append(":</span> ")
-                .append(book.getStockCount())
-                .append("<br><span class='bookview-grid-descriptioncaption'>")
-                .append(getTranslation(CATEGORIES)).append(":</span> ")
+                .append("<br>")
+                .append(getDescriptionCaptionSpan(getTranslation(IN_STOCK)))
+                .append(book.getStockCount()).append("<br>")
+                .append(getDescriptionCaptionSpan(getTranslation(CATEGORIES)))
                 .append(formatCategories(book)).append("</div>");
         return Utils.sanitize(unsanitized.toString());
+    }
+
+    private static String getDescriptionCaptionSpan(String caption) {
+        return "<span class='"
+                + VaadinCreateTheme.BOOKVIEW_GRID_DESCRIPTIONCAPTION + "'>"
+                + caption + ":</span> ";
     }
 
     private static ValueContext createValueContext() {
@@ -276,6 +275,4 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         edited = product != null ? product.getId() : -1;
         editedProduct = product;
     }
-
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

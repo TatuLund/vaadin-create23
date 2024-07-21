@@ -42,7 +42,6 @@ public class LoginView extends CssLayout implements HasI18N {
     private static final String LOGIN_INFO = "login-info";
     private static final String LOGIN_INFO_TEXT = "login-info-text";
     private static final String LOGIN_BUTTON = "login-button";
-    private static final String LOGIN = "login";
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final String FORGOT_PASSWORD = "forgot-password";
@@ -57,7 +56,6 @@ public class LoginView extends CssLayout implements HasI18N {
     private AccessControl accessControl;
     private Registration resizeReg;
     private CssLayout loginInformation;
-    private VerticalLayout centeringLayout;
     private ComboBox<Locale> lang;
     private Label loginInfoText;
     private CapsLockWarning capsLockWarning;
@@ -79,7 +77,7 @@ public class LoginView extends CssLayout implements HasI18N {
         // layout to center login form when there is sufficient screen space
         // - see the theme for how this is made responsive for various screen
         // sizes
-        centeringLayout = new VerticalLayout();
+        var centeringLayout = new VerticalLayout();
         centeringLayout.setMargin(false);
         centeringLayout.setSpacing(false);
         centeringLayout.setStyleName(VaadinCreateTheme.LOGINVIEW_CENTER);

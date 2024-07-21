@@ -2,6 +2,10 @@ package org.vaadin.tatu.vaadincreate;
 
 public class VaadinCreateTheme {
 
+    private VaadinCreateTheme() {
+        // private constructor to hide the implicit public one
+    }
+
     public static final String WHITESPACE_PRE = "whitespace-pre";
 
     public static final String LOGINVIEW_INFORMATION = "loginview-information";
@@ -22,9 +26,14 @@ public class VaadinCreateTheme {
     public static final String BOOKVIEW_FILTER = "bookview-filter";
     public static final String BOOKVIEW = "bookview";
 
+    public static final String FAKEGRID_HEADER = "fakegrid-header";
+    public static final String FAKEGRID_SPINNERWRAPPER = "fakegrid-spinnerwrapper";
+    public static final String FAKEGRID = "fakegrid";
+
     public static final String BOOKVIEW_GRID_ALIGNRIGHT = "bookview-grid-alignright";
     public static final String BOOKVIEW_GRID_EDITED = "bookview-grid-edited";
     public static final String BOOKVIEW_GRID_LOCKED = "bookview-grid-locked";
+    public static final String BOOKVIEW_GRID_DESCRIPTIONCAPTION = "bookview-grid-descriptioncaption";
     public static final String BOOKVIEW_AVAILABILITYLABEL = "bookview-availabilitylabel";
 
     public static final String BOOKFORM_FORM = "bookform-form";

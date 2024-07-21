@@ -18,7 +18,7 @@ public class LockedObjectsImpl implements LockedObjects {
 
     private final WeakHashMap<LockedObject, Object> lockedObjects = new WeakHashMap<>();
 
-    public synchronized static LockedObjects getInstance() {
+    public static synchronized LockedObjects getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new LockedObjectsImpl();
         }

@@ -72,7 +72,7 @@ public class AboutView extends VerticalLayout
                     Alignment.TOP_RIGHT);
         }
 
-        textArea.addValueChangeListener(e -> handleValueChange(e));
+        textArea.addValueChangeListener(this::handleValueChange);
         textArea.setValueChangeMode(ValueChangeMode.BLUR);
         textArea.addBlurListener(e -> {
             adminsNote.setVisible(true);

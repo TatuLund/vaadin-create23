@@ -14,6 +14,7 @@ import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.ValueContext;
+import com.vaadin.data.provider.DataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
@@ -218,7 +219,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         } else {
             getColumns().forEach(c -> c.setHidden(false));
         }
-        recalculateColumnWidths();
+        getDataProvider().refreshAll();
     }
 
     private String createTooltip(Product book) {
@@ -226,6 +227,10 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         // to use HTML in tooltips. which makes it possible to use them like
         // this. When migrating to newer generations of Vaadin, this kind of
         // Tooltips need to be refactored to use for example Popup component.
+        var user = lockedBooks.isLocked(Product.class, book.getId());
+        if (user != null) {
+            return getTranslation(EDITED_BY, user.getName());
+        }
         var converter = new EuroConverter(getTranslation(CANNOT_CONVERT));
         StringBuilder unsanitized = new StringBuilder();
         unsanitized.append("<div>")

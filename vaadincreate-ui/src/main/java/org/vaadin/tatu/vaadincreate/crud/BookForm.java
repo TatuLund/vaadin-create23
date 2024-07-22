@@ -294,7 +294,6 @@ public class BookForm extends Composite implements HasI18N {
         // Buttons
         save.addStyleName(ValoTheme.BUTTON_PRIMARY);
         save.setId("save-button");
-        discard.addStyleName("cancel");
         discard.setId("discard-button");
         cancel.addStyleName("cancel");
         delete.addStyleName(ValoTheme.BUTTON_DANGER);

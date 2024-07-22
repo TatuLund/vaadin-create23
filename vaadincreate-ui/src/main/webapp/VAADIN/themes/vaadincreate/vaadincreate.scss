@@ -531,4 +531,13 @@ $fake-grid-background-color: white;
     }
   }
 
+  .v-button-cancel {
+    background: burlywood;
+    border-top-color: bisque;
+    border-left-color: bisque;
+    border-right-color: orange;
+    border-bottom-color: orange;
+    box-shadow: inset 0 1px 0 bisque, inset 0 -1px 0 orange, 0 2px 3px rgba(0, 0, 0, 0.05);
+    color: white;	  
+  }
 }

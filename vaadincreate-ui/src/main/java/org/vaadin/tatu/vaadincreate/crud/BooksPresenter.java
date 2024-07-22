@@ -7,6 +7,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.persistence.OptimisticLockException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
@@ -168,30 +170,32 @@ public class BooksPresenter implements Serializable {
             if (productId.equals("new")) {
                 newProduct();
             } else {
-                // Ensure this is selected even if coming directly here from
-                // login
                 try {
                     int pid = Integer.parseInt(productId);
-                    Product product = findProduct(pid);
-                    if (product != null) {
-                        if (lockedBooks.isLocked(Product.class, pid) == null) {
-                            lockBook(pid);
-                            view.selectRow(product);
-                        } else {
-                            view.showProductLocked(productId);
-                            logger.warn("Attempt to edit locked product '{}'",
-                                    productId);
-                        }
-                    } else {
-                        view.showNotValidId(productId);
-                        logger.warn("Attempt to edit invalid id '{}'",
-                                productId);
-                    }
+                    lockAndEditIfExistsAndIsUnlocked(productId, pid);
                 } catch (NumberFormatException e) {
                     view.showNotValidId(productId);
                     logger.warn("Attempt to edit invalid id '{}'", productId);
                 }
             }
+        }
+    }
+
+    private void lockAndEditIfExistsAndIsUnlocked(String productId, int pid) {
+        Product product = findProduct(pid);
+        if (product != null) {
+            if (lockedBooks.isLocked(Product.class, pid) == null) {
+                lockBook(pid);
+                // Ensure this is selected even if coming directly here from
+                // login
+                view.selectRow(product);
+            } else {
+                view.showProductLocked(productId);
+                logger.warn("Attempt to edit locked product '{}'", productId);
+            }
+        } else {
+            view.showNotValidId(productId);
+            logger.warn("Attempt to edit invalid id '{}'", productId);
         }
     }
 
@@ -219,11 +223,21 @@ public class BooksPresenter implements Serializable {
         view.clearSelection();
         boolean newBook = product.getId() == -1;
         logger.info("Saving product: {}", newBook ? "new" : product.getId());
-        var savedProduct = service.updateProduct(product);
+
+        try {
+            product = service.updateProduct(product);
+        } catch (OptimisticLockException e) {
+            logger.warn(
+                    "Optimistic lock happened, this should not happen in BooksView");
+            view.showInternalError();
+            view.editProduct(product);
+            return;
+        }
+
         if (newBook) {
-            view.updateGrid(savedProduct);
+            view.updateGrid(product);
         } else {
-            view.updateProduct(savedProduct);
+            view.updateProduct(product);
             unlockBook();
         }
         view.setFragmentParameter("");

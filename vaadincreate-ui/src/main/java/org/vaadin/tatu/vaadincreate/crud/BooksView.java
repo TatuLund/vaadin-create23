@@ -62,6 +62,7 @@ public class BooksView extends CssLayout
     private static final String UNSAVED_CHANGES = "unsaved-changes";
     private static final String CANCEL = "cancel";
     private static final String CATEGORIES_DELETED = "categories-deleted";
+    private static final String INTERNAL_ERROR = "internal-error";
 
     private BookGrid grid;
     private BookForm form;
@@ -281,6 +282,13 @@ public class BooksView extends CssLayout
      */
     public void showCategoriesDeleted() {
         showError(getTranslation(CATEGORIES_DELETED));
+    }
+
+    /**
+     * Displays an error message indicating that internal error occurred.
+     */
+    public void showInternalError() {
+        showError(getTranslation(INTERNAL_ERROR));
     }
 
     /**

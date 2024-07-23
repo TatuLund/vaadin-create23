@@ -229,9 +229,8 @@ public class BooksPresenter implements Serializable {
             logger.warn(
                     "Optimistic lock happened, this should not happen in BooksView");
             view.showInternalError();
-            view.editProduct(product);
             return;
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             logger.error("Backend service failure while updating product: {}",
                     e.getMessage());
             view.showInternalError();

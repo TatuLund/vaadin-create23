@@ -219,7 +219,6 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         } else {
             getColumns().forEach(c -> c.setHidden(false));
         }
-        getDataProvider().refreshAll();
     }
 
     private String createTooltip(Product book) {

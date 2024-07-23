@@ -219,7 +219,6 @@ public class BooksPresenter implements Serializable {
      */
     public void saveProduct(Product product) {
         accessControl.assertAdmin();
-        view.showSaveNotification(product.getProductName());
         view.clearSelection();
         boolean newBook = product.getId() == -1;
         logger.info("Saving product: {}", newBook ? "new" : product.getId());
@@ -232,7 +231,13 @@ public class BooksPresenter implements Serializable {
             view.showInternalError();
             view.editProduct(product);
             return;
+        } catch (Exception e) {
+            logger.error("Backend service failure while updating product: {}",
+                    e.getMessage());
+            view.showInternalError();
+            return;
         }
+        view.showSaveNotification(product.getProductName());
 
         if (newBook) {
             view.updateGrid(product);

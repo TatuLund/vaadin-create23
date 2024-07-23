@@ -288,6 +288,7 @@ public class BooksView extends CssLayout
      * Displays an error message indicating that internal error occurred.
      */
     public void showInternalError() {
+        form.showForm(false);
         showError(getTranslation(INTERNAL_ERROR));
     }
 

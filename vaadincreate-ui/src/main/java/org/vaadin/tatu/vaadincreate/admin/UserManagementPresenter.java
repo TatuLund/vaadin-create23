@@ -22,6 +22,7 @@ public class UserManagementPresenter implements Serializable {
     }
 
     public void requestUpdateUsers() {
+        accessControl.assertAdmin();
         logger.info("Fetching users");
         view.setUsers(UserService.get().getAllUsers());
     }

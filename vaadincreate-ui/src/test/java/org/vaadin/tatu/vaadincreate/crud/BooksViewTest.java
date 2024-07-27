@@ -354,6 +354,56 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
+    public void weakLockConcurrentEdit() {
+        var book = test(grid).item(0);
+        LockedObjects.get().lock(Product.class, book.getId(),
+                CurrentUser.get().get());
+        assertEquals("Edited by Admin", test(grid).description(0));
+
+        // GC wipes weak lock
+        System.gc();
+
+        test(grid).click(1, 0);
+        assertTrue(form.isShown());
+
+        // Concurrent edit is now possible, simulate it
+        ui.getProductService().updateProduct(book);
+
+        // Change and save
+        test(form.productName).setValue("Product name changed");
+        test(form.save).click();
+
+        // Assert internal error happens
+        assertEquals("Internal error.",
+                $(Notification.class).last().getCaption());
+    }
+
+    @Test
+    public void weakLockConcurrentDelete() {
+        var book = test(grid).item(0);
+        LockedObjects.get().lock(Product.class, book.getId(),
+                CurrentUser.get().get());
+        assertEquals("Edited by Admin", test(grid).description(0));
+
+        // GC wipes weak lock
+        System.gc();
+
+        test(grid).click(1, 0);
+        assertTrue(form.isShown());
+
+        // Concurrent delete is now possible, simulate it
+        ui.getProductService().deleteProduct(book.getId());
+
+        // Change and save
+        test(form.productName).setValue("Product name changed");
+        test(form.save).click();
+
+        // Assert internal error happens
+        assertEquals("Internal error.",
+                $(Notification.class).last().getCaption());
+    }
+
+    @Test
     public void lockBookUnlockBook() {
         var book = test(grid).item(0);
         assertTrue(LockedObjects.get().isLocked(Product.class,

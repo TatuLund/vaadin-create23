@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
-import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
 import com.vaadin.server.ServiceException;
@@ -66,7 +65,6 @@ public class UserManagementViewTest extends AbstractUITest {
         assertFalse(save.isEnabled());
 
         test($(PasswordField.class).id("password-field")).setValue("tester");
-        test($(PasswordField.class).id("password-repat")).focus();
         assertTrue(
                 test($(PasswordField.class).id("password-field")).isInvalid());
         assertEquals("Passwords do not match",

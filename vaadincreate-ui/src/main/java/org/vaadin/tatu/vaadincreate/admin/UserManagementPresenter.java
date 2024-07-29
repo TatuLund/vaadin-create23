@@ -13,7 +13,6 @@ import org.vaadin.tatu.vaadincreate.backend.data.User;
 public class UserManagementPresenter implements Serializable {
 
     private UserManagementView view;
-    private UserService service = VaadinCreateUI.get().getUserService();
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
 
@@ -29,7 +28,7 @@ public class UserManagementPresenter implements Serializable {
 
     public void removeUser(int id) {
         accessControl.assertAdmin();
-        service.removeUser(id);
+        getService().removeUser(id);
         logger.info("User '{}' removed.", id);
         view.showUserRemoved();
         requestUpdateUsers();
@@ -38,7 +37,7 @@ public class UserManagementPresenter implements Serializable {
     public void updateUser(User user) {
         accessControl.assertAdmin();
         try {
-            service.updateUser(user);
+            getService().updateUser(user);
             view.showUserUpdated();
             requestUpdateUsers();
             logger.info("User {}/'{}' updated.", user.getId(), user.getName());
@@ -47,5 +46,10 @@ public class UserManagementPresenter implements Serializable {
         }
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private UserService getService() {
+        return VaadinCreateUI.get().getUserService();
+    }
+
+    private static Logger logger = LoggerFactory
+            .getLogger(UserManagementPresenter.class);
 }

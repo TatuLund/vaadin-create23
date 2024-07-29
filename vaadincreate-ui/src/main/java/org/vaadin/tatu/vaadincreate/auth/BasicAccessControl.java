@@ -57,6 +57,7 @@ public class BasicAccessControl implements AccessControl {
         return user.getName();
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static Logger logger = LoggerFactory
+            .getLogger(BasicAccessControl.class);
 
 }

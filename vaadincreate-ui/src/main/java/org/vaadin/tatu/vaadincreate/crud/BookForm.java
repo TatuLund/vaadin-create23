@@ -231,9 +231,8 @@ public class BookForm extends Composite implements HasI18N {
     }
 
     public boolean isShown() {
-        var isShown = layout.getStyleName()
+        return layout.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
-        return isShown;
     }
 
     public boolean hasChanges() {

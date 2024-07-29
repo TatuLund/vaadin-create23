@@ -18,7 +18,8 @@ public interface I18NProvider extends Serializable {
         return DefaultI18NProvider.getInstance();
     }
 
-    public abstract String getTranslation(String key, Locale locale, Object... params);
+    public abstract String getTranslation(String key, Locale locale,
+            Object... params);
 
     public abstract List<Locale> getLocales();
 
@@ -47,8 +48,7 @@ public interface I18NProvider extends Serializable {
     }
 
     private static Optional<Locale> getSupportedLocale(String lang) {
-        Optional<Locale> locale = I18NProvider.get().getLocales().stream()
+        return I18NProvider.get().getLocales().stream()
                 .filter(loc -> loc.getLanguage().equals(lang)).findFirst();
-        return locale;
     }
 }

@@ -12,6 +12,7 @@ import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
+import com.google.gwt.dev.About;
 import com.vaadin.data.HasValue.ValueChangeEvent;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
@@ -37,15 +38,12 @@ public class AboutView extends VerticalLayout
 
     private static final String VAADIN = "vaadin";
 
-    private AppDataService service = VaadinCreateUI.get().getAppService();
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
 
     private Button editButton;
     private Label adminsNote;
     private TextArea textArea;
-
-    private EventBus eventBus = EventBus.get();
 
     public AboutView() {
         var aboutContent = createAboutContent();
@@ -85,7 +83,7 @@ public class AboutView extends VerticalLayout
         addComponents(aboutContent, adminsContent);
         setComponentAlignment(aboutContent, Alignment.MIDDLE_CENTER);
         setComponentAlignment(adminsContent, Alignment.MIDDLE_CENTER);
-        eventBus.registerEventBusListener(this);
+        getEventBus().registerEventBusListener(this);
     }
 
     private void handleValueChange(ValueChangeEvent<String> e) {
@@ -94,11 +92,11 @@ public class AboutView extends VerticalLayout
             // Sanitize user input with Jsoup to avoid JavaScript injection
             // vulnerabilities
             var text = Utils.sanitize(unsanitized);
-            Message mes = service.updateMessage(text);
+            Message mes = getService().updateMessage(text);
             adminsNote.setCaption(
                     Utils.formatDate(mes.getDateStamp(), getLocale()));
             adminsNote.setValue(mes.getMessage());
-            eventBus.post(mes);
+            getEventBus().post(mes);
             logger.info("Admin message updated");
         }
     }
@@ -148,7 +146,7 @@ public class AboutView extends VerticalLayout
 
     @Override
     public void enter(ViewChangeEvent event) {
-        Message message = service.getMessage();
+        Message message = getService().getMessage();
         adminsNote.setCaption(
                 Utils.formatDate(message.getDateStamp(), getLocale()));
         adminsNote.setValue(message.getMessage());
@@ -174,8 +172,16 @@ public class AboutView extends VerticalLayout
     @Override
     public void detach() {
         super.detach();
-        eventBus.unregisterEventBusListener(this);
+        getEventBus().unregisterEventBusListener(this);
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private EventBus getEventBus() {
+        return EventBus.get();
+    }
+
+    private AppDataService getService() {
+        return VaadinCreateUI.get().getAppService();
+    }
+
+    private static Logger logger = LoggerFactory.getLogger(AboutView.class);
 }

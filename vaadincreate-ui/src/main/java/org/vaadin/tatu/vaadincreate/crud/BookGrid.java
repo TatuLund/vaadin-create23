@@ -14,7 +14,6 @@ import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.ValueContext;
-import com.vaadin.data.provider.DataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
@@ -42,7 +41,6 @@ public class BookGrid extends Grid<Product> implements HasI18N {
 
     private Registration resizeReg;
     private Label availabilityCaption;
-    private LockedObjects lockedBooks = LockedObjects.get();
 
     private Product editedProduct;
     private int edited;
@@ -64,7 +62,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
             if (book.getId() == edited) {
                 return VaadinCreateTheme.BOOKVIEW_GRID_EDITED;
             }
-            if (lockedBooks.isLocked(Product.class, book.getId()) != null) {
+            if (getLockedBooks().isLocked(Product.class,
+                    book.getId()) != null) {
                 return VaadinCreateTheme.BOOKVIEW_GRID_LOCKED;
             }
             return "";
@@ -201,7 +200,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
      */
     private void adjustColumns(int width) {
         setDescriptionGenerator(book -> {
-            var user = lockedBooks.isLocked(Product.class, book.getId());
+            var user = getLockedBooks().isLocked(Product.class, book.getId());
             if (user != null) {
                 return getTranslation(EDITED_BY, user.getName());
             }
@@ -231,7 +230,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         // to use HTML in tooltips. which makes it possible to use them like
         // this. When migrating to newer generations of Vaadin, this kind of
         // Tooltips need to be refactored to use for example Popup component.
-        var user = lockedBooks.isLocked(Product.class, book.getId());
+        var user = getLockedBooks().isLocked(Product.class, book.getId());
         if (user != null) {
             return getTranslation(EDITED_BY, user.getName());
         }
@@ -283,5 +282,9 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         }
         edited = product != null ? product.getId() : -1;
         editedProduct = product;
+    }
+
+    private LockedObjects getLockedBooks() {
+        return LockedObjects.get();
     }
 }

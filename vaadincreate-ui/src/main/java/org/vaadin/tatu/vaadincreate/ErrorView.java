@@ -40,5 +40,5 @@ public class ErrorView extends VerticalLayout implements View, HasI18N {
                 CurrentUser.get().get().getName(), event.getViewName());
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static Logger logger = LoggerFactory.getLogger(ErrorView.class);
 }

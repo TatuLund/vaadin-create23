@@ -219,5 +219,5 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
         }
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static Logger logger = LoggerFactory.getLogger(AppLayout.class);
 }

@@ -33,13 +33,10 @@ import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 public class BooksPresenter implements Serializable {
 
     private BooksView view;
-    private final ExecutorService executor = Executors.newCachedThreadPool();
+    private transient ExecutorService executor;
     private transient CompletableFuture<Void> future;
-    private ProductDataService service = VaadinCreateUI.get()
-            .getProductService();
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
-    private LockedObjects lockedBooks = LockedObjects.get();
     private Integer editing;
 
     public BooksPresenter(BooksView simpleCrudView) {
@@ -48,23 +45,19 @@ public class BooksPresenter implements Serializable {
 
     private CompletableFuture<Collection<Product>> loadProductsAsync() {
         logger.info("Fetching products");
+        var service = getService();
         return CompletableFuture.supplyAsync(() -> service.getAllProducts(),
-                executor);
-    }
-
-    private CompletableFuture<Collection<Category>> loadCategoriesAsync() {
-        return CompletableFuture.supplyAsync(() -> service.getAllCategories(),
-                executor);
+                getExecutor());
     }
 
     public void requestUpdateCategories() {
         logger.info("Fetching categories");
-        var categories = service.getAllCategories();
+        var categories = getService().getAllCategories();
         view.setCategories(categories);
     }
 
     public boolean validateCategories(Set<Category> categories) {
-        var allCategories = service.getAllCategories();
+        var allCategories = getService().getAllCategories();
         var valid = allCategories.containsAll(categories);
         if (!valid) {
             view.showCategoriesDeleted();
@@ -131,7 +124,7 @@ public class BooksPresenter implements Serializable {
      */
     public void unlockBook() {
         if (editing != null) {
-            lockedBooks.unlock(Product.class, editing);
+            getLockedBooks().unlock(Product.class, editing);
             editing = null;
         }
     }
@@ -147,7 +140,7 @@ public class BooksPresenter implements Serializable {
         if (editing != null) {
             unlockBook();
         }
-        lockedBooks.lock(Product.class, id, CurrentUser.get().get());
+        getLockedBooks().lock(Product.class, id, CurrentUser.get().get());
         editing = id;
     }
 
@@ -184,7 +177,7 @@ public class BooksPresenter implements Serializable {
     private void lockAndEditIfExistsAndIsUnlocked(String productId, int pid) {
         Product product = findProduct(pid);
         if (product != null) {
-            if (lockedBooks.isLocked(Product.class, pid) == null) {
+            if (getLockedBooks().isLocked(Product.class, pid) == null) {
                 lockBook(pid);
                 // Ensure this is selected even if coming directly here from
                 // login
@@ -208,7 +201,7 @@ public class BooksPresenter implements Serializable {
      */
     public Product findProduct(int productId) {
         logger.info("Fetching product {}", productId);
-        return service.getProductById(productId);
+        return getService().getProductById(productId);
     }
 
     /**
@@ -224,7 +217,7 @@ public class BooksPresenter implements Serializable {
         logger.info("Saving product: {}", newBook ? "new" : product.getId());
 
         try {
-            product = service.updateProduct(product);
+            product = getService().updateProduct(product);
         } catch (OptimisticLockException e) {
             logger.warn(
                     "Optimistic lock happened, this should not happen in BooksView");
@@ -258,7 +251,7 @@ public class BooksPresenter implements Serializable {
         view.showDeleteNotification(product.getProductName());
         view.clearSelection();
         logger.info("Deleting product: {}", product.getId());
-        service.deleteProduct(product.getId());
+        getService().deleteProduct(product.getId());
         view.removeProduct(product);
         unlockBook();
         view.setFragmentParameter("");
@@ -314,7 +307,7 @@ public class BooksPresenter implements Serializable {
      */
     public void rowSelected(Product product) {
         if (accessControl.isUserInRole(Role.ADMIN)) {
-            if (product != null && lockedBooks.isLocked(Product.class,
+            if (product != null && getLockedBooks().isLocked(Product.class,
                     product.getId()) != null) {
                 view.clearSelection();
             } else {
@@ -323,5 +316,21 @@ public class BooksPresenter implements Serializable {
         }
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private LockedObjects getLockedBooks() {
+        return LockedObjects.get();
+    }
+
+    private ProductDataService getService() {
+        return VaadinCreateUI.get().getProductService();
+    }
+
+    private ExecutorService getExecutor() {
+        if (executor == null) {
+            executor = Executors.newCachedThreadPool();
+        }
+        return executor;
+    }
+
+    private static Logger logger = LoggerFactory
+            .getLogger(BooksPresenter.class);
 }

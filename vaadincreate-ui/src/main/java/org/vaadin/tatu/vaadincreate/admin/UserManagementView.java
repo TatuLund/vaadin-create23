@@ -75,7 +75,7 @@ public class UserManagementView extends VerticalLayout
         delete.setId("delete-button");
         delete.setEnabled(false);
         userSelect.setEmptySelectionAllowed(false);
-        userSelect.setItemCaptionGenerator(user -> user.getName());
+        userSelect.setItemCaptionGenerator(User::getName);
         userSelect.setPlaceholder(getTranslation(SEARCH));
         userSelect.setId("user-select");
         userSelect.addValueChangeListener(event -> {
@@ -109,6 +109,7 @@ public class UserManagementView extends VerticalLayout
                 save.setEnabled(false);
                 userSelect.setValue(null);
             } catch (ValidationException e1) {
+                // NOP
             } catch (OptimisticLockException e) {
                 Notification.show(getTranslation(SAVE_CONFLICT),
                         Notification.Type.WARNING_MESSAGE);

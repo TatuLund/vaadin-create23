@@ -13,8 +13,6 @@ import org.vaadin.tatu.vaadincreate.backend.data.Category;
 public class CategoryManagementPresenter implements Serializable {
 
     private CategoryManagementView view;
-    private ProductDataService service = VaadinCreateUI.get()
-            .getProductService();
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
 
@@ -24,21 +22,26 @@ public class CategoryManagementPresenter implements Serializable {
 
     public void requestUpdateCategories() {
         logger.info("Fetching categories");
-        view.setCategories(service.getAllCategories());
+        view.setCategories(getService().getAllCategories());
     }
 
     public void removeCategory(Category category) {
         accessControl.assertAdmin();
-        service.deleteCategory(category.getId());
+        getService().deleteCategory(category.getId());
         logger.info("Category '{}' removed.", category.getName());
     }
 
     public Category updateCategory(Category category) {
         accessControl.assertAdmin();
-        var newCat = service.updateCategory(category);
+        var newCat = getService().updateCategory(category);
         logger.info("Category '{}' updated.", category.getName());
         return newCat;
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private ProductDataService getService() {
+        return VaadinCreateUI.get().getProductService();
+    }
+
+    private static Logger logger = LoggerFactory
+            .getLogger(CategoryManagementPresenter.class);
 }

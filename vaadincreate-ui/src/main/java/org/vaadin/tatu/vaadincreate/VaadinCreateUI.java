@@ -50,11 +50,11 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     // services this UI can be extended and getters for the services overriden
     // for creating test UI for unit tests.
     private AccessControl accessControl = new BasicAccessControl();
-    private ProductDataService productService = ProductDataService.get();
-    private UserService userService = UserService.get();
-    private AppDataService appService = AppDataService.get();
+    private transient ProductDataService productService = ProductDataService
+            .get();
+    private transient UserService userService = UserService.get();
+    private transient AppDataService appService = AppDataService.get();
 
-    private EventBus eventBus = EventBus.get();
     private String target;
 
     @Override
@@ -67,7 +67,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             target = getInitialTarget();
             showAppLayout();
         }
-        eventBus.registerEventBusListener(this);
+        getEventBus().registerEventBusListener(this);
     }
 
     // Vaadin 8 actually has page hide listener and eager closing of UI's, but
@@ -143,6 +143,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
      * @return Instance of ProductDataService
      */
     public ProductDataService getProductService() {
+        if (productService == null) {
+            productService = ProductDataService.get();
+        }
         return productService;
     }
 
@@ -152,6 +155,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
      * @return Instance of UserService
      */
     public UserService getUserService() {
+        if (userService == null) {
+            userService = UserService.get();
+        }
         return userService;
     }
 
@@ -161,6 +167,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
      * @return Instance of AppAdataService
      */
     public AppDataService getAppService() {
+        if (appService == null) {
+            appService = AppDataService.get();
+        }
         return appService;
     }
 
@@ -181,10 +190,15 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     @Override
     public void detach() {
         super.detach();
-        eventBus.unregisterEventBusListener(this);
+        getEventBus().unregisterEventBusListener(this);
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private EventBus getEventBus() {
+        return EventBus.get();
+    }
+
+    private static Logger logger = LoggerFactory
+            .getLogger(VaadinCreateUI.class);
 
     // Set maxIdleTime because of Jetty 10, see:
     // https://github.com/vaadin/flow/issues/17215
@@ -197,8 +211,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         protected void servletInitialized() {
             getService().addSessionInitListener(event -> {
                 VaadinSession s = event.getSession();
-                s.addRequestHandler((session, request,
-                        response) -> handleRequest(session, request, response));
+                s.addRequestHandler(this::handleRequest);
             });
         }
 

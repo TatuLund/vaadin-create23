@@ -48,7 +48,7 @@ public class MockProductDataService extends ProductDataService {
     @Override
     public synchronized List<Product> getAllProducts() {
         synchronized (products) {
-            randomWait(12);
+            randomWait(6);
             return products.stream().map(p -> new Product(p))
                     .collect(Collectors.toList());
         }

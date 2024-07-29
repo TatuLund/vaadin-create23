@@ -26,9 +26,6 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
     private CategoryManagementView categories;
     private UserManagementView users;
 
-    public AdminView() {
-    }
-
     @Override
     public void enter(ViewChangeEvent event) {
         params = event.getParameters();
@@ -81,5 +78,5 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
                 false);
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static Logger logger = LoggerFactory.getLogger(AdminView.class);
 }

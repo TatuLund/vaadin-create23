@@ -11,7 +11,6 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
-import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
@@ -71,7 +70,6 @@ public class BooksView extends CssLayout
     private BooksPresenter presenter = new BooksPresenter(this);
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
-    private EventBus eventBus = EventBus.get();
 
     private Button newProduct;
 
@@ -122,7 +120,7 @@ public class BooksView extends CssLayout
         addComponent(barAndGridLayout);
         addComponent(form);
 
-        eventBus.registerEventBusListener(this);
+        getEventBus().registerEventBusListener(this);
         presenter.init();
     }
 
@@ -421,7 +419,7 @@ public class BooksView extends CssLayout
     @Override
     public void detach() {
         super.detach();
-        eventBus.unregisterEventBusListener(this);
+        getEventBus().unregisterEventBusListener(this);
         // If detach happens before completion of data fetch, cancel the fetch
         presenter.cancelUpdateProducts();
     }
@@ -513,6 +511,10 @@ public class BooksView extends CssLayout
         return updatedProduct;
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private EventBus getEventBus() {
+        return EventBus.get();
+    }
+
+    private static Logger logger = LoggerFactory.getLogger(BooksView.class);
 
 }

@@ -20,7 +20,7 @@ public class EventBusImpl implements EventBus {
      */
     private final WeakHashMap<EventBusListener, Object> eventListeners = new WeakHashMap<>();
 
-    public synchronized static EventBus getInstance() {
+    public static synchronized EventBus getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new EventBusImpl();
         }
@@ -33,8 +33,7 @@ public class EventBusImpl implements EventBus {
     @Override
     public void post(Object event) {
         synchronized (eventListeners) {
-            logger.debug(
-                    "EventBus event fired for {} recipients.",
+            logger.debug("EventBus event fired for {} recipients.",
                     eventListeners.size());
             eventListeners.forEach((listener, o) -> {
                 listener.eventFired(event);
@@ -45,7 +44,8 @@ public class EventBusImpl implements EventBus {
     @Override
     public void registerEventBusListener(EventBusListener listener) {
         synchronized (eventListeners) {
-            logger.debug("EventBus listenerer ({}) registered", listener.hashCode());
+            logger.debug("EventBus listenerer ({}) registered",
+                    listener.hashCode());
             eventListeners.put(listener, null);
         }
     }

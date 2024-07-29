@@ -23,18 +23,17 @@ import org.vaadin.tatu.vaadincreate.backend.data.Product;
 public class StatsPresenter implements Serializable {
 
     private StatsView view;
-    private final ExecutorService executor = Executors.newCachedThreadPool();
+    private transient ExecutorService executor;
     private transient CompletableFuture<Void> future;
-    private ProductDataService service = VaadinCreateUI.get()
-            .getProductService();
 
     public StatsPresenter(StatsView view) {
         this.view = view;
     }
 
     private CompletableFuture<Collection<Product>> loadProductsAsync() {
+        var service = getService();
         return CompletableFuture.supplyAsync(() -> service.getAllProducts(),
-                executor);
+                getExecutor());
     }
 
     /**
@@ -43,6 +42,7 @@ public class StatsPresenter implements Serializable {
      */
     public void requestUpdateStats() {
         logger.info("Fetching products for statistics");
+        var service = getService();
         future = loadProductsAsync().thenAccept(products -> {
             logger.info("Calculating statistics");
             Map<Availability, Long> availabilityStats = new HashMap<>();
@@ -62,7 +62,7 @@ public class StatsPresenter implements Serializable {
                 var instock = products.stream().filter(
                         product -> product.getCategory().contains(category))
                         .mapToLong(prod -> prod.getStockCount()).sum();
-                Long[] counts = {titles, instock};
+                Long[] counts = { titles, instock };
                 categoryStats.put(category.getName(), counts);
             }
 
@@ -116,5 +116,17 @@ public class StatsPresenter implements Serializable {
         }
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private ProductDataService getService() {
+        return VaadinCreateUI.get().getProductService();
+    }
+
+    private ExecutorService getExecutor() {
+        if (executor == null) {
+            executor = Executors.newCachedThreadPool();
+        }
+        return executor;
+    }
+
+    private static Logger logger = LoggerFactory
+            .getLogger(StatsPresenter.class);
 }

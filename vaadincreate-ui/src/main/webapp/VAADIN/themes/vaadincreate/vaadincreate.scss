@@ -38,7 +38,7 @@ $valo-menu-background-color: rgb(59, 63, 66) !default;
 $v-focus-color: rgb(76, 150, 214) !default;
 $v-error-indicator-color: #eb1937 !default;
 $v-friendly-color: rgb(54, 185, 85);
-$warning-indicator-color:  rgb(255, 128, 0) !default;
+$warning-indicator-color:  $v-error-indicator-level-warning-color !default;
 
 $v-font-size: 15px !default;
 $v-font-weight: 400 !default;
@@ -430,7 +430,11 @@ $fake-grid-background-color: white;
   
   // For aligning in grid until #15438 is done
   .bookview-grid-alignright {
-  	text-align: right;
+    text-align: right;
+
+	.v-grid-column-header-content {
+      text-align: right;
+    }	
   }
 
   .bookview-grid-edited {
@@ -532,12 +536,12 @@ $fake-grid-background-color: white;
   }
 
   .v-button-cancel {
-    background: burlywood;
-    border-top-color: bisque;
-    border-left-color: bisque;
-    border-right-color: orange;
-    border-bottom-color: orange;
-    box-shadow: inset 0 1px 0 bisque, inset 0 -1px 0 orange, 0 2px 3px rgba(0, 0, 0, 0.05);
+    background: $v-error-indicator-level-warning-color;
+    border-top-color: lighten($v-error-indicator-level-warning-color, 15%);
+    border-left-color: lighten($v-error-indicator-level-warning-color, 15%);
+    border-right-color: darken($v-error-indicator-level-warning-color, 15%);
+    border-bottom-color: darken($v-error-indicator-level-warning-color, 15%);
+    box-shadow: inset 0 1px 0 lighten($v-error-indicator-level-warning-color, 15%), inset 0 -1px 0 darken($v-error-indicator-level-warning-color, 15%), 0 2px 3px rgba(0, 0, 0, 0.05);
     color: white;	  
   }
 }

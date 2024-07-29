@@ -18,6 +18,7 @@ import com.vaadin.testbench.ScreenshotOnFailureRule;
 import com.vaadin.testbench.TestBench;
 import com.vaadin.testbench.TestBenchTestCase;
 import com.vaadin.testbench.elements.ButtonElement;
+import com.vaadin.testbench.elements.ComboBoxElement;
 import com.vaadin.testbench.elements.FormLayoutElement;
 import com.vaadin.testbench.elements.PasswordFieldElement;
 import com.vaadin.testbench.elements.TextFieldElement;
@@ -74,6 +75,8 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
         loginForm.$(TextFieldElement.class).first().setValue(user);
         loginForm.$(PasswordFieldElement.class).first().setValue(pass);
         blur();
+        loginForm.$(ComboBoxElement.class).first().getPopupSuggestionElements()
+                .get(0).click();
         loginForm.$(ButtonElement.class).first().click();
     }
 
@@ -146,7 +149,7 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
     // error-screenshots folder. Check if they are ok and move to
     // reference-screenshots folder. Rerun the tests to verify,
     protected boolean visualTests() {
-        return false;
+        return true;
     }
 
     public void waitForAppLoaded() {

@@ -530,6 +530,8 @@ public class BooksViewTest extends AbstractUITest {
             assertFalse(col.isHidden());
         });
 
+        assertEquals(null, test(grid).description(0));
+
         ui.getPage().updateBrowserWindowSize(1200, 1024, true);
 
         assertTrue(grid.getColumns().get(0).isHidden());
@@ -538,6 +540,8 @@ public class BooksViewTest extends AbstractUITest {
         assertFalse(grid.getColumns().get(3).isHidden());
         assertFalse(grid.getColumns().get(4).isHidden());
         assertTrue(grid.getColumns().get(5).isHidden());
+
+        assertEquals(null, test(grid).description(0));
 
         ui.getPage().updateBrowserWindowSize(900, 1024, true);
 
@@ -548,6 +552,8 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(grid.getColumns().get(4).isHidden());
         assertTrue(grid.getColumns().get(5).isHidden());
 
+        assertEquals(null, test(grid).description(0));
+
         ui.getPage().updateBrowserWindowSize(500, 1024, true);
 
         assertTrue(grid.getColumns().get(0).isHidden());
@@ -556,6 +562,9 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(grid.getColumns().get(3).isHidden());
         assertTrue(grid.getColumns().get(4).isHidden());
         assertTrue(grid.getColumns().get(5).isHidden());
+
+        assertTrue(test(grid).description(0)
+                .contains(test(grid).item(0).getProductName()));
     }
 
     @Test

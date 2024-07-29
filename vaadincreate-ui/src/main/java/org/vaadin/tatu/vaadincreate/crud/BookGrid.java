@@ -78,11 +78,15 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                         .compareToIgnoreCase(p2.getProductName()));
 
         // Format and add " €" to price
-        addColumn(product -> decimalFormat.format(product.getPrice()) + " €")
-                .setCaption(getTranslation(PRICE)).setResizable(true)
-                .setComparator((p1, p2) -> {
-                    return p1.getPrice().compareTo(p2.getPrice());
-                }).setStyleGenerator(product -> "align-right").setId("price");
+        var priceCol = addColumn(
+                product -> decimalFormat.format(product.getPrice()) + " €")
+                        .setCaption(getTranslation(PRICE)).setResizable(true)
+                        .setComparator((p1, p2) -> {
+                            return p1.getPrice().compareTo(p2.getPrice());
+                        })
+                        .setStyleGenerator(
+                                product -> VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT)
+                        .setId("price");
 
         // Add an traffic light icon in front of availability
         addColumn(this::htmlFormatAvailability, new HtmlRenderer())
@@ -95,7 +99,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                 .addStyleName(VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL);
 
         // Show empty stock as "-"
-        addColumn(product -> {
+        var countCol = addColumn(product -> {
             if (product.getStockCount() == 0) {
                 return "-";
             }
@@ -112,14 +116,15 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         // Show all categories the product is in, separated by commas
         addColumn(this::formatCategories).setCaption(getTranslation(CATEGORIES))
                 .setResizable(false).setSortable(false);
+
+        getHeaderRow(0).getCell(priceCol)
+                .setStyleName(VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT);
+        getHeaderRow(0).getCell(countCol)
+                .setStyleName(VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT);
     }
 
     public Product getSelectedRow() {
         return asSingleSelect().getValue();
-    }
-
-    public void refresh(Product product) {
-        getDataCommunicator().refresh(product);
     }
 
     private String htmlFormatAvailability(Product product) {

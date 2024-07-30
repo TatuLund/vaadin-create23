@@ -5,6 +5,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -23,6 +28,7 @@ import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 
 import com.vaadin.data.ValueContext;
 import com.vaadin.server.ServiceException;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
@@ -607,5 +613,19 @@ public class BooksViewTest extends AbstractUITest {
                     .compareToIgnoreCase((String) test(grid).cell(1, i));
             assertTrue(result >= 0);
         }
+    }
+
+    @Test
+    public void isSerializable() throws IOException, ClassNotFoundException {
+        var bs = new ByteArrayOutputStream();
+        var os = new ObjectOutputStream(bs);
+        os.writeObject(ui.getSession());
+        os.flush();
+        os.close();
+
+        var a = bs.toByteArray();
+        ByteArrayInputStream bis = new ByteArrayInputStream(a);
+        ObjectInputStream in = new ObjectInputStream(bis);
+        var v = (VaadinSession) in.readObject();
     }
 }

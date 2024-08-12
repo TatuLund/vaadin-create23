@@ -62,8 +62,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
             if (book.getId() == edited) {
                 return VaadinCreateTheme.BOOKVIEW_GRID_EDITED;
             }
-            if (getLockedBooks().isLocked(Product.class,
-                    book.getId()) != null) {
+            if (getLockedBooks().isLocked(book) != null) {
                 return VaadinCreateTheme.BOOKVIEW_GRID_LOCKED;
             }
             return "";
@@ -200,7 +199,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
      */
     private void adjustColumns(int width) {
         setDescriptionGenerator(book -> {
-            var user = getLockedBooks().isLocked(Product.class, book.getId());
+            var user = getLockedBooks().isLocked(book);
             if (user != null) {
                 return getTranslation(EDITED_BY, user.getName());
             }
@@ -230,7 +229,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         // to use HTML in tooltips. which makes it possible to use them like
         // this. When migrating to newer generations of Vaadin, this kind of
         // Tooltips need to be refactored to use for example Popup component.
-        var user = getLockedBooks().isLocked(Product.class, book.getId());
+        var user = getLockedBooks().isLocked(book);
         if (user != null) {
             return getTranslation(EDITED_BY, user.getName());
         }

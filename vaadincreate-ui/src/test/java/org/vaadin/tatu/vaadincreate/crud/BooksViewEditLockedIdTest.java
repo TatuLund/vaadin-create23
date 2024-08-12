@@ -34,7 +34,8 @@ public class BooksViewEditLockedIdTest extends AbstractUITest {
         var layout = $(view, VerticalLayout.class).first();
         grid = $(layout, BookGrid.class).single();
 
-        LockedObjects.get().lock(Product.class, 10, CurrentUser.get().get());
+        var book = ui.getProductService().getProductById(10);
+        LockedObjects.get().lock(book, CurrentUser.get().get());
         waitForGrid(layout, grid);
 
         form = $(view, BookForm.class).single();
@@ -42,7 +43,8 @@ public class BooksViewEditLockedIdTest extends AbstractUITest {
 
     @After
     public void cleanUp() {
-        LockedObjects.get().unlock(Product.class, 10);
+        var book = ui.getProductService().getProductById(10);
+        LockedObjects.get().unlock(book);
         logout();
         tearDown();
     }

@@ -17,7 +17,6 @@ import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 import com.vaadin.data.ValueContext;
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 public class BooksViewEditIdTest extends AbstractUITest {
@@ -54,7 +53,8 @@ public class BooksViewEditIdTest extends AbstractUITest {
 
     @Test
     public void editWithId() {
-        assertTrue(LockedObjects.get().isLocked(Product.class, 10) != null);
+        var book = ui.getProductService().getProductById(10);
+        assertTrue(LockedObjects.get().isLocked(book) != null);
         var product = ui.getProductService().getProductById(10);
         assertEquals(product, grid.asSingleSelect().getSelectedItem().get());
 

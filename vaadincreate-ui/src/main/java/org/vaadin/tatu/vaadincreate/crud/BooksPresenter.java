@@ -37,7 +37,7 @@ public class BooksPresenter implements Serializable {
     private transient CompletableFuture<Void> future;
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
-    private Integer editing;
+    private Product editing;
 
     public BooksPresenter(BooksView simpleCrudView) {
         view = simpleCrudView;
@@ -124,7 +124,7 @@ public class BooksPresenter implements Serializable {
      */
     public void unlockBook() {
         if (editing != null) {
-            getLockedBooks().unlock(Product.class, editing);
+            getLockedBooks().unlock(editing);
             editing = null;
         }
     }
@@ -136,12 +136,12 @@ public class BooksPresenter implements Serializable {
      * @param id
      *            the ID of the book to lock for editing
      */
-    private void lockBook(Integer id) {
+    private void lockBook(Product book) {
         if (editing != null) {
             unlockBook();
         }
-        getLockedBooks().lock(Product.class, id, CurrentUser.get().get());
-        editing = id;
+        getLockedBooks().lock(book, CurrentUser.get().get());
+        editing = book;
     }
 
     /**
@@ -177,8 +177,8 @@ public class BooksPresenter implements Serializable {
     private void lockAndEditIfExistsAndIsUnlocked(String productId, int pid) {
         Product product = findProduct(pid);
         if (product != null) {
-            if (getLockedBooks().isLocked(Product.class, pid) == null) {
-                lockBook(pid);
+            if (getLockedBooks().isLocked(product) == null) {
+                lockBook(product);
                 // Ensure this is selected even if coming directly here from
                 // login
                 view.selectRow(product);
@@ -274,7 +274,7 @@ public class BooksPresenter implements Serializable {
             view.setFragmentParameter("new");
         } else {
             view.setFragmentParameter(product.getId() + "");
-            lockBook(product.getId());
+            lockBook(product);
         }
         logger.info("Editing product: {}",
                 product != null ? product.getId() : "none");
@@ -307,8 +307,7 @@ public class BooksPresenter implements Serializable {
      */
     public void rowSelected(Product product) {
         if (accessControl.isUserInRole(Role.ADMIN)) {
-            if (product != null && getLockedBooks().isLocked(Product.class,
-                    product.getId()) != null) {
+            if (product != null && getLockedBooks().isLocked(product) != null) {
                 view.clearSelection();
             } else {
                 editProduct(product);

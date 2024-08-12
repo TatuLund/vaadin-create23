@@ -12,6 +12,7 @@ import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
+import org.vaadin.tatu.vaadincreate.backend.data.AbstractEntity;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects.LockingEvent;
@@ -34,10 +35,9 @@ public class LockedObjectsTest {
         var listener = new TestListener();
         var user = userService.getAllUsers().get(0);
 
-        lockedObjects.lock(MockObject.class, objects.get(0).getId(), user);
+        lockedObjects.lock(objects.get(0), user);
 
-        assertEquals(user, lockedObjects.isLocked(MockObject.class,
-                objects.get(0).getId()));
+        assertEquals(user, lockedObjects.isLocked(objects.get(0)));
         var event = listener.getLastEvent();
         assertEquals(1, listener.getEventCount());
         assertEquals(user, event.getUser());
@@ -45,10 +45,9 @@ public class LockedObjectsTest {
         assertEquals(MockObject.class, event.getType());
         assertTrue(event.isLocked());
 
-        lockedObjects.unlock(MockObject.class, objects.get(0).getId());
+        lockedObjects.unlock(objects.get(0));
 
-        assertEquals(null, lockedObjects.isLocked(MockObject.class,
-                objects.get(0).getId()));
+        assertEquals(null, lockedObjects.isLocked(objects.get(0)));
         event = listener.getLastEvent();
         assertEquals(2, listener.getEventCount());
         assertEquals(user, event.getUser());
@@ -64,9 +63,9 @@ public class LockedObjectsTest {
         var listener = new TestListener();
         var user = userService.getAllUsers().get(0);
         var id = objects.get(0).getId();
-        lockedObjects.lock(MockObject.class, id, user);
+        lockedObjects.lock(objects.get(0), user);
 
-        assertEquals(user, lockedObjects.isLocked(MockObject.class, id));
+        assertEquals(user, lockedObjects.isLocked(objects.get(0)));
         var event = listener.getLastEvent();
         assertEquals(1, listener.getEventCount());
         assertEquals(user, event.getUser());
@@ -80,7 +79,7 @@ public class LockedObjectsTest {
         } catch (InterruptedException e) {
         }
 
-        assertEquals(null, lockedObjects.isLocked(MockObject.class, id));
+        assertEquals(null, lockedObjects.isLocked(objects.get(0)));
 
         listener.remove();
     }
@@ -88,19 +87,17 @@ public class LockedObjectsTest {
     public void lockingTwiceThrows() {
         boolean thrown = false;
         var user = userService.getAllUsers().get(0);
-        lockedObjects.lock(MockObject.class, objects.get(0).getId(), user);
-        assertEquals(user, lockedObjects.isLocked(MockObject.class,
-                objects.get(0).getId()));
+        lockedObjects.lock(objects.get(0), user);
+        assertEquals(user, lockedObjects.isLocked(objects.get(0)));
         try {
-            lockedObjects.lock(MockObject.class, objects.get(0).getId(),
+            lockedObjects.lock(objects.get(0),
                     userService.getAllUsers().get(1));
         } catch (IllegalStateException e) {
             thrown = true;
         }
         assertTrue(thrown);
-        assertEquals(user, lockedObjects.isLocked(MockObject.class,
-                objects.get(0).getId()));
-        lockedObjects.unlock(MockObject.class, objects.get(0).getId());
+        assertEquals(user, lockedObjects.isLocked(objects.get(0)));
+        lockedObjects.unlock(objects.get(0));
     }
 
     public static class TestListener implements EventBusListener {
@@ -132,19 +129,11 @@ public class LockedObjectsTest {
         }
     }
 
-    public static class MockObject {
-        private int id;
+    public static class MockObject extends AbstractEntity {
 
         public MockObject(int id) {
-            this.id = id;
+            setId(id);
         }
 
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
     }
 }

@@ -7,6 +7,7 @@ import java.util.WeakHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.backend.data.AbstractEntity;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
@@ -29,9 +30,12 @@ public class LockedObjectsImpl implements LockedObjects {
     }
 
     @Override
+    public User isLocked(AbstractEntity object) {
+        Objects.requireNonNull(object, "object can't be null");
+        return isLocked(object.getClass(), object.getId());
+    }
+
     public User isLocked(Class<?> type, Integer id) {
-        Objects.requireNonNull(type);
-        Objects.requireNonNull(id);
         synchronized (lockedObjects) {
             var match = findObject(type, id);
             if (match.isPresent()) {
@@ -42,9 +46,13 @@ public class LockedObjectsImpl implements LockedObjects {
     }
 
     @Override
-    public void lock(Class<?> type, Integer id, User user) {
-        Objects.requireNonNull(type);
-        Objects.requireNonNull(user);
+    public void lock(AbstractEntity object, User user) {
+        Objects.requireNonNull(object, "object can't be null");
+        Objects.requireNonNull(user, "user can't be null");
+        lock(object.getClass(), object.getId(), user);
+    }
+
+    private void lock(Class<?> type, Integer id, User user) {
         if (id != null && id < 0) {
             throw new IllegalArgumentException(
                     "Id can't be null and must be positive");
@@ -63,9 +71,12 @@ public class LockedObjectsImpl implements LockedObjects {
     }
 
     @Override
-    public void unlock(Class<?> type, Integer id) {
-        Objects.requireNonNull(type);
-        Objects.requireNonNull(id);
+    public void unlock(AbstractEntity object) {
+        Objects.requireNonNull(object, "object can't be null");
+        unlock(object.getClass(), object.getId());
+    }
+
+    private void unlock(Class<?> type, Integer id) {
         synchronized (lockedObjects) {
             var match = findObject(type, id);
             if (match.isPresent()) {

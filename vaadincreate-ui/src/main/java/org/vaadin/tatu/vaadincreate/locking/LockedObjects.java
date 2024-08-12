@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.locking;
 
 import java.io.Serializable;
 
+import org.vaadin.tatu.vaadincreate.backend.data.AbstractEntity;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 
 /**
@@ -11,38 +12,34 @@ import org.vaadin.tatu.vaadincreate.backend.data.User;
 public interface LockedObjects {
 
     /**
-     * Check which user has locked object of type with given id.
+     * Check which user has locked object.
      *
-     * @param type
-     *            The type of the object
-     * @param id
-     *            The id of the object
+     * @param object
+     *            AnstractEntity
      * @return The user who has locked the object, null if the object is not
      *         locked.
      */
-    public User isLocked(Class<?> type, Integer id);
+    public User isLocked(AbstractEntity object);
 
     /**
      * Lock object for the given user
      *
-     * @param type
-     *            Type of the object
-     * @param id
-     *            Id of the object
+     * @param object
+     *            AnstractEntity
      * @param user
      *            User holding the lock
      */
-    public void lock(Class<?> type, Integer id, User user);
+    public void lock(AbstractEntity object, User user);
 
     /**
-     * Unlock the object of type with given id
+     * Unlock the object
      *
-     * @param type
-     *            The type of the objects
+     * @param object
+     *            AnstractEntity
      * @param id
      *            The id of the object
      */
-    public void unlock(Class<?> type, Integer id);
+    public void unlock(AbstractEntity object);
 
     public static LockedObjects get() {
         return LockedObjectsImpl.getInstance();

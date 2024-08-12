@@ -272,15 +272,13 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, Button.class).caption("Cancel").single()).click();
         assertTrue(form.productName.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertTrue(LockedObjects.get().isLocked(Product.class,
-                book.getId()) != null);
+        assertTrue(LockedObjects.get().isLocked(book) != null);
 
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("confirm-button")).click();
 
         assertFalse(form.isShown());
-        assertFalse(LockedObjects.get().isLocked(Product.class,
-                book.getId()) != null);
+        assertFalse(LockedObjects.get().isLocked(book) != null);
     }
 
     @Test
@@ -350,20 +348,18 @@ public class BooksViewTest extends AbstractUITest {
     @Test
     public void editLockedProduct() {
         var book = test(grid).item(0);
-        LockedObjects.get().lock(Product.class, book.getId(),
-                CurrentUser.get().get());
+        LockedObjects.get().lock(book, CurrentUser.get().get());
 
         assertEquals("Edited by Admin", test(grid).description(0));
         test(grid).click(1, 0);
         assertFalse(form.isShown());
-        LockedObjects.get().unlock(Product.class, book.getId());
+        LockedObjects.get().unlock(book);
     }
 
     @Test
     public void weakLockConcurrentEdit() {
         var book = test(grid).item(0);
-        LockedObjects.get().lock(Product.class, book.getId(),
-                CurrentUser.get().get());
+        LockedObjects.get().lock(book, CurrentUser.get().get());
         assertEquals("Edited by Admin", test(grid).description(0));
 
         // GC wipes weak lock
@@ -387,8 +383,7 @@ public class BooksViewTest extends AbstractUITest {
     @Test
     public void weakLockConcurrentDelete() {
         var book = test(grid).item(0);
-        LockedObjects.get().lock(Product.class, book.getId(),
-                CurrentUser.get().get());
+        LockedObjects.get().lock(book, CurrentUser.get().get());
         assertEquals("Edited by Admin", test(grid).description(0));
 
         // GC wipes weak lock
@@ -412,41 +407,33 @@ public class BooksViewTest extends AbstractUITest {
     @Test
     public void lockBookUnlockBook() {
         var book = test(grid).item(0);
-        assertTrue(LockedObjects.get().isLocked(Product.class,
-                book.getId()) == null);
+        assertTrue(LockedObjects.get().isLocked(book) == null);
 
         test(grid).click(1, 0);
         assertTrue(form.isShown());
-        assertTrue(LockedObjects.get().isLocked(Product.class,
-                book.getId()) != null);
+        assertTrue(LockedObjects.get().isLocked(book) != null);
 
         test(grid).click(1, 1);
         assertTrue(form.isShown());
-        assertTrue(LockedObjects.get().isLocked(Product.class,
-                book.getId()) == null);
-        assertTrue(LockedObjects.get().isLocked(Product.class,
-                test(grid).item(1).getId()) != null);
+        assertTrue(LockedObjects.get().isLocked(book) == null);
+        assertTrue(LockedObjects.get().isLocked(test(grid).item(1)) != null);
 
         test(grid).click(1, 1);
         assertFalse(form.isShown());
-        assertTrue(LockedObjects.get().isLocked(Product.class,
-                test(grid).item(1).getId()) == null);
+        assertTrue(LockedObjects.get().isLocked(test(grid).item(1)) == null);
     }
 
     @Test
     public void lockBookUnlockOnNavigate() {
         var book = test(grid).item(0);
-        assertTrue(LockedObjects.get().isLocked(Product.class,
-                book.getId()) == null);
+        assertTrue(LockedObjects.get().isLocked(book) == null);
 
         test(grid).click(1, 0);
         assertTrue(form.isShown());
-        assertTrue(LockedObjects.get().isLocked(Product.class,
-                book.getId()) != null);
+        assertTrue(LockedObjects.get().isLocked(book) != null);
 
         $(Button.class).caption("About").single().click();
-        assertTrue(LockedObjects.get().isLocked(Product.class,
-                book.getId()) == null);
+        assertTrue(LockedObjects.get().isLocked(book) == null);
     }
 
     @Test

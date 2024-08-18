@@ -43,8 +43,8 @@ public class LoginViewTest extends UIUnitTest {
         var login = new LoginView(accessControl, e -> count.addAndGet(1));
         ui.setContent(login);
 
-        test(login.username).setValue("Admin");
-        test(login.password).setValue("Admin");
+        test(login.usernameField).setValue("Admin");
+        test(login.passwordField).setValue("Admin");
         test($(LanguageSelect.class).first())
                 .clickItem(DefaultI18NProvider.LOCALE_EN);
         test(login.login).click();
@@ -64,8 +64,8 @@ public class LoginViewTest extends UIUnitTest {
         test($(login, LanguageSelect.class).single())
                 .clickItem(DefaultI18NProvider.LOCALE_EN);
 
-        test(login.username).setValue("Admin");
-        test(login.password).setValue("Wrong");
+        test(login.usernameField).setValue("Admin");
+        test(login.passwordField).setValue("Wrong");
         test(login.login).click();
         assertEquals(0, count.get());
         assertEquals("Login failed", $(Notification.class).last().getCaption());

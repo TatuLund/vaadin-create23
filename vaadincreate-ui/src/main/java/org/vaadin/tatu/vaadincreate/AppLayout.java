@@ -28,7 +28,7 @@ import com.vaadin.ui.themes.ValoTheme;
 /**
  * This is a responsive application shell with Navigator build with ValoMenu
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "java:S2160"})
 public class AppLayout extends HorizontalLayout implements HasI18N {
 
     private static final String LOGOUT = "logout";

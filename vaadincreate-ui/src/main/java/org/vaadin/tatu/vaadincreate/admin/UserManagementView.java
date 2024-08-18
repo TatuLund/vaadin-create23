@@ -28,7 +28,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "java:S2160"})
 public class UserManagementView extends VerticalLayout
         implements TabView, HasI18N {
 
@@ -135,13 +135,9 @@ public class UserManagementView extends VerticalLayout
                 userSelect.setValue(null);
             });
         });
-        binder.addValueChangeListener(event -> {
-            if (binder.isValid()) {
-                save.setEnabled(true);
-            } else {
-                save.setEnabled(false);
-            }
-        });
+        binder.addValueChangeListener(event -> 
+            save.setEnabled(binder.isValid())
+        );
         buttons.addComponents(delete, save);
         buttons.setComponentAlignment(save, Alignment.MIDDLE_RIGHT);
         buttons.setWidthFull();

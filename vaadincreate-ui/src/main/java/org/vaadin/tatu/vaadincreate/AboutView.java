@@ -12,7 +12,6 @@ import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
-import com.google.gwt.dev.About;
 import com.vaadin.data.HasValue.ValueChangeEvent;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
@@ -30,7 +29,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 @AllPermitted
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "java:S2160" })
 public class AboutView extends VerticalLayout
         implements View, EventBusListener, HasI18N {
 
@@ -43,38 +42,38 @@ public class AboutView extends VerticalLayout
 
     private Button editButton;
     private Label adminsNote;
-    private TextArea textArea;
+    private TextArea admionsNoteField;
 
     public AboutView() {
         var aboutContent = createAboutContent();
 
-        textArea = createTextArea();
-        textArea.setVisible(false);
+        admionsNoteField = createTextArea();
+        admionsNoteField.setVisible(false);
 
         var adminsContent = new HorizontalLayout();
         adminsContent.addStyleName(VaadinCreateTheme.ABOUTVIEW_ADMINSCONTENT);
         adminsContent.setWidth("500px");
         createAdminsNote();
 
-        adminsContent.addComponents(adminsNote, textArea);
+        adminsContent.addComponents(adminsNote, admionsNoteField);
         if (accessControl.isUserInRole(Role.ADMIN)) {
             createEditButton();
             editButton.addClickListener(e -> {
-                textArea.setVisible(true);
+                admionsNoteField.setVisible(true);
                 adminsNote.setVisible(false);
                 editButton.setVisible(false);
-                textArea.setValue(adminsNote.getValue());
+                admionsNoteField.setValue(adminsNote.getValue());
             });
             adminsContent.addComponent(editButton);
             adminsContent.setComponentAlignment(editButton,
                     Alignment.TOP_RIGHT);
         }
 
-        textArea.addValueChangeListener(this::handleValueChange);
-        textArea.setValueChangeMode(ValueChangeMode.BLUR);
-        textArea.addBlurListener(e -> {
+        admionsNoteField.addValueChangeListener(this::handleValueChange);
+        admionsNoteField.setValueChangeMode(ValueChangeMode.BLUR);
+        admionsNoteField.addBlurListener(e -> {
             adminsNote.setVisible(true);
-            textArea.setVisible(false);
+            admionsNoteField.setVisible(false);
             editButton.setVisible(true);
         });
         setSizeFull();
@@ -156,8 +155,8 @@ public class AboutView extends VerticalLayout
     public void eventFired(Object event) {
         if (event instanceof Message) {
             getUI().access(() -> {
-                if (textArea.isVisible()) {
-                    textArea.setVisible(false);
+                if (admionsNoteField.isVisible()) {
+                    admionsNoteField.setVisible(false);
                     adminsNote.setVisible(true);
                     editButton.setVisible(true);
                 }

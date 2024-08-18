@@ -14,7 +14,6 @@ import org.vaadin.tatu.vaadincreate.i18n.I18NProvider;
 import com.vaadin.event.ConnectorEventListener;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.Page;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -34,7 +33,7 @@ import com.vaadin.util.ReflectTools;
 /**
  * UI content when the user is not logged in yet.
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "java:S2160"})
 public class LoginView extends CssLayout implements HasI18N {
 
     private static final String LOGIN_FAILED = "login-failed";
@@ -49,8 +48,8 @@ public class LoginView extends CssLayout implements HasI18N {
     private static final String LANGUAGE = "language";
     private static final String CAPSLOCK = "capslock";
 
-    TextField username;
-    PasswordField password;
+    TextField usernameField;
+    PasswordField passwordField;
     Button login;
     private Button forgotPassword;
     private AccessControl accessControl;
@@ -95,12 +94,12 @@ public class LoginView extends CssLayout implements HasI18N {
             showLoginInformation(e.getWidth());
         });
         buildUI();
-        username.focus();
+        usernameField.focus();
     }
 
     private void updateTranslations() {
-        username.setCaption(getTranslation(USERNAME));
-        password.setCaption(getTranslation(PASSWORD));
+        usernameField.setCaption(getTranslation(USERNAME));
+        passwordField.setCaption(getTranslation(PASSWORD));
         login.setCaption(getTranslation(LOGIN_BUTTON));
         forgotPassword.setCaption(getTranslation(FORGOT_PASSWORD));
         loginInfoText.setValue("<h1>" + getTranslation(LOGIN_INFO) + "</h1>"
@@ -115,7 +114,7 @@ public class LoginView extends CssLayout implements HasI18N {
         resizeReg.remove();
     }
 
-    public void showLoginInformation(int width) {
+    private void showLoginInformation(int width) {
         if (width < 700) {
             removeComponent(loginInformation);
         } else {
@@ -130,17 +129,17 @@ public class LoginView extends CssLayout implements HasI18N {
         loginForm.setSizeUndefined();
         loginForm.setMargin(false);
 
+        loginForm.addComponent(usernameField = new TextField(
+                getTranslation(USERNAME), "Admin"));
+        usernameField.setWidth(15, Unit.EM);
+        usernameField.setId("login-username-field");
         loginForm.addComponent(
-                username = new TextField(getTranslation(USERNAME), "Admin"));
-        username.setWidth(15, Unit.EM);
-        username.setId("login-username-field");
-        loginForm.addComponent(
-                password = new PasswordField(getTranslation(PASSWORD)));
-        capsLockWarning = CapsLockWarning.warnFor(password);
+                passwordField = new PasswordField(getTranslation(PASSWORD)));
+        capsLockWarning = CapsLockWarning.warnFor(passwordField);
         capsLockWarning.setMessage(getTranslation(CAPSLOCK));
-        password.setWidth(15, Unit.EM);
-        password.setDescription(getTranslation(HINT));
-        password.setId("login-password-field");
+        passwordField.setWidth(15, Unit.EM);
+        passwordField.setDescription(getTranslation(HINT));
+        passwordField.setId("login-password-field");
         CssLayout buttons = new CssLayout();
         buttons.setStyleName("buttons");
         loginForm.addComponent(buttons);
@@ -158,11 +157,10 @@ public class LoginView extends CssLayout implements HasI18N {
         login.setClickShortcut(ShortcutAction.KeyCode.ENTER);
         login.addStyleName(ValoTheme.BUTTON_FRIENDLY);
 
-        buttons.addComponent(
-                forgotPassword = new Button(getTranslation(FORGOT_PASSWORD)));
-        forgotPassword.addClickListener(event -> {
-            showNotification(new Notification(getTranslation(HINT)));
-        });
+        forgotPassword = new Button(getTranslation(FORGOT_PASSWORD));
+        buttons.addComponent(forgotPassword);
+        forgotPassword.addClickListener(event -> showNotification(
+                new Notification(getTranslation(HINT))));
         forgotPassword.addStyleName(ValoTheme.BUTTON_LINK);
 
         lang = new LanguageSelect();
@@ -184,23 +182,25 @@ public class LoginView extends CssLayout implements HasI18N {
     }
 
     private CssLayout buildLoginInformation() {
-        var loginInformation = new CssLayout();
-        loginInformation.setStyleName(VaadinCreateTheme.LOGINVIEW_INFORMATION);
+        var layout = new CssLayout();
+        layout.setStyleName(VaadinCreateTheme.LOGINVIEW_INFORMATION);
         loginInfoText = new Label("<h1>" + getTranslation(LOGIN_INFO) + "</h1>"
                 + getTranslation(LOGIN_INFO_TEXT), ContentMode.HTML);
         loginInfoText.setSizeFull();
-        loginInformation.addComponent(loginInfoText);
-        return loginInformation;
+        layout.addComponent(loginInfoText);
+        return layout;
     }
 
+    // Attempt to log in the user and fire an event to notify listeners.
     private void login() {
-        if (accessControl.signIn(username.getValue(), password.getValue())) {
+        if (accessControl.signIn(usernameField.getValue(),
+                passwordField.getValue())) {
             fireEvent(new LoginEvent(this));
         } else {
             showNotification(new Notification(getTranslation(LOGIN_FAILED),
                     getTranslation(LOGIN_FAILED_DESC),
                     Notification.Type.HUMANIZED_MESSAGE));
-            username.focus();
+            usernameField.focus();
         }
     }
 

@@ -8,7 +8,7 @@ import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.ComboBox;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "java:S2160", "java:S110"})
 public class LanguageSelect extends ComboBox<Locale> implements HasI18N {
 
     private static final String LANGUAGE = "language";

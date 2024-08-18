@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate.crud;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Locale;
 
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
@@ -22,8 +23,10 @@ import com.vaadin.data.Binder;
 import com.vaadin.data.Result;
 import com.vaadin.data.ValueContext;
 import com.vaadin.data.converter.StringToIntegerConverter;
+import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.server.AbstractErrorMessage.ContentMode;
 import com.vaadin.server.Page;
+import com.vaadin.server.SerializableComparator;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.ui.ErrorLevel;
 import com.vaadin.ui.AbstractComponent;
@@ -37,7 +40,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "java:S2160"})
 public class BookForm extends Composite implements HasI18N {
 
     // Localization constants
@@ -57,15 +60,17 @@ public class BookForm extends Composite implements HasI18N {
     protected TextField productName = new TextField(
             getTranslation(PRODUCT_NAME));
     protected TextField price = new TextField(getTranslation(PRICE));
-    protected TextField stockCount = new TextField(getTranslation(IN_STOCK));
+    protected TextField stockCount = new TextField(
+            getTranslation(IN_STOCK));
     protected AvailabilitySelector availability = new AvailabilitySelector(
             getTranslation(AVAILABILITY));
     protected CheckBoxGroup<Category> category = new CheckBoxGroup<>(
             getTranslation(CATEGORIES));
-    protected Button save = new Button(getTranslation(SAVE));
-    protected Button discard = new Button(getTranslation(DISCARD));
-    protected Button cancel = new Button(getTranslation(CANCEL));
-    protected Button delete = new Button(getTranslation(DELETE));
+
+    protected Button saveButton = new Button(getTranslation(SAVE));
+    protected Button discardButton = new Button(getTranslation(DISCARD));
+    protected Button cancelButton = new Button(getTranslation(CANCEL));
+    protected Button deleteButton = new Button(getTranslation(DELETE));
 
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
@@ -141,25 +146,25 @@ public class BookForm extends Composite implements HasI18N {
         binder.addStatusChangeListener(event -> {
             var isValid = !event.hasValidationErrors();
             var hasChanges = binder.hasChanges();
-            save.setEnabled(hasChanges && isValid);
-            discard.setEnabled(hasChanges);
+            saveButton.setEnabled(hasChanges && isValid);
+            discardButton.setEnabled(hasChanges);
             if (isValid) {
-                flagStockCountAndAvailabilityInvalid(false);
+                setStockCountAndAvailabilityInvalid(false);
             }
         });
 
-        save.addClickListener(event -> handleSave());
+        saveButton.addClickListener(event -> handleSave());
 
-        discard.addClickListener(event -> {
+        discardButton.addClickListener(event -> {
             presenter.editProduct(currentProduct);
             updateDirtyIndicators();
         });
 
-        cancel.addClickListener(event -> {
+        cancelButton.addClickListener(event -> {
             presenter.cancelProduct();
         });
 
-        delete.addClickListener(event -> handleDelete());
+        deleteButton.addClickListener(event -> handleDelete());
     }
 
     private void handleSave() {
@@ -168,7 +173,7 @@ public class BookForm extends Composite implements HasI18N {
                     && binder.writeBeanIfValid(currentProduct)) {
                 presenter.saveProduct(currentProduct);
             } else if (binderHasInvalidFieldsBound()) {
-                flagStockCountAndAvailabilityInvalid(true);
+                setStockCountAndAvailabilityInvalid(true);
             }
         }
     }
@@ -192,6 +197,7 @@ public class BookForm extends Composite implements HasI18N {
                 .getComponentError() != null).count() == 0;
     }
 
+    // Bean level validation
     private boolean checkAvailabilityVsStockCount(Product product) {
         return (product.getAvailability() == Availability.AVAILABLE
                 && product.getStockCount() > 0)
@@ -201,7 +207,8 @@ public class BookForm extends Composite implements HasI18N {
                         && product.getStockCount() == 0);
     }
 
-    private void flagStockCountAndAvailabilityInvalid(boolean invalid) {
+    // Set the stock count and availability fields as invalid
+    private void setStockCountAndAvailabilityInvalid(boolean invalid) {
         if (invalid) {
             stockCount.setComponentError(
                     new UserError(getTranslation(AVAILABILITY_MISMATCH),
@@ -291,24 +298,29 @@ public class BookForm extends Composite implements HasI18N {
         var spacer = new CssLayout();
 
         // Buttons
-        save.addStyleName(ValoTheme.BUTTON_PRIMARY);
-        save.setId("save-button");
-        discard.setId("discard-button");
-        cancel.addStyleName("cancel");
-        delete.addStyleName(ValoTheme.BUTTON_DANGER);
-        delete.setId("delete-button");
-        delete.setEnabled(false);
+        saveButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        saveButton.setId("save-button");
+        discardButton.setId("discard-button");
+        cancelButton.addStyleName(VaadinCreateTheme.BUTTON_CANCEL);
+        deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
+        deleteButton.setId("delete-button");
+        deleteButton.setEnabled(false);
 
-        formLayout.addComponents(productName, fieldWrapper, availability,
-                category);
+        formLayout.addComponents(productName, fieldWrapper,
+                availability, category);
         formLayout.addComponent(spacer);
-        formLayout.addComponents(save, discard, cancel, delete);
+        formLayout.addComponents(saveButton, discardButton, cancelButton,
+                deleteButton);
         formLayout.setExpandRatio(spacer, 1);
         layout.addComponent(formLayout);
     }
 
+    @SuppressWarnings("unchecked")
     public void setCategories(Collection<Category> categories) {
         category.setItems(categories);
+        // Show selected items first in the list
+        var dataProvider = (ListDataProvider<Category>) category.getDataProvider();
+        dataProvider.setSortComparator((a, b) -> category.getValue().contains(a) ? -1 : 1);
         if (getProduct() != null) {
             category.setValue(getProduct().getCategory());
         }
@@ -320,7 +332,7 @@ public class BookForm extends Composite implements HasI18N {
         if (product == null) {
             product = new Product();
         }
-        delete.setEnabled(product.getId() != -1);
+        deleteButton.setEnabled(product.getId() != -1);
         currentProduct = product;
         binder.readBean(product);
 

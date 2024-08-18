@@ -27,7 +27,7 @@ import com.vaadin.ui.UIDetachedException;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "java:S2160"})
 @RolesPermitted({ Role.USER, Role.ADMIN })
 public class StatsView extends VerticalLayout implements View, HasI18N {
 
@@ -114,6 +114,13 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         return availabilityChartWrapper;
     }
 
+    /**
+     * Updates the statistics asynchronously.
+     * 
+     * @param availabilityStats A map containing availability statistics.
+     * @param categoryStats A map containing category statistics.
+     * @param priceStats A map containing price statistics.
+     */
     public void updateStatsAsync(Map<Availability, Long> availabilityStats,
             Map<String, Long[]> categoryStats, Map<String, Long> priceStats) {
         try {
@@ -134,6 +141,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         }
     }
 
+    // Update the charts with the new data
     private void updatePriceChart(Map<String, Long> priceStats) {
         var priceSeries = priceSeries(priceStats);
         priceSeries.setName(getTranslation(COUNT));
@@ -141,6 +149,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         conf.setSeries(priceSeries);
     }
 
+    // Update the charts with the new data
     private void updateCategoryChart(Map<String, Long[]> categoryStats) {
         var conf = categoryChart.getConfiguration();
 
@@ -163,6 +172,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         categoryStats.keySet().forEach(cat -> conf.getxAxis().addCategory(cat));
     }
 
+    // Update the charts with the new data
     private void updateAvailabilityChart(
             Map<Availability, Long> availabilityStats) {
         var availabilitySeries = availabilitySeries(availabilityStats);
@@ -200,13 +210,17 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     }
 
     private static SolidColor toColor(Availability availability) {
-        var color = "#0000ff";
-        if (availability == Availability.COMING) {
-            color = VaadinCreateTheme.COLOR_COMING;
-        } else if (availability == Availability.AVAILABLE) {
-            color = VaadinCreateTheme.COLOR_AVAILABLE;
-        } else {
-            color = VaadinCreateTheme.COLOR_DISCONTINUED;
+        String color;
+        switch (availability) {
+            case COMING:
+                color = VaadinCreateTheme.COLOR_COMING;
+                break;
+            case AVAILABLE:
+                color = VaadinCreateTheme.COLOR_AVAILABLE;
+                break;
+            default:
+                color = VaadinCreateTheme.COLOR_DISCONTINUED;
+                break;
         }
         return new SolidColor(color);
     }

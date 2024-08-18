@@ -78,7 +78,7 @@ public class BooksViewEditIdTest extends AbstractUITest {
                 .get();
         test(form.category).clickItem(cat);
 
-        test(form.save).click();
+        test(form.saveButton).click();
 
         assertTrue($(Notification.class).last().getCaption()
                 .contains("Modified book"));

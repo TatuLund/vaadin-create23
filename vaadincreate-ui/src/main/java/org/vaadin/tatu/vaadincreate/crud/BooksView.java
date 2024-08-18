@@ -43,7 +43,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * See also {@link BookPresenter} for fetching the data, the actual CRUD
  * operations and controlling the view based on events from outside.
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "java:S2160" })
 @RolesPermitted({ Role.USER, Role.ADMIN })
 public class BooksView extends CssLayout
         implements View, HasI18N, EventBusListener {
@@ -65,7 +65,6 @@ public class BooksView extends CssLayout
 
     private BookGrid grid;
     private BookForm form;
-    private TextField filter;
 
     private BooksPresenter presenter = new BooksPresenter(this);
     private AccessControl accessControl = VaadinCreateUI.get()
@@ -93,9 +92,8 @@ public class BooksView extends CssLayout
                         form.showForm(false);
                         setFragmentParameter("");
                     });
-                    dialog.addCancelListener(e -> {
-                        grid.select(form.getProduct());
-                    });
+                    dialog.addCancelListener(
+                            e -> grid.select(form.getProduct()));
                 } else {
                     presenter.rowSelected(event.getValue());
                 }
@@ -155,16 +153,16 @@ public class BooksView extends CssLayout
      * @return the created HorizontalLayout for the top bar
      */
     private HorizontalLayout createTopBar() {
-        filter = new TextField();
-        filter.setId("filter-field");
-        filter.setStyleName(VaadinCreateTheme.BOOKVIEW_FILTER);
-        filter.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
-        filter.setPlaceholder(getTranslation(FILTER));
-        filter.setIcon(VaadinIcons.SEARCH);
-        ResetButtonForTextField.extend(filter);
+        var filterField = new TextField();
+        filterField.setId("filter-field");
+        filterField.setStyleName(VaadinCreateTheme.BOOKVIEW_FILTER);
+        filterField.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
+        filterField.setPlaceholder(getTranslation(FILTER));
+        filterField.setIcon(VaadinIcons.SEARCH);
+        ResetButtonForTextField.extend(filterField);
         // Apply the filter to grid's data provider. TextField value is never
         // null
-        filter.addValueChangeListener(event -> dataProvider
+        filterField.addValueChangeListener(event -> dataProvider
                 .setFilter(book -> passesFilter(book, event.getValue())));
 
         newProduct = new Button(getTranslation(NEW_PRODUCT));
@@ -175,9 +173,9 @@ public class BooksView extends CssLayout
 
         var topLayout = new HorizontalLayout();
         topLayout.setWidth("100%");
-        topLayout.addComponents(filter, newProduct);
-        topLayout.setComponentAlignment(filter, Alignment.MIDDLE_LEFT);
-        topLayout.setExpandRatio(filter, 1);
+        topLayout.addComponents(filterField, newProduct);
+        topLayout.setComponentAlignment(filterField, Alignment.MIDDLE_LEFT);
+        topLayout.setExpandRatio(filterField, 1);
         topLayout.setStyleName(VaadinCreateTheme.BOOKVIEW_TOOLBAR);
         return topLayout;
     }
@@ -478,20 +476,16 @@ public class BooksView extends CssLayout
         return dialog;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void eventFired(Object event) {
         if (event instanceof LockingEvent && isAttached()) {
             var bookEvent = (LockingEvent) event;
             getUI().access(() -> {
                 if (grid.getDataProvider() instanceof ListDataProvider) {
-                    ListDataProvider<Product> dataProvider = (ListDataProvider<Product>) grid
-                            .getDataProvider();
                     dataProvider.getItems().stream()
                             .filter(book -> book.getId() == bookEvent.getId())
-                            .findFirst().ifPresent(product -> {
-                                dataProvider.refreshItem(product);
-                            });
+                            .findFirst().ifPresent(product -> dataProvider
+                                    .refreshItem(product));
                 }
             });
         }

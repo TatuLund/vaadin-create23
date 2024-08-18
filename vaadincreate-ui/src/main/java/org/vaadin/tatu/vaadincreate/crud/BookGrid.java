@@ -28,13 +28,20 @@ import com.vaadin.ui.renderers.NumberRenderer;
  * items. This version uses an in-memory data source that is suitable for small
  * data sets.
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "java:S2160" })
 public class BookGrid extends Grid<Product> implements HasI18N {
 
+    // Column keys
+    private static final String STOCK_ID = "stock";
+    private static final String NAME_ID = "name";
+    private static final String AVAILABILITY_ID = "availability";
+    private static final String PRICE_ID = "price";
+
+    // I18N keys
     private static final String CATEGORIES = "categories";
     private static final String IN_STOCK = "in-stock";
-    private static final String AVAILABILITY = "availability";
-    private static final String PRICE = "price";
+    private static final String AVAILABILITY = AVAILABILITY_ID;
+    private static final String PRICE = PRICE_ID;
     private static final String PRODUCT_NAME = "product-name";
     private static final String CANNOT_CONVERT = "cannot-convert";
     private static final String EDITED_BY = "edited-by";
@@ -70,7 +77,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
 
         addColumn(Product::getId, new NumberRenderer()).setCaption("Id")
                 .setResizable(false);
-        addColumn(Product::getProductName).setId("name")
+        addColumn(Product::getProductName).setId(NAME_ID)
                 .setCaption(getTranslation(PRODUCT_NAME)).setResizable(false)
                 .setComparator((p1, p2) -> p1.getProductName()
                         .compareToIgnoreCase(p2.getProductName()));
@@ -84,14 +91,14 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                         })
                         .setStyleGenerator(
                                 product -> VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT)
-                        .setId("price");
+                        .setId(PRICE_ID);
 
         // Add an traffic light icon in front of availability
         addColumn(this::htmlFormatAvailability, new HtmlRenderer())
                 .setResizable(false).setComparator((p1, p2) -> {
                     return p1.getAvailability().toString()
                             .compareTo(p2.getAvailability().toString());
-                }).setId("availability");
+                }).setId(AVAILABILITY_ID);
         availabilityCaption = new Label(getTranslation(AVAILABILITY));
         availabilityCaption
                 .addStyleName(VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL);
@@ -109,7 +116,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                 })
                 .setStyleGenerator(
                         product -> VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT)
-                .setId("stock");
+                .setId(STOCK_ID);
 
         // Show all categories the product is in, separated by commas
         addColumn(this::formatCategories).setCaption(getTranslation(CATEGORIES))
@@ -136,6 +143,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                 + "</span>";
     }
 
+    // Helper method to create an icon for availability
     private static String createAvailabilityIcon(Availability availability) {
         var color = "";
         switch (availability) {
@@ -173,7 +181,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         super.attach();
         // Replace caption with Label component so that it is possible to
         // control its visibility with CSS in the theme.
-        getHeader().getDefaultRow().getCell("availability")
+        getHeader().getDefaultRow().getCell(AVAILABILITY_ID)
                 .setComponent(availabilityCaption);
         // Get initial width and set visible columns based on that.
         var width = getUI().getPage().getBrowserWindowWidth();
@@ -207,18 +215,18 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         });
         getColumns().forEach(c -> c.setHidden(true));
         if (width < 650) {
-            getColumn("name").setHidden(false).setWidth(300);
-            getColumn("price").setHidden(false);
+            getColumn(NAME_ID).setHidden(false).setWidth(300);
+            getColumn(PRICE_ID).setHidden(false);
             setDescriptionGenerator(this::createTooltip, ContentMode.HTML);
         } else if (width < 920) {
-            getColumn("name").setHidden(false).setWidthUndefined();
-            getColumn("price").setHidden(false);
-            getColumn("availability").setHidden(false);
+            getColumn(NAME_ID).setHidden(false).setWidthUndefined();
+            getColumn(PRICE_ID).setHidden(false);
+            getColumn(AVAILABILITY_ID).setHidden(false);
         } else if (width < 1300) {
-            getColumn("name").setHidden(false).setWidthUndefined();
-            getColumn("price").setHidden(false);
-            getColumn("stock").setHidden(false);
-            getColumn("availability").setHidden(false);
+            getColumn(NAME_ID).setHidden(false).setWidthUndefined();
+            getColumn(PRICE_ID).setHidden(false);
+            getColumn(STOCK_ID).setHidden(false);
+            getColumn(AVAILABILITY_ID).setHidden(false);
         } else {
             getColumns().forEach(c -> c.setHidden(false));
         }
@@ -252,12 +260,14 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         return Utils.sanitize(unsanitized.toString());
     }
 
+    // Helper method to create a span with a caption
     private static String getDescriptionCaptionSpan(String caption) {
         return "<span class='"
                 + VaadinCreateTheme.BOOKVIEW_GRID_DESCRIPTIONCAPTION + "'>"
                 + caption + ":</span> ";
     }
 
+    // Helper method to create a ValueContext for the EuroConverter
     private static ValueContext createValueContext() {
         var field = new TextField();
         return new ValueContext(field, field);
@@ -271,6 +281,13 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         super.detach();
     }
 
+    /**
+     * Sets the product to be the last edited product in the grid. It will be
+     * shown with a different style.
+     *
+     * @param product
+     *            the product to be highlighted as last edited
+     */
     public void setEdited(Product product) {
         if (edited != -1) {
             edited = -1;

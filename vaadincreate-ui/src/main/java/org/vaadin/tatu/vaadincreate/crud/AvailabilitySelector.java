@@ -17,15 +17,16 @@ public class AvailabilitySelector extends ComboBox<Availability> {
         setEmptySelectionAllowed(false);
         setTextInputAllowed(false);
         setItemIconGenerator(item -> VaadinIcons.CIRCLE);
-        setStyleGenerator(
-                item -> "bookform-availability-" + item.name().toLowerCase());
+        setStyleGenerator(item -> getAvailabilityStyle(item));
         addValueChangeListener(e -> {
             if (e.getOldValue() != null) {
-                removeStyleName("bookform-availability-"
-                        + e.getOldValue().name().toLowerCase());
+                removeStyleName(getAvailabilityStyle(e.getOldValue()));
             }
-            addStyleName("bookform-availability-"
-                    + e.getValue().name().toLowerCase());
+            addStyleName(getAvailabilityStyle(e.getValue()));
         });
+    }
+
+    private String getAvailabilityStyle(Availability item) {
+        return "bookform-availability-" + item.name().toLowerCase();
     }
 }

@@ -46,7 +46,7 @@ public class BooksPresenter implements Serializable {
     private CompletableFuture<Collection<Product>> loadProductsAsync() {
         logger.info("Fetching products");
         var service = getService();
-        return CompletableFuture.supplyAsync(() -> service.getAllProducts(),
+        return CompletableFuture.supplyAsync(service::getAllProducts,
                 getExecutor());
     }
 

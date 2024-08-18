@@ -28,11 +28,13 @@ The demo app covers various use cases you may encounter in real life application
 	- Bean level validation example
 	- Bookmarkable editor
 	- Description generator showing details in compact mode
+	- Pessimistic locking preventing concurrent edits
 - Simplified example of access control
 - AdminView
 	- Example of nested sub-navigation using url-parameters and TabSheet component,
 	- Category management view, use Grid as list editor
 	- User management view, use FormLayout light variant
+	- Optimistic locking used for handling concurrent edits
 - AboutView
 	- Demo how to correctly sanitize user input with Jsoup in order to avoid XSS,
 	- CustomLayout example
@@ -46,6 +48,7 @@ The demo app covers various use cases you may encounter in real life application
     - Test custom components in isolation
     - Test as much as possible with unit tests
     - Prefer UI Unit Testing for testing UI logic including non-happy paths
+    - Use UI Unit Testing for verifying various concurrent user actions scenarios
     - Verify the most important parts with end to end tests using TestBench
     - Include few Screenshot tests to verify visuals
 

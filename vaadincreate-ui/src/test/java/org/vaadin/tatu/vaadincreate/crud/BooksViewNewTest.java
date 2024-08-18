@@ -61,7 +61,7 @@ public class BooksViewNewTest extends AbstractUITest {
                 .get();
         test(form.category).clickItem(cat);
 
-        test(form.save).click();
+        test(form.saveButton).click();
 
         assertTrue($(Notification.class).last().getCaption()
                 .contains("A new product"));

@@ -108,8 +108,8 @@ public class BooksViewTest extends AbstractUITest {
                 .get();
         test(form.category).clickItem(cat);
 
-        test(form.save).click();
-        assertFalse(form.save.isEnabled());
+        test(form.saveButton).click();
+        assertFalse(form.saveButton.isEnabled());
         assertTrue(test(form.availability).isInvalid());
         var errorMessage = "Mismatch between availability and stock count";
         assertEquals(errorMessage, test(form.availability).errorMessage());
@@ -119,7 +119,7 @@ public class BooksViewTest extends AbstractUITest {
         test(form.stockCount).setValue("0");
         assertFalse(test(form.availability).isInvalid());
         assertFalse(test(form.stockCount).isInvalid());
-        assertTrue(form.save.isEnabled());
+        assertTrue(form.saveButton.isEnabled());
 
         test($(form, Button.class).caption("Cancel").single()).click();
 
@@ -150,7 +150,7 @@ public class BooksViewTest extends AbstractUITest {
                 .get();
         test(form.category).clickItem(cat);
 
-        test(form.save).click();
+        test(form.saveButton).click();
 
         assertTrue(
                 $(Notification.class).last().getCaption().contains("New book"));
@@ -207,7 +207,7 @@ public class BooksViewTest extends AbstractUITest {
         var id = book.getId();
         var name = book.getProductName();
 
-        test(form.delete).click();
+        test(form.deleteButton).click();
 
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("confirm-button")).click();
@@ -247,7 +247,7 @@ public class BooksViewTest extends AbstractUITest {
         var id = book.getId();
 
         test(form.productName).setValue("Edited book");
-        test(form.save).click();
+        test(form.saveButton).click();
         assertFalse(form.isShown());
 
         var edited = ui.getProductService().getProductById(id);
@@ -321,7 +321,7 @@ public class BooksViewTest extends AbstractUITest {
 
         assertEquals(book, grid.getSelectedRow());
 
-        test(form.discard).click();
+        test(form.discardButton).click();
         assertFalse(form.productName.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
     }
@@ -373,7 +373,7 @@ public class BooksViewTest extends AbstractUITest {
 
         // Change and save
         test(form.productName).setValue("Product name changed");
-        test(form.save).click();
+        test(form.saveButton).click();
 
         // Assert internal error happens
         assertEquals("Internal error.",
@@ -397,7 +397,7 @@ public class BooksViewTest extends AbstractUITest {
 
         // Change and save
         test(form.productName).setValue("Product name changed");
-        test(form.save).click();
+        test(form.saveButton).click();
 
         // Assert internal error happens
         assertEquals("Internal error.",
@@ -509,7 +509,7 @@ public class BooksViewTest extends AbstractUITest {
         ui.getProductService().deleteCategory(category.getId());
 
         test(form.category).clickItem(category);
-        test(form.save).click();
+        test(form.saveButton).click();
 
         assertEquals("One or more of the selected categories were deleted.",
                 $(Notification.class).last().getCaption());

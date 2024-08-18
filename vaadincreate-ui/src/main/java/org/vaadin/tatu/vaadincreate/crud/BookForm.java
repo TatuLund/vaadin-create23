@@ -77,6 +77,7 @@ public class BookForm extends Composite implements HasI18N {
     private Product currentProduct;
     private CssLayout layout = new CssLayout();
     private BooksPresenter presenter;
+    private boolean visible;
 
     private static class StockCountConverter extends StringToIntegerConverter {
 
@@ -224,6 +225,7 @@ public class BookForm extends Composite implements HasI18N {
 
     public void showForm(boolean visible) {
         accessControl.assertAdmin();
+        this.visible = visible;
         // This process is tricky. The element needs to be in DOM and not having
         // 'display: none' in order to CSS animations to work. We will set
         // display none after a delay so that pressing 'tab' key will not reveal
@@ -256,8 +258,7 @@ public class BookForm extends Composite implements HasI18N {
     }
 
     public boolean isShown() {
-        return layout.getStyleName()
-                .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
+        return visible;
     }
 
     public boolean hasChanges() {

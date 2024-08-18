@@ -3,7 +3,6 @@ package org.vaadin.tatu.vaadincreate.crud;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Locale;
 
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
@@ -24,9 +23,9 @@ import com.vaadin.data.Result;
 import com.vaadin.data.ValueContext;
 import com.vaadin.data.converter.StringToIntegerConverter;
 import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.AbstractErrorMessage.ContentMode;
 import com.vaadin.server.Page;
-import com.vaadin.server.SerializableComparator;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.ui.ErrorLevel;
 import com.vaadin.ui.AbstractComponent;
@@ -36,11 +35,12 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-@SuppressWarnings({"serial", "java:S2160"})
+@SuppressWarnings({ "serial", "java:S2160" })
 public class BookForm extends Composite implements HasI18N {
 
     // Localization constants
@@ -60,8 +60,7 @@ public class BookForm extends Composite implements HasI18N {
     protected TextField productName = new TextField(
             getTranslation(PRODUCT_NAME));
     protected TextField price = new TextField(getTranslation(PRICE));
-    protected TextField stockCount = new TextField(
-            getTranslation(IN_STOCK));
+    protected TextField stockCount = new TextField(getTranslation(IN_STOCK));
     protected AvailabilitySelector availability = new AvailabilitySelector(
             getTranslation(AVAILABILITY));
     protected CheckBoxGroup<Category> category = new CheckBoxGroup<>(
@@ -163,6 +162,7 @@ public class BookForm extends Composite implements HasI18N {
         cancelButton.addClickListener(event -> {
             presenter.cancelProduct();
         });
+        cancelButton.setClickShortcut(KeyCode.ESCAPE);
 
         deleteButton.addClickListener(event -> handleDelete());
     }
@@ -224,11 +224,29 @@ public class BookForm extends Composite implements HasI18N {
 
     public void showForm(boolean visible) {
         accessControl.assertAdmin();
+        // This process is tricky. The element needs to be in DOM and not having
+        // 'display: none' in order to CSS animations to work. We will set
+        // display none after a delay so that pressing 'tab' key will not reveal
+        // the form while set not visible.
         if (visible) {
+            JavaScript.eval(
+                    "document.getElementById('book-form').style.display='block';");
             clearDirtyIndicators();
-            layout.addStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
+            getUI().runAfterRoundTrip(() -> layout
+                    .addStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
         } else {
             layout.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
+            if (isAttached()) {
+                getUI().runAfterRoundTrip(() -> {
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    JavaScript.eval(
+                            "document.getElementById('book-form').style.display='none';");
+                });
+            }
         }
         setEnabled(visible);
     }
@@ -306,8 +324,8 @@ public class BookForm extends Composite implements HasI18N {
         deleteButton.setId("delete-button");
         deleteButton.setEnabled(false);
 
-        formLayout.addComponents(productName, fieldWrapper,
-                availability, category);
+        formLayout.addComponents(productName, fieldWrapper, availability,
+                category);
         formLayout.addComponent(spacer);
         formLayout.addComponents(saveButton, discardButton, cancelButton,
                 deleteButton);
@@ -319,8 +337,10 @@ public class BookForm extends Composite implements HasI18N {
     public void setCategories(Collection<Category> categories) {
         category.setItems(categories);
         // Show selected items first in the list
-        var dataProvider = (ListDataProvider<Category>) category.getDataProvider();
-        dataProvider.setSortComparator((a, b) -> category.getValue().contains(a) ? -1 : 1);
+        var dataProvider = (ListDataProvider<Category>) category
+                .getDataProvider();
+        dataProvider.setSortComparator(
+                (a, b) -> category.getValue().contains(a) ? -1 : 1);
         if (getProduct() != null) {
             category.setValue(getProduct().getCategory());
         }

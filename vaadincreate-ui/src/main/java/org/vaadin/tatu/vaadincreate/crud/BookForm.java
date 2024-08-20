@@ -198,7 +198,7 @@ public class BookForm extends Composite implements HasI18N {
         if (visible) {
             clearDirtyIndicators();
         }
-        sidePanel.setVisible(visible);
+        sidePanel.show(visible);
         setEnabled(visible);
     }
 

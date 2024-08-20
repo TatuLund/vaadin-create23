@@ -84,6 +84,8 @@ public class BooksViewTest extends AbstractUITest {
 
             assertEquals(book.getAvailability(), form.availability.getValue());
             assertEquals(book.getCategory(), form.category.getValue());
+            
+            verifySelectedCategoriesAreTheFirst();
 
             test(grid).click(1, i);
 
@@ -94,6 +96,16 @@ public class BooksViewTest extends AbstractUITest {
             assertEquals(Collections.emptySet(), form.category.getValue());
         }
 
+    }
+
+    private void verifySelectedCategoriesAreTheFirst() {
+        // Verify that the selected categories are the first in the list
+        var items = form.category.getDataCommunicator().fetchItemsWithRange(0,
+                form.category.getDataCommunicator().getDataProviderSize());
+        var size = form.category.getValue().size();
+        for (int j=0;j<size;j++) {
+            assertTrue(form.category.getValue().contains(items.get(j)));
+        }
     }
 
     @Test
@@ -149,6 +161,7 @@ public class BooksViewTest extends AbstractUITest {
         var cat = ui.getProductService().getAllCategories().stream().findFirst()
                 .get();
         test(form.category).clickItem(cat);
+        verifySelectedCategoriesAreTheFirst();
 
         test(form.saveButton).click();
 

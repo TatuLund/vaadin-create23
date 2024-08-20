@@ -12,7 +12,7 @@ import com.vaadin.ui.JavaScript;
  */
 @SuppressWarnings("serial")
 public class SidePanel extends Composite {
-    CssLayout layout = new CssLayout();
+    private CssLayout layout = new CssLayout();
 
     public SidePanel() {
         layout.setId("book-form");
@@ -25,15 +25,21 @@ public class SidePanel extends Composite {
     /**
      * Set side panel content.
      *
-     * @param content Component
+     * @param content
+     *            Component
      */
     public void setContent(Component content) {
         layout.removeAllComponents();
         layout.addComponent(content);
     }
 
-    @Override
-    public void setVisible(boolean visible) {
+    /**
+     * Show the side panel with the animation. True slides in, false slides out.
+     *
+     * @param visible
+     *            boolean value.
+     */
+    public void show(boolean visible) {
         // This process is tricky. The element needs to be in DOM and not
         // having
         // 'display: none' in order to CSS animations to work. We will set
@@ -43,11 +49,10 @@ public class SidePanel extends Composite {
         if (visible) {
             JavaScript.eval(
                     "document.getElementById('book-form').style.display='block';");
-            getUI().runAfterRoundTrip(() -> layout.addStyleName(
-                    VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
+            getUI().runAfterRoundTrip(() -> layout
+                    .addStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
         } else {
-            layout.removeStyleName(
-                    VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
+            layout.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
             if (isAttached()) {
                 getUI().runAfterRoundTrip(() -> {
                     try {
@@ -62,4 +67,3 @@ public class SidePanel extends Composite {
         }
     }
 }
-

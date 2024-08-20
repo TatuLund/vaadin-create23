@@ -1,9 +1,6 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Collection;
-import java.util.Locale;
 
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
@@ -19,9 +16,6 @@ import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 
 import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.Binder;
-import com.vaadin.data.Result;
-import com.vaadin.data.ValueContext;
-import com.vaadin.data.converter.StringToIntegerConverter;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.AbstractErrorMessage.ContentMode;
@@ -35,7 +29,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -75,38 +68,9 @@ public class BookForm extends Composite implements HasI18N {
             .getAccessControl();
     private Binder<Product> binder;
     private Product currentProduct;
-    private CssLayout layout = new CssLayout();
+    private SidePanel sidePanel = new SidePanel();
     private BooksPresenter presenter;
     private boolean visible;
-
-    private static class StockCountConverter extends StringToIntegerConverter {
-
-        public StockCountConverter(String message) {
-            super(message);
-        }
-
-        @Override
-        protected NumberFormat getFormat(Locale locale) {
-            // do not use a thousands separator, as HTML5 input type
-            // number expects a fixed wire/DOM number format regardless
-            // of how the browser presents it to the user (which could
-            // depend on the browser locale)
-            var format = new DecimalFormat();
-            format.setMaximumFractionDigits(0);
-            format.setDecimalSeparatorAlwaysShown(false);
-            format.setParseIntegerOnly(true);
-            format.setGroupingUsed(false);
-            return format;
-        }
-
-        @Override
-        public Result<Integer> convertToModel(String value,
-                ValueContext context) {
-            Result<Integer> result = super.convertToModel(value, context);
-            return result.map(stock -> stock == null ? 0 : stock);
-        }
-
-    }
 
     /**
      * Represents a form for creating or editing a book. This form is used in
@@ -119,9 +83,8 @@ public class BookForm extends Composite implements HasI18N {
      */
     public BookForm(BooksPresenter presenter) {
         this.presenter = presenter;
-        setCompositionRoot(layout);
+        setCompositionRoot(sidePanel);
         buildForm();
-        layout.setId("book-form");
 
         binder = new BeanValidationBinder<>(Product.class);
         binder.forField(price)
@@ -223,33 +186,19 @@ public class BookForm extends Composite implements HasI18N {
         }
     }
 
+    /**
+     * Slide the form in/out. True slides the form in, false slides out.
+     *
+     * @param visible
+     *            boolean value.
+     */
     public void showForm(boolean visible) {
         accessControl.assertAdmin();
         this.visible = visible;
-        // This process is tricky. The element needs to be in DOM and not having
-        // 'display: none' in order to CSS animations to work. We will set
-        // display none after a delay so that pressing 'tab' key will not reveal
-        // the form while set not visible.
         if (visible) {
-            JavaScript.eval(
-                    "document.getElementById('book-form').style.display='block';");
             clearDirtyIndicators();
-            getUI().runAfterRoundTrip(() -> layout
-                    .addStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
-        } else {
-            layout.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
-            if (isAttached()) {
-                getUI().runAfterRoundTrip(() -> {
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    JavaScript.eval(
-                            "document.getElementById('book-form').style.display='none';");
-                });
-            }
         }
+        sidePanel.setVisible(visible);
         setEnabled(visible);
     }
 
@@ -272,7 +221,7 @@ public class BookForm extends Composite implements HasI18N {
         return hasChanges;
     }
 
-    public void updateDirtyIndicators() {
+    private void updateDirtyIndicators() {
         clearDirtyIndicators();
         binder.getChangedBindings()
                 .forEach(binding -> ((Component) binding.getField())
@@ -285,8 +234,6 @@ public class BookForm extends Composite implements HasI18N {
     }
 
     private void buildForm() {
-        layout.addStyleNames(VaadinCreateTheme.BOOKFORM,
-                VaadinCreateTheme.BOOKFORM_WRAPPER);
         var formLayout = new VerticalLayout();
         formLayout.setHeightFull();
         formLayout.setMargin(false);
@@ -331,7 +278,7 @@ public class BookForm extends Composite implements HasI18N {
         formLayout.addComponents(saveButton, discardButton, cancelButton,
                 deleteButton);
         formLayout.setExpandRatio(spacer, 1);
-        layout.addComponent(formLayout);
+        sidePanel.setContent(formLayout);
     }
 
     @SuppressWarnings("unchecked")

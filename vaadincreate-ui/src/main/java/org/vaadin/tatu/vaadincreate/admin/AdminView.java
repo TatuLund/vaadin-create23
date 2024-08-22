@@ -21,17 +21,13 @@ import com.vaadin.ui.themes.ValoTheme;
 public class AdminView extends VerticalLayout implements View, HasI18N {
 
     public static final String VIEW_NAME = "admin";
-    private String params;
-    private TabSheet tabSheet;
-    private CategoryManagementView categories;
-    private UserManagementView users;
 
     @Override
     public void enter(ViewChangeEvent event) {
-        params = event.getParameters();
-        tabSheet = new TabSheet();
-        categories = new CategoryManagementView();
-        users = new UserManagementView();
+        var params = event.getParameters();
+        var tabSheet = new TabSheet();
+        var categories = new CategoryManagementView();
+        var users = new UserManagementView();
         tabSheet.addTab(categories,
                 getTranslation(CategoryManagementView.VIEW_NAME));
         tabSheet.getTab(categories).setIcon(VaadinIcons.LIST);

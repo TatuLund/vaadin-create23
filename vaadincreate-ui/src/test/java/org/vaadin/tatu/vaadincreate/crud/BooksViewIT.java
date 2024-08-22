@@ -25,8 +25,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 public class BooksViewIT extends AbstractViewTest {
 
-    private final static String PRICE_EN = "10.00 €";
-    private final static String PRICE_FI = "10,00 €";
+    private static final String PRICE_EN = "10.00 €";
+    private static final String PRICE_FI = "10,00 €";
 
     @Override
     public void setup() throws Exception {

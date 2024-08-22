@@ -1,7 +1,6 @@
 package org.vaadin.tatu.vaadincreate.stats;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +16,6 @@ import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.VerticalLayout;
 
 public class StatsViewTest extends AbstractUITest {
 

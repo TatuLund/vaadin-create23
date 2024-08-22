@@ -3,14 +3,11 @@ package org.vaadin.tatu.vaadincreate.crud;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import java.util.Collection;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
-import org.vaadin.tatu.vaadincreate.backend.data.Product;
 
 import com.vaadin.server.Page;
 import com.vaadin.server.ServiceException;
@@ -22,7 +19,6 @@ public class BooksViewEditNewUserTest extends AbstractUITest {
     private BooksView view;
     private BookGrid grid;
     private BookForm form;
-    private Collection<Product> backup;
 
     @Before
     public void setup() throws ServiceException {

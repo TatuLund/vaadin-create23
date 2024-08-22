@@ -33,6 +33,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
         test($(cats, Button.class).id("new-category")).click();
         assertFalse($(cats, Button.class).id("new-category").isEnabled());
 
+        @SuppressWarnings("unchecked")
         var grid = (Grid<Category>) $(cats, Grid.class).single();
         var gridSize = test(grid).size();
         var horiz = (HorizontalLayout) test(grid).cell(0, gridSize - 1);

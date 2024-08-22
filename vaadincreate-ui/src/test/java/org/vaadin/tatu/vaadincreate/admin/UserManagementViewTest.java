@@ -51,6 +51,7 @@ public class UserManagementViewTest extends AbstractUITest {
         assertFalse($(FormLayout.class).single().isEnabled());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void addUser() {
         $(Button.class).id("new-button").click();
@@ -113,6 +114,7 @@ public class UserManagementViewTest extends AbstractUITest {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void deleteUser() {
         test($(ComboBox.class).id("user-select")).setInput("User0");

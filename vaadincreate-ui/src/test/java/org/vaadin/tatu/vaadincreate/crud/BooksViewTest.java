@@ -3,6 +3,8 @@ package org.vaadin.tatu.vaadincreate.crud;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -84,7 +86,7 @@ public class BooksViewTest extends AbstractUITest {
 
             assertEquals(book.getAvailability(), form.availability.getValue());
             assertEquals(book.getCategory(), form.category.getValue());
-            
+
             verifySelectedCategoriesAreTheFirst();
 
             test(grid).click(1, i);
@@ -103,7 +105,7 @@ public class BooksViewTest extends AbstractUITest {
         var items = form.category.getDataCommunicator().fetchItemsWithRange(0,
                 form.category.getDataCommunicator().getDataProviderSize());
         var size = form.category.getValue().size();
-        for (int j=0;j<size;j++) {
+        for (int j = 0; j < size; j++) {
             assertTrue(form.category.getValue().contains(items.get(j)));
         }
     }
@@ -285,13 +287,13 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, Button.class).caption("Cancel").single()).click();
         assertTrue(form.productName.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertTrue(LockedObjects.get().isLocked(book) != null);
+        assertNotNull(LockedObjects.get().isLocked(book));
 
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("confirm-button")).click();
 
         assertFalse(form.isShown());
-        assertFalse(LockedObjects.get().isLocked(book) != null);
+        assertNull(LockedObjects.get().isLocked(book));
     }
 
     @Test
@@ -420,33 +422,33 @@ public class BooksViewTest extends AbstractUITest {
     @Test
     public void lockBookUnlockBook() {
         var book = test(grid).item(0);
-        assertTrue(LockedObjects.get().isLocked(book) == null);
+        assertNull(LockedObjects.get().isLocked(book));
 
         test(grid).click(1, 0);
         assertTrue(form.isShown());
-        assertTrue(LockedObjects.get().isLocked(book) != null);
+        assertNotNull(LockedObjects.get().isLocked(book));
 
         test(grid).click(1, 1);
         assertTrue(form.isShown());
-        assertTrue(LockedObjects.get().isLocked(book) == null);
-        assertTrue(LockedObjects.get().isLocked(test(grid).item(1)) != null);
+        assertNull(LockedObjects.get().isLocked(book));
+        assertNotNull(LockedObjects.get().isLocked(test(grid).item(1)));
 
         test(grid).click(1, 1);
         assertFalse(form.isShown());
-        assertTrue(LockedObjects.get().isLocked(test(grid).item(1)) == null);
+        assertNull(LockedObjects.get().isLocked(test(grid).item(1)));
     }
 
     @Test
     public void lockBookUnlockOnNavigate() {
         var book = test(grid).item(0);
-        assertTrue(LockedObjects.get().isLocked(book) == null);
+        assertNull(LockedObjects.get().isLocked(book));
 
         test(grid).click(1, 0);
         assertTrue(form.isShown());
-        assertTrue(LockedObjects.get().isLocked(book) != null);
+        assertNotNull(LockedObjects.get().isLocked(book));
 
         $(Button.class).caption("About").single().click();
-        assertTrue(LockedObjects.get().isLocked(book) == null);
+        assertNull(LockedObjects.get().isLocked(book));
     }
 
     @Test
@@ -478,8 +480,8 @@ public class BooksViewTest extends AbstractUITest {
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("confirm-button")).click();
 
-        assertTrue($(AboutView.class).size() == 1);
-        assertTrue($(BooksView.class).size() == 0);
+        assertEquals(1, $(AboutView.class).size());
+        assertEquals(0, $(BooksView.class).size());
     }
 
     @Test
@@ -494,7 +496,7 @@ public class BooksViewTest extends AbstractUITest {
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("cancel-button")).click();
 
-        assertTrue($(BooksView.class).size() == 1);
+        assertEquals(1, $(BooksView.class).size());
         assertTrue(form.isShown());
     }
 

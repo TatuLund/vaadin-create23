@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,7 +44,7 @@ public class AppLayoutTest extends UIUnitTest {
         accessControl.signIn("Admin", "Admin");
         var view = navigate("test", MockView.class);
 
-        Assert.assertTrue(view.label != null);
+        Assert.assertNotNull(view.label);
         Assert.assertEquals("View", view.label.getValue());
     }
 
@@ -56,6 +58,7 @@ public class AppLayoutTest extends UIUnitTest {
         accessControl.signIn("User", "User");
         ui.getNavigator().navigateTo("test");
         var view = (ErrorView) ui.getNavigator().getCurrentView();
+        assertNotNull(view);
     }
 
     private void mockApp(UI ui, MockAccessControl accessControl) {

@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
@@ -54,7 +55,7 @@ public class BooksViewEditIdTest extends AbstractUITest {
     @Test
     public void editWithId() {
         var book = ui.getProductService().getProductById(10);
-        assertTrue(LockedObjects.get().isLocked(book) != null);
+        assertNotNull(LockedObjects.get().isLocked(book));
         var product = ui.getProductService().getProductById(10);
         assertEquals(product, grid.asSingleSelect().getSelectedItem().get());
 

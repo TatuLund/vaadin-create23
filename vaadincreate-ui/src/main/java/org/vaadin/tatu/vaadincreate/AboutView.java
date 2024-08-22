@@ -35,6 +35,8 @@ public class AboutView extends VerticalLayout
 
     public static final String VIEW_NAME = "about";
 
+    // Localization constants
+    private static final String EDIT_NOTE = "edit-note";
     private static final String VAADIN = "vaadin";
 
     private AccessControl accessControl = VaadinCreateUI.get()
@@ -106,6 +108,7 @@ public class AboutView extends VerticalLayout
         editButton.setIcon(VaadinIcons.EDIT);
         editButton.addStyleNames(ValoTheme.BUTTON_BORDERLESS,
                 ValoTheme.BUTTON_SMALL);
+        editButton.setDescription(getTranslation(EDIT_NOTE));
     }
 
     private void createAdminsNote() {

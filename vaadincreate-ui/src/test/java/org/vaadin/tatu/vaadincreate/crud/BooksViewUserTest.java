@@ -3,15 +3,12 @@ package org.vaadin.tatu.vaadincreate.crud;
 import org.junit.After;
 import org.junit.Before;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
-import org.vaadin.tatu.vaadincreate.backend.data.User;
 
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.VerticalLayout;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-
-import java.util.Optional;
 
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;

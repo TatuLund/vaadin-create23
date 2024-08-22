@@ -123,9 +123,7 @@ public class BookForm extends Composite implements HasI18N {
             updateDirtyIndicators();
         });
 
-        cancelButton.addClickListener(event -> {
-            presenter.cancelProduct();
-        });
+        cancelButton.addClickListener(event -> presenter.cancelProduct());
         cancelButton.setClickShortcut(KeyCode.ESCAPE);
 
         deleteButton.addClickListener(event -> handleDelete());

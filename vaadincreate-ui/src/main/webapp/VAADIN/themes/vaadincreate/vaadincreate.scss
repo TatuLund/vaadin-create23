@@ -533,11 +533,20 @@ $fake-grid-background-color: white;
   }
 
   .no-cell-focus {
-	.v-grid-cell-focused:before {
-	  border: unset;
-	}  
+	  .v-grid-cell-focused:before {
+	    border: unset;
+	  }  
   }
- 
+
+  .row-focus {
+    .v-grid-row-focused {
+      border: 1px solid $v-focus-color;
+      .v-grid-cell {
+        background-color: lighten($v-focus-color, 30%);
+      }
+    }
+  }
+
   .adminview-categorygrid {
     box-shadow: $light-shadow;
 

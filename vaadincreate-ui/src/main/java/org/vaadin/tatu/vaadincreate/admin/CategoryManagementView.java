@@ -83,7 +83,7 @@ public class CategoryManagementView extends VerticalLayout
                 VaadinCreateTheme.ADMINVIEW_CATEGORY_GRID,
                 VaadinCreateTheme.GRID_NO_STRIPES,
                 VaadinCreateTheme.GRID_NO_BORDERS,
-                VaadinCreateTheme.GRID_NO_FOCUS);
+                VaadinCreateTheme.GRID_NO_CELL_FOCUS);
         categoriesListing.setHeightMode(HeightMode.ROW);
     }
 

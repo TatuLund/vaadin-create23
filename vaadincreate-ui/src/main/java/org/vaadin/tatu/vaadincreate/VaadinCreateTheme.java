@@ -53,7 +53,8 @@ public class VaadinCreateTheme {
 
     public static final String GRID_NO_STRIPES = "no-stripes";
     public static final String GRID_NO_BORDERS = "no-borders";
-    public static final String GRID_NO_FOCUS = "no-cell-focus";
+    public static final String GRID_NO_CELL_FOCUS = "no-cell-focus";
+    public static final String GRID_ROW_FOCUS = "row-focus";
 
     public static final String BUTTON_CANCEL = "cancel";
 }

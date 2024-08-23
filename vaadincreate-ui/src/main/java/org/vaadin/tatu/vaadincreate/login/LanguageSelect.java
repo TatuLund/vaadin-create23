@@ -19,7 +19,7 @@ public class LanguageSelect extends ComboBox<Locale> implements HasI18N {
         setItems(DefaultI18NProvider.getInstance().getLocales());
         setItemCaptionGenerator(item -> getTranslation(item.getLanguage()));
         setItemIconGenerator(locale -> new ThemeResource(
-                "flags/" + locale.getLanguage() + ".gif"));
+            String.format("flags/%s.gif", locale.getLanguage())));
         setEmptySelectionAllowed(false);
         setTextInputAllowed(false);
     }

@@ -27,7 +27,7 @@ import com.vaadin.ui.UIDetachedException;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-@SuppressWarnings({"serial", "java:S2160"})
+@SuppressWarnings({ "serial", "java:S2160" })
 @RolesPermitted({ Role.USER, Role.ADMIN })
 public class StatsView extends VerticalLayout implements View, HasI18N {
 
@@ -117,9 +117,12 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     /**
      * Updates the statistics asynchronously.
      * 
-     * @param availabilityStats A map containing availability statistics.
-     * @param categoryStats A map containing category statistics.
-     * @param priceStats A map containing price statistics.
+     * @param availabilityStats
+     *            A map containing availability statistics.
+     * @param categoryStats
+     *            A map containing category statistics.
+     * @param priceStats
+     *            A map containing price statistics.
      */
     public void updateStatsAsync(Map<Availability, Long> availabilityStats,
             Map<String, Long[]> categoryStats, Map<String, Long> priceStats) {
@@ -212,15 +215,15 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     private static SolidColor toColor(Availability availability) {
         String color;
         switch (availability) {
-            case COMING:
-                color = VaadinCreateTheme.COLOR_COMING;
-                break;
-            case AVAILABLE:
-                color = VaadinCreateTheme.COLOR_AVAILABLE;
-                break;
-            default:
-                color = VaadinCreateTheme.COLOR_DISCONTINUED;
-                break;
+        case COMING:
+            color = VaadinCreateTheme.COLOR_COMING;
+            break;
+        case AVAILABLE:
+            color = VaadinCreateTheme.COLOR_AVAILABLE;
+            break;
+        default:
+            color = VaadinCreateTheme.COLOR_DISCONTINUED;
+            break;
         }
         return new SolidColor(color);
     }

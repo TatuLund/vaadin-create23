@@ -33,7 +33,7 @@ import com.vaadin.util.ReflectTools;
 /**
  * UI content when the user is not logged in yet.
  */
-@SuppressWarnings({"serial", "java:S2160"})
+@SuppressWarnings({ "serial", "java:S2160" })
 public class LoginView extends CssLayout implements HasI18N {
 
     private static final String LOGIN_FAILED = "login-failed";
@@ -90,9 +90,8 @@ public class LoginView extends CssLayout implements HasI18N {
     @Override
     public void attach() {
         super.attach();
-        resizeReg = getUI().getPage().addBrowserWindowResizeListener(e -> {
-            showLoginInformation(e.getWidth());
-        });
+        resizeReg = getUI().getPage().addBrowserWindowResizeListener(
+                e -> showLoginInformation(e.getWidth()));
         buildUI();
         usernameField.focus();
     }
@@ -102,10 +101,18 @@ public class LoginView extends CssLayout implements HasI18N {
         passwordField.setCaption(getTranslation(PASSWORD));
         login.setCaption(getTranslation(LOGIN_BUTTON));
         forgotPassword.setCaption(getTranslation(FORGOT_PASSWORD));
-        loginInfoText.setValue("<h1>" + getTranslation(LOGIN_INFO) + "</h1>"
-                + getTranslation(LOGIN_INFO_TEXT));
+        loginInfoText.setValue(getLoginInfoText());
         lang.setCaption(getTranslation(LANGUAGE));
         capsLockWarning.setMessage(getTranslation(CAPSLOCK));
+    }
+
+    private String getLoginInfoText() {
+        var h1 = createH1(getTranslation(LOGIN_INFO));
+        return String.format("%s %s", h1, getTranslation(LOGIN_INFO_TEXT));
+    }
+
+    private static String createH1(String text) {
+        return String.format("<h1>%s</h1>", text);
     }
 
     @Override
@@ -184,8 +191,7 @@ public class LoginView extends CssLayout implements HasI18N {
     private CssLayout buildLoginInformation() {
         var layout = new CssLayout();
         layout.setStyleName(VaadinCreateTheme.LOGINVIEW_INFORMATION);
-        loginInfoText = new Label("<h1>" + getTranslation(LOGIN_INFO) + "</h1>"
-                + getTranslation(LOGIN_INFO_TEXT), ContentMode.HTML);
+        loginInfoText = new Label(getLoginInfoText(), ContentMode.HTML);
         loginInfoText.setSizeFull();
         layout.addComponent(loginInfoText);
         return layout;

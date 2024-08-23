@@ -10,6 +10,15 @@ public class CookieUtil {
         // private constructor to hide the implicit public one
     }
 
+    /**
+     * Retrieves a cookie by its name from the given VaadinRequest.
+     *
+     * @param name
+     *            the name of the cookie to retrieve
+     * @param request
+     *            the VaadinRequest from which to retrieve the cookie
+     * @return the Cookie object with the specified name, or null if not found
+     */
     public static Cookie getCookieByName(String name, VaadinRequest request) {
         // Fetch all cookies from the request
         Cookie[] cookies = request.getCookies();
@@ -22,6 +31,7 @@ public class CookieUtil {
                 }
             }
         } catch (NullPointerException e) {
+            // We return null if not found.
         }
         return null;
     }

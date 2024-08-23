@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class StatsPresenter implements Serializable {
 
     private CompletableFuture<Collection<Product>> loadProductsAsync() {
         var service = getService();
-        return CompletableFuture.supplyAsync(() -> service.getAllProducts(),
+        return CompletableFuture.supplyAsync(service::getAllProducts,
                 getExecutor());
     }
 
@@ -45,7 +46,8 @@ public class StatsPresenter implements Serializable {
         var service = getService();
         future = loadProductsAsync().thenAccept(products -> {
             logger.info("Calculating statistics");
-            Map<Availability, Long> availabilityStats = new HashMap<>();
+            EnumMap<Availability, Long> availabilityStats = new EnumMap<>(
+                    Availability.class);
             for (Availability availability : Availability.values()) {
                 var count = products.stream().filter(
                         product -> product.getAvailability() == availability)

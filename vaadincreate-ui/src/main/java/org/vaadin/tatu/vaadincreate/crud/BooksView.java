@@ -185,6 +185,8 @@ public class BooksView extends CssLayout
         params = event.getParameters();
         if (!accessControl.isUserInRole(Role.ADMIN)) {
             grid.setSelectionMode(SelectionMode.NONE);
+            grid.setReadOnly(true);
+            form.setVisible(false);
         }
         presenter.requestUpdateProducts();
     }
@@ -437,7 +439,8 @@ public class BooksView extends CssLayout
         }
 
         var page = VaadinCreateUI.get().getPage();
-        var path = "!" + BooksView.VIEW_NAME + "/" + fragmentParameter;
+        var path = String.format("!%s/%s", BooksView.VIEW_NAME,
+                fragmentParameter);
         page.setUriFragment(path, false);
     }
 
@@ -446,9 +449,7 @@ public class BooksView extends CssLayout
         if (form.hasChanges()) {
             var dialog = createDiscardChangesConfirmDialog();
             dialog.open();
-            dialog.addConfirmedListener(e -> {
-                event.navigate();
-            });
+            dialog.addConfirmedListener(e -> event.navigate());
             // IMHO: Navigator clears url too early and this workaround
             // shouldn't be necessary. This is a possible bug.
             var book = getSelectedRow();

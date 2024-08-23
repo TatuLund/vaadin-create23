@@ -20,6 +20,14 @@ public class Utils {
         // private constructor to hide the implicit public one
     }
 
+    /**
+     * Sanitizes the given string by removing any potentially unsafe HTML tags
+     * and attributes.
+     *
+     * @param unsanitized
+     *            the string to be sanitized
+     * @return the sanitized string
+     */
     public static String sanitize(String unsanitized) {
         var settings = new OutputSettings();
         settings.prettyPrint(false);
@@ -28,6 +36,11 @@ public class Utils {
                 settings);
     }
 
+    /**
+     * Fixes the session fixation vulnerability by changing the session ID. This
+     * method disables push mode, changes the session ID, and enables push mode
+     * again.
+     */
     public static void sessionFixation() {
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.DISABLED);
         VaadinServletRequest request = (VaadinServletRequest) VaadinRequest
@@ -36,6 +49,16 @@ public class Utils {
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
     }
 
+    /**
+     * Formats the given LocalDateTime object into a string representation using
+     * the specified locale.
+     *
+     * @param dateTime
+     *            the LocalDateTime object to be formatted
+     * @param locale
+     *            the locale to be used for formatting
+     * @return the formatted string representation of the LocalDateTime object
+     */
     public static String formatDate(LocalDateTime dateTime, Locale locale) {
         var formatter = DateTimeFormatter
                 .ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(locale);

@@ -63,6 +63,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     public BookGrid() {
         setId("book-grid");
         setSizeFull();
+        addStyleNames(VaadinCreateTheme.GRID_NO_CELL_FOCUS,
+                VaadinCreateTheme.GRID_ROW_FOCUS);
 
         // Set highlight color to last edited row with style generator.
         setStyleGenerator(book -> {
@@ -128,6 +130,18 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                 .setStyleName(VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT);
     }
 
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
+        if (!readOnly) {
+            addStyleNames(VaadinCreateTheme.GRID_NO_CELL_FOCUS,
+                    VaadinCreateTheme.GRID_ROW_FOCUS);
+        } else {
+            addStyleName(VaadinCreateTheme.GRID_NO_CELL_FOCUS);
+            removeStyleName(VaadinCreateTheme.GRID_ROW_FOCUS);
+        }
+    }
+
     public Product getSelectedRow() {
         return asSingleSelect().getValue();
     }
@@ -138,9 +152,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
 
         var iconCode = createAvailabilityIcon(availability);
 
-        return iconCode + "<span class=\""
-                + VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL + "\"> " + text
-                + "</span>";
+        return String.format("%s<span class=\"%s\"> %s</span>", iconCode,
+                VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL, text);
     }
 
     // Helper method to create an icon for availability
@@ -160,11 +173,10 @@ public class BookGrid extends Grid<Product> implements HasI18N {
             break;
         }
 
-        return "<span class=\"v-icon\" style=\"font-family: "
-                + VaadinIcons.CIRCLE.getFontFamily() + ";color:" + color
-                + "\">&#x"
-                + Integer.toHexString(VaadinIcons.CIRCLE.getCodepoint())
-                + ";</span>";
+        return String.format(
+                "<span class=\"v-icon\" style=\"font-family: %s;color:%s\">&#x%s;</span>",
+                VaadinIcons.CIRCLE.getFontFamily(), color,
+                Integer.toHexString(VaadinIcons.CIRCLE.getCodepoint()));
     }
 
     private String formatCategories(Product product) {
@@ -262,9 +274,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
 
     // Helper method to create a span with a caption
     private static String getDescriptionCaptionSpan(String caption) {
-        return "<span class='"
-                + VaadinCreateTheme.BOOKVIEW_GRID_DESCRIPTIONCAPTION + "'>"
-                + caption + ":</span> ";
+        return String.format("<span class='%s'>%s:</span> ",
+                VaadinCreateTheme.BOOKVIEW_GRID_DESCRIPTIONCAPTION, caption);
     }
 
     // Helper method to create a ValueContext for the EuroConverter

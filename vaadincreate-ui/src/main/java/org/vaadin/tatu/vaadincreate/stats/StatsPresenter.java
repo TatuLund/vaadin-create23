@@ -63,7 +63,7 @@ public class StatsPresenter implements Serializable {
                         .count();
                 var instock = products.stream().filter(
                         product -> product.getCategory().contains(category))
-                        .mapToLong(prod -> prod.getStockCount()).sum();
+                        .mapToLong(Product::getStockCount).sum();
                 Long[] counts = { titles, instock };
                 categoryStats.put(category.getName(), counts);
             }
@@ -84,7 +84,7 @@ public class StatsPresenter implements Serializable {
         if (future != null) {
             boolean cancelled = future.cancel(true);
             future = null;
-            logger.info("Fetching stats cancelled: " + cancelled);
+            logger.info("Fetching stats cancelled: {}", cancelled);
         }
     }
 

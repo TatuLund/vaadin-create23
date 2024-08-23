@@ -136,12 +136,13 @@ public class LoginView extends CssLayout implements HasI18N {
         loginForm.setSizeUndefined();
         loginForm.setMargin(false);
 
-        loginForm.addComponent(usernameField = new TextField(
-                getTranslation(USERNAME), "Admin"));
+        usernameField = new TextField(getTranslation(USERNAME), "Admin");
+        loginForm.addComponent(usernameField);
         usernameField.setWidth(15, Unit.EM);
         usernameField.setId("login-username-field");
-        loginForm.addComponent(
-                passwordField = new PasswordField(getTranslation(PASSWORD)));
+
+        passwordField = new PasswordField(getTranslation(PASSWORD));
+        loginForm.addComponent(passwordField);
         capsLockWarning = CapsLockWarning.warnFor(passwordField);
         capsLockWarning.setMessage(getTranslation(CAPSLOCK));
         passwordField.setWidth(15, Unit.EM);
@@ -151,7 +152,8 @@ public class LoginView extends CssLayout implements HasI18N {
         buttons.setStyleName("buttons");
         loginForm.addComponent(buttons);
 
-        buttons.addComponent(login = new Button(getTranslation(LOGIN_BUTTON)));
+        login = new Button(getTranslation(LOGIN_BUTTON));
+        buttons.addComponent(login);
         login.setDisableOnClick(true);
         login.setId("login-button");
         login.addClickListener(event -> {

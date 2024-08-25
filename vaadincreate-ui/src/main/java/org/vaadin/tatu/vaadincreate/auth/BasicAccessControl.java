@@ -44,10 +44,7 @@ public class BasicAccessControl implements AccessControl {
     public boolean isUserInRole(Role role) {
         assert (CurrentUser.get().isPresent());
         User user = CurrentUser.get().get();
-        if (user.getRole() == role) {
-            return true;
-        }
-        return false;
+        return user.getRole() == role;
     }
 
     @Override

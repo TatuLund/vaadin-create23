@@ -13,6 +13,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.Binder;
@@ -36,33 +37,24 @@ import com.vaadin.ui.themes.ValoTheme;
 @SuppressWarnings({ "serial", "java:S2160" })
 public class BookForm extends Composite implements HasI18N {
 
-    // Localization constants
-    private static final String AVAILABILITY_MISMATCH = "availability-mismatch";
-    private static final String SAVE = "save";
-    private static final String CANCEL = "cancel";
-    private static final String CANNOT_CONVERT = "cannot-convert";
-    private static final String CATEGORIES = "categories";
-    private static final String DISCARD = "discard";
-    private static final String AVAILABILITY = "availability";
-    private static final String IN_STOCK = "in-stock";
-    private static final String PRICE = "price";
-    private static final String PRODUCT_NAME = "product-name";
-    private static final String DELETE = "delete";
-    private static final String WILL_DELETE = "will-delete";
-
+    // The form fields are bound to the product object by naming convention.
+    // E.g. using the field name "productName" will bind to the Product's
+    // "productName" property.
     protected TextField productName = new TextField(
-            getTranslation(PRODUCT_NAME));
-    protected TextField price = new TextField(getTranslation(PRICE));
-    protected TextField stockCount = new TextField(getTranslation(IN_STOCK));
+            getTranslation(I18n.PRODUCT_NAME));
+    protected TextField price = new TextField(getTranslation(I18n.PRICE));
+    protected TextField stockCount = new TextField(
+            getTranslation(I18n.IN_STOCK));
     protected AvailabilitySelector availability = new AvailabilitySelector(
-            getTranslation(AVAILABILITY));
+            getTranslation(I18n.AVAILABILITY));
     protected CheckBoxGroup<Category> category = new CheckBoxGroup<>(
-            getTranslation(CATEGORIES));
+            getTranslation(I18n.CATEGORIES));
 
-    protected Button saveButton = new Button(getTranslation(SAVE));
-    protected Button discardButton = new Button(getTranslation(DISCARD));
-    protected Button cancelButton = new Button(getTranslation(CANCEL));
-    protected Button deleteButton = new Button(getTranslation(DELETE));
+    protected Button saveButton = new Button(getTranslation(I18n.SAVE));
+    protected Button discardButton = new Button(
+            getTranslation(I18n.Form.DISCARD));
+    protected Button cancelButton = new Button(getTranslation(I18n.CANCEL));
+    protected Button deleteButton = new Button(getTranslation(I18n.DELETE));
 
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
@@ -88,12 +80,12 @@ public class BookForm extends Composite implements HasI18N {
 
         binder = new BeanValidationBinder<>(Product.class);
         binder.forField(price)
-                .withConverter(
-                        new EuroConverter(getTranslation(CANNOT_CONVERT)))
+                .withConverter(new EuroConverter(
+                        getTranslation(I18n.Form.CANNOT_CONVERT)))
                 .bind("price");
         binder.forField(stockCount)
-                .withConverter(
-                        new StockCountConverter(getTranslation(CANNOT_CONVERT)))
+                .withConverter(new StockCountConverter(
+                        getTranslation(I18n.Form.CANNOT_CONVERT)))
                 .bind("stockCount");
 
         category.setItemCaptionGenerator(Category::getName);
@@ -142,10 +134,10 @@ public class BookForm extends Composite implements HasI18N {
 
     private void handleDelete() {
         if (currentProduct != null) {
-            var dialog = new ConfirmDialog(getTranslation(WILL_DELETE,
+            var dialog = new ConfirmDialog(getTranslation(I18n.WILL_DELETE,
                     currentProduct.getProductName()), Type.ALERT);
-            dialog.setConfirmText(getTranslation(DELETE));
-            dialog.setCancelText(getTranslation(CANCEL));
+            dialog.setConfirmText(getTranslation(I18n.DELETE));
+            dialog.setCancelText(getTranslation(I18n.CANCEL));
             dialog.open();
             dialog.addConfirmedListener(e -> {
                 presenter.deleteProduct(currentProduct);
@@ -172,12 +164,12 @@ public class BookForm extends Composite implements HasI18N {
     // Set the stock count and availability fields as invalid
     private void setStockCountAndAvailabilityInvalid(boolean invalid) {
         if (invalid) {
-            stockCount.setComponentError(
-                    new UserError(getTranslation(AVAILABILITY_MISMATCH),
-                            ContentMode.TEXT, ErrorLevel.ERROR));
-            availability.setComponentError(
-                    new UserError(getTranslation(AVAILABILITY_MISMATCH),
-                            ContentMode.TEXT, ErrorLevel.ERROR));
+            stockCount.setComponentError(new UserError(
+                    getTranslation(I18n.Form.AVAILABILITY_MISMATCH),
+                    ContentMode.TEXT, ErrorLevel.ERROR));
+            availability.setComponentError(new UserError(
+                    getTranslation(I18n.Form.AVAILABILITY_MISMATCH),
+                    ContentMode.TEXT, ErrorLevel.ERROR));
         } else {
             stockCount.setComponentError(null);
             availability.setComponentError(null);

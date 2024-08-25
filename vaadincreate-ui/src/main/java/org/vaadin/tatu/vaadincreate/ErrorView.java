@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -20,13 +21,10 @@ import com.vaadin.ui.themes.ValoTheme;
 @AllPermitted
 public class ErrorView extends VerticalLayout implements View, HasI18N {
 
-    private static final String VIEW_NOT_FOUND = "view-not-found";
-    private static final String NOT_FOUND_DESC = "not-found-desc";
-
     Label explanation = new Label();
 
     public ErrorView() {
-        var header = new Label(getTranslation(VIEW_NOT_FOUND));
+        var header = new Label(getTranslation(I18n.Error.VIEW_NOT_FOUND));
         header.addStyleName(ValoTheme.LABEL_H1);
         addComponent(header);
         addComponent(explanation);
@@ -34,8 +32,8 @@ public class ErrorView extends VerticalLayout implements View, HasI18N {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        explanation
-                .setValue(getTranslation(NOT_FOUND_DESC, event.getViewName()));
+        explanation.setValue(
+                getTranslation(I18n.Error.NOT_FOUND_DESC, event.getViewName()));
         logger.warn("User '{}' attempted to navigate non-existent view '{}'",
                 CurrentUser.get().get().getName(), event.getViewName());
     }

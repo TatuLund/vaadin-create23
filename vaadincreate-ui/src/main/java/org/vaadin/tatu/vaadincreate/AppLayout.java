@@ -8,6 +8,7 @@ import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
@@ -28,14 +29,11 @@ import com.vaadin.ui.themes.ValoTheme;
 /**
  * This is a responsive application shell with Navigator build with ValoMenu
  */
-@SuppressWarnings({"serial", "java:S2160"})
+@SuppressWarnings({ "serial", "java:S2160" })
 public class AppLayout extends HorizontalLayout implements HasI18N {
 
-    private static final String LOGOUT = "logout";
-    private static final String MENU = "menu";
-
     private final VerticalLayout content = new VerticalLayout();
-    private final CssLayout menu = new CssLayout();
+    private final CssLayout menuLayout = new CssLayout();
     private final CssLayout menuItems = new CssLayout();
     private final CssLayout title;
     private final UI ui;
@@ -61,10 +59,10 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
         setSizeFull();
         Responsive.makeResponsive(ui);
 
-        menu.setPrimaryStyleName(ValoTheme.MENU_ROOT);
-        menu.addStyleName(ValoTheme.MENU_PART);
-        menu.setWidth(null);
-        menu.setHeight("100%");
+        menuLayout.setPrimaryStyleName(ValoTheme.MENU_ROOT);
+        menuLayout.addStyleName(ValoTheme.MENU_PART);
+        menuLayout.setWidth(null);
+        menuLayout.setHeight("100%");
 
         title = new CssLayout();
         var logo = new Label(VaadinIcons.BOOK.getHtml(), ContentMode.HTML);
@@ -73,50 +71,41 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
         title.addComponents(logo);
         title.addStyleNames(ValoTheme.MENU_TITLE);
 
-        menu.addComponent(title);
+        menuLayout.addComponent(title);
 
-        var toggleButton = new Button(getTranslation(MENU), vent -> {
-            if (menu.getStyleName().contains(ValoTheme.MENU_VISIBLE)) {
-                menu.removeStyleName(ValoTheme.MENU_VISIBLE);
+        var toggleButton = new Button(getTranslation(I18n.App.MENU), vent -> {
+            if (menuLayout.getStyleName().contains(ValoTheme.MENU_VISIBLE)) {
+                menuLayout.removeStyleName(ValoTheme.MENU_VISIBLE);
             } else {
-                menu.addStyleName(ValoTheme.MENU_VISIBLE);
+                menuLayout.addStyleName(ValoTheme.MENU_VISIBLE);
             }
         });
-        toggleButton.setDescription(getTranslation(MENU));
+        toggleButton.setDescription(getTranslation(I18n.App.MENU));
 
         toggleButton.setIcon(VaadinIcons.LIST);
         toggleButton.addStyleName(ValoTheme.MENU_TOGGLE);
         toggleButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
         toggleButton.addStyleName(ValoTheme.BUTTON_SMALL);
-        menu.addComponent(toggleButton);
+        menuLayout.addComponent(toggleButton);
 
-        menu.addComponent(menuItems);
+        menuLayout.addComponent(menuItems);
         menuItems.addStyleName(ValoTheme.MENU_ITEMS);
 
         var logout = new MenuBar();
         logout.setId("logout");
-        var item = logout.addItem(getTranslation(LOGOUT), e -> {
-            // Use runAfterLeaveConfirmation wrapper to run the logout in based
-            // on beforeLeave of the current view. E.g. if BooksView has changes
-            // ConfirmDialog is shown.
-            nav.runAfterLeaveConfirmation(() -> {
-                logger.info("User '{}' logout",
-                        CurrentUser.get().get().getName());
-                ui.getSession().getSession().invalidate();
-                ui.getPage().reload();
-            });
-        });
+        var item = logout.addItem(getTranslation(I18n.App.LOGOUT),
+                e -> handleConfirmLogoutWhenChanges(ui, nav));
         item.setIcon(VaadinIcons.KEY);
-        item.setDescription(getTranslation(LOGOUT));
+        item.setDescription(getTranslation(I18n.App.LOGOUT));
         logout.addStyleName(ValoTheme.MENU_USER);
-        menu.addComponent(logout);
+        menuLayout.addComponent(logout);
 
         content.setPrimaryStyleName(ValoTheme.NAV_CONTENT);
         content.setSizeFull();
         content.setMargin(false);
         content.setSpacing(false);
 
-        addComponent(menu);
+        addComponent(menuLayout);
         addComponent(content);
         setExpandRatio(content, 1);
 
@@ -131,7 +120,7 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
                 setSelected(event.getViewName());
                 logger.info("User '{}' navigated to view '{}'",
                         CurrentUser.get().get().getName(), event.getViewName());
-                menu.removeStyleName(ValoTheme.MENU_VISIBLE);
+                menuLayout.removeStyleName(ValoTheme.MENU_VISIBLE);
             }
 
             @Override
@@ -140,6 +129,17 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
                 return hasAccessToView(view.getClass());
             }
 
+        });
+    }
+
+    private void handleConfirmLogoutWhenChanges(UI ui, Navigator nav) {
+        // Use runAfterLeaveConfirmation wrapper to run the logout in based
+        // on beforeLeave of the current view. E.g. if BooksView has changes
+        // ConfirmDialog is shown.
+        nav.runAfterLeaveConfirmation(() -> {
+            logger.info("User '{}' logout", CurrentUser.get().get().getName());
+            ui.getSession().getSession().invalidate();
+            ui.getPage().reload();
         });
     }
 
@@ -187,9 +187,7 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
         var menuItem = new Button(viewName);
         menuItem.setId(path);
         menuItem.setData(path);
-        menuItem.addClickListener(e -> {
-            ui.getNavigator().navigateTo(path);
-        });
+        menuItem.addClickListener(e -> ui.getNavigator().navigateTo(path));
         menuItem.setPrimaryStyleName(ValoTheme.MENU_ITEM);
         if (path.equals("")) {
             menuItem.addStyleName(ValoTheme.MENU_SELECTED);

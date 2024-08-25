@@ -8,7 +8,6 @@ import org.vaadin.tatu.vaadincreate.backend.data.User;
 /**
  * This is a ledger for locked objects used for pessimistic locking.
  */
-@SuppressWarnings("serial")
 public interface LockedObjects {
 
     /**

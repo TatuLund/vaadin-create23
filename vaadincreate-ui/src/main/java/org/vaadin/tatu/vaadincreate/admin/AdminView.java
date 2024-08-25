@@ -70,7 +70,8 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
         }
 
         var page = VaadinCreateUI.get().getPage();
-        page.setUriFragment("!" + AdminView.VIEW_NAME + "/" + fragmentParameter,
+        page.setUriFragment(
+                String.format("!%s/%s", AdminView.VIEW_NAME, fragmentParameter),
                 false);
     }
 

@@ -9,9 +9,10 @@ import org.slf4j.LoggerFactory;
  * Super simple event bus to be used with CDI, e.g. as application scoped
  * broadcaster.
  */
+@SuppressWarnings("java:S6548")
 public class EventBusImpl implements EventBus {
 
-    private static EventBusImpl INSTANCE;
+    private static EventBusImpl instance;
 
     /**
      * It is <em>VERY IMPORTANT</em> we use a weak hash map when registering
@@ -21,10 +22,10 @@ public class EventBusImpl implements EventBus {
     private final WeakHashMap<EventBusListener, Object> eventListeners = new WeakHashMap<>();
 
     public static synchronized EventBus getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new EventBusImpl();
+        if (instance == null) {
+            instance = new EventBusImpl();
         }
-        return INSTANCE;
+        return instance;
     }
 
     private EventBusImpl() {
@@ -35,9 +36,7 @@ public class EventBusImpl implements EventBus {
         synchronized (eventListeners) {
             logger.debug("EventBus event fired for {} recipients.",
                     eventListeners.size());
-            eventListeners.forEach((listener, o) -> {
-                listener.eventFired(event);
-            });
+            eventListeners.forEach((listener, o) -> listener.eventFired(event));
         }
     }
 

@@ -9,6 +9,7 @@ import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.ChartType;
@@ -33,13 +34,6 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
 
     public static final String VIEW_NAME = "stats";
 
-    private static final String NO_DATA = "no-data";
-    private static final String CATEGORIES = "categories";
-    private static final String AVAILABILITIES = "availabilities";
-    private static final String PRICES = "prices";
-    private static final String COUNT = "count";
-    private static final String IN_STOCK = "in-stock";
-
     private StatsPresenter presenter = new StatsPresenter(this);
 
     private CssLayout dashboard;
@@ -60,7 +54,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         lang = new Lang();
         // Set loading label to Chart no data as loading of data is done
         // asynchronously
-        lang.setNoData(getTranslation(NO_DATA));
+        lang.setNoData(getTranslation(I18n.Stats.NO_DATA));
 
         var availabilityChartWrapper = createAvailabilityChart();
 
@@ -82,7 +76,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         priceChart.setId("price-chart");
         priceChartWrapper.addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
         var conf = priceChart.getConfiguration();
-        conf.setTitle(getTranslation(PRICES));
+        conf.setTitle(getTranslation(I18n.Stats.PRICES));
         conf.setLang(lang);
         priceChartWrapper.addComponent(priceChart);
         return priceChartWrapper;
@@ -95,7 +89,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         categoryChart = new Chart(ChartType.COLUMN);
         categoryChart.setId("category-chart");
         var conf = categoryChart.getConfiguration();
-        conf.setTitle(getTranslation(CATEGORIES));
+        conf.setTitle(getTranslation(I18n.CATEGORIES));
         conf.setLang(lang);
         categoryChartWrapper.addComponent(categoryChart);
         return categoryChartWrapper;
@@ -108,7 +102,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         availabilityChartWrapper
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
         var conf = availabilityChart.getConfiguration();
-        conf.setTitle(getTranslation(AVAILABILITIES));
+        conf.setTitle(getTranslation(I18n.Stats.AVAILABILITIES));
         conf.setLang(lang);
         availabilityChartWrapper.addComponent(availabilityChart);
         return availabilityChartWrapper;
@@ -147,7 +141,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     // Update the charts with the new data
     private void updatePriceChart(Map<String, Long> priceStats) {
         var priceSeries = priceSeries(priceStats);
-        priceSeries.setName(getTranslation(COUNT));
+        priceSeries.setName(getTranslation(I18n.Stats.COUNT));
         var conf = priceChart.getConfiguration();
         conf.setSeries(priceSeries);
     }
@@ -158,9 +152,9 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
 
         // Show count of titles on primary axis
         var titles = categorySeries(categoryStats, 0);
-        titles.setName(getTranslation(COUNT));
+        titles.setName(getTranslation(I18n.Stats.COUNT));
         conf.setSeries(titles);
-        conf.getyAxis().setTitle(getTranslation(COUNT));
+        conf.getyAxis().setTitle(getTranslation(I18n.Stats.COUNT));
 
         // Create secondary axis for counts in stock
         // and position it to the right side
@@ -168,10 +162,10 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         stockAxis.setOpposite(true);
         conf.addyAxis(stockAxis);
         var stockCounts = categorySeries(categoryStats, 1);
-        stockCounts.setName(getTranslation(IN_STOCK));
+        stockCounts.setName(getTranslation(I18n.IN_STOCK));
         stockCounts.setyAxis(1);
         conf.addSeries(stockCounts);
-        stockAxis.setTitle(getTranslation(IN_STOCK));
+        stockAxis.setTitle(getTranslation(I18n.IN_STOCK));
         categoryStats.keySet().forEach(cat -> conf.getxAxis().addCategory(cat));
     }
 
@@ -179,7 +173,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     private void updateAvailabilityChart(
             Map<Availability, Long> availabilityStats) {
         var availabilitySeries = availabilitySeries(availabilityStats);
-        availabilitySeries.setName(getTranslation(COUNT));
+        availabilitySeries.setName(getTranslation(I18n.Stats.COUNT));
         var conf = availabilityChart.getConfiguration();
         conf.setSeries(availabilitySeries);
         conf.getLegend().setEnabled(false);
@@ -194,7 +188,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         var series = new DataSeries();
         categories.forEach((category, count) -> {
             var item = new DataSeriesItem(category, count[index]);
-            series.setName(getTranslation(CATEGORIES));
+            series.setName(getTranslation(I18n.CATEGORIES));
             series.add(item);
         });
         return series;
@@ -206,7 +200,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         availabilities.forEach((availability, count) -> {
             var item = new DataSeriesItem(availability.name(), count);
             item.setColor(toColor(availability));
-            series.setName(getTranslation(AVAILABILITIES));
+            series.setName(getTranslation(I18n.Stats.AVAILABILITIES));
             series.add(item);
         });
         return series;
@@ -232,7 +226,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         var series = new DataSeries();
         prices.forEach((pricebracket, count) -> {
             var item = new DataSeriesItem(pricebracket, count);
-            series.setName(getTranslation(PRICES));
+            series.setName(getTranslation(I18n.Stats.PRICES));
             series.add(item);
         });
         return series;
@@ -248,12 +242,11 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     @Override
     public void attach() {
         super.attach();
-        resizeListener = getUI().getPage().addBrowserWindowResizeListener(e -> {
-            // Vaadin responsive forces layout only when break point changes,
-            // however Chart requires re-layout also when window size changes
-            // when using non-fixed sizes.
-            JavaScript.eval("vaadin.forceLayout()");
-        });
+        // Vaadin responsive forces layout only when break point changes,
+        // however Chart requires re-layout also when window size changes
+        // when using non-fixed sizes.
+        resizeListener = getUI().getPage().addBrowserWindowResizeListener(
+                e -> JavaScript.eval("vaadin.forceLayout()"));
     }
 
     @Override

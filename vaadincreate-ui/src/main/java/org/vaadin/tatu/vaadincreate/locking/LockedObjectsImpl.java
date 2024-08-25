@@ -11,19 +11,20 @@ import org.vaadin.tatu.vaadincreate.backend.data.AbstractEntity;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
-@SuppressWarnings("serial")
+@SuppressWarnings("java:S6548")
 public class LockedObjectsImpl implements LockedObjects {
 
-    private static LockedObjectsImpl INSTANCE;
+    private static LockedObjectsImpl instance;
     private EventBus eventBus = EventBus.get();
+    private static final String NOT_NULL_ERROR = "object can't be null";
 
     private final WeakHashMap<LockedObject, Object> lockedObjects = new WeakHashMap<>();
 
     public static synchronized LockedObjects getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new LockedObjectsImpl();
+        if (instance == null) {
+            instance = new LockedObjectsImpl();
         }
-        return INSTANCE;
+        return instance;
     }
 
     private LockedObjectsImpl() {
@@ -31,7 +32,7 @@ public class LockedObjectsImpl implements LockedObjects {
 
     @Override
     public User isLocked(AbstractEntity object) {
-        Objects.requireNonNull(object, "object can't be null");
+        Objects.requireNonNull(object, NOT_NULL_ERROR);
         return isLocked(object.getClass(), object.getId());
     }
 
@@ -47,7 +48,7 @@ public class LockedObjectsImpl implements LockedObjects {
 
     @Override
     public void lock(AbstractEntity object, User user) {
-        Objects.requireNonNull(object, "object can't be null");
+        Objects.requireNonNull(object, NOT_NULL_ERROR);
         Objects.requireNonNull(user, "user can't be null");
         lock(object.getClass(), object.getId(), user);
     }
@@ -72,7 +73,7 @@ public class LockedObjectsImpl implements LockedObjects {
 
     @Override
     public void unlock(AbstractEntity object) {
-        Objects.requireNonNull(object, "object can't be null");
+        Objects.requireNonNull(object, NOT_NULL_ERROR);
         unlock(object.getClass(), object.getId());
     }
 

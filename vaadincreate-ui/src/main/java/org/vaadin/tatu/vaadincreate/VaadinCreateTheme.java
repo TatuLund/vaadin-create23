@@ -1,6 +1,6 @@
 package org.vaadin.tatu.vaadincreate;
 
-public class VaadinCreateTheme {
+public final class VaadinCreateTheme {
 
     private VaadinCreateTheme() {
         // private constructor to hide the implicit public one

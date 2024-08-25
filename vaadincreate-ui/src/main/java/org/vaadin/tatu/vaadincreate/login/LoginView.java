@@ -10,6 +10,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18NProvider;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.event.ConnectorEventListener;
 import com.vaadin.event.ShortcutAction;
@@ -35,18 +36,6 @@ import com.vaadin.util.ReflectTools;
  */
 @SuppressWarnings({ "serial", "java:S2160" })
 public class LoginView extends CssLayout implements HasI18N {
-
-    private static final String LOGIN_FAILED = "login-failed";
-    private static final String LOGIN_FAILED_DESC = "login-failed-desc";
-    private static final String LOGIN_INFO = "login-info";
-    private static final String LOGIN_INFO_TEXT = "login-info-text";
-    private static final String LOGIN_BUTTON = "login-button";
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "password";
-    private static final String FORGOT_PASSWORD = "forgot-password";
-    private static final String HINT = "hint";
-    private static final String LANGUAGE = "language";
-    private static final String CAPSLOCK = "capslock";
 
     TextField usernameField;
     PasswordField passwordField;
@@ -97,18 +86,19 @@ public class LoginView extends CssLayout implements HasI18N {
     }
 
     private void updateTranslations() {
-        usernameField.setCaption(getTranslation(USERNAME));
-        passwordField.setCaption(getTranslation(PASSWORD));
-        login.setCaption(getTranslation(LOGIN_BUTTON));
-        forgotPassword.setCaption(getTranslation(FORGOT_PASSWORD));
+        usernameField.setCaption(getTranslation(I18n.USERNAME));
+        passwordField.setCaption(getTranslation(I18n.PASSWORD));
+        login.setCaption(getTranslation(I18n.Login.LOGIN_BUTTON));
+        forgotPassword.setCaption(getTranslation(I18n.Login.FORGOT_PASSWORD));
         loginInfoText.setValue(getLoginInfoText());
-        lang.setCaption(getTranslation(LANGUAGE));
-        capsLockWarning.setMessage(getTranslation(CAPSLOCK));
+        lang.setCaption(getTranslation(I18n.Login.LANGUAGE));
+        capsLockWarning.setMessage(getTranslation(I18n.Login.CAPSLOCK));
     }
 
     private String getLoginInfoText() {
-        var h1 = createH1(getTranslation(LOGIN_INFO));
-        return String.format("%s %s", h1, getTranslation(LOGIN_INFO_TEXT));
+        var h1 = createH1(getTranslation(I18n.Login.LOGIN_INFO));
+        return String.format("%s %s", h1,
+                getTranslation(I18n.Login.LOGIN_INFO_TEXT));
     }
 
     private static String createH1(String text) {
@@ -136,23 +126,24 @@ public class LoginView extends CssLayout implements HasI18N {
         loginForm.setSizeUndefined();
         loginForm.setMargin(false);
 
-        usernameField = new TextField(getTranslation(USERNAME), "Admin");
+        usernameField = new TextField(getTranslation(I18n.USERNAME),
+                "Admin");
         loginForm.addComponent(usernameField);
         usernameField.setWidth(15, Unit.EM);
         usernameField.setId("login-username-field");
 
-        passwordField = new PasswordField(getTranslation(PASSWORD));
+        passwordField = new PasswordField(getTranslation(I18n.PASSWORD));
         loginForm.addComponent(passwordField);
         capsLockWarning = CapsLockWarning.warnFor(passwordField);
-        capsLockWarning.setMessage(getTranslation(CAPSLOCK));
+        capsLockWarning.setMessage(getTranslation(I18n.Login.CAPSLOCK));
         passwordField.setWidth(15, Unit.EM);
-        passwordField.setDescription(getTranslation(HINT));
+        passwordField.setDescription(getTranslation(I18n.Login.HINT));
         passwordField.setId("login-password-field");
         CssLayout buttons = new CssLayout();
         buttons.setStyleName("buttons");
         loginForm.addComponent(buttons);
 
-        login = new Button(getTranslation(LOGIN_BUTTON));
+        login = new Button(getTranslation(I18n.Login.LOGIN_BUTTON));
         buttons.addComponent(login);
         login.setDisableOnClick(true);
         login.setId("login-button");
@@ -166,10 +157,10 @@ public class LoginView extends CssLayout implements HasI18N {
         login.setClickShortcut(ShortcutAction.KeyCode.ENTER);
         login.addStyleName(ValoTheme.BUTTON_FRIENDLY);
 
-        forgotPassword = new Button(getTranslation(FORGOT_PASSWORD));
+        forgotPassword = new Button(getTranslation(I18n.Login.FORGOT_PASSWORD));
         buttons.addComponent(forgotPassword);
         forgotPassword.addClickListener(event -> showNotification(
-                new Notification(getTranslation(HINT))));
+                new Notification(getTranslation(I18n.Login.HINT))));
         forgotPassword.addStyleName(ValoTheme.BUTTON_LINK);
 
         lang = new LanguageSelect();
@@ -205,9 +196,10 @@ public class LoginView extends CssLayout implements HasI18N {
                 passwordField.getValue())) {
             fireEvent(new LoginEvent(this));
         } else {
-            showNotification(new Notification(getTranslation(LOGIN_FAILED),
-                    getTranslation(LOGIN_FAILED_DESC),
-                    Notification.Type.HUMANIZED_MESSAGE));
+            showNotification(
+                    new Notification(getTranslation(I18n.Login.LOGIN_FAILED),
+                            getTranslation(I18n.Login.LOGIN_FAILED_DESC),
+                            Notification.Type.HUMANIZED_MESSAGE));
             usernameField.focus();
         }
     }

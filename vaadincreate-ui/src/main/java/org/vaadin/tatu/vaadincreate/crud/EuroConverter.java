@@ -44,6 +44,7 @@ public class EuroConverter extends StringToBigDecimalConverter {
     @Override
     public String convertToPresentation(BigDecimal value,
             ValueContext context) {
-        return super.convertToPresentation(value, context) + " €";
+        return String.format("%s €",
+                super.convertToPresentation(value, context));
     }
 }

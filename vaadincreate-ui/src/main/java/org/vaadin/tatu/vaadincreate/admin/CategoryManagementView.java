@@ -9,6 +9,7 @@ import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.provider.ListDataProvider;
@@ -26,20 +27,11 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-@SuppressWarnings({"serial", "java:S2160"})
+@SuppressWarnings({ "serial", "java:S2160" })
 public class CategoryManagementView extends VerticalLayout
         implements TabView, HasI18N {
 
     public static final String VIEW_NAME = "categories";
-
-    private static final String DELETE = "delete";
-    private static final String CANCEL = "cancel";
-    private static final String CATEGORY_DELETED = "category-deleted";
-    private static final String CATEGORY_SAVED = "category-saved";
-    private static final String ADD_NEW_CATEGORY = "add-new-category";
-    private static final String EDIT_CATEGORIES = "edit-categories";
-    private static final String WILL_DELETE = "will-delete";
-    private static final String SAVE_CONFLICT = "save-conflict";
 
     private CategoryManagementPresenter presenter = new CategoryManagementPresenter(
             this);
@@ -51,8 +43,8 @@ public class CategoryManagementView extends VerticalLayout
         setSizeFull();
         createCategoryListing();
 
-        newCategoryButton = new Button(getTranslation(ADD_NEW_CATEGORY),
-                event -> {
+        newCategoryButton = new Button(
+                getTranslation(I18n.Category.ADD_NEW_CATEGORY), event -> {
                     Category category = new Category();
                     dataProvider.getItems().add(category);
                     dataProvider.refreshAll();
@@ -65,7 +57,7 @@ public class CategoryManagementView extends VerticalLayout
         newCategoryButton.setDisableOnClick(true);
         newCategoryButton.setId("new-category");
 
-        var h4 = new Label(getTranslation(EDIT_CATEGORIES));
+        var h4 = new Label(getTranslation(I18n.Category.EDIT_CATEGORIES));
         h4.addStyleName(ValoTheme.LABEL_H4);
 
         addComponents(h4, newCategoryButton, categoriesListing);
@@ -121,10 +113,10 @@ public class CategoryManagementView extends VerticalLayout
 
         var deleteButton = new Button(VaadinIcons.TRASH, event -> {
             var dialog = new ConfirmDialog(
-                    getTranslation(WILL_DELETE, category.getName()),
+                    getTranslation(I18n.WILL_DELETE, category.getName()),
                     ConfirmDialog.Type.ALERT);
-            dialog.setConfirmText(getTranslation(DELETE));
-            dialog.setCancelText(getTranslation(CANCEL));
+            dialog.setConfirmText(getTranslation(I18n.DELETE));
+            dialog.setCancelText(getTranslation(I18n.CANCEL));
             dialog.open();
             dialog.addConfirmedListener(e -> {
                 presenter.removeCategory(category);
@@ -132,12 +124,12 @@ public class CategoryManagementView extends VerticalLayout
                 dataProvider.refreshAll();
                 categoriesListing
                         .setHeightByRows(dataProvider.getItems().size());
-                Notification.show(
-                        getTranslation(CATEGORY_DELETED, category.getName()));
+                Notification.show(getTranslation(I18n.Category.CATEGORY_DELETED,
+                        category.getName()));
             });
         });
         deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
-        deleteButton.setDescription(getTranslation(DELETE));
+        deleteButton.setDescription(getTranslation(I18n.DELETE));
 
         var binder = new BeanValidationBinder<>(Category.class);
         binder.forField(nameField).bind("name");
@@ -159,10 +151,11 @@ public class CategoryManagementView extends VerticalLayout
                     presenter.requestUpdateCategories();
                     deleteButton.setEnabled(true);
                     newCategoryButton.setEnabled(true);
-                    Notification.show(getTranslation(CATEGORY_SAVED,
-                            newCategory.getName()));
+                    Notification
+                            .show(getTranslation(I18n.Category.CATEGORY_SAVED,
+                                    newCategory.getName()));
                 } catch (OptimisticLockException e) {
-                    Notification.show(getTranslation(SAVE_CONFLICT),
+                    Notification.show(getTranslation(I18n.SAVE_CONFLICT),
                             Notification.Type.WARNING_MESSAGE);
                     presenter.requestUpdateCategories();
                 }

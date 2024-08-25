@@ -10,6 +10,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.ValidationException;
@@ -28,28 +29,11 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-@SuppressWarnings({"serial", "java:S2160"})
+@SuppressWarnings({ "serial", "java:S2160" })
 public class UserManagementView extends VerticalLayout
         implements TabView, HasI18N {
 
     public static final String VIEW_NAME = "users";
-
-    private static final String NOT_MATCHING = "not-matching";
-    private static final String USERNAME = "username";
-    private static final String PASSWD = "password";
-    private static final String PASSWD_REPEAT = "password-repeat";
-    private static final String ROLE = "role";
-    private static final String SEARCH = "search";
-    private static final String SAVE = "save";
-    private static final String DELETE = "delete";
-    private static final String CANCEL = "cancel";
-    private static final String USER_DELETED = "user-deleted";
-    private static final String USER_SAVED = "user-saved";
-    private static final String USER_IS_DUPLICATE = "user-is-duplicate";
-    private static final String NEW_USER = "new-user";
-    private static final String EDIT_USERS = "edit-users";
-    private static final String WILL_DELETE = "will-delete";
-    private static final String SAVE_CONFLICT = "save-conflict";
 
     private BeanValidationBinder<User> binder = new BeanValidationBinder<>(
             User.class);
@@ -62,21 +46,21 @@ public class UserManagementView extends VerticalLayout
     private PasswordField password2;
 
     public UserManagementView() {
-        var h4 = new Label(getTranslation(EDIT_USERS));
+        var h4 = new Label(getTranslation(I18n.User.EDIT_USERS));
         h4.addStyleName(ValoTheme.LABEL_H4);
         var header = new HorizontalLayout();
         var buttons = new HorizontalLayout();
         var form = createUserForm();
         form.setEnabled(false);
-        var save = new Button(getTranslation(SAVE));
+        var save = new Button(getTranslation(I18n.SAVE));
         save.setEnabled(false);
-        var delete = new Button(getTranslation(DELETE));
+        var delete = new Button(getTranslation(I18n.DELETE));
         delete.addStyleName(ValoTheme.BUTTON_DANGER);
         delete.setId("delete-button");
         delete.setEnabled(false);
         userSelect.setEmptySelectionAllowed(false);
         userSelect.setItemCaptionGenerator(User::getName);
-        userSelect.setPlaceholder(getTranslation(SEARCH));
+        userSelect.setPlaceholder(getTranslation(I18n.User.SEARCH));
         userSelect.setId("user-select");
         userSelect.addValueChangeListener(event -> {
             if (event.isUserOriginated()) {
@@ -86,7 +70,7 @@ public class UserManagementView extends VerticalLayout
                 save.setEnabled(false);
             }
         });
-        var newUser = new Button(getTranslation(NEW_USER));
+        var newUser = new Button(getTranslation(I18n.User.NEW_USER));
         newUser.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         newUser.setId("new-button");
         newUser.setIcon(VaadinIcons.PLUS_CIRCLE);
@@ -111,7 +95,7 @@ public class UserManagementView extends VerticalLayout
             } catch (ValidationException e1) {
                 // NOP
             } catch (OptimisticLockException e) {
-                Notification.show(getTranslation(SAVE_CONFLICT),
+                Notification.show(getTranslation(I18n.SAVE_CONFLICT),
                         Notification.Type.WARNING_MESSAGE);
                 presenter.requestUpdateUsers();
                 clearForm(form);
@@ -122,10 +106,10 @@ public class UserManagementView extends VerticalLayout
         });
         delete.addClickListener(event -> {
             var dialog = new ConfirmDialog(
-                    getTranslation(WILL_DELETE, user.getName()),
+                    getTranslation(I18n.WILL_DELETE, user.getName()),
                     ConfirmDialog.Type.ALERT);
-            dialog.setConfirmText(getTranslation(DELETE));
-            dialog.setCancelText(getTranslation(CANCEL));
+            dialog.setConfirmText(getTranslation(I18n.DELETE));
+            dialog.setCancelText(getTranslation(I18n.CANCEL));
             dialog.open();
             dialog.addConfirmedListener(e -> {
                 presenter.removeUser(user.getId());
@@ -135,9 +119,8 @@ public class UserManagementView extends VerticalLayout
                 userSelect.setValue(null);
             });
         });
-        binder.addValueChangeListener(event -> 
-            save.setEnabled(binder.isValid())
-        );
+        binder.addValueChangeListener(
+                event -> save.setEnabled(binder.isValid()));
         buttons.addComponents(delete, save);
         buttons.setComponentAlignment(save, Alignment.MIDDLE_RIGHT);
         buttons.setWidthFull();
@@ -163,16 +146,16 @@ public class UserManagementView extends VerticalLayout
     private FormLayout createUserForm() {
         var form = new FormLayout();
         form.addStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM);
-        var username = new TextField(getTranslation(USERNAME));
+        var username = new TextField(getTranslation(I18n.User.USERNAME));
         username.setId("user-field");
         var userNameExt = new AttributeExtension();
         userNameExt.extend(username);
         userNameExt.setAttribute("autocomplete", "242343243");
-        var password = new PasswordField(getTranslation(PASSWD));
+        var password = new PasswordField(getTranslation(I18n.PASSWORD));
         password.setId("password-field");
-        password2 = new PasswordField(getTranslation(PASSWD_REPEAT));
+        password2 = new PasswordField(getTranslation(I18n.User.PASSWD_REPEAT));
         password2.setId("password-repeat");
-        var role = new ComboBox<Role>(getTranslation(ROLE));
+        var role = new ComboBox<Role>(getTranslation(I18n.User.ROLE));
         role.setItems(Role.values());
         role.setEmptySelectionAllowed(false);
         role.setTextInputAllowed(false);
@@ -183,7 +166,7 @@ public class UserManagementView extends VerticalLayout
         binder.bind(username, "name");
         binder.forField(password)
                 .withValidator(value -> value.equals(password2.getValue()),
-                        getTranslation(NOT_MATCHING))
+                        getTranslation(I18n.User.NOT_MATCHING))
                 .bind("passwd");
 
         password2.addValueChangeListener(event -> {
@@ -223,7 +206,8 @@ public class UserManagementView extends VerticalLayout
      * notification message is constructed using the user's name.
      */
     public void showDuplicateError() {
-        Notification.show(getTranslation(USER_IS_DUPLICATE, user.getName()),
+        Notification.show(
+                getTranslation(I18n.User.USER_IS_DUPLICATE, user.getName()),
                 Type.ERROR_MESSAGE);
     }
 
@@ -231,14 +215,15 @@ public class UserManagementView extends VerticalLayout
      * Shows a notification indicating that the user has been updated.
      */
     public void showUserUpdated() {
-        Notification.show(getTranslation(USER_SAVED, user.getName()));
+        Notification.show(getTranslation(I18n.User.USER_SAVED, user.getName()));
     }
 
     /**
      * Shows a notification indicating that a user has been removed.
      */
     public void showUserRemoved() {
-        Notification.show(getTranslation(USER_DELETED, user.getName()));
+        Notification
+                .show(getTranslation(I18n.User.USER_DELETED, user.getName()));
     }
 
 }

@@ -17,6 +17,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects.LockingEvent;
 
 import com.vaadin.data.provider.ListDataProvider;
@@ -49,19 +50,6 @@ public class BooksView extends CssLayout
         implements View, HasI18N, EventBusListener {
 
     public static final String VIEW_NAME = "inventory";
-
-    private static final String UPDATED = "updated";
-    private static final String REMOVED = "removed";
-    private static final String CONFIRM = "confirm";
-    private static final String NEW_PRODUCT = "new-product";
-    private static final String FILTER = "filter";
-    private static final String NOT_VALID_PID = "not-valid-pid";
-    private static final String PRODUCT_LOCKED = "product-locked";
-    private static final String PRODUCT_DELETED = "product-deleted";
-    private static final String UNSAVED_CHANGES = "unsaved-changes";
-    private static final String CANCEL = "cancel";
-    private static final String CATEGORIES_DELETED = "categories-deleted";
-    private static final String INTERNAL_ERROR = "internal-error";
 
     private BookGrid grid;
     private BookForm form;
@@ -157,7 +145,7 @@ public class BooksView extends CssLayout
         filterField.setId("filter-field");
         filterField.setStyleName(VaadinCreateTheme.BOOKVIEW_FILTER);
         filterField.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
-        filterField.setPlaceholder(getTranslation(FILTER));
+        filterField.setPlaceholder(getTranslation(I18n.Books.FILTER));
         filterField.setIcon(VaadinIcons.SEARCH);
         ResetButtonForTextField.extend(filterField);
         // Apply the filter to grid's data provider. TextField value is never
@@ -165,7 +153,7 @@ public class BooksView extends CssLayout
         filterField.addValueChangeListener(event -> dataProvider
                 .setFilter(book -> passesFilter(book, event.getValue())));
 
-        newProduct = new Button(getTranslation(NEW_PRODUCT));
+        newProduct = new Button(getTranslation(I18n.Books.NEW_PRODUCT));
         newProduct.setId("new-product");
         newProduct.addStyleName(ValoTheme.BUTTON_PRIMARY);
         newProduct.setIcon(VaadinIcons.PLUS_CIRCLE);
@@ -261,7 +249,7 @@ public class BooksView extends CssLayout
      *            the invalid product ID
      */
     public void showNotValidId(String productId) {
-        showError(getTranslation(NOT_VALID_PID, productId));
+        showError(getTranslation(I18n.Books.NOT_VALID_PID, productId));
     }
 
     /**
@@ -271,7 +259,7 @@ public class BooksView extends CssLayout
      *            the lccked product ID
      */
     public void showProductLocked(String productId) {
-        showError(getTranslation(PRODUCT_LOCKED, productId));
+        showError(getTranslation(I18n.Books.PRODUCT_LOCKED, productId));
     }
 
     /**
@@ -279,7 +267,7 @@ public class BooksView extends CssLayout
      * were deleted.
      */
     public void showCategoriesDeleted() {
-        showError(getTranslation(CATEGORIES_DELETED));
+        showError(getTranslation(I18n.Books.CATEGORIES_DELETED));
     }
 
     /**
@@ -287,7 +275,7 @@ public class BooksView extends CssLayout
      */
     public void showInternalError() {
         form.showForm(false);
-        showError(getTranslation(INTERNAL_ERROR));
+        showError(getTranslation(I18n.Books.INTERNAL_ERROR));
     }
 
     /**
@@ -297,7 +285,7 @@ public class BooksView extends CssLayout
      *            the name of the saved book
      */
     public void showSaveNotification(String book) {
-        Notification.show(getTranslation(UPDATED, book),
+        Notification.show(getTranslation(I18n.Books.UPDATED, book),
                 Type.TRAY_NOTIFICATION);
     }
 
@@ -308,7 +296,7 @@ public class BooksView extends CssLayout
      *            the name of the book that has been deleted
      */
     public void showDeleteNotification(String book) {
-        Notification.show(getTranslation(REMOVED, book),
+        Notification.show(getTranslation(I18n.Books.REMOVED, book),
                 Type.TRAY_NOTIFICATION);
     }
 
@@ -405,7 +393,7 @@ public class BooksView extends CssLayout
             if (product.getId() > 0) {
                 product = refreshProduct(product);
                 if (product == null) {
-                    showError(getTranslation(PRODUCT_DELETED));
+                    showError(getTranslation(I18n.Books.PRODUCT_DELETED));
                     return;
                 }
             }
@@ -470,10 +458,11 @@ public class BooksView extends CssLayout
      * @return The created ConfirmDialog instance.
      */
     private ConfirmDialog createDiscardChangesConfirmDialog() {
-        var dialog = new ConfirmDialog(getTranslation(UNSAVED_CHANGES),
+        var dialog = new ConfirmDialog(
+                getTranslation(I18n.Books.UNSAVED_CHANGES),
                 ConfirmDialog.Type.ALERT);
-        dialog.setConfirmText(getTranslation(CONFIRM));
-        dialog.setCancelText(getTranslation(CANCEL));
+        dialog.setConfirmText(getTranslation(I18n.Books.CONFIRM));
+        dialog.setCancelText(getTranslation(I18n.CANCEL));
         return dialog;
     }
 

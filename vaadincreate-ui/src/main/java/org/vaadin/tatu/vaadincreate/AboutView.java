@@ -10,6 +10,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.HasValue.ValueChangeEvent;
@@ -34,10 +35,6 @@ public class AboutView extends VerticalLayout
         implements View, EventBusListener, HasI18N {
 
     public static final String VIEW_NAME = "about";
-
-    // Localization constants
-    private static final String EDIT_NOTE = "edit-note";
-    private static final String VAADIN = "vaadin";
 
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
@@ -108,7 +105,7 @@ public class AboutView extends VerticalLayout
         editButton.setIcon(VaadinIcons.EDIT);
         editButton.addStyleNames(ValoTheme.BUTTON_BORDERLESS,
                 ValoTheme.BUTTON_SMALL);
-        editButton.setDescription(getTranslation(EDIT_NOTE));
+        editButton.setDescription(getTranslation(I18n.About.EDIT_NOTE));
     }
 
     private void createAdminsNote() {
@@ -136,8 +133,8 @@ public class AboutView extends VerticalLayout
         aboutContent.setStyleName(VaadinCreateTheme.ABOUTVIEW_ABOUTCONTENT);
 
         var aboutLabel = new Label(
-                VaadinIcons.INFO_CIRCLE.getHtml()
-                        + getTranslation(VAADIN, Version.getFullVersion()),
+                VaadinIcons.INFO_CIRCLE.getHtml() + getTranslation(
+                        I18n.About.VAADIN, Version.getFullVersion()),
                 ContentMode.HTML);
         aboutLabel.addStyleName(VaadinCreateTheme.ABOUTVIEW_ABOUTLABEL);
         // you can add Vaadin components in predefined slots in the custom

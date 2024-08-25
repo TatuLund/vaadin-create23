@@ -39,7 +39,7 @@ import com.vaadin.ui.UI;
 
 @Theme("vaadincreate")
 @StyleSheet("vaadin://styles/additional-styles.css")
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "java:S2160" })
 @Push(transport = Transport.WEBSOCKET_XHR)
 @Viewport("width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no")
 public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
@@ -79,9 +79,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             getPage().getJavaScript()
                     .execute("function closeListener() { catchClose(); } "
                             + "window.addEventListener('beforeunload', closeListener);");
-            getPage().getJavaScript().addFunction("catchClose", arguments -> {
-                close();
-            });
+            getPage().getJavaScript().addFunction("catchClose",
+                    arguments -> close());
         }
     }
 

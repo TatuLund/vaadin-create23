@@ -149,12 +149,14 @@ public class BooksViewTest extends AbstractUITest {
 
         test($(form, Button.class).caption("Cancel").single()).click();
         assertFalse(form.isShown());
+        assertTrue(test(grid).isFocused());
     }
 
     @Test
     public void addProduct() {
         test($(view, Button.class).id("new-product")).click();
 
+        assertTrue(test(form.productName).isFocused());
         test(form.productName).setValue("New book");
         test(form.price).setValue("10.0 €");
         test(form.availability).clickItem(Availability.AVAILABLE);
@@ -166,6 +168,8 @@ public class BooksViewTest extends AbstractUITest {
         verifySelectedCategoriesAreTheFirst();
 
         test(form.saveButton).click();
+
+        assertTrue(test(grid).isFocused());
 
         assertTrue(
                 $(Notification.class).last().getCaption().contains("New book"));
@@ -203,6 +207,7 @@ public class BooksViewTest extends AbstractUITest {
         test($(dialog, Button.class).id("confirm-button")).click();
 
         assertFalse(form.isShown());
+        assertTrue(test(grid).isFocused());
     }
 
     @Test
@@ -212,6 +217,7 @@ public class BooksViewTest extends AbstractUITest {
 
         test($(form, Button.class).caption("Cancel").single()).click();
         assertFalse(form.isShown());
+        assertTrue(test(grid).isFocused());
     }
 
     @Test
@@ -293,6 +299,8 @@ public class BooksViewTest extends AbstractUITest {
         test($(dialog, Button.class).id("confirm-button")).click();
 
         assertFalse(form.isShown());
+        assertTrue(test(grid).isFocused());
+
         assertNull(LockedObjects.get().isLocked(book));
     }
 

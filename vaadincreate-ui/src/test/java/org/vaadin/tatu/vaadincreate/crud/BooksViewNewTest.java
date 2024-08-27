@@ -51,6 +51,8 @@ public class BooksViewNewTest extends AbstractUITest {
 
     @Test
     public void newProduct() {
+        assertTrue(form.isShown());
+        assertTrue(test(form.productName).isFocused());
         test(form.productName).setValue("A new product");
         test(form.price).setValue("10.0 €");
         test(form.availability).clickItem(Availability.AVAILABLE);
@@ -65,6 +67,7 @@ public class BooksViewNewTest extends AbstractUITest {
         assertTrue($(Notification.class).last().getCaption()
                 .contains("A new product"));
 
+        assertTrue(test(grid).isFocused());
         assertTrue(ui.getProductService().getAllProducts().stream()
                 .anyMatch(b -> b.getProductName().equals("A new product")));
 

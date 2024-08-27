@@ -62,6 +62,7 @@ public class UserManagementViewTest extends AbstractUITest {
         assertFalse(save.isEnabled());
 
         assertTrue($(FormLayout.class).single().isEnabled());
+        assertTrue(test($(TextField.class).id("user-field")).isFocused());
         test($(TextField.class).id("user-field")).setValue("Tester");
         assertFalse(save.isEnabled());
 

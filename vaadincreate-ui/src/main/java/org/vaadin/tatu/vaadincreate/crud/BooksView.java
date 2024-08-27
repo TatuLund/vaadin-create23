@@ -199,11 +199,13 @@ public class BooksView extends CssLayout
                 clearSelection();
                 setFragmentParameter("");
                 presenter.unlockBook();
+                grid.focus();
             });
         } else {
             form.showForm(false);
             clearSelection();
             presenter.unlockBook();
+            grid.focus();
         }
     }
 
@@ -350,6 +352,7 @@ public class BooksView extends CssLayout
         grid.setEdited(product);
         dataProvider.refreshItem(product);
         form.showForm(false);
+        grid.focus();
     }
 
     /**
@@ -363,6 +366,7 @@ public class BooksView extends CssLayout
         dataProvider.getItems().add(product);
         dataProvider.refreshAll();
         form.showForm(false);
+        grid.focus();
         grid.scrollToEnd();
     }
 
@@ -375,6 +379,11 @@ public class BooksView extends CssLayout
     public void removeProduct(Product product) {
         dataProvider.getItems().remove(product);
         dataProvider.refreshAll();
+    }
+
+    public void newProduct() {
+        editProduct(new Product());
+        form.productName.focus();
     }
 
     /**

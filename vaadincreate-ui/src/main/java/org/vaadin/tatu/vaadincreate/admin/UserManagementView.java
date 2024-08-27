@@ -45,6 +45,8 @@ public class UserManagementView extends VerticalLayout
 
     private PasswordField password2;
 
+    private TextField username;
+
     public UserManagementView() {
         var h4 = new Label(getTranslation(I18n.User.EDIT_USERS));
         h4.addStyleName(ValoTheme.LABEL_H4);
@@ -135,6 +137,7 @@ public class UserManagementView extends VerticalLayout
         binder.readBean(user);
         password2.setValue(user.getPasswd());
         form.setEnabled(true);
+        username.focus();
     }
 
     private void clearForm(FormLayout form) {
@@ -146,7 +149,7 @@ public class UserManagementView extends VerticalLayout
     private FormLayout createUserForm() {
         var form = new FormLayout();
         form.addStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM);
-        var username = new TextField(getTranslation(I18n.User.USERNAME));
+        username = new TextField(getTranslation(I18n.User.USERNAME));
         username.setId("user-field");
         var userNameExt = new AttributeExtension();
         userNameExt.extend(username);

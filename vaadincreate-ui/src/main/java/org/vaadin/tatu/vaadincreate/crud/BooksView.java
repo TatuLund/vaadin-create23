@@ -328,6 +328,7 @@ public class BooksView extends CssLayout
     public void selectRow(Product row) {
         grid.getSelectionModel().select(row);
         editProduct(row);
+        grid.focus();
     }
 
     /**

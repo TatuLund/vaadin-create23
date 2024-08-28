@@ -60,6 +60,7 @@ public class BooksViewEditIdTest extends AbstractUITest {
         assertEquals(product, grid.asSingleSelect().getSelectedItem().get());
 
         assertTrue(form.isShown());
+        assertTrue(test(grid).isFocused());
         assertEquals(product.getProductName(), form.productName.getValue());
         var price = form.price;
         var converter = new EuroConverter("");

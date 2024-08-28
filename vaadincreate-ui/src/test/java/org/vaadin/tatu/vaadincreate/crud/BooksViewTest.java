@@ -73,6 +73,7 @@ public class BooksViewTest extends AbstractUITest {
         for (int i = 0; i < test(grid).size(); i += 10) {
 
             test(grid).click(1, i);
+            assertTrue(test(grid).isFocused());
 
             var book = test(grid).item(i);
             assertEquals(book.getProductName(), form.productName.getValue());

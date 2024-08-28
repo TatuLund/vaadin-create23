@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
@@ -19,17 +21,29 @@ import com.vaadin.ui.Window;
 
 public class CategoryManagementViewTest extends AbstractUITest {
 
-    @Test
-    public void createAndDeleteCategory() throws ServiceException {
-        var ui = new VaadinCreateUI();
+    private VaadinCreateUI ui;
+    private AdminView admin;
+    private CategoryManagementView cats;
+
+    @Before
+    public void setup() throws ServiceException {
+        ui = new VaadinCreateUI();
         mockVaadin(ui);
         login();
 
-        var admin = navigate(AdminView.VIEW_NAME, AdminView.class);
-
+        admin = navigate(AdminView.VIEW_NAME, AdminView.class);
         var tabs = $(admin, TabSheet.class).first();
-        var cats = (CategoryManagementView) test(tabs).current();
+        cats = (CategoryManagementView) test(tabs).current();
+    }
 
+    @After
+    public void cleanUp() {
+        logout();
+        tearDown();
+    }
+
+    @Test
+    public void createAndDeleteCategory() throws ServiceException {
         test($(cats, Button.class).id("new-category")).click();
         assertFalse($(cats, Button.class).id("new-category").isEnabled());
 
@@ -54,10 +68,33 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("confirm-button")).click();
 
-        assertFalse(
-                ui.getProductService().getAllCategories().contains(newCat));
+        assertFalse(ui.getProductService().getAllCategories().contains(newCat));
+    }
 
-        tearDown();
+    @Test
+    public void duplicateCategory() {
+        test($(cats, Button.class).id("new-category")).click();
+        @SuppressWarnings("unchecked")
+        var grid = (Grid<Category>) $(cats, Grid.class).single();
+        var gridSize = test(grid).size();
+        var horiz = (HorizontalLayout) test(grid).cell(0, gridSize - 1);
+        test($(horiz, TextField.class).first()).setValue("Sci-fi");
+        assertTrue(test($(horiz, TextField.class).first()).isInvalid());
+        assertEquals("Category's name already in use.",
+                test($(horiz, TextField.class).first()).errorMessage());
+    }
+
+    @Test
+    public void categoryLength() {
+        test($(cats, Button.class).id("new-category")).click();
+        @SuppressWarnings("unchecked")
+        var grid = (Grid<Category>) $(cats, Grid.class).single();
+        var gridSize = test(grid).size();
+        var horiz = (HorizontalLayout) test(grid).cell(0, gridSize - 1);
+        test($(horiz, TextField.class).first()).setValue("Sci");
+        assertTrue(test($(horiz, TextField.class).first()).isInvalid());
+        assertEquals("Category length is at least 5 and max 40 characters",
+                test($(horiz, TextField.class).first()).errorMessage());
     }
 
 }

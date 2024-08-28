@@ -13,6 +13,8 @@ import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.shared.ui.grid.HeightMode;
@@ -39,14 +41,18 @@ public class CategoryManagementView extends VerticalLayout
     private ListDataProvider<Category> dataProvider;
     private Button newCategoryButton;
 
+    private Collection<Category> categories;
+
+    private Category newCategory;
+
     public CategoryManagementView() {
         setSizeFull();
         createCategoryListing();
 
         newCategoryButton = new Button(
                 getTranslation(I18n.Category.ADD_NEW_CATEGORY), event -> {
-                    Category category = new Category();
-                    dataProvider.getItems().add(category);
+                    newCategory = new Category();
+                    dataProvider.getItems().add(newCategory);
                     dataProvider.refreshAll();
                     categoriesListing
                             .setHeightByRows(dataProvider.getItems().size());
@@ -91,6 +97,7 @@ public class CategoryManagementView extends VerticalLayout
      *            the collection of categories to be set
      */
     public void setCategories(Collection<Category> categories) {
+        this.categories = categories;
         dataProvider = new ListDataProvider<Category>(
                 new ArrayList<>(categories)) {
             @Override
@@ -107,6 +114,15 @@ public class CategoryManagementView extends VerticalLayout
         nameField.setValueChangeMode(ValueChangeMode.LAZY);
         nameField.setValueChangeTimeout(1000);
         nameField.setWidthFull();
+        nameField.addShortcutListener(
+                new ShortcutListener("Cancel", KeyCode.ESCAPE, null) {
+                    @Override
+                    public void handleAction(Object sender, Object target) {
+                        presenter.requestUpdateCategories();
+                        newCategoryButton.setEnabled(true);
+                    }
+
+                });
         if (category.getId() < 0) {
             nameField.focus();
         }
@@ -132,32 +148,34 @@ public class CategoryManagementView extends VerticalLayout
         deleteButton.setDescription(getTranslation(I18n.DELETE));
 
         var binder = new BeanValidationBinder<>(Category.class);
-        binder.forField(nameField).bind("name");
+        binder.forField(nameField).withValidator(value -> categories.stream()
+                .filter(item -> item.getName().equals(value)).count() == 0,
+                getTranslation(I18n.Category.DUPLICATE)).bind("name");
         binder.setBean(category);
         binder.addValueChangeListener(event -> {
             if (binder.isValid()) {
                 try {
-                    var newCategory = presenter.updateCategory(category);
+                    var saved = presenter.updateCategory(category);
                     if (category.getId() == -1) {
                         dataProvider.getItems().remove(category);
-                        dataProvider.getItems().add(newCategory);
+                        dataProvider.getItems().add(saved);
                         dataProvider.refreshAll();
                         nameField.focus();
                     } else {
                         dataProvider.getItems().remove(category);
-                        dataProvider.getItems().add(newCategory);
-                        dataProvider.refreshItem(newCategory);
+                        dataProvider.getItems().add(saved);
+                        dataProvider.refreshItem(saved);
                     }
                     presenter.requestUpdateCategories();
                     deleteButton.setEnabled(true);
                     newCategoryButton.setEnabled(true);
-                    Notification
-                            .show(getTranslation(I18n.Category.CATEGORY_SAVED,
-                                    newCategory.getName()));
-                } catch (OptimisticLockException e) {
+                    Notification.show(getTranslation(
+                            I18n.Category.CATEGORY_SAVED, saved.getName()));
+                } catch (OptimisticLockException | IllegalStateException e) {
                     Notification.show(getTranslation(I18n.SAVE_CONFLICT),
                             Notification.Type.WARNING_MESSAGE);
                     presenter.requestUpdateCategories();
+                    newCategoryButton.setEnabled(true);
                 }
             }
         });

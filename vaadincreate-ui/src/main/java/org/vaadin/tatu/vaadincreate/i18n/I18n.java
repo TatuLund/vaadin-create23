@@ -150,6 +150,7 @@ public final class I18n {
         public static final String CATEGORY_SAVED = "category-saved";
         public static final String ADD_NEW_CATEGORY = "add-new-category";
         public static final String EDIT_CATEGORIES = "edit-categories";
+        public static final String DUPLICATE = "category-duplicate";
 
         private Category() {
             // private constructor to hide the implicit public one

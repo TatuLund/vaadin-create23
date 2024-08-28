@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate.backend.mock;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -122,6 +123,7 @@ public class MockProductDataService extends ProductDataService {
         Objects.requireNonNull(category);
         synchronized (categories) {
             randomWait(1);
+            throwIfInvalidCategory(category);
             var newCategory = new Category(category);
             if (newCategory.getId() < 0) {
                 newCategory.setId(nextCategoryId++);
@@ -135,6 +137,24 @@ public class MockProductDataService extends ProductDataService {
             }
             return newCategory;
         }
+    }
+
+    private void throwIfInvalidCategory(Category category) {
+        Optional<Category> old;
+        old = categories.stream()
+                .filter(item -> item.getName().equals(category.getName()))
+                .findFirst();
+        old.ifPresent(oldCategory -> {
+            if (category.getId() < 0) {
+                throw new IllegalStateException(
+                        "Cannot re-use category name: " + category.getName());
+            } else if (category.getId() >= 0
+                    && oldCategory.getId() != category.getId()) {
+                throw new IllegalStateException(
+                        "Cannot re-use category name: " + category.getName());
+            }
+
+        });
     }
 
     @Override

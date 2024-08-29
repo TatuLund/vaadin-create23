@@ -109,6 +109,7 @@ public class CategoryManagementView extends VerticalLayout
         categoriesListing.setHeightByRows(categories.size());
     }
 
+    @SuppressWarnings("java:S5669")
     private Component createCategoryEditor(Category category) {
         var nameField = new TextField();
         nameField.setValueChangeMode(ValueChangeMode.LAZY);

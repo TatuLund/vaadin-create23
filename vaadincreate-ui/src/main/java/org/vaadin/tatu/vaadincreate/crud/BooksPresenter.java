@@ -291,7 +291,7 @@ public class BooksPresenter implements Serializable {
             view.clearSelection();
             view.setFragmentParameter("new");
             logger.info("New product");
-            view.newProduct();;
+            view.newProduct();
         } else {
             view.setFragmentParameter("");
         }

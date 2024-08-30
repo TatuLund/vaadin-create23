@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.persistence.OptimisticLockException;
 
@@ -33,7 +32,6 @@ import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 public class BooksPresenter implements Serializable {
 
     private BooksView view;
-    private transient ExecutorService executor;
     private transient CompletableFuture<Void> future;
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
@@ -324,10 +322,7 @@ public class BooksPresenter implements Serializable {
     }
 
     private ExecutorService getExecutor() {
-        if (executor == null) {
-            executor = Executors.newCachedThreadPool();
-        }
-        return executor;
+        return VaadinCreateUI.get().getExecutor();
     }
 
     private static Logger logger = LoggerFactory

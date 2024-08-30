@@ -1,5 +1,8 @@
 package org.vaadin.tatu.vaadincreate;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
@@ -54,6 +57,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             .get();
     private transient UserService userService = UserService.get();
     private transient AppDataService appService = AppDataService.get();
+    private transient ExecutorService executor;
 
     private String target;
 
@@ -194,6 +198,13 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     private EventBus getEventBus() {
         return EventBus.get();
+    }
+
+    public ExecutorService getExecutor() {
+        if (executor == null) {
+            executor = Executors.newSingleThreadExecutor();
+        }
+        return executor;
     }
 
     private static Logger logger = LoggerFactory

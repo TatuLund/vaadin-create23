@@ -24,7 +24,6 @@ import org.vaadin.tatu.vaadincreate.backend.data.Product;
 public class StatsPresenter implements Serializable {
 
     private StatsView view;
-    private transient ExecutorService executor;
     private transient CompletableFuture<Void> future;
 
     public StatsPresenter(StatsView view) {
@@ -123,10 +122,7 @@ public class StatsPresenter implements Serializable {
     }
 
     private ExecutorService getExecutor() {
-        if (executor == null) {
-            executor = Executors.newCachedThreadPool();
-        }
-        return executor;
+        return VaadinCreateUI.get().getExecutor();
     }
 
     private static Logger logger = LoggerFactory

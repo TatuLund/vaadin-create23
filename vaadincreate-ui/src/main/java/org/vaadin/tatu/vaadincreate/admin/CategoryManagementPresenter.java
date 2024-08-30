@@ -20,17 +20,33 @@ public class CategoryManagementPresenter implements Serializable {
         this.view = view;
     }
 
+    /**
+     * Request all categories from the backend and update the view.
+     */
     public void requestUpdateCategories() {
         logger.info("Fetching categories");
         view.setCategories(getService().getAllCategories());
     }
 
+    /**
+     * Remove a category from the backend.
+     *
+     * @param category
+     *            the category to remove
+     */
     public void removeCategory(Category category) {
         accessControl.assertAdmin();
         getService().deleteCategory(category.getId());
         logger.info("Category '{}' removed.", category.getName());
     }
 
+    /**
+     * Add a new category to the backend.
+     *
+     * @param category
+     *            the category to add
+     * @return the new category
+     */
     public Category updateCategory(Category category) {
         accessControl.assertAdmin();
         var newCat = getService().updateCategory(category);

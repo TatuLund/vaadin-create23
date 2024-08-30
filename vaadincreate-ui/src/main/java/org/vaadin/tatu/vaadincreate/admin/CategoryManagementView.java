@@ -16,7 +16,7 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
+import com.vaadin.ui.Composite;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -36,12 +36,11 @@ public class CategoryManagementView extends VerticalLayout
 
     private Collection<Category> categories;
 
-    private ComponentList<Category, Component> list;
+    private ComponentList<Category, CategoryForm> list;
 
     public CategoryManagementView() {
         setSizeFull();
-        list = new ComponentList<Category, Component>(
-                this::createCategoryEditor);
+        list = new ComponentList<>(CategoryForm::new);
 
         newCategoryButton = new Button(
                 getTranslation(I18n.Category.ADD_NEW_CATEGORY), event -> {
@@ -77,50 +76,70 @@ public class CategoryManagementView extends VerticalLayout
         list.setItems(new ArrayList<>(categories));
     }
 
-    @SuppressWarnings("java:S5669")
-    private Component createCategoryEditor(Category category) {
-        var nameField = new TextField();
-        nameField.setId(String.format("name-%s", category.getId()));
-        nameField.setValueChangeMode(ValueChangeMode.LAZY);
-        nameField.setValueChangeTimeout(1000);
-        nameField.setWidthFull();
-        nameField.setPlaceholder(getTranslation(I18n.Category.INSTRUCTION));
-        nameField.addShortcutListener(
-                new ShortcutListener("Cancel", KeyCode.ESCAPE, null) {
-                    @Override
-                    public void handleAction(Object sender, Object target) {
-                        presenter.requestUpdateCategories();
-                        newCategoryButton.setEnabled(true);
-                    }
+    @Override
+    public String getTabName() {
+        return VIEW_NAME;
+    }
 
-                });
-        if (category.getId() < 0) {
-            nameField.focus();
+    /**
+     * A form for editing a category.
+     */
+    class CategoryForm extends Composite {
+
+        private Category category;
+        private TextField nameField;
+        private BeanValidationBinder<Category> binder;
+        private Button deleteButton;
+
+        @SuppressWarnings("java:S5669")
+        CategoryForm(Category category) {
+            this.category = category;
+            nameField = new TextField();
+            nameField.setId(String.format("name-%s", category.getId()));
+            nameField.setValueChangeMode(ValueChangeMode.LAZY);
+            nameField.setValueChangeTimeout(1000);
+            nameField.setWidthFull();
+            nameField.setPlaceholder(getTranslation(I18n.Category.INSTRUCTION));
+            // Cancel the form when the user presses escape
+            nameField.addShortcutListener(
+                    new ShortcutListener("Cancel", KeyCode.ESCAPE, null) {
+                        @Override
+                        public void handleAction(Object sender, Object target) {
+                            presenter.requestUpdateCategories();
+                            newCategoryButton.setEnabled(true);
+                        }
+
+                    });
+            if (category.getId() < 0) {
+                nameField.focus();
+            }
+
+            deleteButton = new Button(VaadinIcons.TRASH,
+                    e -> handleConfirmDelete());
+            deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
+            deleteButton.setDescription(getTranslation(I18n.DELETE));
+
+            binder = new BeanValidationBinder<>(Category.class);
+            // Check for duplicate category names
+            binder.forField(nameField)
+                    .withValidator(
+                            value -> categories.stream()
+                                    .filter(item -> item.getName()
+                                            .equals(value))
+                                    .count() == 0,
+                            getTranslation(I18n.Category.DUPLICATE))
+                    .bind("name");
+            binder.setBean(category);
+            binder.addValueChangeListener(event -> handleSave());
+            deleteButton.setEnabled(category.getId() > 0);
+
+            var layout = new HorizontalLayout(nameField, deleteButton);
+            layout.setExpandRatio(nameField, 1);
+            layout.setWidthFull();
+            setCompositionRoot(layout);
         }
 
-        var deleteButton = new Button(VaadinIcons.TRASH, event -> {
-            var dialog = new ConfirmDialog(
-                    getTranslation(I18n.WILL_DELETE, category.getName()),
-                    ConfirmDialog.Type.ALERT);
-            dialog.setConfirmText(getTranslation(I18n.DELETE));
-            dialog.setCancelText(getTranslation(I18n.CANCEL));
-            dialog.open();
-            dialog.addConfirmedListener(e -> {
-                presenter.removeCategory(category);
-                list.removeItem(category);
-                Notification.show(getTranslation(I18n.Category.CATEGORY_DELETED,
-                        category.getName()));
-            });
-        });
-        deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
-        deleteButton.setDescription(getTranslation(I18n.DELETE));
-
-        var binder = new BeanValidationBinder<>(Category.class);
-        binder.forField(nameField).withValidator(value -> categories.stream()
-                .filter(item -> item.getName().equals(value)).count() == 0,
-                getTranslation(I18n.Category.DUPLICATE)).bind("name");
-        binder.setBean(category);
-        binder.addValueChangeListener(event -> {
+        private void handleSave() {
             if (binder.isValid()) {
                 try {
                     var saved = presenter.updateCategory(category);
@@ -140,18 +159,22 @@ public class CategoryManagementView extends VerticalLayout
                     newCategoryButton.setEnabled(true);
                 }
             }
-        });
-        deleteButton.setEnabled(category.getId() > 0);
+        }
 
-        var layout = new HorizontalLayout(nameField, deleteButton);
-        layout.setExpandRatio(nameField, 1);
-        layout.setWidthFull();
-        return layout;
+        // Handle the delete button click event with a confirmation dialog.
+        private void handleConfirmDelete() {
+            var dialog = new ConfirmDialog(
+                    getTranslation(I18n.WILL_DELETE, category.getName()),
+                    ConfirmDialog.Type.ALERT);
+            dialog.setConfirmText(getTranslation(I18n.DELETE));
+            dialog.setCancelText(getTranslation(I18n.CANCEL));
+            dialog.open();
+            dialog.addConfirmedListener(e -> {
+                presenter.removeCategory(category);
+                list.removeItem(category);
+                Notification.show(getTranslation(I18n.Category.CATEGORY_DELETED,
+                        category.getName()));
+            });
+        }
     }
-
-    @Override
-    public String getTabName() {
-        return VIEW_NAME;
-    }
-
 }

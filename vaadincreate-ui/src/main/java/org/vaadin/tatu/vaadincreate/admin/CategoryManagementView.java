@@ -6,22 +6,17 @@ import java.util.Collection;
 import javax.persistence.OptimisticLockException;
 
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
-import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.data.BeanValidationBinder;
-import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.ValueChangeMode;
-import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -37,26 +32,21 @@ public class CategoryManagementView extends VerticalLayout
 
     private CategoryManagementPresenter presenter = new CategoryManagementPresenter(
             this);
-    private Grid<Category> categoriesListing;
-    private ListDataProvider<Category> dataProvider;
     private Button newCategoryButton;
 
     private Collection<Category> categories;
 
-    private Category newCategory;
+    private ComponentList<Category, Component> list;
 
     public CategoryManagementView() {
         setSizeFull();
-        createCategoryListing();
+        list = new ComponentList<Category, Component>(
+                this::createCategoryEditor);
 
         newCategoryButton = new Button(
                 getTranslation(I18n.Category.ADD_NEW_CATEGORY), event -> {
-                    newCategory = new Category();
-                    dataProvider.getItems().add(newCategory);
-                    dataProvider.refreshAll();
-                    categoriesListing
-                            .setHeightByRows(dataProvider.getItems().size());
-                    categoriesListing.scrollToEnd();
+                    var newCategory = new Category();
+                    list.addItem(newCategory);
                 });
         newCategoryButton.setIcon(VaadinIcons.PLUS_CIRCLE);
         newCategoryButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
@@ -66,28 +56,14 @@ public class CategoryManagementView extends VerticalLayout
         var h4 = new Label(getTranslation(I18n.Category.EDIT_CATEGORIES));
         h4.addStyleName(ValoTheme.LABEL_H4);
 
-        addComponents(h4, newCategoryButton, categoriesListing);
-        setExpandRatio(categoriesListing, 1);
-    }
-
-    private void createCategoryListing() {
-        categoriesListing = new Grid<>();
-        categoriesListing.setRowHeight(40);
-        categoriesListing.addComponentColumn(this::createCategoryEditor);
-        categoriesListing.setHeaderRowHeight(1);
-        categoriesListing.setSizeFull();
-        categoriesListing.setSelectionMode(SelectionMode.NONE);
-        categoriesListing.addStyleNames(
-                VaadinCreateTheme.ADMINVIEW_CATEGORY_GRID,
-                VaadinCreateTheme.GRID_NO_STRIPES,
-                VaadinCreateTheme.GRID_NO_BORDERS,
-                VaadinCreateTheme.GRID_NO_CELL_FOCUS);
-        categoriesListing.setHeightMode(HeightMode.ROW);
+        addComponents(h4, newCategoryButton, list);
+        setExpandRatio(list, 1);
     }
 
     @Override
     public void enter() {
         presenter.requestUpdateCategories();
+        newCategoryButton.setEnabled(true);
     }
 
     /**
@@ -98,23 +74,17 @@ public class CategoryManagementView extends VerticalLayout
      */
     public void setCategories(Collection<Category> categories) {
         this.categories = categories;
-        dataProvider = new ListDataProvider<Category>(
-                new ArrayList<>(categories)) {
-            @Override
-            public Object getId(Category item) {
-                return item.getId();
-            }
-        };
-        categoriesListing.setDataProvider(dataProvider);
-        categoriesListing.setHeightByRows(categories.size());
+        list.setItems(new ArrayList<>(categories));
     }
 
     @SuppressWarnings("java:S5669")
     private Component createCategoryEditor(Category category) {
         var nameField = new TextField();
+        nameField.setId(String.format("name-%s", category.getId()));
         nameField.setValueChangeMode(ValueChangeMode.LAZY);
         nameField.setValueChangeTimeout(1000);
         nameField.setWidthFull();
+        nameField.setPlaceholder(getTranslation(I18n.Category.INSTRUCTION));
         nameField.addShortcutListener(
                 new ShortcutListener("Cancel", KeyCode.ESCAPE, null) {
                     @Override
@@ -137,10 +107,7 @@ public class CategoryManagementView extends VerticalLayout
             dialog.open();
             dialog.addConfirmedListener(e -> {
                 presenter.removeCategory(category);
-                dataProvider.getItems().remove(category);
-                dataProvider.refreshAll();
-                categoriesListing
-                        .setHeightByRows(dataProvider.getItems().size());
+                list.removeItem(category);
                 Notification.show(getTranslation(I18n.Category.CATEGORY_DELETED,
                         category.getName()));
             });
@@ -157,15 +124,9 @@ public class CategoryManagementView extends VerticalLayout
             if (binder.isValid()) {
                 try {
                     var saved = presenter.updateCategory(category);
+                    list.replaceItem(category, saved);
                     if (category.getId() == -1) {
-                        dataProvider.getItems().remove(category);
-                        dataProvider.getItems().add(saved);
-                        dataProvider.refreshAll();
                         nameField.focus();
-                    } else {
-                        dataProvider.getItems().remove(category);
-                        dataProvider.getItems().add(saved);
-                        dataProvider.refreshItem(saved);
                     }
                     presenter.requestUpdateCategories();
                     deleteButton.setEnabled(true);

@@ -24,6 +24,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
     private VaadinCreateUI ui;
     private AdminView admin;
     private CategoryManagementView cats;
+    private TabSheet tabs;
 
     @Before
     public void setup() throws ServiceException {
@@ -32,7 +33,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
         login();
 
         admin = navigate(AdminView.VIEW_NAME, AdminView.class);
-        var tabs = $(admin, TabSheet.class).first();
+        tabs = $(admin, TabSheet.class).first();
         cats = (CategoryManagementView) test(tabs).current();
     }
 
@@ -97,4 +98,18 @@ public class CategoryManagementViewTest extends AbstractUITest {
                 test($(horiz, TextField.class).first()).errorMessage());
     }
 
+    @Test
+    public void newButtonEnabledAfterTabChange() {
+        test($(cats, Button.class).id("new-category")).click();
+        @SuppressWarnings("unchecked")
+        var grid = (Grid<Category>) $(cats, Grid.class).single();
+        var gridSize = test(grid).size();
+        var horiz = (HorizontalLayout) test(grid).cell(0, gridSize - 1);
+        test($(horiz, TextField.class).first()).setValue("Sci");
+
+        test(tabs).click(1);
+        test(tabs).click(0);
+
+        assertTrue($(cats, Button.class).id("new-category").isEnabled());
+    }
 }

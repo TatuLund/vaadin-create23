@@ -4,29 +4,22 @@ import java.util.List;
 
 import javax.persistence.OptimisticLockException;
 
-import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
-import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
-import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Composite;
-import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.PasswordField;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -51,8 +44,13 @@ public class UserManagementView extends VerticalLayout
     public UserManagementView() {
         var title = new Label(getTranslation(I18n.User.EDIT_USERS));
         title.addStyleName(ValoTheme.LABEL_H4);
+
         form = new UserForm();
         form.setEnabled(false);
+        form.addFormChangedListener(event -> {
+            save.setEnabled(event.isValid());
+            cancel.setEnabled(true);
+        });
 
         var header = createHeader();
         var buttons = createButtons();
@@ -234,88 +232,4 @@ public class UserManagementView extends VerticalLayout
                 .show(getTranslation(I18n.User.USER_DELETED, user.getName()));
     }
 
-    /**
-     * The form for editing users.
-     */
-    class UserForm extends Composite {
-        private FormLayout form = new FormLayout();
-        private BeanValidationBinder<User> binder = new BeanValidationBinder<>(
-                User.class);
-        private PasswordField password2;
-        private TextField username;
-
-        UserForm() {
-            form.addStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM);
-            username = new TextField(getTranslation(I18n.User.USERNAME));
-            username.setId("user-field");
-            var userNameExt = new AttributeExtension();
-            userNameExt.extend(username);
-            userNameExt.setAttribute("autocomplete", "242343243");
-            var password = new PasswordField(getTranslation(I18n.PASSWORD));
-            password.setId("password-field");
-            password2 = new PasswordField(
-                    getTranslation(I18n.User.PASSWD_REPEAT));
-            password2.setId("password-repeat");
-            var role = new ComboBox<Role>(getTranslation(I18n.User.ROLE));
-            role.setItems(Role.values());
-            role.setEmptySelectionAllowed(false);
-            role.setTextInputAllowed(false);
-            role.setId("role-field");
-            form.addComponents(username, password, password2, role);
-            form.addStyleName(ValoTheme.FORMLAYOUT_LIGHT);
-
-            binder.bind(username, "name");
-            binder.forField(password)
-                    .withValidator(value -> value.equals(password2.getValue()),
-                            getTranslation(I18n.User.NOT_MATCHING))
-                    .bind("passwd");
-
-            password2.addValueChangeListener(event -> {
-                if (event.isUserOriginated()) {
-                    binder.validate();
-                }
-            });
-            password2.setRequiredIndicatorVisible(true);
-
-            binder.bind(role, "role");
-            binder.addValueChangeListener(event -> {
-                save.setEnabled(binder.isValid());
-                cancel.setEnabled(true);
-            });
-
-            setCompositionRoot(form);
-        }
-
-        /**
-         * Populates the form with the user's data.
-         *
-         * @param user
-         *            the user to be populated
-         */
-        void populate(User user) {
-            binder.readBean(user);
-            password2.setValue(user.getPasswd());
-            setEnabled(true);
-            username.focus();
-        }
-
-        /**
-         * Clears the form.
-         */
-        void clear() {
-            binder.readBean(null);
-            password2.setValue("");
-            setEnabled(false);
-        }
-
-        /**
-         * Commits the changes made in the form to the underlying data object.
-         *
-         * @throws ValidationException
-         *             if the data in the form fails validation
-         */
-        void commit() throws ValidationException {
-            binder.writeBean(user);
-        }
-    }
 }

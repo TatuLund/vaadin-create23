@@ -15,6 +15,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
@@ -56,6 +57,8 @@ public class CategoryManagementViewTest extends AbstractUITest {
 
         var cat = test(grid).item(gridSize - 1);
         assertEquals("Tech horror", cat.getName());
+        assertEquals("Category \"Tech horror\" saved.",
+                $(Notification.class).last().getCaption());
 
         assertTrue(ui.getProductService().getAllCategories().stream()
                 .anyMatch(c -> c.getName().equals("Tech horror")));
@@ -65,9 +68,18 @@ public class CategoryManagementViewTest extends AbstractUITest {
                 .get();
 
         form = (CategoryForm) test(grid).cell(0, gridSize - 1);
+        test($(form, TextField.class).first()).setValue("Technology");
+        assertEquals("Category \"Technology\" saved.",
+                $(Notification.class).last().getCaption());
+        cat = test(grid).item(gridSize - 1);
+        assertEquals("Technology", cat.getName());
+
+        form = (CategoryForm) test(grid).cell(0, gridSize - 1);
         test($(form, Button.class).first()).click();
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("confirm-button")).click();
+        assertEquals("Category \"Technology\" removed.",
+                $(Notification.class).last().getCaption());
 
         assertFalse(ui.getProductService().getAllCategories().contains(newCat));
     }

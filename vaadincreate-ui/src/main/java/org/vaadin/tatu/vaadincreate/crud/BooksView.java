@@ -170,6 +170,7 @@ public class BooksView extends CssLayout
 
     @Override
     public void enter(ViewChangeEvent event) {
+        form.showForm(false);
         params = event.getParameters();
         if (!accessControl.isUserInRole(Role.ADMIN)) {
             grid.setSelectionMode(SelectionMode.NONE);

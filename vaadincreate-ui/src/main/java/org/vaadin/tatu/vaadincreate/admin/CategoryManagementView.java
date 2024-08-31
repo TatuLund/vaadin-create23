@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import javax.persistence.OptimisticLockException;
 
+import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -38,6 +39,7 @@ public class CategoryManagementView extends VerticalLayout
 
     private ComponentList<Category, CategoryForm> list;
 
+    @SuppressWarnings("java:S5669")
     public CategoryManagementView() {
         setSizeFull();
         list = new ComponentList<>(CategoryForm::new);
@@ -54,6 +56,16 @@ public class CategoryManagementView extends VerticalLayout
 
         var h4 = new Label(getTranslation(I18n.Category.EDIT_CATEGORIES));
         h4.addStyleName(ValoTheme.LABEL_H4);
+
+        // Cancel the form when the user presses escape
+        addShortcutListener(
+                new ShortcutListener("Cancel", KeyCode.ESCAPE, null) {
+                    @Override
+                    public void handleAction(Object sender, Object target) {
+                        presenter.requestUpdateCategories();
+                        newCategoryButton.setEnabled(true);
+                    }
+                });
 
         addComponents(h4, newCategoryButton, list);
         setExpandRatio(list, 1);
@@ -91,25 +103,19 @@ public class CategoryManagementView extends VerticalLayout
         private BeanValidationBinder<Category> binder;
         private Button deleteButton;
 
-        @SuppressWarnings("java:S5669")
         CategoryForm(Category category) {
             this.category = category;
             nameField = new TextField();
+            var nameFieldExt = new AttributeExtension();
+            nameFieldExt.extend(nameField);
+            nameFieldExt.setAttribute("autocomplete", "off");
             nameField.setId(String.format("name-%s", category.getId()));
             nameField.setValueChangeMode(ValueChangeMode.LAZY);
-            nameField.setValueChangeTimeout(1000);
+            nameField.setValueChangeTimeout(2000);
             nameField.setWidthFull();
             nameField.setPlaceholder(getTranslation(I18n.Category.INSTRUCTION));
-            // Cancel the form when the user presses escape
-            nameField.addShortcutListener(
-                    new ShortcutListener("Cancel", KeyCode.ESCAPE, null) {
-                        @Override
-                        public void handleAction(Object sender, Object target) {
-                            presenter.requestUpdateCategories();
-                            newCategoryButton.setEnabled(true);
-                        }
-
-                    });
+            nameField
+                    .addFocusListener(e -> newCategoryButton.setEnabled(false));
             if (category.getId() < 0) {
                 nameField.focus();
             }
@@ -124,8 +130,8 @@ public class CategoryManagementView extends VerticalLayout
             binder.forField(nameField)
                     .withValidator(
                             value -> categories.stream()
-                                    .filter(item -> item.getName()
-                                            .equals(value))
+                                    .filter(item -> !item.equals(category)
+                                            && item.getName().equals(value))
                                     .count() == 0,
                             getTranslation(I18n.Category.DUPLICATE))
                     .bind("name");

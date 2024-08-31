@@ -11,6 +11,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.themes.ValoTheme;
 
 /**
  * A list of components generated from a collection of items. Components are
@@ -20,6 +22,7 @@ import com.vaadin.ui.Grid.SelectionMode;
 public class ComponentList<T, V extends Component> extends Composite {
     private Grid<T> grid;
     private ListDataProvider<T> dataProvider;
+    private Panel panel = new Panel();
 
     /**
      * Creates a new instance of ComponentList.
@@ -29,7 +32,11 @@ public class ComponentList<T, V extends Component> extends Composite {
      */
     public ComponentList(ValueProvider<T, V> provider) {
         createCategoryListing(provider);
-        setCompositionRoot(grid);
+        panel.setSizeFull();
+        panel.setContent(grid);
+        panel.addStyleNames(VaadinCreateTheme.ADMINVIEW_CATEGORY_GRID,
+                ValoTheme.PANEL_BORDERLESS);
+        setCompositionRoot(panel);
     }
 
     /**
@@ -86,8 +93,7 @@ public class ComponentList<T, V extends Component> extends Composite {
         grid.setHeaderRowHeight(1);
         grid.setSizeFull();
         grid.setSelectionMode(SelectionMode.NONE);
-        grid.addStyleNames(VaadinCreateTheme.ADMINVIEW_CATEGORY_GRID,
-                VaadinCreateTheme.GRID_NO_STRIPES,
+        grid.addStyleNames(VaadinCreateTheme.GRID_NO_STRIPES,
                 VaadinCreateTheme.GRID_NO_BORDERS,
                 VaadinCreateTheme.GRID_NO_CELL_FOCUS);
         grid.setHeightMode(HeightMode.ROW);

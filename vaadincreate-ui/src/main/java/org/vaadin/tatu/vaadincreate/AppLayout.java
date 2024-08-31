@@ -18,6 +18,7 @@ import com.vaadin.server.Resource;
 import com.vaadin.server.Responsive;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Composite;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -30,8 +31,9 @@ import com.vaadin.ui.themes.ValoTheme;
  * This is a responsive application shell with Navigator build with ValoMenu
  */
 @SuppressWarnings({ "serial", "java:S2160" })
-public class AppLayout extends HorizontalLayout implements HasI18N {
+public class AppLayout extends Composite implements HasI18N {
 
+    private final HorizontalLayout layout = new HorizontalLayout();
     private final VerticalLayout content = new VerticalLayout();
     private final CssLayout menuLayout = new CssLayout();
     private final CssLayout menuItems = new CssLayout();
@@ -46,17 +48,17 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
      *            The UI
      */
     public AppLayout(UI ui, AccessControl accessControl) {
-        setSpacing(false);
-        setMargin(false);
+        layout.setSpacing(false);
+        layout.setMargin(false);
         this.accessControl = accessControl;
         this.ui = ui;
         ui.addStyleName(ValoTheme.UI_WITH_MENU);
-        addStyleName("applayout");
+        layout.addStyleName("applayout");
         Navigator nav = new Navigator(ui, content);
         nav.setErrorView(ErrorView.class);
         ui.setNavigator(nav);
 
-        setSizeFull();
+        layout.setSizeFull();
         Responsive.makeResponsive(ui);
 
         menuLayout.setPrimaryStyleName(ValoTheme.MENU_ROOT);
@@ -105,9 +107,9 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
         content.setMargin(false);
         content.setSpacing(false);
 
-        addComponent(menuLayout);
-        addComponent(content);
-        setExpandRatio(content, 1);
+        layout.addComponent(menuLayout);
+        layout.addComponent(content);
+        layout.setExpandRatio(content, 1);
 
         // Use view change listener to detect when navigation happened either by
         // user or directly using location. Update Menu's selected item based on
@@ -130,6 +132,7 @@ public class AppLayout extends HorizontalLayout implements HasI18N {
             }
 
         });
+        setCompositionRoot(layout);
     }
 
     private void handleConfirmLogoutWhenChanges(UI ui, Navigator nav) {

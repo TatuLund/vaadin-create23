@@ -78,6 +78,7 @@ public class ConfirmDialog extends Composite {
             window.close();
         });
         cancelButton.setId("cancel-button");
+        cancelButton.setClickShortcut(KeyCode.ESCAPE);
         confirmButton = new Button("Confirm", e -> {
             fireEvent(new ConfirmedEvent(this));
             window.close();

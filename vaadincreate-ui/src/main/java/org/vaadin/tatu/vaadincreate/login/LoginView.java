@@ -21,6 +21,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Composite;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
@@ -35,7 +36,7 @@ import com.vaadin.util.ReflectTools;
  * UI content when the user is not logged in yet.
  */
 @SuppressWarnings({ "serial", "java:S2160" })
-public class LoginView extends CssLayout implements HasI18N {
+public class LoginView extends Composite implements HasI18N {
 
     TextField usernameField;
     PasswordField passwordField;
@@ -47,14 +48,16 @@ public class LoginView extends CssLayout implements HasI18N {
     private ComboBox<Locale> lang;
     private Label loginInfoText;
     private CapsLockWarning capsLockWarning;
+    private CssLayout layout = new CssLayout();
 
     public LoginView(AccessControl accessControl, LoginListener loginListener) {
         this.accessControl = accessControl;
         addLoginListener(loginListener);
+        setCompositionRoot(layout);
     }
 
     void buildUI() {
-        addStyleName(VaadinCreateTheme.LOGINVIEW);
+        layout.addStyleName(VaadinCreateTheme.LOGINVIEW);
 
         // information text about logging in
         loginInformation = buildLoginInformation();
@@ -73,7 +76,7 @@ public class LoginView extends CssLayout implements HasI18N {
         centeringLayout.setComponentAlignment(loginForm,
                 Alignment.MIDDLE_CENTER);
 
-        addComponent(centeringLayout);
+        layout.addComponent(centeringLayout);
     }
 
     @Override
@@ -113,9 +116,9 @@ public class LoginView extends CssLayout implements HasI18N {
 
     private void showLoginInformation(int width) {
         if (width < 700) {
-            removeComponent(loginInformation);
+            layout.removeComponent(loginInformation);
         } else {
-            addComponent(loginInformation);
+            layout.addComponent(loginInformation);
         }
     }
 
@@ -126,8 +129,7 @@ public class LoginView extends CssLayout implements HasI18N {
         loginForm.setSizeUndefined();
         loginForm.setMargin(false);
 
-        usernameField = new TextField(getTranslation(I18n.USERNAME),
-                "Admin");
+        usernameField = new TextField(getTranslation(I18n.USERNAME), "Admin");
         loginForm.addComponent(usernameField);
         usernameField.setWidth(15, Unit.EM);
         usernameField.setId("login-username-field");

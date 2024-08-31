@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.admin;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
@@ -45,10 +46,21 @@ public class UserManagementViewTest extends AbstractUITest {
 
     @Test
     public void initialState() {
+        assertInitialState();
+    }
+
+    public void assertInitialState() {
         assertFalse($(Button.class).id("delete-button").isEnabled());
         assertFalse($(Button.class).id("save-button").isEnabled());
+        assertFalse($(Button.class).id("cancel-button").isEnabled());
         assertTrue($(Button.class).id("new-button").isEnabled());
         assertFalse($(FormLayout.class).single().isEnabled());
+        assertEquals("", $(TextField.class).id("user-field").getValue());
+        assertEquals("",
+                $(PasswordField.class).id("password-field").getValue());
+        assertEquals("",
+                $(PasswordField.class).id("password-repeat").getValue());
+        assertNull($(ComboBox.class).id("role-field").getValue());
     }
 
     @SuppressWarnings("unchecked")
@@ -65,6 +77,7 @@ public class UserManagementViewTest extends AbstractUITest {
         assertTrue(test($(TextField.class).id("user-field")).isFocused());
         test($(TextField.class).id("user-field")).setValue("Tester");
         assertFalse(save.isEnabled());
+        assertTrue($(Button.class).id("cancel-button").isEnabled());
 
         test($(PasswordField.class).id("password-field")).setValue("tester");
         assertTrue(
@@ -92,7 +105,7 @@ public class UserManagementViewTest extends AbstractUITest {
 
         assertEquals("User \"Tester\" saved.",
                 $(Notification.class).last().getCaption());
-        assertFalse($(FormLayout.class).single().isEnabled());
+        assertInitialState();
 
         // Check that new user is there
         test($(ComboBox.class).id("user-select")).setInput("Tester");
@@ -111,9 +124,8 @@ public class UserManagementViewTest extends AbstractUITest {
         // Assert that optimistic locking is thrown and cought
         assertEquals("Save conflict, try again.",
                 $(Notification.class).last().getCaption());
-        assertFalse($(FormLayout.class).single().isEnabled());
-
-    }
+        assertInitialState();
+     }
 
     @SuppressWarnings("unchecked")
     @Test
@@ -134,6 +146,20 @@ public class UserManagementViewTest extends AbstractUITest {
         assertFalse($(FormLayout.class).single().isEnabled());
 
         test($(ComboBox.class).id("user-select")).setInput("User0");
-        assertFalse($(FormLayout.class).single().isEnabled());
+        assertInitialState();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void cancelForm() {
+        test($(ComboBox.class).id("user-select")).setInput("User1");
+        assertTrue($(FormLayout.class).single().isEnabled());
+
+        test($(TextField.class).id("user-field")).setValue("Modified");
+        assertTrue($(Button.class).id("cancel-button").isEnabled());
+
+        test($(Button.class).id("cancel-button")).click();
+
+        assertInitialState();
     }
 }

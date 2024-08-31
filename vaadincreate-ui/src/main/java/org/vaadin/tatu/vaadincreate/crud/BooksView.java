@@ -170,12 +170,13 @@ public class BooksView extends CssLayout
 
     @Override
     public void enter(ViewChangeEvent event) {
-        form.showForm(false);
         params = event.getParameters();
         if (!accessControl.isUserInRole(Role.ADMIN)) {
             grid.setSelectionMode(SelectionMode.NONE);
             grid.setReadOnly(true);
             form.setVisible(false);
+        } else {
+            form.showForm(false);
         }
         presenter.requestUpdateProducts();
     }

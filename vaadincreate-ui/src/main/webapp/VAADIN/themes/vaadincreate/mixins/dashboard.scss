@@ -1,0 +1,18 @@
+// DASHBOARD VIEW
+@mixin dashboard {
+  .dashboard {
+    width: 100%;
+
+    .dashboard-chart {
+      margin: 10px;
+      width: calc(50% - 20px);
+      box-shadow: $chart-shadow;
+    }
+
+    .dashboard-chart-wide {
+      margin: 10px;
+      width: calc(100% - 20px);
+      box-shadow: $chart-shadow;
+    }
+  }
+}

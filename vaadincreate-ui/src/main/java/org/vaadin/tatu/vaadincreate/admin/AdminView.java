@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.admin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
@@ -21,6 +22,10 @@ import com.vaadin.ui.themes.ValoTheme;
 public class AdminView extends VerticalLayout implements View, HasI18N {
 
     public static final String VIEW_NAME = "admin";
+
+    public AdminView() {
+        addStyleName(VaadinCreateTheme.ADMINVIEW);
+    }
 
     @Override
     public void enter(ViewChangeEvent event) {

@@ -1,0 +1,67 @@
+@mixin utilities {
+
+  .whitespace-pre {
+    white-space: pre;
+  }
+
+  // Experimental style for the grid with no stripes.
+  // This is not part of the Valo theme, but could be added to it.
+  .no-stripes {
+    .v-grid-row-stripe {
+	  background-color: $v-grid-row-background-color;
+    }
+    .v-grid-row-stripe > td {
+      background-color: $v-grid-row-background-color;
+    }
+
+	background-color: $v-grid-row-background-color;
+  }
+
+  .no-borders {
+    .v-grid-row > td {
+       border-bottom: unset;
+    }	  
+  }
+
+  // Experimental style for the grid with no visible cell focus.
+  // This is not part of the Valo theme, but could be added to it.
+  .no-cell-focus {
+	  .v-grid-cell-focused:before {
+	    border: unset;
+	  }  
+  }
+
+  // Experimental style for the grid with visible row focus.
+  // This is not part of the Valo theme, but could be added to it.
+  .row-focus {
+    .v-grid-row-focused {
+      border: 1px solid $v-focus-color;
+      .v-grid-cell {
+        background-color: lighten($v-focus-color, 30%);
+      }
+    }
+  }
+
+  // Expiremental style variant for a beveled and scrollable CheckBoxGroup
+  .v-select-optiongroup-scrollable {
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #c5c5c5;
+    padding: 4px 8px;
+    border-radius: 5px;
+    color: #474747;
+    box-shadow: inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  // Experimental Cancel / Warning button style.
+  // This is not part of the Valo theme, but could be added to it.
+  .v-button-cancel {
+    background: $v-error-indicator-level-warning-color;
+    border-top-color: lighten($v-error-indicator-level-warning-color, 15%);
+    border-left-color: lighten($v-error-indicator-level-warning-color, 15%);
+    border-right-color: darken($v-error-indicator-level-warning-color, 15%);
+    border-bottom-color: darken($v-error-indicator-level-warning-color, 15%);
+    box-shadow: inset 0 1px 0 lighten($v-error-indicator-level-warning-color, 15%), inset 0 -1px 0 darken($v-error-indicator-level-warning-color, 15%), 0 2px 3px rgba(0, 0, 0, 0.05);
+    color: white;	  
+  }
+}

@@ -1,0 +1,132 @@
+// BOOKVIEW
+@mixin books {
+  // makes the CRUD view keep the sidebar editor within the view
+  // as sidebar is absolutely positioned
+  .bookview {
+  	position: relative;
+
+    .bookview-filter {
+      width: round($v-unit-size * 9);
+    }
+  }
+
+  // For aligning in grid until #15438 is done
+  .bookview-grid-alignright {
+    text-align: right;
+
+	  .v-grid-column-header-content {
+      text-align: right;
+    }	
+  }
+
+  .bookview-grid-edited {
+  	color: $v-focus-color;
+  }
+ 
+  .bookview-grid-locked:not(.v-grid-row-selected) { 
+    opacity: $v-disabled-opacity;
+    animation: fadeIn 1s ease-in-out 0s;
+  }
+
+  .bookview-grid-descriptioncaption {
+    color: $highlight-contrast-color;
+  }
+
+  // sidebar editor for CRUD, scrolls if there is not enough space vertically
+  .bookform-wrapper {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+    width: round($v-unit-size * 9);
+    height: 100%;
+    overflow: auto;
+    padding: $v-layout-spacing-vertical $v-layout-spacing-horizontal;
+    background-color: $editor-background-color;
+
+    // Set the context color for the style mixins
+    $temp: $v-app-background-color;
+    $v-app-background-color: $editor-background-color;
+
+    // Restore variable
+    $v-app-background-color: $temp;
+
+    .v-button {
+      display: block;
+    }
+
+    .v-caption {
+      color: $editor-caption-font-color;
+    }
+
+    // try to ensure there is space under the last button also on small displays (does not work on IE8)
+    .bookform-form > .v-expand > .v-slot:last-child {
+      padding-bottom: $v-layout-spacing-vertical;
+    }
+
+  }
+  
+  .bookform {
+    right: 0;
+    @include transition(all 300ms);
+    @include transform(translatex(100%));
+  }
+
+  // Enables animation for opening CRUD editor
+  .bookform-wrapper-visible {
+  	@include transform(none);
+    @include box-shadow($editor-shadow);
+  }
+
+  .bookform-field-dirty {
+    border: 2px dashed $warning-indicator-color !important;
+  }
+
+  .v-filterselect-item-bookform-availability-available {
+    span.v-icon {
+      color: $color-available;
+    }
+  }
+
+  .v-filterselect-item-bookform-availability-coming {
+    span.v-icon {
+      color: $color-coming;
+    }
+  }
+
+  .v-filterselect-item-bookform-availability-discontinued {
+    span.v-icon {
+      color: $color-discontinued;
+    }
+  }
+
+  .bookform-availability-available {
+    span.v-icon {
+      color: $color-available;
+    }
+  }
+
+  .bookform-availability-coming {
+    span.v-icon {
+      color: $color-coming;
+    }
+  }
+
+  .bookform-availability-discontinued {
+    span.v-icon {
+      color: $color-discontinued;
+    }
+  }
+
+  .fakegrid {
+    background: $fake-grid-background-color;
+    border: $v-grid-border;
+	  
+    .fakegrid-header {
+      background: $fake-grid-header-background-color;
+      height: 33px;
+      width: 100%;
+      border: $v-grid-border;
+    }
+  }
+}

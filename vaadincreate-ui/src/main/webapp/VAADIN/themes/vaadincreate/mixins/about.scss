@@ -1,0 +1,39 @@
+// ABOUT VIEW
+@mixin about {
+  .aboutview {
+    overflow: auto;
+  }
+
+  .aboutview-aboutlabel {
+  	.v-icon {
+      margin-right: 5px;
+    }
+  }
+
+  .aboutview-aboutcontent {
+    @include valo-panel-style;
+    max-width: 500px;
+    // Override the default of CustomLayout
+    padding: $v-unit-size !important;
+  }
+
+  .aboutview-adminscontent {
+	  padding: 10px;
+	  box-shadow: $admin-content-shadow;
+    background: white;
+  }
+
+  .adminview-userform {
+    box-shadow: $light-shadow;
+    background: white;
+    border: $v-grid-border;
+  }
+
+  .adminview-categorygrid {
+    box-shadow: $light-shadow;
+
+    thead {
+      display: none;
+    }
+  }
+}

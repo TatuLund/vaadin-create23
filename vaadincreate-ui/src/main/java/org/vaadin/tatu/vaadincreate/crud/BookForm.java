@@ -248,6 +248,8 @@ public class BookForm extends Composite implements HasI18N {
         fieldWrapper.addComponents(price, stockCount);
 
         category.setId("category");
+        category.addStyleName(VaadinCreateTheme.CHECKBOXGROUP_SCROLL);
+        category.setHeight("170px");
         category.setWidthFull();
 
         var spacer = new CssLayout();

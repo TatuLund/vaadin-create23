@@ -1,5 +1,13 @@
 package org.vaadin.tatu.vaadincreate;
 
+/**
+ * The VaadinCreateTheme class defines the CSS class names used in the Vaadin
+ * Create application's theme. These class names are used to style various
+ * components and elements in the application's user interface. The class is
+ * final and has a private constructor to prevent instantiation.
+ *
+ * See: vaadincreate.scss for the implementations.
+ */
 public final class VaadinCreateTheme {
 
     private VaadinCreateTheme() {
@@ -14,10 +22,11 @@ public final class VaadinCreateTheme {
     public static final String LOGINVIEW = "loginview";
 
     public static final String ABOUTVIEW_ADMINSCONTENT = "aboutview-adminscontent";
-    public static final String ABOUT_VIEW = "about-view";
+    public static final String ABOUT_VIEW = "aboutview";
     public static final String ABOUTVIEW_ABOUTCONTENT = "aboutview-aboutcontent";
     public static final String ABOUTVIEW_ABOUTLABEL = "aboutview-aboutlabel";
 
+    public static final String ADMINVIEW = "adminview";
     public static final String ADMINVIEW_CATEGORY_GRID = "adminview-categorygrid";
     public static final String ADMINVIEW_USERFORM = "adminview-userform";
 
@@ -55,6 +64,8 @@ public final class VaadinCreateTheme {
     public static final String GRID_NO_BORDERS = "no-borders";
     public static final String GRID_NO_CELL_FOCUS = "no-cell-focus";
     public static final String GRID_ROW_FOCUS = "row-focus";
+
+    public static final String CHECKBOXGROUP_SCROLL = "scrollable";
 
     public static final String BUTTON_CANCEL = "cancel";
 }

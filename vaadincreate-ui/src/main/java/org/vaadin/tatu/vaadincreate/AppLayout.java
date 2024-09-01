@@ -59,6 +59,7 @@ public class AppLayout extends Composite implements HasI18N {
         ui.setNavigator(nav);
 
         layout.setSizeFull();
+        // Make the application responsive, see vaadincreate.scss
         Responsive.makeResponsive(ui);
 
         menuLayout.setPrimaryStyleName(ValoTheme.MENU_ROOT);
@@ -75,7 +76,8 @@ public class AppLayout extends Composite implements HasI18N {
 
         menuLayout.addComponent(title);
 
-        var toggleButton = new Button(getTranslation(I18n.App.MENU), vent -> {
+        // Add a button to toggle the visibility of the menu when on mobile
+        var toggleButton = new Button(getTranslation(I18n.App.MENU), event -> {
             if (menuLayout.getStyleName().contains(ValoTheme.MENU_VISIBLE)) {
                 menuLayout.removeStyleName(ValoTheme.MENU_VISIBLE);
             } else {

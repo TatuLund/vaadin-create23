@@ -1,0 +1,176 @@
+// RESPONISVE STYLES
+
+// Responsive style rules using Vaadin responsive attributes 
+// enabled in AppLayout for different display sizes
+@mixin responsive {
+
+  // Medium size changes
+  .v-ui[width-range~="0-800px"] {
+
+    .bookview-availabilitylabel {
+      display: none;
+    }
+
+    .applayout {
+      padding-top: $v-unit-size;
+    }
+
+    // More compact login screen
+    .loginview {
+      height: auto;
+      min-height: 100%;
+
+      .loginview-information {
+        position: static;
+        width: 100%;
+        height: auto;
+
+        .v-label {
+          text-align: center;
+
+          h1 {
+            margin-top: .4em;
+          }
+        }
+      }
+
+      .loginview-center {
+        display: block;
+        width: 100%;
+        height: auto;
+        padding-left: 0;
+        padding-top: 60px;
+        padding-bottom: 60px;
+      }
+
+      .loginview-form {
+        width: 400px;
+        max-width: 100%;
+
+        table {
+          width: 100%;
+        }
+
+        .v-textfield {
+          width: 100% !important;
+        }
+
+        .v-formlayout-captioncell,
+        .v-formlayout-contentcell,
+        .v-formlayout-errorcell {
+          display: block;
+          text-align: center;
+          padding-top: 0;
+        }
+        .buttons {
+          width: 100%;
+          .v-button {
+            display: block;
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+
+  // hide the logo for a more compact header when the menu is narrow
+  .v-ui[width-range~="801px-1100px"] .valo-menu-part {
+    .v-slot-logo,
+    .v-slot-logo + .v-spacing {
+      display: none;
+    }
+    .user-menu {
+      width: 71px;
+    }
+  }
+
+  // Move logout button to the bottom of the menu on large screens
+  .v-ui[width-range~="801px-"] .valo-menu-part {
+    .user-menu {
+      position: fixed;
+      bottom: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  // Editor should take whole browser width when we are under 550px in width.
+  .v-ui[width-range~="0-550px"] {
+    .bookform-wrapper {
+      width: 100%;     
+    }
+    
+    .v-grid {
+      user-select: none;
+	  }
+
+    // Remove margins around the grid and reduce top bar margins on small screens
+    .bookview .bookview-grid {
+      padding: 0 0 0 0;
+
+      .bookview-toolbar {
+        // Use spacing to the grid below as the margin - smaller than default margin
+        padding: $v-layout-spacing-vertical $v-layout-spacing-horizontal 0 $v-layout-spacing-horizontal;
+
+        .bookview-filter {
+          width: 100%;
+        }
+      }
+    }
+
+    // About view fills the display on small screens
+    .aboutview {
+      padding: 0.2 * $v-unit-size;
+      padding-bottom: 0;
+      padding-top: 0;
+      height: auto;
+      overflow: hidden;
+
+      .v-slot-about-content {
+        overflow: auto;
+      }
+
+      .aboutcontent {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        vertical-align: top;
+        padding: 0;
+        background: transparent;
+        @include box-shadow(none);
+      }
+    }
+
+    .adminview {
+      padding: 0px;
+    }
+
+    .dashboard {
+      width: 100%;
+	  }
+
+    .dashboard-chart {
+      width: 95%;
+    }
+
+    .dashboard-chart-wide {
+      width: 95%;
+    }
+  }
+
+  // Adjust icon to show nicely when menubar is small
+  .v-ui[width-range~="0-500px"] {
+    .valo-menu .v-menubar-menuitem-caption .v-icon {
+       margin: 0 4px 0 0px;
+    }
+  }
+
+  .v-ui[width-range~="551px-1000px"] {
+    .dashboard-chart {
+      width: calc(100% - 20px);
+    }
+
+	  .dashboard-chart-wide {
+      width: calc(100% - 20px);
+    }
+  }	
+}

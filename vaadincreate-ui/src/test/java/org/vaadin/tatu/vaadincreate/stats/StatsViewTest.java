@@ -2,8 +2,10 @@ package org.vaadin.tatu.vaadincreate.stats;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,6 +13,11 @@ import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.backend.data.Availability;
+import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.crud.BooksPresenter;
+import org.vaadin.tatu.vaadincreate.crud.BooksView;
+import org.vaadin.tatu.vaadincreate.crud.FakeGrid;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.DataSeries;
@@ -21,7 +28,11 @@ public class StatsViewTest extends AbstractUITest {
 
     private StatsView view;
     private VaadinCreateUI ui;
-    private Map<String, Number> values;
+    private Map<String, Number> prices;
+    private Map<String, Number> availabilities;
+    private Map<String, Number> stockTitles;
+    private Map<String, Number> stockCounts;
+    private CssLayout dashboard;
 
     @Before
     public void setup() throws ServiceException {
@@ -31,67 +42,129 @@ public class StatsViewTest extends AbstractUITest {
 
         view = navigate(StatsView.VIEW_NAME, StatsView.class);
 
-        var dashboard = $(CssLayout.class)
-                .styleName(VaadinCreateTheme.DASHBOARD).first();
+        dashboard = $(CssLayout.class).styleName(VaadinCreateTheme.DASHBOARD)
+                .first();
         waitForCharts(dashboard);
     }
 
     @Test
-    public void priceStats() {
-        values = new HashMap<>();
+    public void chartSeriesAreCorrectBeforeAndAfterBookEvents() {
+        // Setup reference stats
+        prices = referencePrices();
+        availabilities = referenceAvailabilities();
+        stockTitles = referenceStockTitles();
+        stockCounts = referenceStockCounts();
+
+        // Assert that actual stats are the same
+        assertStatistics(prices, availabilities, stockTitles, stockCounts);
+
+        var presenter = createBooksPresenter();
+
+        // Simulate other user saving a new product
+        var book = createBook();
+        var savedBook = presenter.saveProduct(book);
+        waitForCharts(dashboard);
+
+        // Update reference stats to reflect new product
+        prices.put("30 - 40 €", 1);
+        availabilities.put("AVAILABLE", 29);
+        book.getCategory().forEach(cat -> {
+            stockTitles.put(cat.getName(),
+                    stockTitles.get(cat.getName()).intValue() + 1);
+        });
+        book.getCategory().forEach(cat -> {
+            stockCounts.put(cat.getName(),
+                    stockCounts.get(cat.getName()).intValue() + 100);
+        });
+
+        // Assert that actual stats have been updated
+        assertStatistics(prices, availabilities, stockTitles, stockCounts);
+
+        // Simulate other user deleting the book
+        presenter.deleteProduct(savedBook);
+        waitForCharts(dashboard);
+
+        // Revert the reference stats
+        prices = referencePrices();
+        availabilities = referenceAvailabilities();
+        stockTitles = referenceStockTitles();
+        stockCounts = referenceStockCounts();
+
+        // Assert that actual stats are back to original
+        assertStatistics(prices, availabilities, stockTitles, stockCounts);
+
+    }
+
+    private BooksPresenter createBooksPresenter() {
+        var bookView = new BooksView();
+        // It is not possible to have multiple parallel UIs in this thread
+        view.addComponent(bookView);
+        var presenter = new BooksPresenter(bookView);
+        presenter.requestUpdateProducts();
+        var fake = $(bookView, FakeGrid.class).first();
+        waitWhile(fake, f -> f.isVisible(), 10);
+        return presenter;
+    }
+
+    private void assertStatistics(Map<String, Number> prices,
+            Map<String, Number> availabilities, Map<String, Number> stockTitles,
+            Map<String, Number> stockCounts) {
+        var chart = $(Chart.class).id("price-chart");
+        var series = (DataSeries) chart.getConfiguration().getSeries().get(0);
+        assertSeries(prices, series);
+
+        chart = $(Chart.class).id("availability-chart");
+        series = (DataSeries) chart.getConfiguration().getSeries().get(0);
+        assertSeries(availabilities, series);
+
+        chart = $(Chart.class).id("category-chart");
+        series = (DataSeries) chart.getConfiguration().getSeries().get(0);
+        assertSeries(stockTitles, series);
+
+        series = (DataSeries) chart.getConfiguration().getSeries().get(1);
+        assertSeries(stockCounts, series);
+    }
+
+    private static Product createBook() {
+        var book = new Product();
+        book.setId(-1);
+        book.setProductName("Test");
+        book.setAvailability(Availability.AVAILABLE);
+        var categories = VaadinCreateUI.get().getProductService()
+                .findCategoriesByIds(Set.of(1, 2));
+        book.setCategory(categories);
+        book.setStockCount(100);
+        book.setPrice(BigDecimal.valueOf(35));
+        return book;
+    }
+
+    private static void assertSeries(Map<String, Number> values,
+            DataSeries series) {
+        series.getData().forEach(item -> {
+            var name = item.getName();
+            var y = item.getY();
+            assertEquals(values.get(name), y.intValue());
+        });
+    }
+
+    private static Map<String, Number> referencePrices() {
+        var values = new HashMap<String, Number>();
         values.put("10 - 20 €", 40);
         values.put("20 - 30 €", 36);
         values.put("0 - 10 €", 24);
-
-        var priceChart = $(Chart.class).id("price-chart");
-        var series = (DataSeries) priceChart.getConfiguration().getSeries()
-                .get(0);
-        series.getData().forEach(item -> {
-            var name = item.getName();
-            var y = item.getY();
-            assertEquals(values.get(name), y.intValue());
-        });
+        return values;
     }
 
-    @Test
-    public void availabilityStats() {
-        values = new HashMap<>();
+    private static Map<String, Number> referenceAvailabilities() {
+        var values = new HashMap<String, Number>();
         values.put("DISCONTINUED", 34);
         values.put("COMING", 38);
         values.put("AVAILABLE", 28);
-
-        var priceChart = $(Chart.class).id("availability-chart");
-        var series = (DataSeries) priceChart.getConfiguration().getSeries()
-                .get(0);
-        series.getData().forEach(item -> {
-            var name = item.getName();
-            var y = item.getY();
-            assertEquals(values.get(name), y.intValue());
-        });
+        return values;
     }
 
-    @Test
-    public void categoryStats() {
-        values = new HashMap<>();
-        values.put("Non-fiction", 15);
-        values.put("Sci-fi", 26);
-        values.put("Thriller", 14);
-        values.put("Romance", 23);
-        values.put("Mystery", 16);
-        values.put("Cookbooks", 7);
-        values.put("Children's books", 26);
-        values.put("Best sellers", 22);
-
-        var priceChart = $(Chart.class).id("category-chart");
-        var series = (DataSeries) priceChart.getConfiguration().getSeries()
-                .get(0);
-        series.getData().forEach(item -> {
-            var name = item.getName();
-            var y = item.getY();
-            assertEquals(values.get(name), y.intValue());
-        });
-
-        values = new HashMap<>();
+    private Map<String, Number> referenceStockCounts() {
+        var values = new HashMap<String, Number>();
         values.put("Non-fiction", 622);
         values.put("Sci-fi", 2321);
         values.put("Thriller", 863);
@@ -100,13 +173,20 @@ public class StatsViewTest extends AbstractUITest {
         values.put("Cookbooks", 546);
         values.put("Children's books", 2082);
         values.put("Best sellers", 1267);
+        return values;
+    }
 
-        series = (DataSeries) priceChart.getConfiguration().getSeries().get(1);
-        series.getData().forEach(item -> {
-            var name = item.getName();
-            var y = item.getY();
-            assertEquals(values.get(name), y.intValue());
-        });
+    private Map<String, Number> referenceStockTitles() {
+        var values = new HashMap<String, Number>();
+        values.put("Non-fiction", 15);
+        values.put("Sci-fi", 26);
+        values.put("Thriller", 14);
+        values.put("Romance", 23);
+        values.put("Mystery", 16);
+        values.put("Cookbooks", 7);
+        values.put("Children's books", 26);
+        values.put("Best sellers", 22);
+        return values;
     }
 
     @After

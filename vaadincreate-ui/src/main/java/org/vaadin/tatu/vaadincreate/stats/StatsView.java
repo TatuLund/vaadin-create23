@@ -256,5 +256,10 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         presenter.cancelUpdateStats();
     }
 
+    public void setLoading() {
+        dashboard.removeStyleName("loaded");
+    }
+
     private static Logger logger = LoggerFactory.getLogger(StatsView.class);
+
 }

@@ -17,6 +17,7 @@ import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 
 /**
@@ -208,7 +209,7 @@ public class BooksPresenter implements Serializable {
      * @param product
      *            The product to be saved.
      */
-    public void saveProduct(Product product) {
+    public Product saveProduct(Product product) {
         accessControl.assertAdmin();
         view.clearSelection();
         boolean newBook = product.getId() == -1;
@@ -220,12 +221,12 @@ public class BooksPresenter implements Serializable {
             logger.warn(
                     "Optimistic lock happened, this should not happen in BooksView");
             view.showInternalError();
-            return;
+            return null;
         } catch (IllegalArgumentException e) {
             logger.error("Backend service failure while updating product: {}",
                     e.getMessage());
             view.showInternalError();
-            return;
+            return null;
         }
         view.showSaveNotification(product.getProductName());
 
@@ -236,6 +237,10 @@ public class BooksPresenter implements Serializable {
             unlockBook();
         }
         view.setFragmentParameter("");
+        // Post SaveEvent to EventBus
+        getEventBus()
+                .post(new BooksChanged(product, BooksChanged.BookChange.SAVE));
+        return product;
     }
 
     /**
@@ -253,6 +258,8 @@ public class BooksPresenter implements Serializable {
         view.removeProduct(product);
         unlockBook();
         view.setFragmentParameter("");
+        getEventBus().post(
+                new BooksChanged(product, BooksChanged.BookChange.DELETE));
     }
 
     /**
@@ -323,6 +330,32 @@ public class BooksPresenter implements Serializable {
 
     private ExecutorService getExecutor() {
         return VaadinCreateUI.get().getExecutor();
+    }
+
+    public static class BooksChanged {
+        public enum BookChange {
+            SAVE, DELETE
+        }
+
+        private Product product;
+        private BookChange change;
+
+        public BooksChanged(Product product, BookChange change) {
+            this.product = product;
+            this.change = change;
+        }
+
+        public Product getProduct() {
+            return product;
+        }
+
+        public BookChange getChange() {
+            return change;
+        }
+    }
+
+    private EventBus getEventBus() {
+        return EventBus.get();
     }
 
     private static Logger logger = LoggerFactory

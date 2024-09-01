@@ -69,7 +69,7 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void selectProduct() throws ServiceException {
+    public void selectProduct() {
         for (int i = 0; i < test(grid).size(); i += 10) {
 
             test(grid).click(1, i);

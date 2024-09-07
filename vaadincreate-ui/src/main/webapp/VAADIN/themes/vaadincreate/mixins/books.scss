@@ -3,7 +3,7 @@
   // makes the CRUD view keep the sidebar editor within the view
   // as sidebar is absolutely positioned
   .bookview {
-  	position: relative;
+    position: relative;
 
     .bookview-filter {
       width: round($v-unit-size * 9);
@@ -20,7 +20,7 @@
   }
 
   .bookview-grid-edited {
-  	color: $v-focus-color;
+    color: $v-focus-color;
   }
  
   .bookview-grid-locked:not(.v-grid-row-selected) { 

@@ -8,27 +8,27 @@
   // This is not part of the Valo theme, but could be added to it.
   .no-stripes {
     .v-grid-row-stripe {
-	  background-color: $v-grid-row-background-color;
+	    background-color: $v-grid-row-background-color;
     }
     .v-grid-row-stripe > td {
       background-color: $v-grid-row-background-color;
     }
 
-	background-color: $v-grid-row-background-color;
+	  background-color: $v-grid-row-background-color;
   }
 
   .no-borders {
     .v-grid-row > td {
-       border-bottom: unset;
+      border-bottom: unset;
     }	  
   }
 
   // Experimental style for the grid with no visible cell focus.
   // This is not part of the Valo theme, but could be added to it.
   .no-cell-focus {
-	  .v-grid-cell-focused:before {
-	    border: unset;
-	  }  
+    .v-grid-cell-focused:before {
+      border: unset;
+    }  
   }
 
   // Experimental style for the grid with visible row focus.

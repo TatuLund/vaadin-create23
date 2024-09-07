@@ -105,17 +105,8 @@ public class CategoryManagementView extends VerticalLayout
 
         CategoryForm(Category category) {
             this.category = category;
-            nameField = new TextField();
-            var nameFieldExt = new AttributeExtension();
-            nameFieldExt.extend(nameField);
-            nameFieldExt.setAttribute("autocomplete", "off");
-            nameField.setId(String.format("name-%s", category.getId()));
-            nameField.setValueChangeMode(ValueChangeMode.LAZY);
-            nameField.setValueChangeTimeout(2000);
-            nameField.setWidthFull();
-            nameField.setPlaceholder(getTranslation(I18n.Category.INSTRUCTION));
-            nameField
-                    .addFocusListener(e -> newCategoryButton.setEnabled(false));
+            configureNameField(category);
+            // Focus the name field if the category is new
             if (category.getId() < 0) {
                 nameField.focus();
             }
@@ -124,6 +115,7 @@ public class CategoryManagementView extends VerticalLayout
                     e -> handleConfirmDelete());
             deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
             deleteButton.setDescription(getTranslation(I18n.DELETE));
+            deleteButton.setEnabled(category.getId() > 0);
 
             binder = new BeanValidationBinder<>(Category.class);
             // Check for duplicate category names
@@ -137,12 +129,25 @@ public class CategoryManagementView extends VerticalLayout
                     .bind("name");
             binder.setBean(category);
             binder.addValueChangeListener(event -> handleSave());
-            deleteButton.setEnabled(category.getId() > 0);
 
             var layout = new HorizontalLayout(nameField, deleteButton);
             layout.setExpandRatio(nameField, 1);
             layout.setWidthFull();
             setCompositionRoot(layout);
+        }
+
+        private void configureNameField(Category category) {
+            nameField = new TextField();
+            var nameFieldExt = new AttributeExtension();
+            nameFieldExt.extend(nameField);
+            nameFieldExt.setAttribute("autocomplete", "off");
+            nameField.setId(String.format("name-%s", category.getId()));
+            nameField.setValueChangeMode(ValueChangeMode.LAZY);
+            nameField.setValueChangeTimeout(2000);
+            nameField.setWidthFull();
+            nameField.setPlaceholder(getTranslation(I18n.Category.INSTRUCTION));
+            nameField
+                    .addFocusListener(e -> newCategoryButton.setEnabled(false));
         }
 
         private void handleSave() {

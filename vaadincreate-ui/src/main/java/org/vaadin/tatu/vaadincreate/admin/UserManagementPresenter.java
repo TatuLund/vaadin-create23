@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.admin;
 
 import java.io.Serializable;
 
+import javax.persistence.OptimisticLockException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
@@ -43,6 +45,9 @@ public class UserManagementPresenter implements Serializable {
             logger.info("User {}/'{}' updated.", user.getId(), user.getName());
         } catch (IllegalArgumentException e) {
             view.showDuplicateError();
+        } catch (OptimisticLockException e) {
+            requestUpdateUsers();
+            view.showSaveConflict();
         }
     }
 

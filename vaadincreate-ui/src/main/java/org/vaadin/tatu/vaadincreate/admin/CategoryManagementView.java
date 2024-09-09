@@ -3,8 +3,6 @@ package org.vaadin.tatu.vaadincreate.admin;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.persistence.OptimisticLockException;
-
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
@@ -93,6 +91,12 @@ public class CategoryManagementView extends VerticalLayout
         return VIEW_NAME;
     }
 
+    public void showSaveConflict() {
+        Notification.show(getTranslation(I18n.SAVE_CONFLICT),
+                Notification.Type.WARNING_MESSAGE);
+        newCategoryButton.setEnabled(true);
+    }
+
     /**
      * A form for editing a category.
      */
@@ -152,8 +156,8 @@ public class CategoryManagementView extends VerticalLayout
 
         private void handleSave() {
             if (binder.isValid()) {
-                try {
-                    var saved = presenter.updateCategory(category);
+                var saved = presenter.updateCategory(category);
+                if (saved != null) {
                     list.replaceItem(category, saved);
                     if (category.getId() == -1) {
                         nameField.focus();
@@ -163,11 +167,6 @@ public class CategoryManagementView extends VerticalLayout
                     newCategoryButton.setEnabled(true);
                     Notification.show(getTranslation(
                             I18n.Category.CATEGORY_SAVED, saved.getName()));
-                } catch (OptimisticLockException | IllegalStateException e) {
-                    Notification.show(getTranslation(I18n.SAVE_CONFLICT),
-                            Notification.Type.WARNING_MESSAGE);
-                    presenter.requestUpdateCategories();
-                    newCategoryButton.setEnabled(true);
                 }
             }
         }

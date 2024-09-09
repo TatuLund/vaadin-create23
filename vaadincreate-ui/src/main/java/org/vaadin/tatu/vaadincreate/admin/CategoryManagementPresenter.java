@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.admin;
 
 import java.io.Serializable;
 
+import javax.persistence.OptimisticLockException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
@@ -49,8 +51,14 @@ public class CategoryManagementPresenter implements Serializable {
      */
     public Category updateCategory(Category category) {
         accessControl.assertAdmin();
-        var newCat = getService().updateCategory(category);
-        logger.info("Category '{}' updated.", category.getName());
+        Category newCat = null;
+        try {
+            newCat = getService().updateCategory(category);
+            logger.info("Category '{}' updated.", category.getName());
+        } catch (OptimisticLockException | IllegalStateException e) {
+            requestUpdateCategories();
+            view.showSaveConflict();
+        }
         return newCat;
     }
 

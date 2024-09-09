@@ -2,8 +2,6 @@ package org.vaadin.tatu.vaadincreate.admin;
 
 import java.util.List;
 
-import javax.persistence.OptimisticLockException;
-
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
@@ -175,16 +173,15 @@ public class UserManagementView extends VerticalLayout
             userSelect.setValue(null);
         } catch (ValidationException e1) {
             // NOP
-        } catch (OptimisticLockException e) {
-            // Show a warning notification if the user was updated by someone
-            // else
-            Notification.show(getTranslation(I18n.SAVE_CONFLICT),
-                    Notification.Type.WARNING_MESSAGE);
-            presenter.requestUpdateUsers();
-            form.clear();
-            disableButtons();
-            userSelect.setValue(null);
         }
+    }
+
+    public void showSaveConflict() {
+        Notification.show(getTranslation(I18n.SAVE_CONFLICT),
+                Notification.Type.WARNING_MESSAGE);
+        form.clear();
+        disableButtons();
+        userSelect.setValue(null);       
     }
 
     @Override

@@ -85,7 +85,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void optimisticLocing() throws ServiceException {
+    public void optimisticLocking() throws ServiceException {
         test($(cats, Button.class).id("new-category")).click();
         assertFalse($(cats, Button.class).id("new-category").isEnabled());
 
@@ -117,6 +117,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
 
         cat = test(grid).item(gridSize - 1);
         assertEquals("Soft horror", cat.getName());
+        assertTrue($(cats, Button.class).id("new-category").isEnabled());
 
         form = (CategoryForm) test(grid).cell(0, gridSize - 1);
         test($(form, Button.class).first()).click();

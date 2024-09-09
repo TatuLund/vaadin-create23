@@ -85,6 +85,48 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
+    public void optimisticLocing() throws ServiceException {
+        test($(cats, Button.class).id("new-category")).click();
+        assertFalse($(cats, Button.class).id("new-category").isEnabled());
+
+        @SuppressWarnings("unchecked")
+        var grid = (Grid<Category>) $(cats, Grid.class).single();
+        var gridSize = test(grid).size();
+        var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
+        test($(form, TextField.class).first()).setValue("Tech horror");
+
+        var cat = test(grid).item(gridSize - 1);
+        assertEquals("Tech horror", cat.getName());
+        assertEquals("Category \"Tech horror\" saved.",
+                $(Notification.class).last().getCaption());
+
+        assertTrue(ui.getProductService().getAllCategories().stream()
+                .anyMatch(c -> c.getName().equals("Tech horror")));
+
+        var newCat = ui.getProductService().getAllCategories().stream()
+                .filter(c -> c.getName().equals("Tech horror")).findFirst()
+                .get();
+        newCat.setName("Soft horror");
+        ui.getProductService().updateCategory(newCat);
+
+        form = (CategoryForm) test(grid).cell(0, gridSize - 1);
+        test($(form, TextField.class).first()).setValue("Technology");
+        // Assert that optimistic locking is thrown and caught
+        assertEquals("Save conflict, try again.",
+                $(Notification.class).last().getCaption());
+
+        cat = test(grid).item(gridSize - 1);
+        assertEquals("Soft horror", cat.getName());
+
+        form = (CategoryForm) test(grid).cell(0, gridSize - 1);
+        test($(form, Button.class).first()).click();
+        var dialog = $(Window.class).id("confirm-dialog");
+        test($(dialog, Button.class).id("confirm-button")).click();
+        assertEquals("Category \"Soft horror\" removed.",
+                $(Notification.class).last().getCaption());
+    }
+
+    @Test
     public void duplicateCategory() {
         test($(cats, Button.class).id("new-category")).click();
         @SuppressWarnings("unchecked")

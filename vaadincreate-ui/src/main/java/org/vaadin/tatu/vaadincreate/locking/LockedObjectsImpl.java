@@ -1,8 +1,6 @@
 package org.vaadin.tatu.vaadincreate.locking;
 
-import java.io.Serializable;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.WeakHashMap;
 
 import org.slf4j.Logger;
@@ -18,7 +16,7 @@ public class LockedObjectsImpl implements LockedObjects {
     private EventBus eventBus = EventBus.get();
     private static final String NOT_NULL_ERROR = "object can't be null";
 
-    private final WeakHashMap<LockedObject, Object> lockedObjects = new WeakHashMap<>();
+    private final WeakHashMap<AbstractEntity, User> lockedObjects = new WeakHashMap<>();
 
     public static synchronized LockedObjects getInstance() {
         if (instance == null) {
@@ -33,78 +31,37 @@ public class LockedObjectsImpl implements LockedObjects {
     @Override
     public User isLocked(AbstractEntity object) {
         Objects.requireNonNull(object, NOT_NULL_ERROR);
-        return isLocked(object.getClass(), object.getId());
-    }
-
-    public User isLocked(Class<?> type, Integer id) {
         synchronized (lockedObjects) {
-            var match = findObject(type, id);
-            if (match.isPresent()) {
-                return match.get().user;
-            }
+            return lockedObjects.get(object);
         }
-        return null;
     }
 
     @Override
     public void lock(AbstractEntity object, User user) {
         Objects.requireNonNull(object, NOT_NULL_ERROR);
         Objects.requireNonNull(user, "user can't be null");
-        lock(object.getClass(), object.getId(), user);
-    }
-
-    private void lock(Class<?> type, Integer id, User user) {
-        if (id != null && id < 0) {
-            throw new IllegalArgumentException(
-                    "Id can't be null and must be positive");
-        }
         synchronized (lockedObjects) {
-            var match = findObject(type, id);
-            if (match.isPresent()) {
+            if (lockedObjects.containsKey(object)) {
                 throw new IllegalStateException(
-                        "Can't lock object already locked: " + id);
+                        "Can't lock object already locked: " + object.getId());
             }
-            lockedObjects.put(new LockedObject(type, id, user), null);
-            eventBus.post(new LockingEvent(type, id, user, true));
+            lockedObjects.put(object, user);
+            eventBus.post(new LockingEvent(object.getClass(), object.getId(), user, true));
             logger.debug("{} locked {} ({})", user.getName(),
-                    type.getSimpleName(), id);
+                    object.getClass().getSimpleName(), object.getId());
         }
     }
 
     @Override
     public void unlock(AbstractEntity object) {
         Objects.requireNonNull(object, NOT_NULL_ERROR);
-        unlock(object.getClass(), object.getId());
-    }
-
-    private void unlock(Class<?> type, Integer id) {
         synchronized (lockedObjects) {
-            var match = findObject(type, id);
-            if (match.isPresent()) {
-                var object = match.get();
-                lockedObjects.remove(object);
-                eventBus.post(new LockingEvent(type, id, object.user, false));
-                logger.debug("{} unlocked {} ({})", object.user.getName(),
-                        type.getSimpleName(), id);
+            User user = lockedObjects.remove(object);
+            if (user != null) {
+                eventBus.post(new LockingEvent(object.getClass(), object.getId(), user, false));
+                logger.debug("{} unlocked {} ({})", user.getName(),
+                        object.getClass().getSimpleName(), object.getId());
             }
-        }
-    }
-
-    private Optional<LockedObject> findObject(Class<?> type, Integer id) {
-        return lockedObjects.keySet().stream()
-                .filter(obj -> obj.type.equals(type) && obj.id.equals(id))
-                .findFirst();
-    }
-
-    static class LockedObject implements Serializable {
-        Integer id;
-        Class<?> type;
-        User user;
-
-        LockedObject(Class<?> type, Integer id, User user) {
-            this.type = type;
-            this.id = id;
-            this.user = user;
         }
     }
 

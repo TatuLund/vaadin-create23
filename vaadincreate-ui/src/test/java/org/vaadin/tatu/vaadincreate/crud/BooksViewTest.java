@@ -371,20 +371,24 @@ public class BooksViewTest extends AbstractUITest {
 
     @Test
     public void editLockedProduct() {
-        var book = test(grid).item(0);
+        var book = test(grid).item(15);
         LockedObjects.get().lock(book, CurrentUser.get().get());
 
-        assertEquals("Edited by Admin", test(grid).description(0));
-        test(grid).click(1, 0);
+        assertEquals("Edited by Admin", test(grid).description(15));
+        test(grid).click(1, 15);
         assertFalse(form.isShown());
         LockedObjects.get().unlock(book);
     }
 
     @Test
     public void weakLockConcurrentEdit() {
-        var book = test(grid).item(0);
+        // Idea of this is to simulate Form being detached due browser crash so
+        // that form no longer holds the product reference. Here it is simulated
+        // by doing lock via proxy object.
+        var book = new Product(test(grid).item(0));
         LockedObjects.get().lock(book, CurrentUser.get().get());
         assertEquals("Edited by Admin", test(grid).description(0));
+        book = null;
 
         // GC wipes weak lock
         System.gc();
@@ -393,7 +397,7 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(form.isShown());
 
         // Concurrent edit is now possible, simulate it
-        ui.getProductService().updateProduct(book);
+        ui.getProductService().updateProduct(test(grid).item(0));
 
         // Change and save
         test(form.productName).setValue("Product name changed");
@@ -406,9 +410,13 @@ public class BooksViewTest extends AbstractUITest {
 
     @Test
     public void weakLockConcurrentDelete() {
-        var book = test(grid).item(0);
+        // Idea of this is to simulate Form being detached due browser crash so
+        // that form no longer holds the product reference. Here it is simulated
+        // by doing lock via proxy object.
+        var book = new Product(test(grid).item(0));
         LockedObjects.get().lock(book, CurrentUser.get().get());
         assertEquals("Edited by Admin", test(grid).description(0));
+        book = null;
 
         // GC wipes weak lock
         System.gc();
@@ -417,7 +425,7 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(form.isShown());
 
         // Concurrent delete is now possible, simulate it
-        ui.getProductService().deleteProduct(book.getId());
+        ui.getProductService().deleteProduct(test(grid).item(0).getId());
 
         // Change and save
         test(form.productName).setValue("Product name changed");

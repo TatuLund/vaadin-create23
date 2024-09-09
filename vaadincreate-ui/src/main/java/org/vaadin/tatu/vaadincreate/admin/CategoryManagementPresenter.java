@@ -55,7 +55,8 @@ public class CategoryManagementPresenter implements Serializable {
         try {
             newCat = getService().updateCategory(category);
             logger.info("Category '{}' updated.", category.getName());
-        } catch (OptimisticLockException | IllegalStateException e) {
+        } catch (OptimisticLockException | IllegalStateException
+                | IllegalArgumentException e) {
             requestUpdateCategories();
             view.showSaveConflict();
         }

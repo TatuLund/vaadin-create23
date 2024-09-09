@@ -167,4 +167,33 @@ public class CategoryManagementViewTest extends AbstractUITest {
 
         assertTrue($(cats, Button.class).id("new-category").isEnabled());
     }
+
+    @Test
+    public void updateDeletedCategoryShowsSaveConflict() {
+        // Simulate other user saving category
+        Category cat = new Category();
+        cat.setName("Horrors");
+        var newCat = ui.getProductService().updateCategory(cat);
+
+        // Switch to user tab and back, will update
+        test(tabs).click(1);
+        test(tabs).click(0);
+
+        @SuppressWarnings("unchecked")
+        var grid = (Grid<Category>) $(cats, Grid.class).single();
+        var gridSize = test(grid).size();
+        var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
+        assertEquals("Horrors", $(form, TextField.class).first().getValue());
+
+        // Simulate other user deleting the category
+        ui.getProductService().deleteCategory(newCat.getId());
+
+        // Attempt to edit the category
+        test($(form, TextField.class).first()).setValue("Horror");
+
+        // Assert that optimistic locking is thrown and caught
+        assertEquals("Save conflict, try again.",
+                $(Notification.class).last().getCaption());
+        assertTrue($(cats, Button.class).id("new-category").isEnabled());
+    }
 }

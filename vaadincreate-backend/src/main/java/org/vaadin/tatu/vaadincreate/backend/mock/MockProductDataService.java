@@ -19,10 +19,10 @@ import org.vaadin.tatu.vaadincreate.backend.data.Product;
  * notify users of modifications. There are mocked delays to simulate real
  * database response times.
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "java:S6548" })
 public class MockProductDataService extends ProductDataService {
 
-    private static MockProductDataService INSTANCE;
+    private static MockProductDataService instance;
 
     private List<Product> products;
     private List<Category> categories;
@@ -39,18 +39,18 @@ public class MockProductDataService extends ProductDataService {
         logger.info("Generated mock product data");
     }
 
-    public synchronized static ProductDataService getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new MockProductDataService();
+    public static synchronized ProductDataService getInstance() {
+        if (instance == null) {
+            instance = new MockProductDataService();
         }
-        return INSTANCE;
+        return instance;
     }
 
     @Override
     public synchronized List<Product> getAllProducts() {
         synchronized (products) {
             randomWait(6);
-            return products.stream().map(p -> new Product(p))
+            return products.stream().map(Product::new)
                     .collect(Collectors.toList());
         }
     }
@@ -59,7 +59,7 @@ public class MockProductDataService extends ProductDataService {
     public List<Category> getAllCategories() {
         synchronized (categories) {
             randomWait(2);
-            return categories.stream().map(cat -> new Category(cat))
+            return categories.stream().map(Category::new)
                     .collect(Collectors.toList());
         }
     }
@@ -88,7 +88,7 @@ public class MockProductDataService extends ProductDataService {
             }
 
             throw new IllegalArgumentException(
-                    "No product with id " + p.getId() + " found");
+                    String.format("No product with id %d found", p.getId()));
         }
     }
 
@@ -96,9 +96,9 @@ public class MockProductDataService extends ProductDataService {
     public Product getProductById(int productId) {
         synchronized (products) {
             randomWait(1);
-            for (int i = 0; i < products.size(); i++) {
-                if (products.get(i).getId() == productId) {
-                    return new Product(products.get(i));
+            for (Product product : products) {
+                if (product.getId() == productId) {
+                    return new Product(product);
                 }
             }
             return null;
@@ -111,8 +111,8 @@ public class MockProductDataService extends ProductDataService {
             randomWait(1);
             Product p = getProductById(productId);
             if (p == null) {
-                throw new IllegalArgumentException(
-                        "Product with id " + productId + " not found");
+                throw new IllegalArgumentException(String
+                        .format("Product with id %d not found", productId));
             }
             products.remove(p);
         }
@@ -131,6 +131,11 @@ public class MockProductDataService extends ProductDataService {
                 logger.info("Category {} created", newCategory.getId());
             } else {
                 var index = categories.indexOf(newCategory);
+                if (index < 0) {
+                    throw new IllegalArgumentException(
+                            String.format("Category with id %d does not exist.",
+                                    newCategory.getId()));
+                }
                 newCategory.setVersion(categories.get(index).getVersion() + 1);
                 categories.set(index, newCategory);
                 logger.info("Category {} updated", newCategory.getId());
@@ -145,15 +150,11 @@ public class MockProductDataService extends ProductDataService {
                 .filter(item -> item.getName().equals(category.getName()))
                 .findFirst();
         old.ifPresent(oldCategory -> {
-            if (category.getId() < 0) {
-                throw new IllegalStateException(
-                        "Cannot re-use category name: " + category.getName());
-            } else if (category.getId() >= 0
-                    && oldCategory.getId() != category.getId()) {
-                throw new IllegalStateException(
-                        "Cannot re-use category name: " + category.getName());
+            if (category.getId() < 0 || (category.getId() >= 0
+                    && oldCategory.getId() != category.getId())) {
+                throw new IllegalStateException(String.format(
+                        "Cannot re-use category name: %s", category.getName()));
             }
-
         });
     }
 
@@ -161,10 +162,10 @@ public class MockProductDataService extends ProductDataService {
     public void deleteCategory(int categoryId) {
         synchronized (categories) {
             randomWait(1);
-            if (!getAllProducts().stream()
-                    .anyMatch(c -> c.getId() == categoryId)) {
-                throw new IllegalArgumentException(
-                        "Category with id " + categoryId + " not found");
+            if (getAllProducts().stream()
+                    .noneMatch(c -> c.getId() == categoryId)) {
+                throw new IllegalArgumentException(String
+                        .format("Category with id %d not found", categoryId));
             }
             deleteCategoryInternal(categoryId);
         }
@@ -173,10 +174,8 @@ public class MockProductDataService extends ProductDataService {
 
     private void deleteCategoryInternal(int categoryId) {
         if (categories.removeIf(category -> category.getId() == categoryId)) {
-            getAllProducts().forEach(product -> {
-                product.getCategory()
-                        .removeIf(category -> category.getId() == categoryId);
-            });
+            getAllProducts().forEach(product -> product.getCategory()
+                    .removeIf(category -> category.getId() == categoryId));
         }
     }
 
@@ -185,28 +184,28 @@ public class MockProductDataService extends ProductDataService {
         synchronized (categories) {
             return categories.stream()
                     .filter(cat -> categoryIds.contains(cat.getId()))
-                    .map(cat -> new Category(cat)).collect(Collectors.toSet());
+                    .map(Category::new).collect(Collectors.toSet());
         }
     }
 
     @Override
     public Collection<Product> backup() {
-        return products.stream().map(product -> new Product(product))
-                .collect(Collectors.toList());
+        return products.stream().map(Product::new).collect(Collectors.toList());
     }
 
+    @Override
     public void restore(Collection<Product> data) {
         products.clear();
-        data.forEach(product -> {
-            products.add(new Product(product));
-        });
+        data.forEach(product -> products.add(new Product(product)));
     }
 
+    @SuppressWarnings("java:S2142")
     private void randomWait(int count) {
         int wait = 50 + random.nextInt(100);
         try {
-            Thread.sleep(wait * count);
+            Thread.sleep(wait * (long) count);
         } catch (InterruptedException e) {
+            // NOP
         }
     }
 

@@ -161,4 +161,12 @@ public class ProductDataServiceTest {
         foundBook = service.getProductById(bookId);
         assertTrue(foundBook.getCategory().isEmpty());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void updateNonExistingCategoryThrows() {
+        var category = new Category();
+        category.setName("Sports");
+        category.setId(20);
+        service.updateCategory(category);        
+    }
 }

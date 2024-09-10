@@ -213,14 +213,16 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     // Set maxIdleTime because of Jetty 10, see:
     // https://github.com/vaadin/flow/issues/17215
     @WebServlet(value = "/*", asyncSupported = true, initParams = {
+            @WebInitParam(name = "org.atmosphere.cpr.AtmosphereConfig.getInitParameter", value = "true"),
             @WebInitParam(name = "org.atmosphere.websocket.maxIdleTime", value = "300000") })
-    @VaadinServletConfiguration(productionMode = false, ui = VaadinCreateUI.class, closeIdleSessions = true)
+    @VaadinServletConfiguration(productionMode = false, ui = VaadinCreateUI.class, heartbeatInterval = 60, closeIdleSessions = true)
     public static class Servlet extends VaadinServlet {
 
         @Override
         protected void servletInitialized() {
             getService().addSessionInitListener(event -> {
                 VaadinSession s = event.getSession();
+                s.getSession().setMaxInactiveInterval(300);
                 s.addRequestHandler(this::handleRequest);
             });
         }

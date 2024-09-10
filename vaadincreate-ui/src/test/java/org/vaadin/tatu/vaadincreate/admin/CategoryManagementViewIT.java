@@ -62,6 +62,8 @@ public class CategoryManagementViewIT extends AbstractViewTest {
 
     @Test
     public void visual() throws IOException {
+        waitForElementPresent(By.id("new-category"));
+
         if (visualTests()) {
             assertTrue(
                     $(UIElement.class).first().compareScreen("category.png"));

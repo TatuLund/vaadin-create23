@@ -13,7 +13,7 @@ import com.vaadin.client.extensions.AbstractExtensionConnector;
 import com.vaadin.client.ui.VOverlay;
 import com.vaadin.shared.ui.Connect;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "deprecation", "java:S1948" })
 @Connect(CapsLockWarning.class)
 public class CapsLockWarningConnector extends AbstractExtensionConnector {
 
@@ -45,14 +45,17 @@ public class CapsLockWarningConnector extends AbstractExtensionConnector {
     // This is native JavaScript function. GWT does not have this new API.
     private native void addKeyDownListener(Element el)
     /*-{
-        var self = this;
-        el.addEventListener('keydown', $entry(function(e) {
-           if (e.getModifierState('CapsLock')) {
-               self.@org.vaadin.tatu.vaadincreate.client.CapsLockWarningConnector::showWarning()();
-           } else {
-               self.@org.vaadin.tatu.vaadincreate.client.CapsLockWarningConnector::hideWarning()();
-           }
-        }));        
+    var self = this;
+    el
+        .addEventListener(
+            'keydown',
+            $entry(function(e) {
+              if (e.getModifierState('CapsLock')) {
+                self.@org.vaadin.tatu.vaadincreate.client.CapsLockWarningConnector::showWarning()();
+              } else {
+                self.@org.vaadin.tatu.vaadincreate.client.CapsLockWarningConnector::hideWarning()();
+              }
+            }));
     }-*/;
 
     @OnStateChange("message")

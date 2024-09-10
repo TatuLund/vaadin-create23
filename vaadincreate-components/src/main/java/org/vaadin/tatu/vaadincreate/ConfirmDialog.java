@@ -18,7 +18,7 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.ReflectTools;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "java:S2160" })
 public class ConfirmDialog extends Composite {
 
     /**

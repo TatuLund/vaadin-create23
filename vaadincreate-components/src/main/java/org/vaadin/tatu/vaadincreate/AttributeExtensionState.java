@@ -8,7 +8,7 @@ import java.util.HashMap;
  * Shared state class for {@link AttributeExtension} communication from server
  * to client.
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "java:S1104", "java:S1319" })
 public class AttributeExtensionState extends JavaScriptExtensionState {
-    public HashMap<String, String> attributes = new HashMap<String, String>();
+    public HashMap<String, String> attributes = new HashMap<>();
 }

@@ -43,10 +43,12 @@ public class LockedObjectsImpl implements LockedObjects {
         synchronized (lockedObjects) {
             if (lockedObjects.containsKey(object)) {
                 throw new IllegalStateException(
-                        "Can't lock object already locked: " + object.getId());
+                        String.format("Can't lock object already locked: %s",
+                                object.getId()));
             }
             lockedObjects.put(object, user);
-            eventBus.post(new LockingEvent(object.getClass(), object.getId(), user, true));
+            eventBus.post(new LockingEvent(object.getClass(), object.getId(),
+                    user, true));
             logger.debug("{} locked {} ({})", user.getName(),
                     object.getClass().getSimpleName(), object.getId());
         }
@@ -58,7 +60,8 @@ public class LockedObjectsImpl implements LockedObjects {
         synchronized (lockedObjects) {
             User user = lockedObjects.remove(object);
             if (user != null) {
-                eventBus.post(new LockingEvent(object.getClass(), object.getId(), user, false));
+                eventBus.post(new LockingEvent(object.getClass(),
+                        object.getId(), user, false));
                 logger.debug("{} unlocked {} ({})", user.getName(),
                         object.getClass().getSimpleName(), object.getId());
             }

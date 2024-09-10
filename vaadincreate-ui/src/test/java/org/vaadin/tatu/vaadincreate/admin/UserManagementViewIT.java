@@ -117,6 +117,8 @@ public class UserManagementViewIT extends AbstractViewTest {
 
     @Test
     public void visual() throws IOException {
+        waitForElementPresent(By.id("new-button"));
+
         if (visualTests()) {
             assertTrue($(UIElement.class).first().compareScreen("user.png"));
         }

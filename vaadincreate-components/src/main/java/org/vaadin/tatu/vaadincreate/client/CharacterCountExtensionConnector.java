@@ -5,7 +5,6 @@ import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
@@ -16,11 +15,15 @@ import com.vaadin.client.ui.VTextField;
 import com.vaadin.client.ui.textfield.AbstractTextFieldConnector;
 import com.vaadin.shared.ui.Connect;
 
+@SuppressWarnings({ "serial", "java:S1948" })
 @Connect(CharacterCountExtension.class)
 public class CharacterCountExtensionConnector extends AbstractExtensionConnector
         implements KeyUpHandler, AttachEvent.Handler {
 
     public static final String CLASSNAME = "v-charactercount";
+
+    private static final String BACKGROUND = "background";
+    private static final String WIDTH = "width";
     private AbstractTextFieldConnector textFieldConnector;
     private VTextField textField;
     private Element countElement;
@@ -28,11 +31,8 @@ public class CharacterCountExtensionConnector extends AbstractExtensionConnector
 
     @Override
     protected void extend(ServerConnector serverConnector) {
-        serverConnector.addStateChangeHandler(event -> {
-            Scheduler.get().scheduleDeferred(() -> {
-                updateCountElementVisibility();
-            });
-        });
+        serverConnector.addStateChangeHandler(event -> Scheduler.get()
+                .scheduleDeferred(this::updateCountElementVisibility));
         textFieldConnector = (AbstractTextFieldConnector) serverConnector;
         textField = (VTextField) textFieldConnector.getWidget();
         var textFieldStyle = CLASSNAME + "-field";
@@ -48,9 +48,8 @@ public class CharacterCountExtensionConnector extends AbstractExtensionConnector
 
         textField.addAttachHandler(this);
         textField.addKeyUpHandler(this);
-        textField.addBlurHandler(event -> {
-            countElement.getStyle().setDisplay(Style.Display.NONE);
-        });
+        textField.addBlurHandler(event -> countElement.getStyle()
+                .setDisplay(Style.Display.NONE));
     }
 
     private void updateCountElementVisibility() {
@@ -59,8 +58,8 @@ public class CharacterCountExtensionConnector extends AbstractExtensionConnector
             countElement.getStyle().setDisplay(Style.Display.NONE);
         } else {
             countElement.getStyle().clearDisplay();
-            wrapper.getStyle().setProperty("width", textField.getElement()
-                    .getStyle().getProperty("width"));
+            wrapper.getStyle().setProperty(WIDTH,
+                    textField.getElement().getStyle().getProperty(WIDTH));
         }
     }
 
@@ -69,6 +68,7 @@ public class CharacterCountExtensionConnector extends AbstractExtensionConnector
         var maxChars = textFieldConnector.getState().maxLength;
         if (maxChars > 0) {
             int chars = maxChars - textField.getValue().length();
+            // GWT does not support String formatter
             countElement.setInnerText(chars + " / " + maxChars);
         }
         updateCountElementVisibility();
@@ -81,10 +81,10 @@ public class CharacterCountExtensionConnector extends AbstractExtensionConnector
             textField.getElement().removeFromParent();
             wrapper.appendChild(textField.getElement());
             wrapper.appendChild(countElement);
-            wrapper.getStyle().setProperty("width", textField.getElement()
-                    .getStyle().getProperty("width"));
-            countElement.getStyle().setProperty("background", textField
-                    .getElement().getStyle().getProperty("background"));
+            wrapper.getStyle().setProperty(WIDTH,
+                    textField.getElement().getStyle().getProperty(WIDTH));
+            countElement.getStyle().setProperty(BACKGROUND,
+                    textField.getElement().getStyle().getProperty(BACKGROUND));
             updateCountElementVisibility();
         } else {
             var parentElement = wrapper.getParentElement();

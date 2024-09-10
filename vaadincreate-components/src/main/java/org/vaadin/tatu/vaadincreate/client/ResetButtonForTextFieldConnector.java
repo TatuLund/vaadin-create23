@@ -21,6 +21,7 @@ import com.vaadin.shared.ui.Connect;
  * @see <a href="https://vaadin.com/blog/-/blogs/2656782">Extending components
  *      in Vaadin 7</a>
  */
+@SuppressWarnings({ "serial", "java:S1948" })
 @Connect(ResetButtonForTextField.class)
 public class ResetButtonForTextFieldConnector extends AbstractExtensionConnector
         implements KeyUpHandler, AttachEvent.Handler {
@@ -32,11 +33,8 @@ public class ResetButtonForTextFieldConnector extends AbstractExtensionConnector
 
     @Override
     protected void extend(ServerConnector serverConnector) {
-        serverConnector.addStateChangeHandler(event -> {
-            Scheduler.get().scheduleDeferred(() -> {
-                updateResetButtonVisibility();
-            });
-        });
+        serverConnector.addStateChangeHandler(event -> Scheduler.get()
+                .scheduleDeferred(this::updateResetButtonVisibility));
         textFieldConnector = (AbstractTextFieldConnector) serverConnector;
         textField = (VTextField) textFieldConnector.getWidget();
         var textFieldStyle = CLASSNAME + "-textfield";
@@ -59,17 +57,24 @@ public class ResetButtonForTextFieldConnector extends AbstractExtensionConnector
         }
     }
 
+    /**
+     * Adds a click listener to the specified element that triggers the clearing
+     * of a text field.
+     * 
+     * @param el
+     *            The element to attach the click listener to.
+     */
     public native void addResetButtonClickListener(Element el)
     /*-{
-        var self = this;
-        el.onclick = $entry(function () {
-            self.@org.vaadin.tatu.vaadincreate.client.ResetButtonForTextFieldConnector::clearTextField()();
-        });
+    var self = this;
+    el.onclick = $entry(function() {
+      self.@org.vaadin.tatu.vaadincreate.client.ResetButtonForTextFieldConnector::clearTextField()();
+    });
     }-*/;
 
     public native void removeResetButtonClickListener(Element el)
     /*-{
-        el.onclick = null;
+    el.onclick = null;
     }-*/;
 
     @Override
@@ -93,6 +98,8 @@ public class ResetButtonForTextFieldConnector extends AbstractExtensionConnector
         }
     }
 
+    // This method is called from JSNI
+    @SuppressWarnings("java:S1144")
     private void clearTextField() {
         textField.setValue("");
         textFieldConnector.flush();

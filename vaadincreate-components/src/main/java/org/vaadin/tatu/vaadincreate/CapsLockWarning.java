@@ -42,12 +42,12 @@ public class CapsLockWarning extends AbstractExtension {
         return (CapsLockWarningState) super.getState();
     }
 
+    // Sanitize the message as it is set by the user
     private static String sanitize(String unsanitized) {
         var settings = new OutputSettings();
         settings.prettyPrint(false);
-        var text = Jsoup.clean(unsanitized, "", Safelist.relaxed()
+        return Jsoup.clean(unsanitized, "", Safelist.relaxed()
                 .addAttributes("span", "style").addAttributes("span", "class"),
                 settings);
-        return text;
     }
 }

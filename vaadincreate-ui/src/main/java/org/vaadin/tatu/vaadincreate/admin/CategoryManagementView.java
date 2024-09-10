@@ -109,7 +109,7 @@ public class CategoryManagementView extends VerticalLayout
 
         CategoryForm(Category category) {
             this.category = category;
-            configureNameField(category);
+            configureNameField();
             // Focus the name field if the category is new
             if (category.getId() < 0) {
                 nameField.focus();
@@ -140,7 +140,7 @@ public class CategoryManagementView extends VerticalLayout
             setCompositionRoot(layout);
         }
 
-        private void configureNameField(Category category) {
+        private void configureNameField() {
             nameField = new TextField();
             var nameFieldExt = new AttributeExtension();
             nameFieldExt.extend(nameField);

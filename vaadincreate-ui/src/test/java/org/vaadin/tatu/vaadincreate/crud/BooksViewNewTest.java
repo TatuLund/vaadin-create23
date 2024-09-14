@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
@@ -66,6 +67,7 @@ public class BooksViewNewTest extends AbstractUITest {
 
         assertTrue($(Notification.class).last().getCaption()
                 .contains("A new product"));
+        assertFalse(form.isShown());
 
         assertTrue(test(grid).isFocused());
         assertTrue(ui.getProductService().getAllProducts().stream()

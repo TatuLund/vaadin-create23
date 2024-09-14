@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -84,6 +85,7 @@ public class BooksViewEditIdTest extends AbstractUITest {
 
         assertTrue($(Notification.class).last().getCaption()
                 .contains("Modified book"));
+        assertFalse(form.isShown());
 
         var savedProduct = ui.getProductService().getProductById(10);
         assertEquals("Modified book", savedProduct.getProductName());

@@ -320,6 +320,31 @@ public class BooksPresenter implements Serializable {
         }
     }
 
+    /**
+     * Saves the given product draft.
+     *
+     * @param draft the product draft to be saved
+     */
+    public void saveDraft(Product draft) {
+        getService().saveDraft(accessControl.getPrincipalName(), draft);
+    }
+
+    /**
+     * Removes the current draft.
+     */
+    public void removeDraft() {
+        getService().saveDraft(accessControl.getPrincipalName(), null);
+    }
+
+    /**
+     * Retrieves the draft version of a product for the currently authenticated user.
+     *
+     * @return the draft product associated with the current user's principal name.
+     */
+    public Product getDraft() {
+        return getService().findDraft(accessControl.getPrincipalName());
+    }
+
     private LockedObjects getLockedBooks() {
         return LockedObjects.get();
     }
@@ -360,4 +385,5 @@ public class BooksPresenter implements Serializable {
 
     private static Logger logger = LoggerFactory
             .getLogger(BooksPresenter.class);
+
 }

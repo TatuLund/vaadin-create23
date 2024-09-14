@@ -323,6 +323,10 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(form.isShown());
         assertFalse(form.productName.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+
+        // Close form gracefully to avoid side effects
+        test(form.cancelButton).click();
+        assertFalse(form.isShown());
     }
 
     @Test
@@ -348,6 +352,9 @@ public class BooksViewTest extends AbstractUITest {
         test(form.discardButton).click();
         assertFalse(form.productName.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+
+        test(form.cancelButton).click();
+        assertFalse(form.isShown());
     }
 
     @Test
@@ -367,6 +374,9 @@ public class BooksViewTest extends AbstractUITest {
 
         var name = (String) test(grid).cell(1, 0);
         assertEquals("Touched book", name);
+
+        test(form.cancelButton).click();
+        assertFalse(form.isShown());
     }
 
     @Test
@@ -406,6 +416,8 @@ public class BooksViewTest extends AbstractUITest {
         // Assert internal error happens
         assertEquals("Internal error.",
                 $(Notification.class).last().getCaption());
+
+        assertFalse(form.isShown());
     }
 
     @Test
@@ -434,6 +446,8 @@ public class BooksViewTest extends AbstractUITest {
         // Assert internal error happens
         assertEquals("Internal error.",
                 $(Notification.class).last().getCaption());
+
+        assertFalse(form.isShown());
     }
 
     @Test
@@ -539,6 +553,11 @@ public class BooksViewTest extends AbstractUITest {
 
         assertEquals(1, $(BooksView.class).size());
         assertTrue(form.isShown());
+
+        // Close form gracefully to avoid side effects
+        test(form.discardButton).click();
+        test(form.cancelButton).click();
+        assertFalse(form.isShown());
     }
 
     @Test
@@ -551,6 +570,10 @@ public class BooksViewTest extends AbstractUITest {
         assertEquals(
                 "Product name must have at least two characters and maximum of 100",
                 test(form.productName).errorMessage());
+
+        test(form.discardButton).click();
+        test(form.cancelButton).click();
+        assertFalse(form.isShown());
     }
 
     @Test

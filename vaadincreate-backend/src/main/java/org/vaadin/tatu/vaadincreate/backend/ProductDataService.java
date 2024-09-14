@@ -83,8 +83,38 @@ public abstract class ProductDataService {
      */
     public abstract Set<Category> findCategoriesByIds(Set<Integer> categories);
 
+    /**
+     * Save draft Product for the user.
+     *
+     * @param userName
+     *            The name of the user. If null, draft will be removed.
+     * @param draft
+     *            Product
+     */
+    public abstract void saveDraft(String userName, Product draft);
+
+    /**
+     * Find the last draft of the user.
+     *
+     * @param userName
+     *            Name of the user
+     * @return Product or null if user does not have draft
+     */
+    public abstract Product findDraft(String userName);
+
+    /**
+     * Only to be used in the tests.
+     *
+     * @return Products
+     */
     public abstract Collection<Product> backup();
 
+    /**
+     * Only to be used in the tests.
+     *
+     * @param data
+     *            Products
+     */
     public abstract void restore(Collection<Product> data);
 
     public static ProductDataService get() {

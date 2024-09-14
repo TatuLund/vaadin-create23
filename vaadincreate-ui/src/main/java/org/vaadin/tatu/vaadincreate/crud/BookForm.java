@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.crud;
 
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
@@ -14,6 +16,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.Binder;
@@ -51,8 +54,7 @@ public class BookForm extends Composite implements HasI18N {
             getTranslation(I18n.CATEGORIES));
 
     protected Button saveButton = new Button(getTranslation(I18n.SAVE));
-    protected Button discardButton = new Button(
-            getTranslation(I18n.Form.DISCARD));
+    protected Button discardButton = new Button(getTranslation(I18n.DISCARD));
     protected Button cancelButton = new Button(getTranslation(I18n.CANCEL));
     protected Button deleteButton = new Button(getTranslation(I18n.DELETE));
 
@@ -316,4 +318,43 @@ public class BookForm extends Composite implements HasI18N {
                 "window.document.getElementById('%s').scrollTop = 0;", getId());
         Page.getCurrent().getJavaScript().execute(scrollScript);
     }
+
+    @Override
+    public void detach() {
+        super.detach();
+        if (isShown() && binder.hasChanges()) {
+            logger.info(
+                    "Browser closed before saving changes, draft product autosaved.");
+            var draft = new Product(getProduct());
+            binder.writeBeanAsDraft(draft, true);
+            presenter.saveDraft(draft);
+        }
+    }
+
+    /**
+     * Merge the draft product into the form.
+     *
+     * @param draft
+     *            the draft product.
+     */
+    public void mergeDraft(Product draft) {
+        // Binder does not support merging, so we need to do it manually
+        var stockConverter = new StockCountConverter("");
+        var euroConverter = new EuroConverter("");
+
+        var count = Utils.convertToPresentation(draft.getStockCount(),
+                stockConverter);
+        var euros = Utils.convertToPresentation(draft.getPrice(),
+                euroConverter);
+
+        Utils.setValueIfDifferent(productName, draft.getProductName());
+        Utils.setValueIfDifferent(stockCount, count);
+        Utils.setValueIfDifferent(category, draft.getCategory());
+        Utils.setValueIfDifferent(availability, draft.getAvailability());
+        Utils.setValueIfDifferent(price, euros);
+
+        updateDirtyIndicators();
+    }
+
+    private static Logger logger = LoggerFactory.getLogger(BookForm.class);
 }

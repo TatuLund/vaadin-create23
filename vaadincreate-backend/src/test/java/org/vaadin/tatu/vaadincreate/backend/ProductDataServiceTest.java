@@ -9,6 +9,7 @@ import org.vaadin.tatu.vaadincreate.backend.mock.MockProductDataService;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
@@ -110,7 +111,8 @@ public class ProductDataServiceTest {
 
     @Test(expected = OptimisticLockException.class)
     public void optimisticLockingCategory() {
-        var category = service.getAllCategories().stream().skip(2).findFirst().get();
+        var category = service.getAllCategories().stream().skip(2).findFirst()
+                .get();
         service.updateCategory(category);
         service.updateCategory(category);
     }
@@ -167,6 +169,21 @@ public class ProductDataServiceTest {
         var category = new Category();
         category.setName("Sports");
         category.setId(20);
-        service.updateCategory(category);        
+        service.updateCategory(category);
+    }
+
+    @Test
+    public void drafts() {
+        var userName = "user";
+        var draft = service.findDraft(userName);
+        assertNull(draft);
+        var product = new Product();
+        service.saveDraft(userName, product);
+        draft = service.findDraft(userName);
+        assertEquals(product, draft);
+        assertFalse(product == draft);
+        service.saveDraft(userName, null);
+        draft = service.findDraft(userName);
+        assertNull(draft);
     }
 }

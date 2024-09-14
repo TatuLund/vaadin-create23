@@ -9,9 +9,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
 
+import com.vaadin.data.Converter;
+import com.vaadin.data.HasValue;
+import com.vaadin.data.ValueContext;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.shared.communication.PushMode;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 
 public class Utils {
@@ -63,5 +67,51 @@ public class Utils {
         var formatter = DateTimeFormatter
                 .ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(locale);
         return dateTime.format(formatter);
+    }
+
+    /**
+     * Helper method to create a ValueContext for a Converter
+     *
+     * @return ValueContext
+     */
+    public static ValueContext createValueContext() {
+        var field = new TextField();
+        return new ValueContext(field, field);
+    }
+
+    /**
+     * Converts a given value to its presentation form using the specified
+     * converter.
+     *
+     * @param <T>
+     *            the type of the value to be converted
+     * @param <U>
+     *            the type of the presentation value
+     * @param value
+     *            the value to be converted
+     * @param converter
+     *            the converter to use for the conversion
+     * @return the converted presentation value
+     */
+    public static <T, U> U convertToPresentation(T value,
+            Converter<U, T> converter) {
+        return converter.convertToPresentation(value, createValueContext());
+    }
+
+    /**
+     * Sets the value of the given field if the new value is different from the
+     * current value.
+     *
+     * @param <T>
+     *            the type of the value
+     * @param field
+     *            the field whose value is to be set
+     * @param newValue
+     *            the new value to set if it is different from the current value
+     */
+    public static <T> void setValueIfDifferent(HasValue<T> field, T newValue) {
+        if (!field.getValue().equals(newValue)) {
+            field.setValue(newValue);
+        }
     }
 }

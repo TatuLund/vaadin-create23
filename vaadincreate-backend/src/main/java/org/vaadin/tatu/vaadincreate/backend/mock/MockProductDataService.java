@@ -1,7 +1,9 @@
 package org.vaadin.tatu.vaadincreate.backend.mock;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
@@ -26,6 +28,7 @@ public class MockProductDataService extends ProductDataService {
 
     private List<Product> products;
     private List<Category> categories;
+    private Map<String, Product> drafts = new HashMap<>();
     private int nextProductId = 0;
     private int nextCategoryId = 0;
 
@@ -189,6 +192,25 @@ public class MockProductDataService extends ProductDataService {
     }
 
     @Override
+    public void saveDraft(String userName, Product draft) {
+        randomWait(1);
+        logger.info("Saving draft for user '{}'", userName);
+        if (draft == null) {
+            drafts.remove(userName);
+        } else {
+            drafts.put(userName, new Product(draft));
+        }
+    }
+
+    @Override
+    public Product findDraft(String userName) {
+        Objects.requireNonNull("userName can't be null");
+        randomWait(1);
+        logger.info("Finding draft for user '{}'", userName);
+        return drafts.get(userName);
+    }
+
+    @Override
     public Collection<Product> backup() {
         return products.stream().map(Product::new).collect(Collectors.toList());
     }
@@ -210,4 +232,5 @@ public class MockProductDataService extends ProductDataService {
     }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
 }

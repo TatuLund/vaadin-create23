@@ -64,6 +64,8 @@ public class BooksView extends CssLayout
     private FakeGrid fakeGrid;
     private String params;
 
+    private Product draft;
+
     public BooksView() {
         setSizeFull();
         addStyleName(VaadinCreateTheme.BOOKVIEW);
@@ -170,6 +172,7 @@ public class BooksView extends CssLayout
 
     @Override
     public void enter(ViewChangeEvent event) {
+        draft = presenter.getDraft();
         params = event.getParameters();
         if (!accessControl.isUserInRole(Role.ADMIN)) {
             grid.setSelectionMode(SelectionMode.NONE);
@@ -414,6 +417,11 @@ public class BooksView extends CssLayout
             form.showForm(false);
         }
         form.editProduct(product);
+        if (draft != null) {
+            form.mergeDraft(draft);
+            draft = null;
+            presenter.removeDraft();
+        }
     }
 
     @Override
@@ -449,7 +457,10 @@ public class BooksView extends CssLayout
         if (form.hasChanges()) {
             var dialog = createDiscardChangesConfirmDialog();
             dialog.open();
-            dialog.addConfirmedListener(e -> event.navigate());
+            dialog.addConfirmedListener(e -> {
+                form.showForm(false);
+                event.navigate();
+            });
             // IMHO: Navigator clears url too early and this workaround
             // shouldn't be necessary. This is a possible bug.
             var book = getSelectedRow();

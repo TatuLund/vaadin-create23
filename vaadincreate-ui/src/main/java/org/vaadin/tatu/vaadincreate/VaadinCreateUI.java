@@ -16,10 +16,12 @@ import org.vaadin.tatu.vaadincreate.backend.AppDataService;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
+import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.login.LoginView;
 import org.vaadin.tatu.vaadincreate.stats.StatsView;
 import org.vaadin.tatu.vaadincreate.util.CookieUtil;
@@ -124,7 +126,33 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         appLayout.addView(AdminView.class, getTranslation(AdminView.VIEW_NAME),
                 VaadinIcons.USERS, AdminView.VIEW_NAME);
 
-        getNavigator().navigateTo(target);
+        Product draft = getProductService()
+                .findDraft(accessControl.getPrincipalName());
+        if (draft != null) {
+            handleDraft(draft);
+        } else {
+            getNavigator().navigateTo(target);
+        }
+    }
+
+    // Handle draft product found in the database and ask user what to do with
+    // it.
+    private void handleDraft(Product draft) {
+        logger.info("Draft found");
+        var dialog = new ConfirmDialog(getTranslation(I18n.DRAFT_FOUND),
+                ConfirmDialog.Type.ALERT);
+        dialog.setCancelText(getTranslation(I18n.DISCARD));
+        dialog.setConfirmText(getTranslation(I18n.YES));
+        var id = draft.getId() == -1 ? "new" : String.valueOf(draft.getId());
+        dialog.addConfirmedListener(e -> getNavigator()
+                .navigateTo(String.format("%s/%s", BooksView.VIEW_NAME, id)));
+        dialog.addCancelListener(e -> {
+            logger.info("Draft discarded");
+            getProductService().saveDraft(accessControl.getPrincipalName(),
+                    null);
+            getNavigator().navigateTo(target);
+        });
+        dialog.open();
     }
 
     public static VaadinCreateUI get() {

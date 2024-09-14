@@ -27,6 +27,9 @@ public final class I18n {
     public static final String PASSWORD = "password";
     public static final String SAVE = "save";
     public static final String SAVE_CONFLICT = "save-conflict";
+    public static final String YES = "yes";
+    public static final String DISCARD = "discard";
+    public static final String DRAFT_FOUND = "draft-found";
 
     public static final class Books {
         public static final String UPDATED = "updated";
@@ -49,7 +52,6 @@ public final class I18n {
     public static final class Form {
         public static final String AVAILABILITY_MISMATCH = "availability-mismatch";
         public static final String CANNOT_CONVERT = "cannot-convert";
-        public static final String DISCARD = "discard";
 
         private Form() {
             // private constructor to hide the implicit public one

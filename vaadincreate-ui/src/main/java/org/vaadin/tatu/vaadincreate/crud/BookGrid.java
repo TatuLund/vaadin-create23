@@ -14,13 +14,11 @@ import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
-import com.vaadin.data.ValueContext;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.renderers.HtmlRenderer;
 import com.vaadin.ui.renderers.NumberRenderer;
 
@@ -251,8 +249,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                         getTranslation(I18n.PRODUCT_NAME)))
                 .append(" <b>").append(book.getProductName()).append("</b><br>")
                 .append(getDescriptionCaptionSpan(getTranslation(I18n.PRICE)))
-                .append(converter.convertToPresentation(book.getPrice(),
-                        createValueContext()))
+                .append(Utils.convertToPresentation(book.getPrice(), converter))
                 .append("<br>")
                 .append(getDescriptionCaptionSpan(
                         getTranslation(I18n.AVAILABILITY)))
@@ -271,12 +268,6 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     private static String getDescriptionCaptionSpan(String caption) {
         return String.format("<span class='%s'>%s:</span> ",
                 VaadinCreateTheme.BOOKVIEW_GRID_DESCRIPTIONCAPTION, caption);
-    }
-
-    // Helper method to create a ValueContext for the EuroConverter
-    private static ValueContext createValueContext() {
-        var field = new TextField();
-        return new ValueContext(field, field);
     }
 
     @Override

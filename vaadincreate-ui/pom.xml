@@ -63,6 +63,8 @@
         <dependency>  
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-push</artifactId>
+            <!-- 8.27.0 does not work with Jetty 10 -->
+            <version>8.26.0</version>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
@@ -76,7 +78,7 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-charts</artifactId>
-            <version>4.3.3</version>
+            <version>4.3.4</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -123,7 +125,7 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>4.8.0</version>
-        <scope>test</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>

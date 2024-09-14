@@ -486,6 +486,30 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
+    public void editProductRevertEdit() {
+        test(grid).click(1, 0);
+
+        var name = form.productName.getValue();
+        var count = form.stockCount.getValue();
+        test(form.productName).setValue("Edited book");
+        test(form.stockCount).setValue("100");
+
+        // Assert that change was detected
+        assertTrue(form.saveButton.isEnabled());
+
+        // Revert edits
+        test(form.productName).setValue(name);
+        test(form.stockCount).setValue(count);
+
+        // Attempt to change item
+        test(grid).click(1, 1);
+
+        assertTrue(form.isShown());
+        // Assert that form content was updated
+        assertEquals(form.productName.getValue(), test(grid).cell(1, 1));
+    }
+
+    @Test
     public void editProductDiscardChangesWhenNavigate() {
         test(grid).click(1, 0);
 

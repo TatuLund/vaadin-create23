@@ -96,6 +96,7 @@ public class BookForm extends Composite implements HasI18N {
         binder.withValidator(this::checkAvailabilityVsStockCount, "Error");
 
         binder.bindInstanceFields(this);
+        binder.setChangeDetectionEnabled(true);
 
         // enable/disable save button while editing
         binder.addStatusChangeListener(event -> {

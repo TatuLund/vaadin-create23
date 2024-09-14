@@ -112,8 +112,15 @@ public class BookForm extends Composite implements HasI18N {
         saveButton.addClickListener(event -> handleSave());
 
         discardButton.addClickListener(event -> {
-            presenter.editProduct(currentProduct);
-            updateDirtyIndicators();
+            if (!binder.hasChanges()) {
+                // There is a bug in change detection, hence buttons were not
+                // disabled yet
+                saveButton.setEnabled(false);
+                discardButton.setEnabled(false);
+            } else {
+                presenter.editProduct(currentProduct);
+                updateDirtyIndicators();
+            }
         });
 
         cancelButton.addClickListener(event -> presenter.cancelProduct());
@@ -123,6 +130,13 @@ public class BookForm extends Composite implements HasI18N {
     }
 
     private void handleSave() {
+        if (!binder.hasChanges()) {
+            // There is a bug in change detection, hence buttons were not
+            // disabled yet
+            saveButton.setEnabled(false);
+            discardButton.setEnabled(false);
+            return;
+        }
         if (presenter.validateCategories(category.getValue())) {
             if (currentProduct != null
                     && binder.writeBeanIfValid(currentProduct)) {

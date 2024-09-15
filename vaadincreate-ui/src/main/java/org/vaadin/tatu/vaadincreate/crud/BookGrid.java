@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
-import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -14,7 +13,6 @@ import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
-import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Grid;
@@ -139,33 +137,10 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         var availability = product.getAvailability();
         var text = availability.toString();
 
-        var iconCode = createAvailabilityIcon(availability);
+        var iconCode = Utils.createAvailabilityIcon(availability);
 
         return String.format("%s<span class=\"%s\"> %s</span>", iconCode,
                 VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL, text);
-    }
-
-    // Helper method to create an icon for availability
-    private static String createAvailabilityIcon(Availability availability) {
-        var color = "";
-        switch (availability) {
-        case AVAILABLE:
-            color = VaadinCreateTheme.COLOR_AVAILABLE;
-            break;
-        case COMING:
-            color = VaadinCreateTheme.COLOR_COMING;
-            break;
-        case DISCONTINUED:
-            color = VaadinCreateTheme.COLOR_DISCONTINUED;
-            break;
-        default:
-            break;
-        }
-
-        return String.format(
-                "<span class=\"v-icon\" style=\"font-family: %s;color:%s\">&#x%s;</span>",
-                VaadinIcons.CIRCLE.getFontFamily(), color,
-                Integer.toHexString(VaadinIcons.CIRCLE.getCodepoint()));
     }
 
     private String formatCategories(Product product) {
@@ -253,7 +228,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                 .append("<br>")
                 .append(getDescriptionCaptionSpan(
                         getTranslation(I18n.AVAILABILITY)))
-                .append(createAvailabilityIcon(book.getAvailability()))
+                .append(Utils.createAvailabilityIcon(book.getAvailability()))
                 .append("<br>")
                 .append(getDescriptionCaptionSpan(
                         getTranslation(I18n.IN_STOCK)))

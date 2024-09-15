@@ -36,6 +36,7 @@ public class BooksPresenter implements Serializable {
     private transient CompletableFuture<Void> future;
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
+    private final String userName = accessControl.getPrincipalName();
     private Product editing;
 
     public BooksPresenter(BooksView simpleCrudView) {
@@ -323,26 +324,29 @@ public class BooksPresenter implements Serializable {
     /**
      * Saves the given product draft.
      *
-     * @param draft the product draft to be saved
+     * @param draft
+     *            the product draft to be saved
      */
     public void saveDraft(Product draft) {
-        getService().saveDraft(accessControl.getPrincipalName(), draft);
+        getService().saveDraft(userName, draft);
     }
 
     /**
      * Removes the current draft.
      */
     public void removeDraft() {
-        getService().saveDraft(accessControl.getPrincipalName(), null);
+        getService().saveDraft(userName, null);
     }
 
     /**
-     * Retrieves the draft version of a product for the currently authenticated user.
+     * Retrieves the draft version of a product for the currently authenticated
+     * user.
      *
-     * @return the draft product associated with the current user's principal name.
+     * @return the draft product associated with the current user's principal
+     *         name.
      */
     public Product getDraft() {
-        return getService().findDraft(accessControl.getPrincipalName());
+        return getService().findDraft(userName);
     }
 
     private LockedObjects getLockedBooks() {

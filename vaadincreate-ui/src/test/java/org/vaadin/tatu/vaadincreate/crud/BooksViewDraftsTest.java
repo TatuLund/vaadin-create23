@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AboutView;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
@@ -67,8 +68,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertTrue(form.isShown());
 
         test(form.productName).setValue("Modified book");
-        test(form.stockCount).setValue("200");
-        test(form.availability).clickItem(Availability.COMING);
+        test(form.availability).clickItem(Availability.AVAILABLE);
 
         // This will close the ui by force, same as closing browser
         tearDown();
@@ -91,11 +91,28 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertNull(service.findDraft("Admin"));
 
         assertEquals("Modified book", form.productName.getValue());
-        assertEquals("200", form.stockCount.getValue());
-        assertEquals(Availability.COMING, form.availability.getValue());
-        assertEquals(book.getCategory(), form.category.getValue());
+        assertTrue(form.productName.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertTrue(form.productName.getDescription()
+                .contains(book.getProductName()));
 
-        test(form.availability).clickItem(Availability.AVAILABLE);
+        assertEquals("0", form.stockCount.getValue());
+        assertFalse(form.stockCount.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+
+        assertEquals(Availability.AVAILABLE, form.availability.getValue());
+        assertTrue(form.availability.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertTrue(form.availability.getDescription()
+                .contains(book.getAvailability().toString()));
+
+        assertEquals(book.getCategory(), form.category.getValue());
+        assertFalse(form.category.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertFalse(form.price.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+
+        test(form.stockCount).setValue("200");
 
         test(form.saveButton).click();
         assertTrue($(Notification.class).last().getCaption()
@@ -111,7 +128,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
 
         test(form.productName).setValue("Modified book");
         test(form.stockCount).setValue("200");
-        test(form.availability).clickItem(Availability.COMING);
+        test(form.availability).clickItem(Availability.DISCONTINUED);
 
         // This will close the ui by force, same as closing browser
         tearDown();
@@ -134,8 +151,22 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertNull(service.findDraft("Admin"));
 
         assertEquals("Modified book", form.productName.getValue());
+        assertTrue(form.productName.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+
         assertEquals("200", form.stockCount.getValue());
-        assertEquals(Availability.COMING, form.availability.getValue());
+        assertTrue(form.stockCount.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+
+        assertEquals(Availability.DISCONTINUED, form.availability.getValue());
+        assertTrue(form.availability.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+
+        assertFalse(form.category.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertFalse(form.price.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+
         assertTrue(form.category.getValue().isEmpty());
 
         test(form.stockCount).setValue("0");
@@ -184,9 +215,26 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertNull(service.findDraft("Admin"));
 
         assertEquals("Modified book", form.productName.getValue());
+        assertTrue(form.productName.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertTrue(form.productName.getDescription().contains("Edited book"));
+
         assertEquals("0", form.stockCount.getValue());
+        assertTrue(form.stockCount.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertTrue(form.stockCount.getDescription().contains("300"));
+
         assertEquals(Availability.AVAILABLE, form.availability.getValue());
+        assertTrue(form.availability.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertTrue(form.availability.getDescription()
+                .contains(book.getAvailability().toString()));
+
         assertEquals(book.getCategory(), form.category.getValue());
+        assertFalse(form.category.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertFalse(form.price.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
         test(form.availability).clickItem(Availability.DISCONTINUED);
 

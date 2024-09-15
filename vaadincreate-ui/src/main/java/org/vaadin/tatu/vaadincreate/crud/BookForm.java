@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
 import org.slf4j.Logger;
@@ -22,14 +23,14 @@ import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.Binder;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.server.AbstractErrorMessage.ContentMode;
+import com.vaadin.server.AbstractErrorMessage;
 import com.vaadin.server.Page;
 import com.vaadin.server.UserError;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.shared.ui.ErrorLevel;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -183,10 +184,10 @@ public class BookForm extends Composite implements HasI18N {
         if (invalid) {
             stockCount.setComponentError(new UserError(
                     getTranslation(I18n.Form.AVAILABILITY_MISMATCH),
-                    ContentMode.TEXT, ErrorLevel.ERROR));
+                    AbstractErrorMessage.ContentMode.TEXT, ErrorLevel.ERROR));
             availability.setComponentError(new UserError(
                     getTranslation(I18n.Form.AVAILABILITY_MISMATCH),
-                    ContentMode.TEXT, ErrorLevel.ERROR));
+                    AbstractErrorMessage.ContentMode.TEXT, ErrorLevel.ERROR));
         } else {
             stockCount.setComponentError(null);
             availability.setComponentError(null);
@@ -229,14 +230,42 @@ public class BookForm extends Composite implements HasI18N {
 
     private void updateDirtyIndicators() {
         clearDirtyIndicators();
-        binder.getChangedBindings()
-                .forEach(binding -> ((Component) binding.getField())
-                        .addStyleName(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        binder.getChangedBindings().forEach(binding -> {
+            var field = ((AbstractComponent) binding.getField());
+            field.addStyleName(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY);
+            var value = binding.getGetter().apply(currentProduct);
+            if (value != null) {
+                field.setDescription(
+                        Utils.sanitize(String.format("<b>%s:</b><br>%s", 
+                                getTranslation(I18n.Form.WAS), convertValue(value))),
+                        ContentMode.HTML);
+            }
+        });
+    }
+
+    private static String convertValue(Object value) {
+        if (value == null) {
+            return "";
+        }
+        if (value instanceof BigDecimal) {
+            var euroConverter = new EuroConverter("");
+            return Utils.convertToPresentation((BigDecimal) value,
+                    euroConverter);
+        }
+        if (value instanceof Availability) {
+            return String.format("%s<span style='margin-right: 5px'>%s</span>",
+                    Utils.createAvailabilityIcon((Availability) value),
+                    value.toString());
+        }
+        return value.toString();
     }
 
     private void clearDirtyIndicators() {
-        binder.getFields().forEach(field -> ((Component) field)
-                .removeStyleName(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        binder.getFields().forEach(hasValue -> {
+            var field = (AbstractComponent) hasValue;
+            field.removeStyleName(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY);
+            field.setDescription(null);
+        });
     }
 
     private void buildForm() {

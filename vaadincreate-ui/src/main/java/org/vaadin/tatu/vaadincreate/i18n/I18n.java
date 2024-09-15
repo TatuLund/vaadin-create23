@@ -52,6 +52,7 @@ public final class I18n {
     public static final class Form {
         public static final String AVAILABILITY_MISMATCH = "availability-mismatch";
         public static final String CANNOT_CONVERT = "cannot-convert";
+        public static final String WAS = "was";
 
         private Form() {
             // private constructor to hide the implicit public one

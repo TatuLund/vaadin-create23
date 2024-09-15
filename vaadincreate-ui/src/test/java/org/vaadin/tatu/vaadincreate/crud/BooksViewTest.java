@@ -294,6 +294,8 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, Button.class).caption("Cancel").single()).click();
         assertTrue(form.productName.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertTrue(form.productName.getDescription()
+                .contains(book.getProductName()));
         assertNotNull(LockedObjects.get().isLocked(book));
 
         var dialog = $(Window.class).id("confirm-dialog");
@@ -307,6 +309,7 @@ public class BooksViewTest extends AbstractUITest {
 
     @Test
     public void editAndSelectAndConfirmCancel() {
+        var book = test(grid).item(0);
         test(grid).click(1, 0);
         assertTrue(form.isShown());
 
@@ -315,6 +318,8 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 1);
         assertTrue(form.productName.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertTrue(form.productName.getDescription()
+                .contains(book.getProductName()));
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("confirm-button")).click();
         assertFalse(form.isShown());
@@ -323,6 +328,7 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(form.isShown());
         assertFalse(form.productName.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertNull(form.productName.getDescription());
 
         // Close form gracefully to avoid side effects
         test(form.cancelButton).click();
@@ -340,18 +346,23 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 1);
         assertTrue(form.productName.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertTrue(form.productName.getDescription()
+                .contains(book.getProductName()));
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("cancel-button")).click();
 
         assertTrue(form.isShown());
         assertTrue(form.productName.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertTrue(form.productName.getDescription()
+                .contains(book.getProductName()));
 
         assertEquals(book, grid.getSelectedRow());
 
         test(form.discardButton).click();
         assertFalse(form.productName.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertNull(form.productName.getDescription());
 
         test(form.cancelButton).click();
         assertFalse(form.isShown());

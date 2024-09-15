@@ -430,6 +430,9 @@ public class BooksView extends CssLayout
         getEventBus().unregisterEventBusListener(this);
         // If detach happens before completion of data fetch, cancel the fetch
         presenter.cancelUpdateProducts();
+        if (getUI().getSession().getSession() == null) {
+            presenter.unlockBook();
+        }
     }
 
     /**

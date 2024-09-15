@@ -8,10 +8,13 @@ import java.util.Locale;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 
 import com.vaadin.data.Converter;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.ValueContext;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.shared.communication.PushMode;
@@ -113,5 +116,34 @@ public class Utils {
         if (!field.getValue().equals(newValue)) {
             field.setValue(newValue);
         }
+    }
+
+    /**
+     * Creates an icon for the given availability status.
+     *
+     * @param availability
+     *            the availability status for which to create an icon
+     * @return the HTML representation of the icon
+     */
+    public static String createAvailabilityIcon(Availability availability) {
+        var color = "";
+        switch (availability) {
+        case AVAILABLE:
+            color = VaadinCreateTheme.COLOR_AVAILABLE;
+            break;
+        case COMING:
+            color = VaadinCreateTheme.COLOR_COMING;
+            break;
+        case DISCONTINUED:
+            color = VaadinCreateTheme.COLOR_DISCONTINUED;
+            break;
+        default:
+            break;
+        }
+
+        return String.format(
+                "<span class='v-icon' style='font-family: %s;color:%s'>&#x%s;</span>",
+                VaadinIcons.CIRCLE.getFontFamily(), color,
+                Integer.toHexString(VaadinIcons.CIRCLE.getCodepoint()));
     }
 }

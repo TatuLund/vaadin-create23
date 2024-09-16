@@ -74,6 +74,8 @@ public class MockDataGenerator implements Serializable {
         User admin = new User(users.size() + 1, "Admin", "admin", Role.ADMIN,
                 0);
         users.add(admin);
+        admin = new User(users.size() + 1, "Super", "super", Role.ADMIN, 0);
+        users.add(admin);
         return users;
     }
 

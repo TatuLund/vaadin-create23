@@ -38,6 +38,7 @@ public class BooksPresenter implements Serializable {
             .getAccessControl();
     private final String userName = accessControl.getPrincipalName();
     private Product editing;
+    private Product draft;
 
     public BooksPresenter(BooksView simpleCrudView) {
         view = simpleCrudView;
@@ -187,8 +188,13 @@ public class BooksPresenter implements Serializable {
                 logger.warn("Attempt to edit locked product '{}'", productId);
             }
         } else {
-            view.showNotValidId(productId);
-            logger.warn("Attempt to edit invalid id '{}'", productId);
+            if (getDraft() != null) {
+                view.showDeleteNotification(null);
+                newProduct();
+            } else {
+                view.showNotValidId(productId);
+                logger.warn("Attempt to edit invalid id '{}'", productId);
+            }
         }
     }
 
@@ -329,12 +335,14 @@ public class BooksPresenter implements Serializable {
      */
     public void saveDraft(Product draft) {
         getService().saveDraft(userName, draft);
+        this.draft = draft;
     }
 
     /**
      * Removes the current draft.
      */
     public void removeDraft() {
+        draft = null;
         getService().saveDraft(userName, null);
     }
 
@@ -346,7 +354,10 @@ public class BooksPresenter implements Serializable {
      *         name.
      */
     public Product getDraft() {
-        return getService().findDraft(userName);
+        if (draft == null) {
+            draft = getService().findDraft(userName);
+        }
+        return draft;
     }
 
     private LockedObjects getLockedBooks() {

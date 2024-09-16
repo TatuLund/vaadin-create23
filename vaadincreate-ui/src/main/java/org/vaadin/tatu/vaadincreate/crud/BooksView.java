@@ -303,8 +303,13 @@ public class BooksView extends CssLayout
      *            the name of the book that has been deleted
      */
     public void showDeleteNotification(String book) {
-        Notification.show(getTranslation(I18n.Books.REMOVED, book),
-                Type.TRAY_NOTIFICATION);
+        String message = "";
+        if (book != null) {
+            message = getTranslation(I18n.Books.REMOVED, book);
+        } else {
+            message = getTranslation(I18n.Books.PRODUCT_DELETED);
+        }
+        Notification.show(message, Type.TRAY_NOTIFICATION);
     }
 
     /**

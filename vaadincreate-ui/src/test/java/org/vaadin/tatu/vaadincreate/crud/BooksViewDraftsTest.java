@@ -246,6 +246,72 @@ public class BooksViewDraftsTest extends AbstractUITest {
     }
 
     @Test
+    public void editBookExitConcurrentDeleteContinueWithDraft()
+            throws ServiceException {
+        test(grid).click(1, 0);
+        var book = test(grid).item(0);
+        assertTrue(form.isShown());
+
+        test(form.productName).setValue("Modified book");
+        test(form.availability).clickItem(Availability.AVAILABLE);
+
+        // This will close the ui by force, same as closing browser
+        tearDown();
+
+        assertNotNull(service.findDraft("Admin"));
+
+        // Simulate other user editing book
+        service.deleteProduct(book.getId());
+
+        // Start again
+        ui = new VaadinCreateUI();
+        mockVaadin(ui);
+        login();
+
+        // Confirm to edit draft
+        var dialog = $(Window.class).id("confirm-dialog");
+        test($(dialog, Button.class).id("confirm-button")).click();
+
+        grid = $(BookGrid.class).single();
+        waitForGrid((VerticalLayout) grid.getParent(), grid);
+        form = $(BookForm.class).single();
+        assertTrue(form.isShown());
+        assertNull(service.findDraft("Admin"));
+
+        assertEquals("Product was deleted.",
+                $(Notification.class).last().getCaption());
+
+        assertEquals("Modified book", form.productName.getValue());
+        assertTrue(form.productName.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+
+        assertEquals("0", form.stockCount.getValue());
+        assertFalse(form.stockCount.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+
+        assertEquals(Availability.AVAILABLE, form.availability.getValue());
+        assertTrue(form.availability.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertTrue(form.availability.getDescription()
+                .contains(Availability.COMING.toString()));
+
+        assertEquals(book.getCategory(), form.category.getValue());
+        assertTrue(form.category.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        assertTrue(form.category.getDescription().contains("[]"));
+        assertTrue(form.price.getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+
+        test(form.availability).clickItem(Availability.DISCONTINUED);
+
+        test(form.saveButton).click();
+        assertTrue($(Notification.class).last().getCaption()
+                .contains("Modified book"));
+
+        assertFalse(form.isShown());
+    }
+
+    @Test
     public void leaveDraftCancelDraft() throws ServiceException {
         test(grid).click(1, 0);
         assertTrue(form.isShown());

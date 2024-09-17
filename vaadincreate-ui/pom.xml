@@ -63,13 +63,6 @@
         <dependency>  
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-push</artifactId>
-            <!-- 8.27.0 has this dep in wrong scope -->
-            <exclusions>
-                <exclusion>
-                    <groupId>com.vaadin.external.atmosphere.client</groupId>
-                    <artifactId>javascript</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>

@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
@@ -47,7 +46,7 @@ public class BookForm extends Composite implements HasI18N {
     protected TextField productName = new TextField(
             getTranslation(I18n.PRODUCT_NAME));
     protected TextField price = new TextField(getTranslation(I18n.PRICE));
-    protected TextField stockCount = new TextField(
+    protected NumberField stockCount = new NumberField(
             getTranslation(I18n.IN_STOCK));
     protected AvailabilitySelector availability = new AvailabilitySelector(
             getTranslation(I18n.AVAILABILITY));
@@ -86,10 +85,7 @@ public class BookForm extends Composite implements HasI18N {
                 .withConverter(new EuroConverter(
                         getTranslation(I18n.Form.CANNOT_CONVERT)))
                 .bind("price");
-        binder.forField(stockCount)
-                .withConverter(new StockCountConverter(
-                        getTranslation(I18n.Form.CANNOT_CONVERT)))
-                .bind("stockCount");
+        binder.forField(stockCount).bind("stockCount");
 
         category.setItemCaptionGenerator(Category::getName);
         binder.forField(category).bind("category");
@@ -235,10 +231,9 @@ public class BookForm extends Composite implements HasI18N {
             field.addStyleName(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY);
             var value = binding.getGetter().apply(currentProduct);
             if (value != null) {
-                field.setDescription(
-                        Utils.sanitize(String.format("<b>%s:</b><br>%s", 
-                                getTranslation(I18n.Form.WAS), convertValue(value))),
-                        ContentMode.HTML);
+                field.setDescription(Utils.sanitize(String.format(
+                        "<b>%s:</b><br>%s", getTranslation(I18n.Form.WAS),
+                        convertValue(value))), ContentMode.HTML);
             }
         });
     }
@@ -284,11 +279,6 @@ public class BookForm extends Composite implements HasI18N {
         fieldWrapper.setWidthFull();
         price.setId("price");
         price.setWidthFull();
-        // Mark the stock count field as numeric.
-        // This affects the virtual keyboard shown on mobile devices.
-        var stockFieldExtension = new AttributeExtension();
-        stockFieldExtension.extend(stockCount);
-        stockFieldExtension.setAttribute("type", "number");
         stockCount.setId("stock-count");
         stockCount.setWidthFull();
         fieldWrapper.addComponents(price, stockCount);
@@ -368,16 +358,13 @@ public class BookForm extends Composite implements HasI18N {
      */
     public void mergeDraft(Product draft) {
         // Binder does not support merging, so we need to do it manually
-        var stockConverter = new StockCountConverter("");
         var euroConverter = new EuroConverter("");
 
-        var count = Utils.convertToPresentation(draft.getStockCount(),
-                stockConverter);
         var euros = Utils.convertToPresentation(draft.getPrice(),
                 euroConverter);
 
         Utils.setValueIfDifferent(productName, draft.getProductName());
-        Utils.setValueIfDifferent(stockCount, count);
+        Utils.setValueIfDifferent(stockCount, draft.getStockCount());
         Utils.setValueIfDifferent(category, draft.getCategory());
         Utils.setValueIfDifferent(availability, draft.getAvailability());
         Utils.setValueIfDifferent(price, euros);

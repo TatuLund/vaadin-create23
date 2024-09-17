@@ -96,7 +96,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertTrue(form.productName.getDescription()
                 .contains(book.getProductName()));
 
-        assertEquals("0", form.stockCount.getValue());
+        assertEquals(Integer.valueOf(0), form.stockCount.getValue());
         assertFalse(form.stockCount.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
@@ -112,7 +112,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertFalse(form.price.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
-        test(form.stockCount).setValue("200");
+        test(form.stockCount).setValue(200);
 
         test(form.saveButton).click();
         assertTrue($(Notification.class).last().getCaption()
@@ -127,7 +127,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertTrue(form.isShown());
 
         test(form.productName).setValue("Modified book");
-        test(form.stockCount).setValue("200");
+        test(form.stockCount).setValue(200);
         test(form.availability).clickItem(Availability.DISCONTINUED);
 
         // This will close the ui by force, same as closing browser
@@ -154,7 +154,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertTrue(form.productName.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
-        assertEquals("200", form.stockCount.getValue());
+        assertEquals(Integer.valueOf(200), form.stockCount.getValue());
         assertTrue(form.stockCount.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
@@ -169,7 +169,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
 
         assertTrue(form.category.getValue().isEmpty());
 
-        test(form.stockCount).setValue("0");
+        test(form.stockCount).setValue(0);
 
         test(form.saveButton).click();
         assertTrue($(Notification.class).last().getCaption()
@@ -219,7 +219,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
         assertTrue(form.productName.getDescription().contains("Edited book"));
 
-        assertEquals("0", form.stockCount.getValue());
+        assertEquals(Integer.valueOf(0), form.stockCount.getValue());
         assertTrue(form.stockCount.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
         assertTrue(form.stockCount.getDescription().contains("300"));
@@ -285,7 +285,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertTrue(form.productName.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
-        assertEquals("0", form.stockCount.getValue());
+        assertEquals(Integer.valueOf(0), form.stockCount.getValue());
         assertFalse(form.stockCount.getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 

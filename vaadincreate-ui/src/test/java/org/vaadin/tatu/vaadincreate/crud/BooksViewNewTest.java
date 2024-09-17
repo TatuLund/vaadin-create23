@@ -57,7 +57,7 @@ public class BooksViewNewTest extends AbstractUITest {
         test(form.productName).setValue("A new product");
         test(form.price).setValue("10.0 €");
         test(form.availability).clickItem(Availability.AVAILABLE);
-        test(form.stockCount).setValue("10");
+        test(form.stockCount).setValue(10);
 
         var cat = ui.getProductService().getAllCategories().stream().findFirst()
                 .get();

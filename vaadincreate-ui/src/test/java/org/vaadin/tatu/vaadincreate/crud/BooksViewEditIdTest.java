@@ -68,14 +68,15 @@ public class BooksViewEditIdTest extends AbstractUITest {
         var priceString = converter.convertToPresentation(product.getPrice(),
                 new ValueContext(null, price, ui.getLocale()));
         assertEquals(priceString, form.price.getValue());
-        assertEquals("" + product.getStockCount(), form.stockCount.getValue());
+        assertEquals(Integer.valueOf(product.getStockCount()),
+                form.stockCount.getValue());
         assertEquals(product.getAvailability(), form.availability.getValue());
         assertEquals(product.getCategory(), form.category.getValue());
 
         test(form.productName).setValue("Modified book");
         test(form.price).setValue("10.0 €");
         test(form.availability).clickItem(Availability.AVAILABLE);
-        test(form.stockCount).setValue("10");
+        test(form.stockCount).setValue(10);
 
         var cat = ui.getProductService().getAllCategories().stream().findFirst()
                 .get();

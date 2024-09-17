@@ -92,6 +92,13 @@ $fake-grid-background-color: white;
     padding: 4px 32px 4px 16px;	  
   }
 
+  // It sounds like a bug in CustomField the need to tweak this
+  .v-customcomponent {
+    input {
+      width: 100%;
+    }
+  }
+
   // Hide spinner buttons from number input
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button {

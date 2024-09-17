@@ -83,7 +83,8 @@ public class BooksViewTest extends AbstractUITest {
                     converter.convertToPresentation(book.getPrice(),
                             new ValueContext(null, price, ui.getLocale())),
                     price.getValue());
-            assertEquals("" + book.getStockCount(), form.stockCount.getValue());
+            assertEquals(Integer.valueOf(book.getStockCount()),
+                    form.stockCount.getValue());
 
             assertEquals(book.getAvailability(), form.availability.getValue());
             assertEquals(book.getCategory(), form.category.getValue());
@@ -93,7 +94,7 @@ public class BooksViewTest extends AbstractUITest {
             test(grid).click(1, i);
 
             assertEquals("", form.productName.getValue());
-            assertEquals("0", form.stockCount.getValue());
+            assertEquals(Integer.valueOf(0), form.stockCount.getValue());
             assertEquals("0.00 €", form.price.getValue());
             assertEquals(Availability.COMING, form.availability.getValue());
             assertEquals(Collections.emptySet(), form.category.getValue());
@@ -118,7 +119,7 @@ public class BooksViewTest extends AbstractUITest {
         test(form.productName).setValue("Te");
         test(form.availability).clickItem(Availability.COMING);
         test(form.price).setValue("10.0 €");
-        test(form.stockCount).setValue("10");
+        test(form.stockCount).setValue(10);
         var cat = ui.getProductService().getAllCategories().stream().findFirst()
                 .get();
         test(form.category).clickItem(cat);
@@ -131,7 +132,7 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(test(form.stockCount).isInvalid());
         assertEquals(errorMessage, test(form.stockCount).errorMessage());
 
-        test(form.stockCount).setValue("0");
+        test(form.stockCount).setValue(0);
         assertFalse(test(form.availability).isInvalid());
         assertFalse(test(form.stockCount).isInvalid());
         assertTrue(form.saveButton.isEnabled());
@@ -161,7 +162,7 @@ public class BooksViewTest extends AbstractUITest {
         test(form.productName).setValue("New book");
         test(form.price).setValue("10.0 €");
         test(form.availability).clickItem(Availability.AVAILABLE);
-        test(form.stockCount).setValue("10");
+        test(form.stockCount).setValue(10);
 
         var cat = ui.getProductService().getAllCategories().stream().findFirst()
                 .get();
@@ -200,7 +201,7 @@ public class BooksViewTest extends AbstractUITest {
         test(form.productName).setValue("New book");
         test(form.price).setValue("10.0 €");
         test(form.availability).clickItem(Availability.AVAILABLE);
-        test(form.stockCount).setValue("10");
+        test(form.stockCount).setValue(10);
 
         test($(form, Button.class).caption("Cancel").single()).click();
 
@@ -498,7 +499,7 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 0);
 
         test(form.productName).setValue("Edited book");
-        test(form.stockCount).setValue("100");
+        test(form.stockCount).setValue(100);
 
         test(grid).click(1, 1);
 
@@ -517,7 +518,7 @@ public class BooksViewTest extends AbstractUITest {
         var name = form.productName.getValue();
         var count = form.stockCount.getValue();
         test(form.productName).setValue("Edited book");
-        test(form.stockCount).setValue("100");
+        test(form.stockCount).setValue(100);
 
         // Assert that change was detected
         assertTrue(form.saveButton.isEnabled());
@@ -539,7 +540,7 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 0);
 
         test(form.productName).setValue("Edited book");
-        test(form.stockCount).setValue("100");
+        test(form.stockCount).setValue(100);
 
         $(Button.class).caption("About").single().click();
 
@@ -555,7 +556,7 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 0);
 
         test(form.productName).setValue("Edited book");
-        test(form.stockCount).setValue("100");
+        test(form.stockCount).setValue(100);
 
         logout();
 

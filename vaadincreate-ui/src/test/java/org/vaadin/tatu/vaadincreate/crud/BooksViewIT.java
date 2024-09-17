@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 
@@ -13,6 +14,7 @@ import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.CheckBoxGroupElement;
 import com.vaadin.testbench.elements.ComboBoxElement;
 import com.vaadin.testbench.elements.CssLayoutElement;
+import com.vaadin.testbench.elements.CustomFieldElement;
 import com.vaadin.testbench.elements.GridElement;
 import com.vaadin.testbench.elements.LabelElement;
 import com.vaadin.testbench.elements.MenuBarElement;
@@ -76,7 +78,8 @@ public class BooksViewIT extends AbstractViewTest {
         form.$(TextFieldElement.class).id("product-name").setValue("Test book");
 
         form.$(TextFieldElement.class).id("price").setValue(price);
-        form.$(TextFieldElement.class).id("stock-count").setValue("10");
+        form.$(CustomFieldElement.class).id("stock-count")
+                .findElement(By.tagName("input")).sendKeys("1", "0", Keys.TAB);
         form.$(ComboBoxElement.class).id("availability")
                 .getPopupSuggestionElements().get(1).click();
         form.$(CheckBoxGroupElement.class).id("category")
@@ -112,8 +115,9 @@ public class BooksViewIT extends AbstractViewTest {
                 form.$(TextFieldElement.class).id("product-name").getValue());
         Assert.assertEquals(price,
                 form.$(TextFieldElement.class).id("price").getValue());
-        Assert.assertEquals("10",
-                form.$(TextFieldElement.class).id("stock-count").getValue());
+        var input = form.$(CustomFieldElement.class).id("stock-count")
+                .findElement(By.tagName("input"));
+        Assert.assertEquals("10", input.getAttribute("value"));
         Assert.assertEquals("Available",
                 form.$(ComboBoxElement.class).id("availability").getValue());
         var category = form.$(CheckBoxGroupElement.class).id("category");
@@ -253,8 +257,9 @@ public class BooksViewIT extends AbstractViewTest {
                 row.getCell(1).getText());
         Assert.assertTrue(row.getCell(2).getText().endsWith(
                 form.$(ComboBoxElement.class).id("availability").getText()));
-        Assert.assertEquals(
-                form.$(TextFieldElement.class).id("stock-count").getValue(),
+        var input = form.$(CustomFieldElement.class).id("stock-count")
+                .findElement(By.tagName("input"));
+        Assert.assertEquals(input.getAttribute("value"),
                 stockCount(row.getCell(3).getText()));
 
         // Click the second book
@@ -273,8 +278,9 @@ public class BooksViewIT extends AbstractViewTest {
                 row.getCell(1).getText());
         Assert.assertTrue(row.getCell(2).getText().endsWith(
                 form.$(ComboBoxElement.class).id("availability").getText()));
-        Assert.assertEquals(
-                form.$(TextFieldElement.class).id("stock-count").getValue(),
+        input = form.$(CustomFieldElement.class).id("stock-count")
+                .findElement(By.tagName("input"));
+        Assert.assertEquals(input.getAttribute("value"),
                 stockCount(row.getCell(3).getText()));
     }
 

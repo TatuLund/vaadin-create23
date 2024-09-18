@@ -26,12 +26,16 @@ import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.crud.form.AvailabilitySelector;
+import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
+import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 
 import com.vaadin.data.ValueContext;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBoxGroup;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -76,39 +80,53 @@ public class BooksViewTest extends AbstractUITest {
             assertTrue(test(grid).isFocused());
 
             var book = test(grid).item(i);
-            assertEquals(book.getProductName(), form.productName.getValue());
-            var price = form.price;
+            assertEquals(book.getProductName(),
+                    $(form, TextField.class).id("product-name").getValue());
+            var price = $(form, TextField.class).id("price");
             var converter = new EuroConverter("");
             assertEquals(
                     converter.convertToPresentation(book.getPrice(),
                             new ValueContext(null, price, ui.getLocale())),
                     price.getValue());
             assertEquals(Integer.valueOf(book.getStockCount()),
-                    form.stockCount.getValue());
+                    $(form, NumberField.class).id("stock-count").getValue());
 
-            assertEquals(book.getAvailability(), form.availability.getValue());
-            assertEquals(book.getCategory(), form.category.getValue());
+            assertEquals(book.getAvailability(),
+                    $(form, AvailabilitySelector.class).id("availability")
+                            .getValue());
+            assertEquals(book.getCategory(),
+                    $(form, CheckBoxGroup.class).id("category").getValue());
 
             verifySelectedCategoriesAreTheFirst();
 
             test(grid).click(1, i);
 
-            assertEquals("", form.productName.getValue());
-            assertEquals(Integer.valueOf(0), form.stockCount.getValue());
-            assertEquals("0.00 €", form.price.getValue());
-            assertEquals(Availability.COMING, form.availability.getValue());
-            assertEquals(Collections.emptySet(), form.category.getValue());
+            assertEquals("",
+                    $(form, TextField.class).id("product-name").getValue());
+            assertEquals(Integer.valueOf(0),
+                    $(form, NumberField.class).id("stock-count").getValue());
+            assertEquals("0.00 €",
+                    $(form, TextField.class).id("price").getValue());
+            assertEquals(Availability.COMING,
+                    $(form, AvailabilitySelector.class).id("availability")
+                            .getValue());
+            assertEquals(Collections.emptySet(),
+                    $(form, CheckBoxGroup.class).id("category").getValue());
         }
 
     }
 
     private void verifySelectedCategoriesAreTheFirst() {
         // Verify that the selected categories are the first in the list
-        var items = form.category.getDataCommunicator().fetchItemsWithRange(0,
-                form.category.getDataCommunicator().getDataProviderSize());
-        var size = form.category.getValue().size();
+        var items = $(form, CheckBoxGroup.class).id("category")
+                .getDataCommunicator().fetchItemsWithRange(0,
+                        $(form, CheckBoxGroup.class).id("category")
+                                .getDataCommunicator().getDataProviderSize());
+        var size = $(form, CheckBoxGroup.class).id("category").getValue()
+                .size();
         for (int j = 0; j < size; j++) {
-            assertTrue(form.category.getValue().contains(items.get(j)));
+            assertTrue($(form, CheckBoxGroup.class).id("category").getValue()
+                    .contains(items.get(j)));
         }
     }
 
@@ -116,26 +134,35 @@ public class BooksViewTest extends AbstractUITest {
     public void crossValidationAndDiscard() {
         test($(view, Button.class).id("new-product")).click();
 
-        test(form.productName).setValue("Te");
-        test(form.availability).clickItem(Availability.COMING);
-        test(form.price).setValue("10.0 €");
-        test(form.stockCount).setValue(10);
+        test($(form, TextField.class).id("product-name")).setValue("Te");
+        test($(form, AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.COMING);
+        test($(form, TextField.class).id("price")).setValue("10.0 €");
+        test($(form, NumberField.class).id("stock-count")).setValue(10);
         var cat = ui.getProductService().getAllCategories().stream().findFirst()
                 .get();
-        test(form.category).clickItem(cat);
+        test($(form, CheckBoxGroup.class).id("category")).clickItem(cat);
 
-        test(form.saveButton).click();
-        assertFalse(form.saveButton.isEnabled());
-        assertTrue(test(form.availability).isInvalid());
+        test($(form, Button.class).id("save-button")).click();
+        assertFalse($(form, Button.class).id("save-button").isEnabled());
+        assertTrue(test($(form, AvailabilitySelector.class).id("availability"))
+                .isInvalid());
         var errorMessage = "Mismatch between availability and stock count";
-        assertEquals(errorMessage, test(form.availability).errorMessage());
-        assertTrue(test(form.stockCount).isInvalid());
-        assertEquals(errorMessage, test(form.stockCount).errorMessage());
+        assertEquals(errorMessage,
+                test($(form, AvailabilitySelector.class).id("availability"))
+                        .errorMessage());
+        assertTrue(
+                test($(form, NumberField.class).id("stock-count")).isInvalid());
+        assertEquals(errorMessage,
+                test($(form, NumberField.class).id("stock-count"))
+                        .errorMessage());
 
-        test(form.stockCount).setValue(0);
-        assertFalse(test(form.availability).isInvalid());
-        assertFalse(test(form.stockCount).isInvalid());
-        assertTrue(form.saveButton.isEnabled());
+        test($(form, NumberField.class).id("stock-count")).setValue(0);
+        assertFalse(test($(form, AvailabilitySelector.class).id("availability"))
+                .isInvalid());
+        assertFalse(
+                test($(form, NumberField.class).id("stock-count")).isInvalid());
+        assertTrue($(form, Button.class).id("save-button").isEnabled());
 
         test($(form, Button.class).caption("Cancel").single()).click();
 
@@ -145,9 +172,11 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(form.isShown());
 
         test($(form, Button.class).caption("Discard").single()).click();
-        assertEquals("", form.productName.getValue());
-        assertEquals("0.00 €", form.price.getValue());
-        assertTrue(form.category.getValue().isEmpty());
+        assertEquals("",
+                $(form, TextField.class).id("product-name").getValue());
+        assertEquals("0.00 €", $(form, TextField.class).id("price").getValue());
+        assertTrue($(form, CheckBoxGroup.class).id("category").getValue()
+                .isEmpty());
 
         test($(form, Button.class).caption("Cancel").single()).click();
         assertFalse(form.isShown());
@@ -158,18 +187,20 @@ public class BooksViewTest extends AbstractUITest {
     public void addProduct() {
         test($(view, Button.class).id("new-product")).click();
 
-        assertTrue(test(form.productName).isFocused());
-        test(form.productName).setValue("New book");
-        test(form.price).setValue("10.0 €");
-        test(form.availability).clickItem(Availability.AVAILABLE);
-        test(form.stockCount).setValue(10);
+        assertTrue(
+                test($(form, TextField.class).id("product-name")).isFocused());
+        test($(form, TextField.class).id("product-name")).setValue("New book");
+        test($(form, TextField.class).id("price")).setValue("10.0 €");
+        test($(form, AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.AVAILABLE);
+        test($(form, NumberField.class).id("stock-count")).setValue(10);
 
         var cat = ui.getProductService().getAllCategories().stream().findFirst()
                 .get();
-        test(form.category).clickItem(cat);
+        test($(form, CheckBoxGroup.class).id("category")).clickItem(cat);
         verifySelectedCategoriesAreTheFirst();
 
-        test(form.saveButton).click();
+        test($(form, Button.class).id("save-button")).click();
 
         assertTrue(test(grid).isFocused());
 
@@ -198,10 +229,11 @@ public class BooksViewTest extends AbstractUITest {
         test($(view, Button.class).id("new-product")).click();
         assertTrue(form.isShown());
 
-        test(form.productName).setValue("New book");
-        test(form.price).setValue("10.0 €");
-        test(form.availability).clickItem(Availability.AVAILABLE);
-        test(form.stockCount).setValue(10);
+        test($(form, TextField.class).id("product-name")).setValue("New book");
+        test($(form, TextField.class).id("price")).setValue("10.0 €");
+        test($(form, AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.AVAILABLE);
+        test($(form, NumberField.class).id("stock-count")).setValue(10);
 
         test($(form, Button.class).caption("Cancel").single()).click();
 
@@ -230,7 +262,7 @@ public class BooksViewTest extends AbstractUITest {
         var id = book.getId();
         var name = book.getProductName();
 
-        test(form.deleteButton).click();
+        test($(form, Button.class).id("delete-button")).click();
 
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("confirm-button")).click();
@@ -269,8 +301,9 @@ public class BooksViewTest extends AbstractUITest {
 
         var id = book.getId();
 
-        test(form.productName).setValue("Edited book");
-        test(form.saveButton).click();
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Edited book");
+        test($(form, Button.class).id("save-button")).click();
         assertFalse(form.isShown());
 
         var edited = ui.getProductService().getProductById(id);
@@ -290,12 +323,13 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 0);
         assertTrue(form.isShown());
 
-        test(form.productName).setValue("Edited book");
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Edited book");
 
         test($(form, Button.class).caption("Cancel").single()).click();
-        assertTrue(form.productName.getStyleName()
+        assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertTrue(form.productName.getDescription()
+        assertTrue($(form, TextField.class).id("product-name").getDescription()
                 .contains(book.getProductName()));
         assertNotNull(LockedObjects.get().isLocked(book));
 
@@ -314,12 +348,13 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 0);
         assertTrue(form.isShown());
 
-        test(form.productName).setValue("Changed book");
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Changed book");
 
         test(grid).click(1, 1);
-        assertTrue(form.productName.getStyleName()
+        assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertTrue(form.productName.getDescription()
+        assertTrue($(form, TextField.class).id("product-name").getDescription()
                 .contains(book.getProductName()));
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("confirm-button")).click();
@@ -327,12 +362,13 @@ public class BooksViewTest extends AbstractUITest {
 
         test(grid).click(1, 0);
         assertTrue(form.isShown());
-        assertFalse(form.productName.getStyleName()
+        assertFalse($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertNull(form.productName.getDescription());
+        assertNull(
+                $(form, TextField.class).id("product-name").getDescription());
 
         // Close form gracefully to avoid side effects
-        test(form.cancelButton).click();
+        test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
     }
 
@@ -342,30 +378,32 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 0);
         assertTrue(form.isShown());
 
-        test(form.productName).setValue("Changed book");
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Changed book");
 
         test(grid).click(1, 1);
-        assertTrue(form.productName.getStyleName()
+        assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertTrue(form.productName.getDescription()
+        assertTrue($(form, TextField.class).id("product-name").getDescription()
                 .contains(book.getProductName()));
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("cancel-button")).click();
 
         assertTrue(form.isShown());
-        assertTrue(form.productName.getStyleName()
+        assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertTrue(form.productName.getDescription()
+        assertTrue($(form, TextField.class).id("product-name").getDescription()
                 .contains(book.getProductName()));
 
         assertEquals(book, grid.getSelectedRow());
 
-        test(form.discardButton).click();
-        assertFalse(form.productName.getStyleName()
+        test($(form, Button.class).id("discard-button")).click();
+        assertFalse($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertNull(form.productName.getDescription());
+        assertNull(
+                $(form, TextField.class).id("product-name").getDescription());
 
-        test(form.cancelButton).click();
+        test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
     }
 
@@ -382,12 +420,13 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(form.isShown());
 
         // Assert that change is visible when product is opened
-        assertEquals("Touched book", form.productName.getValue());
+        assertEquals("Touched book",
+                $(form, TextField.class).id("product-name").getValue());
 
         var name = (String) test(grid).cell(1, 0);
         assertEquals("Touched book", name);
 
-        test(form.cancelButton).click();
+        test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
     }
 
@@ -422,8 +461,9 @@ public class BooksViewTest extends AbstractUITest {
         ui.getProductService().updateProduct(test(grid).item(0));
 
         // Change and save
-        test(form.productName).setValue("Product name changed");
-        test(form.saveButton).click();
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Product name changed");
+        test($(form, Button.class).id("save-button")).click();
 
         // Assert internal error happens
         assertEquals("Internal error.",
@@ -452,8 +492,9 @@ public class BooksViewTest extends AbstractUITest {
         ui.getProductService().deleteProduct(test(grid).item(0).getId());
 
         // Change and save
-        test(form.productName).setValue("Product name changed");
-        test(form.saveButton).click();
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Product name changed");
+        test($(form, Button.class).id("save-button")).click();
 
         // Assert internal error happens
         assertEquals("Internal error.",
@@ -498,8 +539,9 @@ public class BooksViewTest extends AbstractUITest {
     public void editProductDiscardChanges() {
         test(grid).click(1, 0);
 
-        test(form.productName).setValue("Edited book");
-        test(form.stockCount).setValue(100);
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Edited book");
+        test($(form, NumberField.class).id("stock-count")).setValue(100);
 
         test(grid).click(1, 1);
 
@@ -515,32 +557,35 @@ public class BooksViewTest extends AbstractUITest {
     public void editProductRevertEdit() {
         test(grid).click(1, 0);
 
-        var name = form.productName.getValue();
-        var count = form.stockCount.getValue();
-        test(form.productName).setValue("Edited book");
-        test(form.stockCount).setValue(100);
+        var name = $(form, TextField.class).id("product-name").getValue();
+        var count = $(form, NumberField.class).id("stock-count").getValue();
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Edited book");
+        test($(form, NumberField.class).id("stock-count")).setValue(100);
 
         // Assert that change was detected
-        assertTrue(form.saveButton.isEnabled());
+        assertTrue($(form, Button.class).id("save-button").isEnabled());
 
         // Revert edits
-        test(form.productName).setValue(name);
-        test(form.stockCount).setValue(count);
+        test($(form, TextField.class).id("product-name")).setValue(name);
+        test($(form, NumberField.class).id("stock-count")).setValue(count);
 
         // Attempt to change item
         test(grid).click(1, 1);
 
         assertTrue(form.isShown());
         // Assert that form content was updated
-        assertEquals(form.productName.getValue(), test(grid).cell(1, 1));
+        assertEquals($(form, TextField.class).id("product-name").getValue(),
+                test(grid).cell(1, 1));
     }
 
     @Test
     public void editProductDiscardChangesWhenNavigate() {
         test(grid).click(1, 0);
 
-        test(form.productName).setValue("Edited book");
-        test(form.stockCount).setValue(100);
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Edited book");
+        test($(form, NumberField.class).id("stock-count")).setValue(100);
 
         $(Button.class).caption("About").single().click();
 
@@ -555,8 +600,9 @@ public class BooksViewTest extends AbstractUITest {
     public void editProductDiscardChangesWhenLogout() {
         test(grid).click(1, 0);
 
-        test(form.productName).setValue("Edited book");
-        test(form.stockCount).setValue(100);
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Edited book");
+        test($(form, NumberField.class).id("stock-count")).setValue(100);
 
         logout();
 
@@ -567,8 +613,8 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(form.isShown());
 
         // Close form gracefully to avoid side effects
-        test(form.discardButton).click();
-        test(form.cancelButton).click();
+        test($(form, Button.class).id("discard-button")).click();
+        test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
     }
 
@@ -576,15 +622,17 @@ public class BooksViewTest extends AbstractUITest {
     public void validationError() {
         test(grid).click(1, 0);
 
-        test(form.productName).setValue("");
-        test(form.stockCount).focus();
-        assertTrue(test(form.productName).isInvalid());
+        test($(form, TextField.class).id("product-name")).setValue("");
+        test($(form, NumberField.class).id("stock-count")).focus();
+        assertTrue(
+                test($(form, TextField.class).id("product-name")).isInvalid());
         assertEquals(
                 "Product name must have at least two characters and maximum of 100",
-                test(form.productName).errorMessage());
+                test($(form, TextField.class).id("product-name"))
+                        .errorMessage());
 
-        test(form.discardButton).click();
-        test(form.cancelButton).click();
+        test($(form, Button.class).id("discard-button")).click();
+        test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
     }
 
@@ -599,8 +647,8 @@ public class BooksViewTest extends AbstractUITest {
         // Simulate other user deleting the category while editor is open
         ui.getProductService().deleteCategory(category.getId());
 
-        test(form.category).clickItem(category);
-        test(form.saveButton).click();
+        test($(form, CheckBoxGroup.class).id("category")).clickItem(category);
+        test($(form, Button.class).id("save-button")).click();
 
         assertEquals("One or more of the selected categories were deleted.",
                 $(Notification.class).last().getCaption());

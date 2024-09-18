@@ -18,10 +18,15 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.crud.form.AvailabilitySelector;
+import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
+import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBoxGroup;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -67,8 +72,10 @@ public class BooksViewDraftsTest extends AbstractUITest {
 
         assertTrue(form.isShown());
 
-        test(form.productName).setValue("Modified book");
-        test(form.availability).clickItem(Availability.AVAILABLE);
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Modified book");
+        test($(form, AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.AVAILABLE);
 
         // This will close the ui by force, same as closing browser
         tearDown();
@@ -90,31 +97,36 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertTrue(form.isShown());
         assertNull(service.findDraft("Admin"));
 
-        assertEquals("Modified book", form.productName.getValue());
-        assertTrue(form.productName.getStyleName()
+        assertEquals("Modified book",
+                $(form, TextField.class).id("product-name").getValue());
+        assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertTrue(form.productName.getDescription()
+        assertTrue($(form, TextField.class).id("product-name").getDescription()
                 .contains(book.getProductName()));
 
-        assertEquals(Integer.valueOf(0), form.stockCount.getValue());
-        assertFalse(form.stockCount.getStyleName()
+        assertEquals(Integer.valueOf(0),
+                $(form, NumberField.class).id("stock-count").getValue());
+        assertFalse($(form, NumberField.class).id("stock-count").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
-        assertEquals(Availability.AVAILABLE, form.availability.getValue());
-        assertTrue(form.availability.getStyleName()
+        assertEquals(Availability.AVAILABLE, $(form, AvailabilitySelector.class)
+                .id("availability").getValue());
+        assertTrue($(form, AvailabilitySelector.class).id("availability")
+                .getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertTrue(form.availability.getDescription()
-                .contains(book.getAvailability().toString()));
+        assertTrue($(form, AvailabilitySelector.class).id("availability")
+                .getDescription().contains(book.getAvailability().toString()));
 
-        assertEquals(book.getCategory(), form.category.getValue());
-        assertFalse(form.category.getStyleName()
+        assertEquals(book.getCategory(),
+                $(form, CheckBoxGroup.class).id("category").getValue());
+        assertFalse($(form, CheckBoxGroup.class).id("category").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertFalse(form.price.getStyleName()
+        assertFalse($(form, TextField.class).id("price").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
-        test(form.stockCount).setValue(200);
+        test($(form, NumberField.class).id("stock-count")).setValue(200);
 
-        test(form.saveButton).click();
+        test($(form, Button.class).id("save-button")).click();
         assertTrue($(Notification.class).last().getCaption()
                 .contains("Modified book"));
 
@@ -126,9 +138,11 @@ public class BooksViewDraftsTest extends AbstractUITest {
         test($(view, Button.class).id("new-product")).click();
         assertTrue(form.isShown());
 
-        test(form.productName).setValue("Modified book");
-        test(form.stockCount).setValue(200);
-        test(form.availability).clickItem(Availability.DISCONTINUED);
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Modified book");
+        test($(form, NumberField.class).id("stock-count")).setValue(200);
+        test($(form, AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.DISCONTINUED);
 
         // This will close the ui by force, same as closing browser
         tearDown();
@@ -150,28 +164,34 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertTrue(form.isShown());
         assertNull(service.findDraft("Admin"));
 
-        assertEquals("Modified book", form.productName.getValue());
-        assertTrue(form.productName.getStyleName()
+        assertEquals("Modified book",
+                $(form, TextField.class).id("product-name").getValue());
+        assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
-        assertEquals(Integer.valueOf(200), form.stockCount.getValue());
-        assertTrue(form.stockCount.getStyleName()
+        assertEquals(Integer.valueOf(200),
+                $(form, NumberField.class).id("stock-count").getValue());
+        assertTrue($(form, NumberField.class).id("stock-count").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
-        assertEquals(Availability.DISCONTINUED, form.availability.getValue());
-        assertTrue(form.availability.getStyleName()
+        assertEquals(Availability.DISCONTINUED,
+                $(form, AvailabilitySelector.class).id("availability")
+                        .getValue());
+        assertTrue($(form, AvailabilitySelector.class).id("availability")
+                .getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
-        assertFalse(form.category.getStyleName()
+        assertFalse($(form, CheckBoxGroup.class).id("category").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertFalse(form.price.getStyleName()
+        assertFalse($(form, TextField.class).id("price").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
-        assertTrue(form.category.getValue().isEmpty());
+        assertTrue($(form, CheckBoxGroup.class).id("category").getValue()
+                .isEmpty());
 
-        test(form.stockCount).setValue(0);
+        test($(form, NumberField.class).id("stock-count")).setValue(0);
 
-        test(form.saveButton).click();
+        test($(form, Button.class).id("save-button")).click();
         assertTrue($(Notification.class).last().getCaption()
                 .contains("Modified book"));
 
@@ -185,8 +205,10 @@ public class BooksViewDraftsTest extends AbstractUITest {
         var book = test(grid).item(0);
         assertTrue(form.isShown());
 
-        test(form.productName).setValue("Modified book");
-        test(form.availability).clickItem(Availability.AVAILABLE);
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Modified book");
+        test($(form, AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.AVAILABLE);
 
         // This will close the ui by force, same as closing browser
         tearDown();
@@ -214,31 +236,39 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertTrue(form.isShown());
         assertNull(service.findDraft("Admin"));
 
-        assertEquals("Modified book", form.productName.getValue());
-        assertTrue(form.productName.getStyleName()
+        assertEquals("Modified book",
+                $(form, TextField.class).id("product-name").getValue());
+        assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertTrue(form.productName.getDescription().contains("Edited book"));
+        assertTrue($(form, TextField.class).id("product-name").getDescription()
+                .contains("Edited book"));
 
-        assertEquals(Integer.valueOf(0), form.stockCount.getValue());
-        assertTrue(form.stockCount.getStyleName()
+        assertEquals(Integer.valueOf(0),
+                $(form, NumberField.class).id("stock-count").getValue());
+        assertTrue($(form, NumberField.class).id("stock-count").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertTrue(form.stockCount.getDescription().contains("300"));
+        assertTrue($(form, NumberField.class).id("stock-count").getDescription()
+                .contains("300"));
 
-        assertEquals(Availability.AVAILABLE, form.availability.getValue());
-        assertTrue(form.availability.getStyleName()
+        assertEquals(Availability.AVAILABLE, $(form, AvailabilitySelector.class)
+                .id("availability").getValue());
+        assertTrue($(form, AvailabilitySelector.class).id("availability")
+                .getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertTrue(form.availability.getDescription()
-                .contains(book.getAvailability().toString()));
+        assertTrue($(form, AvailabilitySelector.class).id("availability")
+                .getDescription().contains(book.getAvailability().toString()));
 
-        assertEquals(book.getCategory(), form.category.getValue());
-        assertFalse(form.category.getStyleName()
+        assertEquals(book.getCategory(),
+                $(form, CheckBoxGroup.class).id("category").getValue());
+        assertFalse($(form, CheckBoxGroup.class).id("category").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertFalse(form.price.getStyleName()
+        assertFalse($(form, TextField.class).id("price").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
-        test(form.availability).clickItem(Availability.DISCONTINUED);
+        test($(form, AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.DISCONTINUED);
 
-        test(form.saveButton).click();
+        test($(form, Button.class).id("save-button")).click();
         assertTrue($(Notification.class).last().getCaption()
                 .contains("Modified book"));
 
@@ -252,8 +282,10 @@ public class BooksViewDraftsTest extends AbstractUITest {
         var book = test(grid).item(0);
         assertTrue(form.isShown());
 
-        test(form.productName).setValue("Modified book");
-        test(form.availability).clickItem(Availability.AVAILABLE);
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Modified book");
+        test($(form, AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.AVAILABLE);
 
         // This will close the ui by force, same as closing browser
         tearDown();
@@ -281,30 +313,37 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertEquals("Product was deleted.",
                 $(Notification.class).last().getCaption());
 
-        assertEquals("Modified book", form.productName.getValue());
-        assertTrue(form.productName.getStyleName()
+        assertEquals("Modified book",
+                $(form, TextField.class).id("product-name").getValue());
+        assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
-        assertEquals(Integer.valueOf(0), form.stockCount.getValue());
-        assertFalse(form.stockCount.getStyleName()
+        assertEquals(Integer.valueOf(0),
+                $(form, NumberField.class).id("stock-count").getValue());
+        assertFalse($(form, NumberField.class).id("stock-count").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
-        assertEquals(Availability.AVAILABLE, form.availability.getValue());
-        assertTrue(form.availability.getStyleName()
+        assertEquals(Availability.AVAILABLE, $(form, AvailabilitySelector.class)
+                .id("availability").getValue());
+        assertTrue($(form, AvailabilitySelector.class).id("availability")
+                .getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertTrue(form.availability.getDescription()
-                .contains(Availability.COMING.toString()));
+        assertTrue($(form, AvailabilitySelector.class).id("availability")
+                .getDescription().contains(Availability.COMING.toString()));
 
-        assertEquals(book.getCategory(), form.category.getValue());
-        assertTrue(form.category.getStyleName()
+        assertEquals(book.getCategory(),
+                $(form, CheckBoxGroup.class).id("category").getValue());
+        assertTrue($(form, CheckBoxGroup.class).id("category").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertTrue(form.category.getDescription().contains("[]"));
-        assertTrue(form.price.getStyleName()
+        assertTrue($(form, CheckBoxGroup.class).id("category").getDescription()
+                .contains("[]"));
+        assertTrue($(form, TextField.class).id("price").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
 
-        test(form.availability).clickItem(Availability.DISCONTINUED);
+        test($(form, AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.DISCONTINUED);
 
-        test(form.saveButton).click();
+        test($(form, Button.class).id("save-button")).click();
         assertTrue($(Notification.class).last().getCaption()
                 .contains("Modified book"));
 
@@ -316,8 +355,10 @@ public class BooksViewDraftsTest extends AbstractUITest {
         test(grid).click(1, 0);
         assertTrue(form.isShown());
 
-        test(form.productName).setValue("Modified book");
-        test(form.availability).clickItem(Availability.AVAILABLE);
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Modified book");
+        test($(form, AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.AVAILABLE);
 
         // This will close the ui by force, same as closing browser
         tearDown();

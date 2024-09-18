@@ -14,11 +14,17 @@ import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.crud.form.AvailabilitySelector;
+import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
+import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 
 import com.vaadin.data.ValueContext;
 import com.vaadin.server.ServiceException;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBoxGroup;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 public class BooksViewEditIdTest extends AbstractUITest {
@@ -62,27 +68,27 @@ public class BooksViewEditIdTest extends AbstractUITest {
 
         assertTrue(form.isShown());
         assertTrue(test(grid).isFocused());
-        assertEquals(product.getProductName(), form.productName.getValue());
-        var price = form.price;
+        assertEquals(product.getProductName(), $(form, TextField.class).id("product-name").getValue());
+        var price = $(form, TextField.class).id("price");
         var converter = new EuroConverter("");
         var priceString = converter.convertToPresentation(product.getPrice(),
                 new ValueContext(null, price, ui.getLocale()));
-        assertEquals(priceString, form.price.getValue());
+        assertEquals(priceString, $(form, TextField.class).id("price").getValue());
         assertEquals(Integer.valueOf(product.getStockCount()),
-                form.stockCount.getValue());
-        assertEquals(product.getAvailability(), form.availability.getValue());
-        assertEquals(product.getCategory(), form.category.getValue());
+                $(form, NumberField.class).id("stock-count").getValue());
+        assertEquals(product.getAvailability(), $(form, AvailabilitySelector.class).id("availability").getValue());
+        assertEquals(product.getCategory(), $(form, CheckBoxGroup.class).id("category").getValue());
 
-        test(form.productName).setValue("Modified book");
-        test(form.price).setValue("10.0 €");
-        test(form.availability).clickItem(Availability.AVAILABLE);
-        test(form.stockCount).setValue(10);
+        test($(form, TextField.class).id("product-name")).setValue("Modified book");
+        test($(form, TextField.class).id("price")).setValue("10.0 €");
+        test($(form, AvailabilitySelector.class).id("availability")).clickItem(Availability.AVAILABLE);
+        test($(form, NumberField.class).id("stock-count")).setValue(10);
 
         var cat = ui.getProductService().getAllCategories().stream().findFirst()
                 .get();
-        test(form.category).clickItem(cat);
+        test($(form, CheckBoxGroup.class).id("category")).clickItem(cat);
 
-        test(form.saveButton).click();
+        test($(form, Button.class).id("save-button")).click();
 
         assertTrue($(Notification.class).last().getCaption()
                 .contains("Modified book"));

@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate.crud;
+package org.vaadin.tatu.vaadincreate.crud.form;
 
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 

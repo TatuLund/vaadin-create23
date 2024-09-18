@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate.crud;
+package org.vaadin.tatu.vaadincreate.crud.form;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -14,6 +14,8 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.crud.BooksPresenter;
+import org.vaadin.tatu.vaadincreate.crud.EuroConverter;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
@@ -295,6 +297,7 @@ public class BookForm extends Composite implements HasI18N {
         saveButton.setId("save-button");
         discardButton.setId("discard-button");
         cancelButton.addStyleName(VaadinCreateTheme.BUTTON_CANCEL);
+        cancelButton.setId("cancel-button");
         deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
         deleteButton.setId("delete-button");
         deleteButton.setEnabled(false);
@@ -370,6 +373,10 @@ public class BookForm extends Composite implements HasI18N {
         Utils.setValueIfDifferent(price, euros);
 
         updateDirtyIndicators();
+    }
+
+    public void focus() {
+        productName.focus();
     }
 
     private static Logger logger = LoggerFactory.getLogger(BookForm.class);

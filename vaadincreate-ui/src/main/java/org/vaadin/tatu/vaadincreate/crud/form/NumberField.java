@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate.crud;
+package org.vaadin.tatu.vaadincreate.crud.form;
 
 import com.vaadin.server.AbstractErrorMessage;
 import com.vaadin.server.UserError;
@@ -32,10 +32,11 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 @SuppressWarnings({ "serial", "java:S2160" })
 public class NumberField extends CustomField<Integer> implements HasI18N {
 
-    private TextField textField = new TextField();
+    protected TextField textField = new TextField();
     private StockCountConverter stockCountConverter = new StockCountConverter(
-            getTranslation(I18n.Form.CANNOT_CONVERT));
+            "");
     private Integer intValue;
+    private boolean first = true;
 
     /**
      * Creates a new number field with the given caption.
@@ -50,9 +51,15 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
         textField.addValueChangeListener(event -> {
             var result = stockCountConverter.convertToModel(
                     textField.getValue(), Utils.createValueContext());
-            result.ifError(e -> textField.setComponentError(new UserError(
-                    getTranslation(I18n.Form.CANNOT_CONVERT),
-                    AbstractErrorMessage.ContentMode.TEXT, ErrorLevel.ERROR)));
+            result.ifError(e -> {
+                // Return null so that Binder will trigger validation error on
+                // missing value.
+                intValue = null;
+                textField.setComponentError(
+                        new UserError(getTranslation(I18n.Form.CANNOT_CONVERT),
+                                AbstractErrorMessage.ContentMode.TEXT,
+                                ErrorLevel.ERROR));
+            });
             result.ifOk(value -> {
                 intValue = value;
                 textField.setComponentError(null);

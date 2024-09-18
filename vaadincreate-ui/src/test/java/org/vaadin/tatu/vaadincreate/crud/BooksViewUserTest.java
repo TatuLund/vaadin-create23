@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate.crud;
 import org.junit.After;
 import org.junit.Before;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
 
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.VerticalLayout;

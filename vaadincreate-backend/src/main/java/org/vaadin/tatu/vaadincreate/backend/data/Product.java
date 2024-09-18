@@ -21,7 +21,8 @@ public class Product extends AbstractEntity {
     private BigDecimal price = BigDecimal.ZERO;
     private Set<Integer> category = Collections.emptySet();
     @Min(value = 0, message = "{stock.not.negative}")
-    private int stockCount = 0;
+    @NotNull(message = "{stock.required}")
+    private Integer stockCount = 0;
     @NotNull(message = "{availability.required}")
     private Availability availability = Availability.COMING;
 
@@ -65,11 +66,11 @@ public class Product extends AbstractEntity {
                 .collect(Collectors.toSet());
     }
 
-    public int getStockCount() {
+    public Integer getStockCount() {
         return stockCount;
     }
 
-    public void setStockCount(int stockCount) {
+    public void setStockCount(Integer stockCount) {
         this.stockCount = stockCount;
     }
 

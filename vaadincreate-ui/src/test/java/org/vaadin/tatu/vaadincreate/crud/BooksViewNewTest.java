@@ -13,9 +13,15 @@ import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.crud.form.AvailabilitySelector;
+import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
+import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 
 import com.vaadin.server.ServiceException;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBoxGroup;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 public class BooksViewNewTest extends AbstractUITest {
@@ -53,17 +59,20 @@ public class BooksViewNewTest extends AbstractUITest {
     @Test
     public void newProduct() {
         assertTrue(form.isShown());
-        assertTrue(test(form.productName).isFocused());
-        test(form.productName).setValue("A new product");
-        test(form.price).setValue("10.0 €");
-        test(form.availability).clickItem(Availability.AVAILABLE);
-        test(form.stockCount).setValue(10);
+        assertTrue(
+                test($(form, TextField.class).id("product-name")).isFocused());
+        test($(form, TextField.class).id("product-name"))
+                .setValue("A new product");
+        test($(form, TextField.class).id("price")).setValue("10.0 €");
+        test($(form, AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.AVAILABLE);
+        test($(form, NumberField.class).id("stock-count")).setValue(10);
 
         var cat = ui.getProductService().getAllCategories().stream().findFirst()
                 .get();
-        test(form.category).clickItem(cat);
+        test($(form, CheckBoxGroup.class).id("category")).clickItem(cat);
 
-        test(form.saveButton).click();
+        test($(form, Button.class).id("save-button")).click();
 
         assertTrue($(Notification.class).last().getCaption()
                 .contains("A new product"));

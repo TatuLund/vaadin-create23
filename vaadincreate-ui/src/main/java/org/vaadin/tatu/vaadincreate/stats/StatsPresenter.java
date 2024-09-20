@@ -3,13 +3,15 @@ package org.vaadin.tatu.vaadincreate.stats;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,38 +50,57 @@ public class StatsPresenter implements EventBusListener, Serializable {
         var service = getService();
         future = loadProductsAsync().thenAccept(products -> {
             logger.info("Calculating statistics");
-            EnumMap<Availability, Long> availabilityStats = new EnumMap<>(
-                    Availability.class);
-            for (Availability availability : Availability.values()) {
-                var count = products.stream().filter(
-                        product -> product.getAvailability() == availability)
-                        .count();
-                availabilityStats.put(availability, count);
-            }
 
-            Map<String, Long[]> categoryStats = new HashMap<>();
-            var categories = service.getAllCategories();
-            for (Category category : categories) {
-                var titles = products.stream().filter(
-                        product -> product.getCategory().contains(category))
-                        .count();
-                var instock = products.stream().filter(
-                        product -> product.getCategory().contains(category))
-                        .mapToLong(Product::getStockCount).sum();
-                Long[] counts = { titles, instock };
-                categoryStats.put(category.getName(), counts);
-            }
+            Map<Availability, Long> availabilityStats = calculateAvailabilityStats(
+                    products);
 
-            Map<String, Long> priceStats = new HashMap<>();
-            for (PriceBracket priceBracket : getPriceBrackets(products)) {
-                var count = products.stream().filter(product -> priceBracket
-                        .isInPriceBracket(product.getPrice())).count();
-                priceStats.put(priceBracket.toString(), count);
-            }
+            Map<String, Long[]> categoryStats = calculateCategoryStats(service,
+                    products);
+
+            Map<String, Long> priceStats = calculatePriceStats(products);
 
             view.updateStatsAsync(availabilityStats, categoryStats, priceStats);
             future = null;
         });
+    }
+
+    // Calculate statistics based on product data and return as a map of price
+    // brackets and product counts
+    private Map<String, Long> calculatePriceStats(
+            Collection<Product> products) {
+        return getPriceBrackets(products).stream()
+                .collect(Collectors.toMap(PriceBracket::toString,
+                        priceBracket -> products.stream()
+                                .filter(product -> priceBracket
+                                        .isInPriceBracket(product.getPrice()))
+                                .count()));
+    }
+
+    // Calculate statistics based on product data and return as a map of
+    // category names and product counts
+    private Map<String, Long[]> calculateCategoryStats(
+            ProductDataService service, Collection<Product> products) {
+        return service.getAllCategories().stream()
+                .collect(Collectors.toMap(Category::getName, category -> {
+                    long titles = products.stream().filter(
+                            product -> product.getCategory().contains(category))
+                            .count();
+                    long instock = products.stream().filter(
+                            product -> product.getCategory().contains(category))
+                            .mapToLong(Product::getStockCount).sum();
+                    return new Long[] { titles, instock };
+                }));
+    }
+
+    // Calculate statistics based on product data and return as a map of
+    // availability statuses and product counts
+    private Map<Availability, Long> calculateAvailabilityStats(
+            Collection<Product> products) {
+        return Arrays.stream(Availability.values()).map(availability -> Map
+                .entry(availability, products.stream().filter(
+                        product -> product.getAvailability() == availability)
+                        .count()))
+                .collect(toEnumMap(Availability.class));
     }
 
     public void cancelUpdateStats() {
@@ -102,24 +123,6 @@ public class StatsPresenter implements EventBusListener, Serializable {
         return brackets;
     }
 
-    private static class PriceBracket {
-        private int max;
-
-        public PriceBracket(int max) {
-            this.max = max;
-        }
-
-        public boolean isInPriceBracket(BigDecimal price) {
-            return price.doubleValue() < max
-                    && price.doubleValue() >= (max - 10);
-        }
-
-        @Override
-        public String toString() {
-            return (max - 10) + " - " + max + " €";
-        }
-    }
-
     private ProductDataService getService() {
         return VaadinCreateUI.get().getProductService();
     }
@@ -140,6 +143,36 @@ public class StatsPresenter implements EventBusListener, Serializable {
             view.setLoading();
             requestUpdateStats();
         }
+    }
+
+    private static class PriceBracket {
+        private int max;
+
+        public PriceBracket(int max) {
+            this.max = max;
+        }
+
+        public boolean isInPriceBracket(BigDecimal price) {
+            return price.doubleValue() < max
+                    && price.doubleValue() >= (max - 10);
+        }
+
+        @Override
+        public String toString() {
+            return (max - 10) + " - " + max + " €";
+        }
+    }
+
+    // Collectors.toMap does not support EnumMap, so we need to implement our
+    // own collector
+    private static <K extends Enum<K>, V> Collector<Map.Entry<K, V>, ?, EnumMap<K, V>> toEnumMap(
+            Class<K> keyType) {
+        return Collector.of(() -> new EnumMap<>(keyType),
+                (map, entry) -> map.put(entry.getKey(), entry.getValue()),
+                (map1, map2) -> {
+                    map1.putAll(map2);
+                    return map1;
+                });
     }
 
     private static Logger logger = LoggerFactory

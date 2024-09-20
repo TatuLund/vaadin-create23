@@ -36,7 +36,6 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
     private StockCountConverter stockCountConverter = new StockCountConverter(
             "");
     private Integer intValue;
-    private boolean first = true;
 
     /**
      * Creates a new number field with the given caption.

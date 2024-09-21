@@ -54,7 +54,6 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     // in the unit tests included. Supposed these were the real production
     // services this UI can be extended and getters for the services overriden
     // for creating test UI for unit tests.
-    private AccessControl accessControl = new BasicAccessControl();
     private transient ProductDataService productService = ProductDataService
             .get();
     private transient UserService userService = UserService.get();
@@ -127,7 +126,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 VaadinIcons.USERS, AdminView.VIEW_NAME);
 
         Product draft = getProductService()
-                .findDraft(accessControl.getPrincipalName());
+                .findDraft(getAccessControl().getPrincipalName());
         if (draft != null) {
             handleDraft(draft);
         } else {
@@ -148,7 +147,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 .navigateTo(String.format("%s/%s", BooksView.VIEW_NAME, id)));
         dialog.addCancelListener(e -> {
             logger.info("Draft discarded");
-            getProductService().saveDraft(accessControl.getPrincipalName(),
+            getProductService().saveDraft(getAccessControl().getPrincipalName(),
                     null);
             getNavigator().navigateTo(target);
         });
@@ -165,6 +164,11 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
      * @return Instance of AccessControl
      */
     public AccessControl getAccessControl() {
+        var accessControl = getSession().getAttribute(AccessControl.class);
+        if (accessControl == null) {
+            accessControl = new BasicAccessControl();
+            getSession().setAttribute(AccessControl.class, accessControl);
+        }
         return accessControl;
     }
 

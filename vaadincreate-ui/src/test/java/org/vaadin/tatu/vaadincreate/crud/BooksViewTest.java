@@ -131,6 +131,7 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void crossValidationAndDiscard() {
         test($(view, Button.class).id("new-product")).click();
 
@@ -184,6 +185,7 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void addProduct() {
         test($(view, Button.class).id("new-product")).click();
 
@@ -637,6 +639,7 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void categoriesValid() {
         var category = new Category();
         category.setName("Science");
@@ -652,6 +655,58 @@ public class BooksViewTest extends AbstractUITest {
 
         assertEquals("One or more of the selected categories were deleted.",
                 $(Notification.class).last().getCaption());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void sanitation() {
+        // Make window small in order to show tooltip
+        ui.getPage().updateBrowserWindowSize(500, 1024, true);
+
+        // Create a book with offending content
+        test($(view, Button.class).id("new-product")).click();
+        test($(form, TextField.class).id("product-name")).setValue(
+                "<b><img src=1 onerror=alert(document.domain)>A new book</b>");
+        test($(form, TextField.class).id("price")).setValue("10.0 €");
+        test($(form, AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.AVAILABLE);
+        test($(form, NumberField.class).id("stock-count")).setValue(10);
+
+        var cat = ui.getProductService().getAllCategories().stream().findFirst()
+                .get();
+        test($(form, CheckBoxGroup.class).id("category")).clickItem(cat);
+        test($(form, Button.class).id("save-button")).click();
+        assertFalse(form.isShown());
+
+        int row = test(grid).size() - 1;
+
+        // Assert JS sanitized
+        assertFalse(test(grid).description(row).contains("alert"));
+        // Assert text content remain
+        assertTrue(test(grid).description(row).contains("A new book"));
+
+        test(grid).click(1,row);
+        assertTrue(form.isShown());
+
+        test($(form, TextField.class).id("product-name"))
+                .setValue("The new book");
+
+        test($(form, Button.class).id("cancel-button")).click();
+        var dialog = $(Window.class).id("confirm-dialog");
+        test($(dialog, Button.class).id("cancel-button")).click();
+
+        assertTrue($(form, TextField.class).id("product-name").getStyleName()
+                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
+        // Assert JS sanitized
+        assertFalse($(form, TextField.class).id("product-name").getDescription()
+                .contains("alert"));
+        // Assert text content remain
+        assertTrue($(form, TextField.class).id("product-name").getDescription()
+                .contains("A new book"));
+
+        test($(form, Button.class).id("discard-button")).click();
+        test($(form, Button.class).id("cancel-button")).click();
+        assertFalse(form.isShown());
     }
 
     @Test

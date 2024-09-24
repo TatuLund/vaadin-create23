@@ -3,26 +3,34 @@ package org.vaadin.tatu.vaadincreate.crud.form;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
 
+import com.vaadin.data.ValueContext;
 import com.vaadin.server.ServiceException;
 import com.vaadin.testbench.uiunittest.UIUnitTest;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 
 public class NumberFieldTest extends UIUnitTest {
 
+    private final static char MINUS = '\u002D';
     private static final String ERROR_MESSAGE = "Cannot convert value to a number.";
-    UI ui;
+    private UI ui;
     private NumberField field;
 
     @Before
     public void setup() throws ServiceException {
         // Vaadin mocks
+        Locale.setDefault(DefaultI18NProvider.LOCALE_EN);
+
         ui = mockVaadin();
+        ui.getSession().setLocale(DefaultI18NProvider.LOCALE_EN);
         field = new NumberField("Field");
         ui.setContent(field);
     }
@@ -44,7 +52,7 @@ public class NumberFieldTest extends UIUnitTest {
         test(field.textField).setValue("20");
         assertEquals(Integer.valueOf(20), field.getValue());
 
-        test(field.textField).setValue("-20");
+        test(field.textField).setValue(MINUS + "20");
         assertEquals(Integer.valueOf(-20), field.getValue());
     }
 
@@ -84,5 +92,11 @@ public class NumberFieldTest extends UIUnitTest {
         test(field.textField).setValue("40");
         assertEquals(3, count.get());
         assertEquals(1, user.get());
+    }
+
+    @Test
+    public void setValueNull() {
+        field.setValue(null);
+        assertEquals(Integer.valueOf(0), field.getValue());
     }
 }

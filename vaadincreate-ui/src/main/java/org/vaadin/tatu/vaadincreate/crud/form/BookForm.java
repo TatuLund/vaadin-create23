@@ -375,6 +375,7 @@ public class BookForm extends Composite implements HasI18N {
         updateDirtyIndicators();
     }
 
+    @Override
     public void focus() {
         productName.focus();
     }

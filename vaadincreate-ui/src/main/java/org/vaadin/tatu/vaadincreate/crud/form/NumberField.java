@@ -65,7 +65,6 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
             });
             fireEvent(event);
         });
-        textField.setWidth("100%");
     }
 
     private void setTypeNumber() {
@@ -79,6 +78,14 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
     @Override
     protected TextField initContent() {
         return textField;
+    }
+
+    @Override
+    public void setValue(Integer value) {
+        if (value == null) {
+            value = 0;
+        }
+        super.setValue(value);
     }
 
     @Override

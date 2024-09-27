@@ -11,15 +11,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
 
-import com.vaadin.data.ValueContext;
 import com.vaadin.server.ServiceException;
 import com.vaadin.testbench.uiunittest.UIUnitTest;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 
 public class NumberFieldTest extends UIUnitTest {
 
-    private final static char MINUS = '\u002D';
+    private static final char MINUS = '\u002D';
     private static final String ERROR_MESSAGE = "Cannot convert value to a number.";
     private UI ui;
     private NumberField field;

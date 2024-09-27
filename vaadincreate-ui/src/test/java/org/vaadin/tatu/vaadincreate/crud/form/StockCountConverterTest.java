@@ -10,7 +10,6 @@ import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vaadin.tatu.vaadincreate.crud.form.StockCountConverter;
 
 import com.vaadin.data.ValueContext;
 import com.vaadin.ui.TextField;
@@ -18,7 +17,7 @@ import com.vaadin.ui.TextField;
 public class StockCountConverterTest {
 
     private static final String ERROR_MESSAGE = "Invalid stock count";
-    private final static char MINUS = '\u002D';
+    private static final char MINUS = '\u002D';
     private StockCountConverter converter;
     private TextField field;
     private ValueContext context;

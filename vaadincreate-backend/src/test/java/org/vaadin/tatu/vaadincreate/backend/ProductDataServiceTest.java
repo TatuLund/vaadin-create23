@@ -81,7 +81,8 @@ public class ProductDataServiceTest {
 
     @Test
     public void findProductById() {
-        assertNotNull(service.getProductById(100));
+        var id = service.getAllProducts().stream().findFirst().get().getId();
+        assertNotNull(service.getProductById(id));
     }
 
     @Test
@@ -96,7 +97,8 @@ public class ProductDataServiceTest {
 
     @Test(expected = OptimisticLockException.class)
     public void optimisticLocking() {
-        var product = service.getProductById(100);
+        var id = service.getAllProducts().stream().findFirst().get().getId();
+        var product = service.getProductById(id);
         var copy = new Product(product);
         service.updateProduct(product);
         service.updateProduct(copy);

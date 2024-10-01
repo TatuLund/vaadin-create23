@@ -28,7 +28,7 @@ public class UserManagementPresenter implements Serializable {
         view.setUsers(UserService.get().getAllUsers());
     }
 
-    public void removeUser(int id) {
+    public void removeUser(Integer id) {
         accessControl.assertAdmin();
         getService().removeUser(id);
         logger.info("User '{}' removed.", id);

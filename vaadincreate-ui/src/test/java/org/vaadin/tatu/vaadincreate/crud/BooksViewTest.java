@@ -2,7 +2,6 @@ package org.vaadin.tatu.vaadincreate.crud;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -12,8 +11,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
@@ -47,15 +46,12 @@ public class BooksViewTest extends AbstractUITest {
     private BooksView view;
     private BookGrid grid;
     private BookForm form;
-    private Collection<Product> backup;
 
     @Before
     public void setup() throws ServiceException {
         ui = new VaadinCreateUI();
         mockVaadin(ui);
         login();
-
-        backup = ui.getProductService().backup();
 
         view = navigate(BooksView.VIEW_NAME, BooksView.class);
 
@@ -67,7 +63,6 @@ public class BooksViewTest extends AbstractUITest {
 
     @After
     public void cleanUp() {
-        ui.getProductService().restore(backup);
         logout();
         tearDown();
     }
@@ -191,7 +186,8 @@ public class BooksViewTest extends AbstractUITest {
 
         assertTrue(
                 test($(form, TextField.class).id("product-name")).isFocused());
-        test($(form, TextField.class).id("product-name")).setValue("New book");
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Filter book");
         test($(form, TextField.class).id("price")).setValue("10.0 €");
         test($(form, AvailabilitySelector.class).id("availability"))
                 .clickItem(Availability.AVAILABLE);
@@ -206,24 +202,27 @@ public class BooksViewTest extends AbstractUITest {
 
         assertTrue(test(grid).isFocused());
 
-        assertTrue(
-                $(Notification.class).last().getCaption().contains("New book"));
+        assertTrue($(Notification.class).last().getCaption()
+                .contains("Filter book"));
 
         assertTrue(ui.getProductService().getAllProducts().stream()
-                .anyMatch(b -> b.getProductName().equals("New book")));
+                .anyMatch(b -> b.getProductName().equals("Filter book")));
 
         // New book is added to the end
         int row = test(grid).size() - 1;
-        assertEquals("New book", test(grid).cell(1, row));
+        assertEquals("Filter book", test(grid).cell(1, row));
         assertEquals("10.00 €", test(grid).cell(2, row));
         assertEquals("10", test(grid).cell(4, row));
 
         // Find by filter and its the first row
-        test($(TextField.class).id("filter-field")).setValue("New book");
+        test($(TextField.class).id("filter-field")).setValue("Filter book");
         assertEquals(1, test(grid).size());
-        assertEquals("New book", test(grid).cell(1, 0));
+        assertEquals("Filter book", test(grid).cell(1, 0));
         assertEquals("10.00 €", test(grid).cell(2, 0));
         assertEquals("10", test(grid).cell(4, 0));
+
+        // Cleanup
+        ui.getProductService().deleteProduct(test(grid).item(0).getId());
     }
 
     @Test
@@ -258,11 +257,15 @@ public class BooksViewTest extends AbstractUITest {
 
     @Test
     public void deleteProduct() {
-        var book = test(grid).item(0);
-        test(grid).click(1, 0);
+        createBook("Delete book");
 
+        test($(TextField.class).id("filter-field")).setValue("Delete book");
+
+        var row = 0;
+        var book = test(grid).item(row);
         var id = book.getId();
-        var name = book.getProductName();
+        assertEquals("Delete book", book.getProductName());
+        test(grid).click(1, row);
 
         test($(form, Button.class).id("delete-button")).click();
 
@@ -275,15 +278,34 @@ public class BooksViewTest extends AbstractUITest {
 
         assertEquals(null, ui.getProductService().getProductById(id));
 
-        var newName = test(grid).cell(1, 0);
-        assertNotEquals(name, newName);
+        assertEquals(0, test(grid).size());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void createBook(String name) {
+        test($(view, Button.class).id("new-product")).click();
+        test($(TextField.class).id("product-name")).setValue(name);
+        test($(AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.AVAILABLE);
+        test($(TextField.class).id("price")).setValue("35.0 €");
+        var categories = VaadinCreateUI.get().getProductService()
+                .getAllCategories().stream().collect(Collectors.toList());
+        test($(CheckBoxGroup.class).id("category"))
+                .clickItem(categories.get(1));
+        test($(CheckBoxGroup.class).id("category"))
+                .clickItem(categories.get(2));
+        test($(NumberField.class).id("stock-count")).setValue(100);
+        test($(Button.class).id("save-button")).click();
     }
 
     @Test
     public void concurrentDelete() {
+        createBook("Concurrent delete");
+
         // Simulate other user deleting the book
+        test($(TextField.class).id("filter-field"))
+                .setValue("Concurrent delete");
         var book = test(grid).item(0);
-        var name = book.getProductName();
         ui.getProductService().deleteProduct(book.getId());
 
         test(grid).click(1, 0);
@@ -291,17 +313,22 @@ public class BooksViewTest extends AbstractUITest {
                 $(Notification.class).last().getCaption());
         assertFalse(form.isShown());
 
-        var newName = test(grid).cell(1, 0);
-        assertNotEquals(name, newName);
+        assertEquals(0, test(grid).size());
     }
 
     @Test
     public void editProduct() {
-        var book = test(grid).item(0);
-        test(grid).click(1, 0);
+        createBook("Test book");
+
+        test($(TextField.class).id("filter-field")).setValue("Test book");
+
+        var row = 0;
+        var book = test(grid).item(row);
+        test(grid).click(1, row);
         assertTrue(form.isShown());
 
         var id = book.getId();
+        assertNotNull(id);
 
         test($(form, TextField.class).id("product-name"))
                 .setValue("Edited book");
@@ -310,13 +337,15 @@ public class BooksViewTest extends AbstractUITest {
 
         var edited = ui.getProductService().getProductById(id);
 
-        var name = (String) test(grid).cell(1, 0);
+        test($(TextField.class).id("filter-field")).setValue("Edited book");
+        var name = (String) test(grid).cell(1, row);
 
         assertEquals("Edited book", name);
         assertEquals("Edited book", edited.getProductName());
         assertEquals(VaadinCreateTheme.BOOKVIEW_GRID_EDITED,
                 test(grid).styleName(0));
 
+        ui.getProductService().deleteProduct(id);
     }
 
     @Test
@@ -415,8 +444,9 @@ public class BooksViewTest extends AbstractUITest {
 
         // Simulate other user persisting a change to the database
         var edited = ui.getProductService().getProductById(book.getId());
+        var productName = edited.getProductName();
         edited.setProductName("Touched book");
-        ui.getProductService().updateProduct(edited);
+        var saved = ui.getProductService().updateProduct(edited);
 
         test(grid).click(1, 0);
         assertTrue(form.isShown());
@@ -430,6 +460,9 @@ public class BooksViewTest extends AbstractUITest {
 
         test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
+
+        edited.setProductName(productName);
+        ui.getProductService().updateProduct(saved);
     }
 
     @Test
@@ -445,8 +478,10 @@ public class BooksViewTest extends AbstractUITest {
 
     @Test
     public void weakLockConcurrentEdit() {
-        // Idea of this is to simulate Form being detached due browser crash so
-        // that form no longer holds the product reference. Here it is simulated
+        // Idea of this is to simulate Form being detached due browser
+        // crash so
+        // that form no longer holds the product reference. Here it is
+        // simulated
         // by doing lock via proxy object.
         var book = new Product(test(grid).item(0));
         LockedObjects.get().lock(book, CurrentUser.get().get());
@@ -460,7 +495,7 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(form.isShown());
 
         // Concurrent edit is now possible, simulate it
-        ui.getProductService().updateProduct(test(grid).item(0));
+        ui.getProductService().updateProduct(new Product(test(grid).item(0)));
 
         // Change and save
         test($(form, TextField.class).id("product-name"))
@@ -476,9 +511,15 @@ public class BooksViewTest extends AbstractUITest {
 
     @Test
     public void weakLockConcurrentDelete() {
-        // Idea of this is to simulate Form being detached due browser crash so
-        // that form no longer holds the product reference. Here it is simulated
+        // Idea of this is to simulate Form being detached due browser
+        // crash so
+        // that form no longer holds the product reference. Here it is
+        // simulated
         // by doing lock via proxy object.
+        createBook("Concurrent delete");
+        test($(TextField.class).id("filter-field"))
+                .setValue("Concurrent delete");
+
         var book = new Product(test(grid).item(0));
         LockedObjects.get().lock(book, CurrentUser.get().get());
         assertEquals("Edited by Admin", test(grid).description(0));
@@ -579,6 +620,9 @@ public class BooksViewTest extends AbstractUITest {
         // Assert that form content was updated
         assertEquals($(form, TextField.class).id("product-name").getValue(),
                 test(grid).cell(1, 1));
+
+        test($(form, Button.class).id("cancel-button")).click();
+        assertFalse(form.isShown());
     }
 
     @Test
@@ -593,6 +637,8 @@ public class BooksViewTest extends AbstractUITest {
 
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("confirm-button")).click();
+
+        assertFalse(form.isShown());
 
         assertEquals(1, $(AboutView.class).size());
         assertEquals(0, $(BooksView.class).size());
@@ -644,10 +690,12 @@ public class BooksViewTest extends AbstractUITest {
         var category = new Category();
         category.setName("Science");
         category = ui.getProductService().updateCategory(category);
+        assertNotNull(category.getId());
 
         test(grid).click(1, 0);
 
-        // Simulate other user deleting the category while editor is open
+        // Simulate other user deleting the category while editor is
+        // open
         ui.getProductService().deleteCategory(category.getId());
 
         test($(form, CheckBoxGroup.class).id("category")).clickItem(category);
@@ -655,6 +703,9 @@ public class BooksViewTest extends AbstractUITest {
 
         assertEquals("One or more of the selected categories were deleted.",
                 $(Notification.class).last().getCaption());
+
+        test($(form, Button.class).id("cancel-button")).click();
+        assertFalse(form.isShown());
     }
 
     @Test
@@ -685,7 +736,10 @@ public class BooksViewTest extends AbstractUITest {
         // Assert text content remain
         assertTrue(test(grid).description(row).contains("A new book"));
 
-        test(grid).click(1,row);
+        test(grid).click(1, row);
+        var id = test(grid).item(row).getId();
+        assertNotNull(id);
+
         assertTrue(form.isShown());
 
         test($(form, TextField.class).id("product-name"))
@@ -707,6 +761,8 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, Button.class).id("discard-button")).click();
         test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
+
+        ui.getProductService().deleteProduct(id);
     }
 
     @Test

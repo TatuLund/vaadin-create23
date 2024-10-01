@@ -127,7 +127,6 @@ public class StatsViewTest extends AbstractUITest {
 
     private static Product createBook() {
         var book = new Product();
-        book.setId(-1);
         book.setProductName("Test");
         book.setAvailability(Availability.AVAILABLE);
         var categories = VaadinCreateUI.get().getProductService()

@@ -1,13 +1,17 @@
 package org.vaadin.tatu.vaadincreate.backend.data;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "java:S2160" })
+@Entity
 public class Category extends AbstractEntity {
 
     @NotNull(message = "{category.required}")
     @Size(min = 5, max = 40, message = "{category.length}")
+    @Column(name = "category_name")
     private String name;
 
     public Category() {

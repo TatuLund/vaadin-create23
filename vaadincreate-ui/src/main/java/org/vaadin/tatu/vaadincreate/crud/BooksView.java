@@ -158,6 +158,7 @@ public class BooksView extends CssLayout
 
         newProduct = new Button(getTranslation(I18n.Books.NEW_PRODUCT));
         newProduct.setId("new-product");
+        newProduct.setEnabled(false);
         newProduct.addStyleName(ValoTheme.BUTTON_PRIMARY);
         newProduct.setIcon(VaadinIcons.PLUS_CIRCLE);
         newProduct.addClickListener(click -> presenter.newProduct());
@@ -180,7 +181,7 @@ public class BooksView extends CssLayout
             grid.setReadOnly(true);
             form.setVisible(false);
         } else {
-            form.showForm(false);
+            form.setVisible(false);
         }
         presenter.requestUpdateProducts();
     }
@@ -226,6 +227,10 @@ public class BooksView extends CssLayout
     public void setProductsAsync(Collection<Product> products) {
         try {
             getUI().access(() -> {
+                if (accessControl.isUserInRole(Role.ADMIN)) {
+                    form.setVisible(true);
+                    newProduct.setEnabled(true);
+                }
                 logger.info("Updating products");
                 dataProvider = new ListDataProvider<>(products);
                 grid.setDataProvider(dataProvider);
@@ -411,7 +416,7 @@ public class BooksView extends CssLayout
         grid.setEdited(null);
         if (product != null) {
             // Ensure the product is up-to-date
-            if (product.getId() > 0) {
+            if (product.getId() != null) {
                 product = refreshProduct(product);
                 if (product == null) {
                     showError(getTranslation(I18n.Books.PRODUCT_DELETED));
@@ -504,8 +509,8 @@ public class BooksView extends CssLayout
             var bookEvent = (LockingEvent) event;
             getUI().access(() -> {
                 if (grid.getDataProvider() instanceof ListDataProvider) {
-                    dataProvider.getItems().stream()
-                            .filter(book -> book.getId() == bookEvent.getId())
+                    dataProvider.getItems().stream().filter(
+                            book -> book.getId().equals(bookEvent.getId()))
                             .findFirst().ifPresent(product -> dataProvider
                                     .refreshItem(product));
                 }

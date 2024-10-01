@@ -126,6 +126,9 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
         options.addArguments("--window-size=1280,900");
+        // https://issues.chromium.org/issues/367755364
+        // Headless window is opened in viewport, fix it
+        options.addArguments("--window-position=-2400,-2400");
         setDriver(TestBench.createDriver(new ChromeDriver(options)));
         getDriver().get(getURL(urlFragment));
 

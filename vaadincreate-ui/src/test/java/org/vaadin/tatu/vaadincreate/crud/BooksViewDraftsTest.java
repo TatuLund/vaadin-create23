@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,7 +17,6 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
-import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.crud.form.AvailabilitySelector;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
 import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
@@ -33,7 +32,6 @@ import com.vaadin.ui.Window;
 public class BooksViewDraftsTest extends AbstractUITest {
 
     private VaadinCreateUI ui;
-    private Collection<Product> backup;
     private BookGrid grid;
     private BookForm form;
     private BooksView view;
@@ -48,8 +46,6 @@ public class BooksViewDraftsTest extends AbstractUITest {
         mockVaadin(ui);
         login();
 
-        backup = service.backup();
-
         view = navigate(BooksView.VIEW_NAME, BooksView.class);
 
         layout = $(view, VerticalLayout.class).first();
@@ -60,15 +56,18 @@ public class BooksViewDraftsTest extends AbstractUITest {
 
     @After
     public void cleanUp() {
-        service.restore(backup);
         logout();
         tearDown();
     }
 
     @Test
     public void editBookExitContinueWithDraft() throws ServiceException {
+        createBook("Draft book");
+        test($(TextField.class).id("filter-field")).setValue("Draft book");
+
         test(grid).click(1, 0);
         var book = test(grid).item(0);
+        var id = book.getId();
 
         assertTrue(form.isShown());
 
@@ -131,6 +130,8 @@ public class BooksViewDraftsTest extends AbstractUITest {
                 .contains("Modified book"));
 
         assertFalse(form.isShown());
+
+        ui.getProductService().deleteProduct(id);
     }
 
     @Test
@@ -196,11 +197,20 @@ public class BooksViewDraftsTest extends AbstractUITest {
                 .contains("Modified book"));
 
         assertFalse(form.isShown());
+
+        var book = test(grid).item(test(grid).size() - 1);
+        assertEquals("Modified book", book.getProductName());
+
+        var id = book.getId();
+        ui.getProductService().deleteProduct(id);
     }
 
     @Test
     public void editBookExitConcurrentEditContinueWithDraft()
             throws ServiceException {
+        createBook("Draft book");
+        test($(TextField.class).id("filter-field")).setValue("Draft book");
+
         test(grid).click(1, 0);
         var book = test(grid).item(0);
         assertTrue(form.isShown());
@@ -273,11 +283,20 @@ public class BooksViewDraftsTest extends AbstractUITest {
                 .contains("Modified book"));
 
         assertFalse(form.isShown());
+
+        book = test(grid).item(test(grid).size() - 1);
+        assertEquals("Modified book", book.getProductName());
+
+        var id = book.getId();
+        ui.getProductService().deleteProduct(id);
     }
 
     @Test
     public void editBookExitConcurrentDeleteContinueWithDraft()
             throws ServiceException {
+        createBook("Draft book");
+        test($(TextField.class).id("filter-field")).setValue("Draft book");
+
         test(grid).click(1, 0);
         var book = test(grid).item(0);
         assertTrue(form.isShown());
@@ -348,6 +367,12 @@ public class BooksViewDraftsTest extends AbstractUITest {
                 .contains("Modified book"));
 
         assertFalse(form.isShown());
+
+        book = test(grid).item(test(grid).size() - 1);
+        assertEquals("Modified book", book.getProductName());
+
+        var id = book.getId();
+        ui.getProductService().deleteProduct(id);
     }
 
     @Test
@@ -378,5 +403,22 @@ public class BooksViewDraftsTest extends AbstractUITest {
 
         var about = $(AboutView.class).single();
         assertNotNull(about);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void createBook(String name) {
+        test($(view, Button.class).id("new-product")).click();
+        test($(TextField.class).id("product-name")).setValue(name);
+        test($(AvailabilitySelector.class).id("availability"))
+                .clickItem(Availability.COMING);
+        test($(TextField.class).id("price")).setValue("35.0 €");
+        var categories = VaadinCreateUI.get().getProductService()
+                .getAllCategories().stream().collect(Collectors.toList());
+        test($(CheckBoxGroup.class).id("category"))
+                .clickItem(categories.get(1));
+        test($(CheckBoxGroup.class).id("category"))
+                .clickItem(categories.get(2));
+        test($(NumberField.class).id("stock-count")).setValue(0);
+        test($(Button.class).id("save-button")).click();
     }
 }

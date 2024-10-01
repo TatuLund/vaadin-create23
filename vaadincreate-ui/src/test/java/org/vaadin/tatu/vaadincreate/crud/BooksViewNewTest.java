@@ -30,7 +30,6 @@ public class BooksViewNewTest extends AbstractUITest {
     private BooksView view;
     private BookGrid grid;
     private BookForm form;
-    private Collection<Product> backup;
 
     @Before
     public void setup() throws ServiceException {
@@ -38,20 +37,16 @@ public class BooksViewNewTest extends AbstractUITest {
         mockVaadin(ui);
         login();
 
-        backup = ui.getProductService().backup();
-
         view = navigate(BooksView.VIEW_NAME + "/new", BooksView.class);
 
         var layout = $(view, VerticalLayout.class).first();
         grid = $(layout, BookGrid.class).single();
         waitForGrid(layout, grid);
         form = $(view, BookForm.class).single();
-
     }
 
     @After
     public void cleanUp() {
-        ui.getProductService().restore(backup);
         logout();
         tearDown();
     }
@@ -86,6 +81,8 @@ public class BooksViewNewTest extends AbstractUITest {
         assertEquals("A new product", test(grid).cell(1, row));
         assertEquals("10.00 €", test(grid).cell(2, row));
         assertEquals("10", test(grid).cell(4, row));
+
+        ui.getProductService().deleteProduct(test(grid).item(row).getId());
     }
 
 }

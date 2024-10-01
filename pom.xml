@@ -6,7 +6,7 @@
 	<groupId>org.vaadin.tatu</groupId>
 	<artifactId>vaadincreate-root</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>2.0-SNAPSHOT</version>
 	<name>VaadinCreate 23 Root Project</name>
 
 	<prerequisites>

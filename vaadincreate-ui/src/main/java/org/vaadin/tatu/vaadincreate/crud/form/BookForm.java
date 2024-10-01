@@ -200,6 +200,9 @@ public class BookForm extends Composite implements HasI18N {
      */
     public void showForm(boolean visible) {
         accessControl.assertAdmin();
+        if (this.visible == visible) {
+            return;
+        }
         this.visible = visible;
         if (visible) {
             clearDirtyIndicators();
@@ -330,7 +333,7 @@ public class BookForm extends Composite implements HasI18N {
         if (product == null) {
             product = new Product();
         }
-        deleteButton.setEnabled(product.getId() != -1);
+        deleteButton.setEnabled(product.getId() != null);
         currentProduct = product;
         binder.readBean(product);
 

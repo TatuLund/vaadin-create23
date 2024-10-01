@@ -111,7 +111,7 @@ public class CategoryManagementView extends VerticalLayout
             this.category = category;
             configureNameField();
             // Focus the name field if the category is new
-            if (category.getId() < 0) {
+            if (category.getId() == null) {
                 nameField.focus();
             }
 
@@ -119,7 +119,7 @@ public class CategoryManagementView extends VerticalLayout
                     e -> handleConfirmDelete());
             deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
             deleteButton.setDescription(getTranslation(I18n.DELETE));
-            deleteButton.setEnabled(category.getId() > 0);
+            deleteButton.setEnabled(category.getId() != null);
 
             binder = new BeanValidationBinder<>(Category.class);
             // Check for duplicate category names
@@ -159,7 +159,7 @@ public class CategoryManagementView extends VerticalLayout
                 var saved = presenter.updateCategory(category);
                 if (saved != null) {
                     list.replaceItem(category, saved);
-                    if (category.getId() == -1) {
+                    if (category.getId() == null) {
                         nameField.focus();
                     }
                     presenter.requestUpdateCategories();

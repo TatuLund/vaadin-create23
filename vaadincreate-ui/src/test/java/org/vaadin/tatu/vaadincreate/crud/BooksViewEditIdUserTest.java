@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
 
 import com.vaadin.server.Page;
@@ -27,7 +28,8 @@ public class BooksViewEditIdUserTest extends AbstractUITest {
         mockVaadin(ui);
         login("User1", "user1");
 
-        view = navigate(BooksView.VIEW_NAME + "/10", BooksView.class);
+        var id = getNthProduct(10).getId();
+        view = navigate(BooksView.VIEW_NAME + "/" + id, BooksView.class);
 
         var layout = $(view, VerticalLayout.class).first();
         grid = $(layout, BookGrid.class).single();
@@ -46,6 +48,11 @@ public class BooksViewEditIdUserTest extends AbstractUITest {
     public void editWithId() {
         assertFalse(form.isShown());
         assertEquals("!inventory/", Page.getCurrent().getUriFragment());
+    }
+
+    private Product getNthProduct(int n) {
+        return ui.getProductService().getAllProducts().stream().skip(n)
+                .findFirst().get();
     }
 
 }

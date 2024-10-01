@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.vaadin.tatu.vaadincreate.backend.data.User;
-import org.vaadin.tatu.vaadincreate.backend.mock.MockUserService;
+import org.vaadin.tatu.vaadincreate.backend.service.UserServiceImpl;
 
 public interface UserService {
 
@@ -14,12 +14,12 @@ public interface UserService {
 
     public abstract List<User> getAllUsers();
 
+    public User getUserById(Integer userId);
+
+    void removeUser(Integer userId);
+
     public static UserService get() {
-        return MockUserService.getInstance();
+        return UserServiceImpl.getInstance();
     }
-
-    public User getUserById(int userId);
-
-    void removeUser(int userId);
 
 }

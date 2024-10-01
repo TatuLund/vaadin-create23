@@ -2,10 +2,8 @@ package org.vaadin.tatu.vaadincreate.backend;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import java.math.BigDecimal;
 
 import javax.persistence.OptimisticLockException;
 
@@ -13,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
-import org.vaadin.tatu.vaadincreate.backend.mock.MockUserService;
+import org.vaadin.tatu.vaadincreate.backend.service.UserServiceImpl;
 
 public class UserServiceTest {
 
@@ -21,7 +19,7 @@ public class UserServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        service = MockUserService.getInstance();
+        service = UserServiceImpl.getInstance();
     }
 
     @Test
@@ -36,7 +34,7 @@ public class UserServiceTest {
         var version = user.getVersion();
         user.setName("Test1");
         User user2 = service.updateUser(user);
-        assertEquals(version + 1, user2.getVersion());
+        assertEquals((Integer.valueOf(version + 1)), user2.getVersion());
         assertEquals("Test1", user2.getName());
         assertEquals(oldSize, service.getAllUsers().size());
     }
@@ -51,16 +49,20 @@ public class UserServiceTest {
     @Test(expected = OptimisticLockException.class)
     public void optimisticLocking() {
         var user = service.findByName("User5").get();
-        var u = service.updateUser(user);
+        var copy = new User(user);
         service.updateUser(user);
+        service.updateUser(copy);
     }
 
     @Test
     public void addNewUser() throws Exception {
         var oldSize = service.getAllUsers().size();
-        User user = new User(20, "Test2", "test2", Role.USER, 0);
+        User user = new User();
+        user.setName("Test2");
+        user.setPasswd("test2");
+        user.setRole(Role.USER);
         var newUser = service.updateUser(user);
-        assertEquals(0, newUser.getVersion());
+        assertEquals(Integer.valueOf(0), newUser.getVersion());
         assertEquals(oldSize + 1, service.getAllUsers().size());
 
         var foundUser = service.findByName("Test2");
@@ -69,7 +71,10 @@ public class UserServiceTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void addNewUserByDuplicateName() throws Exception {
-        User user = new User(20, "Admin", "admin", Role.USER, 0);
+        User user = new User();
+        user.setName("Admin");
+        user.setPasswd("admin");
+        user.setRole(Role.USER);
         service.updateUser(user);
     }
 
@@ -85,7 +90,8 @@ public class UserServiceTest {
 
     @Test
     public void findUserById() {
-        assertNotEquals(null, service.getUserById(1));
+        var user = service.getAllUsers().get(0);
+        assertNotNull(service.getUserById(user.getId()));
     }
 
     @Test

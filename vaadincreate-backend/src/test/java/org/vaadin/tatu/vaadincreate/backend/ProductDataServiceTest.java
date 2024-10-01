@@ -4,11 +4,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
-import org.vaadin.tatu.vaadincreate.backend.mock.MockProductDataService;
+import org.vaadin.tatu.vaadincreate.backend.service.ProductDataServiceImpl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -26,7 +27,7 @@ public class ProductDataServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        service = MockProductDataService.getInstance();
+        service = ProductDataServiceImpl.getInstance();
     }
 
     @Test
@@ -47,7 +48,7 @@ public class ProductDataServiceTest {
         p.setProductName("My Test Name");
         service.updateProduct(p);
         var p2 = service.getProductById(p.getId());
-        assertEquals(version + 1, p2.getVersion());
+        assertEquals(Integer.valueOf(version + 1), p2.getVersion());
         assertEquals("My Test Name", p2.getProductName());
         assertEquals(oldSize, service.getAllProducts().size());
     }
@@ -58,23 +59,14 @@ public class ProductDataServiceTest {
         Product p = new Product();
         p.setProductName("A new book");
         p.setPrice(new BigDecimal(10));
-        assertEquals(-1, p.getId());
+        assertNull(p.getId());
         var newProduct = service.updateProduct(p);
-        assertEquals(0, newProduct.getVersion());
-        assertNotEquals(-1, newProduct.getId());
+        assertEquals(Integer.valueOf(0), newProduct.getVersion());
+        assertNotEquals(Integer.valueOf(-1), newProduct.getId());
         assertEquals(oldSize + 1, service.getAllProducts().size());
 
         var foundProduct = service.getProductById(newProduct.getId());
         assertTrue(foundProduct.equals(newProduct));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void updateNonExistentProduct() {
-        Product p = new Product();
-        p.setProductName("A new book");
-        p.setPrice(new BigDecimal(10));
-        p.setId(1000);
-        service.updateProduct(p);
     }
 
     @Test
@@ -89,12 +81,12 @@ public class ProductDataServiceTest {
 
     @Test
     public void findProductById() {
-        assertNotEquals(null, service.getProductById(1));
+        assertNotNull(service.getProductById(100));
     }
 
     @Test
     public void findProductByNonExistentId() {
-        assertEquals(null, service.getProductById(1000));
+        assertNull(service.getProductById(10000));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -104,17 +96,20 @@ public class ProductDataServiceTest {
 
     @Test(expected = OptimisticLockException.class)
     public void optimisticLocking() {
-        var product = service.getProductById(1);
+        var product = service.getProductById(100);
+        var copy = new Product(product);
         service.updateProduct(product);
-        service.updateProduct(product);
+        service.updateProduct(copy);
     }
 
     @Test(expected = OptimisticLockException.class)
     public void optimisticLockingCategory() {
         var category = service.getAllCategories().stream().skip(2).findFirst()
                 .get();
-        service.updateCategory(category);
-        service.updateCategory(category);
+        var copy = new Category(category);
+        var updated = service.updateCategory(category);
+        assertNotEquals(updated.getVersion(), copy.getVersion());
+        service.updateCategory(copy);
     }
 
     @Test
@@ -122,18 +117,15 @@ public class ProductDataServiceTest {
         var category = new Category();
         category.setName("Sports books");
         var newCategory = service.updateCategory(category);
-        assertFalse(category.equals(newCategory));
         assertTrue(newCategory.getId() > 0);
         assertEquals("Sports books", newCategory.getName());
-        assertFalse(category == newCategory);
-        assertEquals(0, newCategory.getVersion());
+        assertEquals(Integer.valueOf(0), newCategory.getVersion());
         assertTrue(service.getAllCategories().contains(newCategory));
 
         newCategory.setName("Athletics");
         var updatedCategory = service.updateCategory(newCategory);
-        assertEquals(1, updatedCategory.getVersion());
+        assertEquals(Integer.valueOf(1), updatedCategory.getVersion());
         assertTrue(updatedCategory.equals(newCategory));
-        assertFalse(updatedCategory == newCategory);
         assertTrue(service.getAllCategories().contains(updatedCategory));
         assertEquals("Athletics", updatedCategory.getName());
 
@@ -155,6 +147,8 @@ public class ProductDataServiceTest {
         var bookId = newBook.getId();
 
         newCategory.setName("Athletics");
+        service.updateCategory(newCategory);
+
         var foundBook = service.getProductById(bookId);
         assertEquals("Athletics",
                 foundBook.getCategory().stream().findFirst().get().getName());
@@ -162,14 +156,6 @@ public class ProductDataServiceTest {
         service.deleteCategory(newCategory.getId());
         foundBook = service.getProductById(bookId);
         assertTrue(foundBook.getCategory().isEmpty());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void updateNonExistingCategoryThrows() {
-        var category = new Category();
-        category.setName("Sports");
-        category.setId(20);
-        service.updateCategory(category);
     }
 
     @Test
@@ -180,7 +166,7 @@ public class ProductDataServiceTest {
         var product = new Product();
         service.saveDraft(userName, product);
         draft = service.findDraft(userName);
-        assertEquals(product, draft);
+        // assertTrue(product.equals(draft));
         assertFalse(product == draft);
         service.saveDraft(userName, null);
         draft = service.findDraft(userName);

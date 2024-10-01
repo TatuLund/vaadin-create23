@@ -27,7 +27,7 @@ public class BooksViewIdNotFoundTest extends AbstractUITest {
         mockVaadin(ui);
         login();
 
-        view = navigate(BooksView.VIEW_NAME + "/1234", BooksView.class);
+        view = navigate(BooksView.VIEW_NAME + "/12345", BooksView.class);
 
         var layout = $(view, VerticalLayout.class).first();
         grid = $(layout, BookGrid.class).single();
@@ -44,7 +44,7 @@ public class BooksViewIdNotFoundTest extends AbstractUITest {
 
     @Test
     public void error() {
-        assertEquals("Product id \"1234\" not valid or found.",
+        assertEquals("Product id \"12345\" not valid or found.",
                 $(Notification.class).last().getCaption());
         assertFalse(form.isShown());
     }

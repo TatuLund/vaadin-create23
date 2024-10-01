@@ -129,8 +129,6 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 .findDraft(getAccessControl().getPrincipalName());
         if (draft != null) {
             handleDraft(draft);
-        } else {
-            getNavigator().navigateTo(target);
         }
     }
 
@@ -142,7 +140,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 ConfirmDialog.Type.ALERT);
         dialog.setCancelText(getTranslation(I18n.DISCARD));
         dialog.setConfirmText(getTranslation(I18n.YES));
-        var id = draft.getId() == -1 ? "new" : String.valueOf(draft.getId());
+        var id = draft.getId() == null ? "new" : String.valueOf(draft.getId());
         dialog.addConfirmedListener(e -> getNavigator()
                 .navigateTo(String.format("%s/%s", BooksView.VIEW_NAME, id)));
         dialog.addCancelListener(e -> {

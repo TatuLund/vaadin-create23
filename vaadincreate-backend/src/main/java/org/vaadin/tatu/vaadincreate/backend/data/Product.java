@@ -3,31 +3,50 @@ package org.vaadin.tatu.vaadincreate.backend.data;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
-
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "java:S2160" })
+@Entity
 public class Product extends AbstractEntity {
 
     @NotNull(message = "{product.name.required}")
     @Size(min = 2, max = 100, message = "{product.name.min2max200}")
+    @Column(name = "product_name")
     private String productName = "";
+
     @Min(value = 0, message = "{price.not.negative}")
+    @Column(name = "price")
     private BigDecimal price = BigDecimal.ZERO;
-    private Set<Integer> category = Collections.emptySet();
+
+    // Using Eager as the category is shown in the Grid, Lazy would not help performance.
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST,
+            CascadeType.MERGE, CascadeType.DETACH })
+    @JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<Category> category = Collections.emptySet();
+
     @Min(value = 0, message = "{stock.not.negative}")
     @NotNull(message = "{stock.required}")
+    @Column(name = "stock_count")
     private Integer stockCount = 0;
+
     @NotNull(message = "{availability.required}")
+    @Column(name = "availability")
+    @Enumerated(EnumType.STRING)
     private Availability availability = Availability.COMING;
 
     public Product() {
-        setId(-1);
     }
 
     public Product(Product other) {
@@ -57,13 +76,11 @@ public class Product extends AbstractEntity {
     }
 
     public Set<Category> getCategory() {
-        return ProductDataService.get().findCategoriesByIds(category);
+        return category;
     }
 
     public void setCategory(Set<Category> category) {
-        this.category = category.stream()
-                .map(cat -> Integer.valueOf(cat.getId()))
-                .collect(Collectors.toSet());
+        this.category = category;
     }
 
     public Integer getStockCount() {

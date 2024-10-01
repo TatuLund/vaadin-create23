@@ -211,7 +211,7 @@ public class BooksPresenter implements Serializable {
     }
 
     /**
-     * Saves the given product.
+     * Saves the given product
      *
      * @param product
      *            The product to be saved.
@@ -219,7 +219,7 @@ public class BooksPresenter implements Serializable {
     public Product saveProduct(Product product) {
         accessControl.assertAdmin();
         view.clearSelection();
-        boolean newBook = product.getId() == -1;
+        boolean newBook = product.getId() == null;
         logger.info("Saving product: {}", newBook ? "new" : product.getId());
 
         try {
@@ -282,7 +282,7 @@ public class BooksPresenter implements Serializable {
         if (product == null) {
             view.setFragmentParameter("");
             unlockBook();
-        } else if (product.getId() == -1) {
+        } else if (product.getId() == null) {
             view.setFragmentParameter("new");
         } else {
             view.setFragmentParameter(product.getId() + "");

@@ -3,42 +3,48 @@ package org.vaadin.tatu.vaadincreate.backend.data;
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.persistence.OptimisticLockException;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Version;
 
+@MappedSuperclass
 @SuppressWarnings("serial")
 public abstract class AbstractEntity implements Serializable {
 
-    @NotNull
-    @Min(0)
-    int id = -1;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgenerator")
+    @SequenceGenerator(name = "idgenerator", initialValue = 1)
+    Integer id;
 
-    int version = 0;
+    @Version
+    Integer version;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public int getVersion() {
+    public Integer getVersion() {
         return version;
     }
 
-    public void setVersion(int version) {
-        if (version - this.version == 1) {
-            this.version = version;
-        } else {
-            throw new OptimisticLockException(this);
-        }
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        if (id != null) {
+            return Objects.hash(id);
+        } else {
+            return super.hashCode();
+        }
     }
 
     @Override
@@ -50,6 +56,9 @@ public abstract class AbstractEntity implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         AbstractEntity other = (AbstractEntity) obj;
-        return id == other.id;
+        if (id != null) {
+            return id.equals(other.id);
+        }
+        return super.equals(other);
     }
 }

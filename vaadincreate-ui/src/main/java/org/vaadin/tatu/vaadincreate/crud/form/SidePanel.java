@@ -47,8 +47,10 @@ public class SidePanel extends Composite {
         if (visible) {
             JavaScript.eval(
                     "document.getElementById('book-form').style.display='block';");
-            getUI().runAfterRoundTrip(() -> layout
-                    .addStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
+            if (getUI() != null) {
+                getUI().runAfterRoundTrip(() -> layout.addStyleName(
+                        VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
+            }
         } else {
             layout.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
             if (isAttached()) {

@@ -70,7 +70,11 @@ public class ComponentList<T, V extends Component> extends Composite {
     public void setItems(Collection<T> items) {
         dataProvider = new ListDataProvider<>(items);
         grid.setDataProvider(dataProvider);
-        grid.setHeightByRows(items.size());
+        if (!items.isEmpty()) {
+            grid.setHeightByRows(items.size());
+        } else {
+            grid.setHeightByRows(1);
+        }
     }
 
     /**

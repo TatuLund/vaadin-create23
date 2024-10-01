@@ -5,12 +5,12 @@ import java.util.Set;
 
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
-import org.vaadin.tatu.vaadincreate.backend.mock.MockProductDataService;
+import org.vaadin.tatu.vaadincreate.backend.service.ProductDataServiceImpl;
 
 /**
  * Back-end service interface for retrieving and updating product data.
  */
-public abstract class ProductDataService {
+public interface ProductDataService {
 
     /**
      * Get all Products in the database.
@@ -46,7 +46,7 @@ public abstract class ProductDataService {
      * @throws IllegalArgumentException
      *             if product did not exists
      */
-    public abstract void deleteProduct(int productId);
+    public abstract void deleteProduct(Integer productId);
 
     /**
      * Find a Product from database using id
@@ -55,7 +55,7 @@ public abstract class ProductDataService {
      *            id of the Product
      * @return Product if it was found, otherwise null
      */
-    public abstract Product getProductById(int productId);
+    public abstract Product getProductById(Integer productId);
 
     /**
      * Saves a new category or updates an existing one.
@@ -72,7 +72,7 @@ public abstract class ProductDataService {
      * @param categoryId
      *            the ID of the category to delete
      */
-    public abstract void deleteCategory(int categoryId);
+    public abstract void deleteCategory(Integer categoryId);
 
     /**
      * Find categories by their ids.
@@ -102,22 +102,7 @@ public abstract class ProductDataService {
      */
     public abstract Product findDraft(String userName);
 
-    /**
-     * Only to be used in the tests.
-     *
-     * @return Products
-     */
-    public abstract Collection<Product> backup();
-
-    /**
-     * Only to be used in the tests.
-     *
-     * @param data
-     *            Products
-     */
-    public abstract void restore(Collection<Product> data);
-
     public static ProductDataService get() {
-        return MockProductDataService.getInstance();
+        return ProductDataServiceImpl.getInstance();
     }
 }

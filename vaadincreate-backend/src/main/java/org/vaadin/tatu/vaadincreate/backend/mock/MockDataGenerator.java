@@ -16,10 +16,8 @@ import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
 @SuppressWarnings("serial")
 public class MockDataGenerator implements Serializable {
-    private static int nextCategoryId = 1;
-    private static int nextProductId = 1;
     private static final Random random = new Random(1);
-    private static final String categoryNames[] = new String[] {
+    private static final String[] categoryNames = new String[] {
             "Children's books", "Best sellers", "Romance", "Mystery",
             "Thriller", "Sci-fi", "Non-fiction", "Cookbooks" };
 
@@ -41,7 +39,7 @@ public class MockDataGenerator implements Serializable {
             "speaking to a big audience", "creating software", "giant needles",
             "elephants", "keeping your wife happy" };
 
-    static List<Category> createCategories() {
+    public static List<Category> createCategories() {
         List<Category> categories = new ArrayList<>();
         for (String name : categoryNames) {
             Category c = createCategory(name);
@@ -51,7 +49,7 @@ public class MockDataGenerator implements Serializable {
 
     }
 
-    static List<Product> createProducts(List<Category> categories) {
+    public static List<Product> createProducts(List<Category> categories) {
         List<Product> products = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             Product p = createProduct(categories);
@@ -61,34 +59,40 @@ public class MockDataGenerator implements Serializable {
         return products;
     }
 
-    static String createMessage() {
+    public static String createMessage() {
         return "System update complete";
     }
 
-    static List<User> createUsers() {
+    public static List<User> createUsers() {
         List<User> users = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            User user = new User(i + 1, "User" + i, "user" + i, Role.USER, 0);
+        for (Integer i = 0; i < 10; i++) {
+            User user = new User();
+            user.setName("User" + i);
+            user.setPasswd("user" + i);
+            user.setRole(Role.USER);
             users.add(user);
         }
-        User admin = new User(users.size() + 1, "Admin", "admin", Role.ADMIN,
-                0);
+        User admin = new User();
+        admin.setName("Admin");
+        admin.setPasswd("admin");
+        admin.setRole(Role.ADMIN);
         users.add(admin);
-        admin = new User(users.size() + 1, "Super", "super", Role.ADMIN, 0);
+        admin = new User();
+        admin.setName("Super");
+        admin.setPasswd("super");
+        admin.setRole(Role.ADMIN);
         users.add(admin);
         return users;
     }
 
     private static Category createCategory(String name) {
         Category c = new Category();
-        c.setId(nextCategoryId++);
         c.setName(name);
         return c;
     }
 
     private static Product createProduct(List<Category> categories) {
         Product p = new Product();
-        p.setId(nextProductId++);
         p.setProductName(generateName());
 
         p.setPrice(new BigDecimal((random.nextInt(250) + 50) / 10.0));

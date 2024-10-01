@@ -55,7 +55,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
 
         // Set highlight color to last edited row with style generator.
         setStyleGenerator(book -> {
-            if (book.getId() == edited) {
+            if (book.getId() != null && book.getId() == edited) {
                 return VaadinCreateTheme.BOOKVIEW_GRID_EDITED;
             }
             if (getLockedBooks().isLocked(book) != null) {

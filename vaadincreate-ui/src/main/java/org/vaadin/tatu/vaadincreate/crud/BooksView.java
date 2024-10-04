@@ -67,6 +67,8 @@ public class BooksView extends CssLayout
 
     private Product draft;
 
+    private UI ui;
+
     public BooksView() {
         setSizeFull();
         addStyleName(VaadinCreateTheme.BOOKVIEW);
@@ -173,6 +175,12 @@ public class BooksView extends CssLayout
     }
 
     @Override
+    public void attach() {
+        super.attach();
+        ui = getUI();
+    }
+
+    @Override
     public void enter(ViewChangeEvent event) {
         draft = presenter.getDraft();
         params = event.getParameters();
@@ -226,7 +234,7 @@ public class BooksView extends CssLayout
      */
     public void setProductsAsync(Collection<Product> products) {
         try {
-            getUI().access(() -> {
+            ui.access(() -> {
                 if (accessControl.isUserInRole(Role.ADMIN)) {
                     form.setVisible(true);
                     newProduct.setEnabled(true);
@@ -479,7 +487,7 @@ public class BooksView extends CssLayout
             // shouldn't be necessary. This is a possible bug.
             var book = getSelectedRow();
             if (book != null) {
-                getUI().access(() -> {
+                ui.access(() -> {
                     logger.debug("Set fragment: {}", book.getId());
                     setFragmentParameter("" + book.getId());
                 });
@@ -505,16 +513,25 @@ public class BooksView extends CssLayout
 
     @Override
     public void eventFired(Object event) {
-        if (event instanceof LockingEvent && isAttached()) {
+        if (event instanceof LockingEvent) {
             var bookEvent = (LockingEvent) event;
-            getUI().access(() -> {
-                if (grid.getDataProvider() instanceof ListDataProvider) {
-                    dataProvider.getItems().stream().filter(
-                            book -> book.getId().equals(bookEvent.getId()))
-                            .findFirst().ifPresent(product -> dataProvider
-                                    .refreshItem(product));
+            try {
+                if (ui != null) {
+                    ui.access(() -> {
+                        if (isAttached() && grid
+                                .getDataProvider() instanceof ListDataProvider) {
+                            dataProvider.getItems().stream()
+                                    .filter(book -> book.getId()
+                                            .equals(bookEvent.getId()))
+                                    .findFirst()
+                                    .ifPresent(product -> dataProvider
+                                            .refreshItem(product));
+                        }
+                    });
                 }
-            });
+            } catch (UIDetachedException e) {
+                logger.info("UI closed, no need to refresh Grid.");
+            }
         }
     }
 

@@ -130,6 +130,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         if (draft != null) {
             handleDraft(draft);
         }
+        if (target.isEmpty()) {
+            logger.info("Reroute to about view");
+        }
     }
 
     // Handle draft product found in the database and ask user what to do with

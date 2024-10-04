@@ -32,6 +32,10 @@ public class ErrorView extends VerticalLayout implements View, HasI18N {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
+        if (event.getViewName().isEmpty()) {
+            getUI().getNavigator().navigateTo(AboutView.VIEW_NAME);
+            return;
+        }
         explanation.setValue(
                 getTranslation(I18n.Error.NOT_FOUND_DESC, event.getViewName()));
         logger.warn("User '{}' attempted to navigate non-existent view '{}'",

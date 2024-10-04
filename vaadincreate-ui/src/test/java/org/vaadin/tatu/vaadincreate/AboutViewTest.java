@@ -23,6 +23,7 @@ public class AboutViewTest extends AbstractUITest {
 
     private VaadinCreateUI ui;
     private AboutView view;
+    private String route = "";
 
     @Before
     public void setup() throws ServiceException {
@@ -30,7 +31,12 @@ public class AboutViewTest extends AbstractUITest {
         mockVaadin(ui);
         login();
 
-        view = navigate(AboutView.VIEW_NAME, AboutView.class);
+        view = navigate(route, AboutView.class);
+        if (route.isEmpty()) {
+            route = AboutView.VIEW_NAME;
+        } else {
+            route = "";
+        }
 
         var layout = $(view, VerticalLayout.class).first();
     }

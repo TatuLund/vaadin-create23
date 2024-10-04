@@ -24,6 +24,7 @@ import com.vaadin.shared.Registration;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.JavaScript;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.UIDetachedException;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -45,6 +46,8 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     private Lang lang;
 
     private Registration resizeListener;
+
+    private UI ui;
 
     public StatsView() {
         addStyleNames(VaadinCreateTheme.STATSVIEW, ValoTheme.SCROLLABLE);
@@ -121,20 +124,22 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     public void updateStatsAsync(Map<Availability, Long> availabilityStats,
             Map<String, Long[]> categoryStats, Map<String, Long> priceStats) {
         try {
-            getUI().access(() -> {
-                updateAvailabilityChart(availabilityStats);
-                updateCategoryChart(categoryStats);
-                updatePriceChart(priceStats);
+            ui.access(() -> {
+                if (isAttached()) {
+                    updateAvailabilityChart(availabilityStats);
+                    updateCategoryChart(categoryStats);
+                    updatePriceChart(priceStats);
 
-                availabilityChart.drawChart();
-                categoryChart.drawChart();
-                priceChart.drawChart();
+                    availabilityChart.drawChart();
+                    categoryChart.drawChart();
+                    priceChart.drawChart();
 
-                dashboard.addStyleName("loaded");
-                lang.setNoData("");
+                    dashboard.addStyleName("loaded");
+                    lang.setNoData("");
+                }
             });
         } catch (UIDetachedException e) {
-            logger.info("Browser was closed, updates not pushed");
+            logger.info("Browser was closed, statistics updates not pushed");
         }
     }
 
@@ -245,7 +250,8 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         // Vaadin responsive forces layout only when break point changes,
         // however Chart requires re-layout also when window size changes
         // when using non-fixed sizes.
-        resizeListener = getUI().getPage().addBrowserWindowResizeListener(
+        ui = getUI();
+        resizeListener = ui.getPage().addBrowserWindowResizeListener(
                 e -> JavaScript.eval("vaadin.forceLayout()"));
     }
 

@@ -608,10 +608,15 @@ public class BooksViewTest extends AbstractUITest {
 
         // Assert that change was detected
         assertTrue($(form, Button.class).id("save-button").isEnabled());
+        assertTrue($(form, Button.class).id("discard-button").isEnabled());
 
         // Revert edits
         test($(form, TextField.class).id("product-name")).setValue(name);
         test($(form, NumberField.class).id("stock-count")).setValue(count);
+
+        // Assert that change was detected
+        assertFalse($(form, Button.class).id("save-button").isEnabled());
+        assertFalse($(form, Button.class).id("discard-button").isEnabled());
 
         // Attempt to change item
         test(grid).click(1, 1);

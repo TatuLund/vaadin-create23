@@ -61,6 +61,20 @@ public class AppLayoutTest extends UIUnitTest {
         assertNotNull(view);
     }
 
+    @Test
+    public void testAppLayoutTestUnknownRoute() {
+        // App mocks
+        var accessControl = new MockAccessControl("Admin");
+        mockApp(ui, accessControl);
+
+        // Test
+        accessControl.signIn("Admin", "Admin");
+        ui.getNavigator().navigateTo("nonview");
+
+        var view = (ErrorView) ui.getNavigator().getCurrentView();
+        assertNotNull(view);
+    }
+
     private void mockApp(UI ui, MockAccessControl accessControl) {
         var appLayout = new AppLayout(ui, accessControl);
         appLayout.addView(MockView.class, "Test", VaadinIcons.INFO, "test");

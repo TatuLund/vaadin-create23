@@ -67,6 +67,7 @@ public class BookForm extends Composite implements HasI18N {
     private SidePanel sidePanel = new SidePanel();
     private BooksPresenter presenter;
     private boolean visible;
+    private boolean isValid;
 
     /**
      * Represents a form for creating or editing a book. This form is used in
@@ -101,27 +102,24 @@ public class BookForm extends Composite implements HasI18N {
 
         // enable/disable save button while editing
         binder.addStatusChangeListener(event -> {
-            var isValid = !event.hasValidationErrors();
-            var hasChanges = binder.hasChanges();
-            saveButton.setEnabled(hasChanges && isValid);
-            discardButton.setEnabled(hasChanges);
+            isValid = !event.hasValidationErrors();
             if (isValid) {
                 setStockCountAndAvailabilityInvalid(false);
             }
         });
 
+        binder.addValueChangeListener(event -> {
+            var hasChanges = binder.hasChanges();
+            saveButton.setEnabled(hasChanges && isValid);
+            discardButton.setEnabled(hasChanges);
+
+        });
+
         saveButton.addClickListener(event -> handleSave());
 
         discardButton.addClickListener(event -> {
-            if (!binder.hasChanges()) {
-                // There is a bug in change detection, hence buttons were not
-                // disabled yet
-                saveButton.setEnabled(false);
-                discardButton.setEnabled(false);
-            } else {
-                presenter.editProduct(currentProduct);
-                updateDirtyIndicators();
-            }
+            presenter.editProduct(currentProduct);
+            updateDirtyIndicators();
         });
 
         cancelButton.addClickListener(event -> presenter.cancelProduct());
@@ -131,13 +129,6 @@ public class BookForm extends Composite implements HasI18N {
     }
 
     private void handleSave() {
-        if (!binder.hasChanges()) {
-            // There is a bug in change detection, hence buttons were not
-            // disabled yet
-            saveButton.setEnabled(false);
-            discardButton.setEnabled(false);
-            return;
-        }
         if (presenter.validateCategories(category.getValue())) {
             if (currentProduct != null
                     && binder.writeBeanIfValid(currentProduct)) {

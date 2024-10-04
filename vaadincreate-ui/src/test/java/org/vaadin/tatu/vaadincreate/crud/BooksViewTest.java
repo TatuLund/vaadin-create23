@@ -129,6 +129,8 @@ public class BooksViewTest extends AbstractUITest {
     @SuppressWarnings("unchecked")
     public void crossValidationAndDiscard() {
         test($(view, Button.class).id("new-product")).click();
+        assertFalse($(form, Button.class).id("discard-button").isEnabled());
+        assertFalse($(form, Button.class).id("save-button").isEnabled());
 
         test($(form, TextField.class).id("product-name")).setValue("Te");
         test($(form, AvailabilitySelector.class).id("availability"))

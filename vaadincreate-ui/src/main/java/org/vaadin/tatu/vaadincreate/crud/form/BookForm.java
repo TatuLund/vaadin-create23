@@ -115,7 +115,6 @@ public class BookForm extends Composite implements HasI18N {
             var hasChanges = binder.hasChanges();
             saveButton.setEnabled(hasChanges && isValid);
             discardButton.setEnabled(hasChanges);
-
         });
 
         saveButton.addClickListener(event -> handleSave());
@@ -330,6 +329,8 @@ public class BookForm extends Composite implements HasI18N {
         deleteButton.setEnabled(product.getId() != null);
         currentProduct = product;
         binder.readBean(product);
+        saveButton.setEnabled(false);
+        discardButton.setEnabled(false);
 
         // Scroll to the top
         // As this is not a Panel, using JavaScript

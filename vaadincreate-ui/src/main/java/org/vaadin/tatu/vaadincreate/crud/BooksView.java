@@ -20,6 +20,7 @@ import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects.LockingEvent;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
@@ -35,7 +36,6 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.UIDetachedException;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -233,23 +233,19 @@ public class BooksView extends CssLayout
      *            Collection of Product
      */
     public void setProductsAsync(Collection<Product> products) {
-        try {
-            ui.access(() -> {
-                if (accessControl.isUserInRole(Role.ADMIN)) {
-                    form.setVisible(true);
-                    newProduct.setEnabled(true);
-                }
-                logger.info("Updating products");
-                dataProvider = new ListDataProvider<>(products);
-                grid.setDataProvider(dataProvider);
-                grid.setVisible(true);
-                fakeGrid.setVisible(false);
-                // Open form with url parameter based book
-                presenter.enter(params);
-            });
-        } catch (UIDetachedException e) {
-            logger.info("Browser was closed, updates not pushed");
-        }
+        Utils.access(ui, () -> {
+            if (accessControl.isUserInRole(Role.ADMIN)) {
+                form.setVisible(true);
+                newProduct.setEnabled(true);
+            }
+            logger.info("Updating products");
+            dataProvider = new ListDataProvider<>(products);
+            grid.setDataProvider(dataProvider);
+            grid.setVisible(true);
+            fakeGrid.setVisible(false);
+            // Open form with url parameter based book
+            presenter.enter(params);
+        });
     }
 
     /**
@@ -515,23 +511,15 @@ public class BooksView extends CssLayout
     public void eventFired(Object event) {
         if (event instanceof LockingEvent) {
             var bookEvent = (LockingEvent) event;
-            try {
-                if (ui != null) {
-                    ui.access(() -> {
-                        if (isAttached() && grid
-                                .getDataProvider() instanceof ListDataProvider) {
-                            dataProvider.getItems().stream()
-                                    .filter(book -> book.getId()
-                                            .equals(bookEvent.getId()))
-                                    .findFirst()
-                                    .ifPresent(product -> dataProvider
-                                            .refreshItem(product));
-                        }
-                    });
+            Utils.access(ui, () -> {
+                if (isAttached()
+                        && grid.getDataProvider() instanceof ListDataProvider) {
+                    dataProvider.getItems().stream().filter(
+                            book -> book.getId().equals(bookEvent.getId()))
+                            .findFirst().ifPresent(product -> dataProvider
+                                    .refreshItem(product));
                 }
-            } catch (UIDetachedException e) {
-                logger.info("UI closed, no need to refresh Grid.");
-            }
+            });
         }
     }
 

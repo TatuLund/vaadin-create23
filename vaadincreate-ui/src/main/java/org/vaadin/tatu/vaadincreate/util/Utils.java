@@ -8,6 +8,8 @@ import java.util.Locale;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 
@@ -20,6 +22,7 @@ import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.UIDetachedException;
 
 public class Utils {
 
@@ -146,4 +149,29 @@ public class Utils {
                 VaadinIcons.CIRCLE.getFontFamily(), color,
                 Integer.toHexString(VaadinIcons.CIRCLE.getCodepoint()));
     }
+
+    /**
+     * Executes a given command within the context of the specified UI. If the
+     * UI is not available, logs a warning message. If the UI is detached (e.g.,
+     * the browser window is closed), logs a warning message.
+     *
+     * @param ui
+     *            the UI instance within which the command should be executed
+     * @param command
+     *            the command to be executed
+     */
+    public static void access(UI ui, Runnable command) {
+        if (ui != null) {
+            try {
+                ui.access(command);
+            } catch (UIDetachedException e) {
+                logger.warn("Browser window was closed while pushing updates.");
+            }
+        } else {
+            logger.warn("No UI available for pushing updates.");
+        }
+    }
+
+    private static Logger logger = LoggerFactory.getLogger(Utils.class);
+
 }

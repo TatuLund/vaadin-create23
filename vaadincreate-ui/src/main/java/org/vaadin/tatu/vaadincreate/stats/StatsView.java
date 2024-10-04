@@ -10,6 +10,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.ChartType;
@@ -25,7 +26,6 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.UIDetachedException;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -123,24 +123,21 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
      */
     public void updateStatsAsync(Map<Availability, Long> availabilityStats,
             Map<String, Long[]> categoryStats, Map<String, Long> priceStats) {
-        try {
-            ui.access(() -> {
-                if (isAttached()) {
-                    updateAvailabilityChart(availabilityStats);
-                    updateCategoryChart(categoryStats);
-                    updatePriceChart(priceStats);
+        Utils.access(ui, () -> {
+            if (isAttached()) {
+                updateAvailabilityChart(availabilityStats);
+                updateCategoryChart(categoryStats);
+                updatePriceChart(priceStats);
 
-                    availabilityChart.drawChart();
-                    categoryChart.drawChart();
-                    priceChart.drawChart();
+                availabilityChart.drawChart();
+                categoryChart.drawChart();
+                priceChart.drawChart();
 
-                    dashboard.addStyleName("loaded");
-                    lang.setNoData("");
-                }
-            });
-        } catch (UIDetachedException e) {
-            logger.info("Browser was closed, statistics updates not pushed");
-        }
+                dashboard.addStyleName("loaded");
+                lang.setNoData("");
+                logger.debug("Stats updated");
+            }
+        });
     }
 
     // Update the charts with the new data

@@ -106,6 +106,9 @@ public class BookForm extends Composite implements HasI18N {
             if (isValid) {
                 setStockCountAndAvailabilityInvalid(false);
             }
+            if (!isValid) {
+                saveButton.setEnabled(false);                
+            }
         });
 
         binder.addValueChangeListener(event -> {

@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
-import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -39,6 +39,63 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+/**
+ * Represents a form for creating or editing a book. This form is used in the
+ * Vaadin Create application. It allows users to enter information about a book,
+ * such as its price, stock count, and category. The form includes validation
+ * for the entered data and provides buttons for saving, discarding, canceling,
+ * and deleting the book. The form is bound to a presenter, which handles the
+ * business logic for saving, editing, and deleting books.
+ *
+ * <p>
+ * The form fields are bound to the product object by naming convention. E.g.
+ * using the field name "productName" will bind to the Product's "productName"
+ * property.
+ * </p>
+ *
+ * <p>
+ * The form includes the following fields:
+ * <ul>
+ * <li>productName - TextField for the product name</li>
+ * <li>price - TextField for the product price</li>
+ * <li>stockCount - NumberField for the stock count</li>
+ * <li>availability - AvailabilitySelector for the product availability</li>
+ * <li>category - CheckBoxGroup for the product categories</li>
+ * </ul>
+ * </p>
+ *
+ * <p>
+ * The form includes the following buttons:
+ * <ul>
+ * <li>saveButton - Button for saving the product</li>
+ * <li>discardButton - Button for discarding changes</li>
+ * <li>cancelButton - Button for canceling the operation</li>
+ * <li>deleteButton - Button for deleting the product</li>
+ * </ul>
+ * </p>
+ *
+ * <p>
+ * The form uses a Binder for binding the fields to the Product object and
+ * includes validation for the fields. It also includes bean level validation
+ * for checking the availability vs. stock count.
+ * </p>
+ *
+ * <p>
+ * The form includes methods for handling save, delete, and other operations, as
+ * well as methods for showing/hiding the form, checking for changes, and
+ * updating dirty indicators.
+ * </p>
+ *
+ * <p>
+ * The form also includes methods for setting categories, editing a product,
+ * merging a draft product, and focusing on the product name field.
+ * </p>
+ *
+ * <p>
+ * The form is designed to be used with a presenter, which handles the business
+ * logic for saving, editing, and deleting products.
+ * </p>
+ */
 @SuppressWarnings({ "serial", "java:S2160" })
 public class BookForm extends Composite implements HasI18N {
 
@@ -70,13 +127,10 @@ public class BookForm extends Composite implements HasI18N {
     private boolean isValid;
 
     /**
-     * Represents a form for creating or editing a book. This form is used in
-     * the Vaadin Create application. It allows users to enter information about
-     * a book, such as its price, stock count, and category. The form includes
-     * validation for the entered data and provides buttons for saving,
-     * discarding, canceling, and deleting the book. The form is bound to a
-     * presenter, which handles the business logic for saving, editing, and
-     * deleting books.
+     * Creates a new BookForm with the given presenter.
+     *
+     * @param presenter
+     *            the presenter for the form.
      */
     public BookForm(BooksPresenter presenter) {
         this.presenter = presenter;
@@ -107,7 +161,7 @@ public class BookForm extends Composite implements HasI18N {
                 setStockCountAndAvailabilityInvalid(false);
             }
             if (!isValid) {
-                saveButton.setEnabled(false);                
+                saveButton.setEnabled(false);
             }
         });
 

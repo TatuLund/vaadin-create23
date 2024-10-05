@@ -104,6 +104,7 @@ public class StatsPresenter implements EventBusListener, Serializable {
     }
 
     public void cancelUpdateStats() {
+        getEventBus().unregisterEventBusListener(this);
         if (future != null) {
             boolean cancelled = future.cancel(true);
             future = null;

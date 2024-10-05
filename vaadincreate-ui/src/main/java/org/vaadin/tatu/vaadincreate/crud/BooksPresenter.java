@@ -40,10 +40,17 @@ public class BooksPresenter implements Serializable {
     private Product editing;
     private Product draft;
 
-    public BooksPresenter(BooksView simpleCrudView) {
-        view = simpleCrudView;
+    /**
+     * Creates a new instance of the presenter.
+     *
+     * @param booksView
+     *            the view
+     */
+    public BooksPresenter(BooksView booksView) {
+        view = booksView;
     }
 
+    // This method is used to load products asynchronously.
     private CompletableFuture<Collection<Product>> loadProductsAsync() {
         logger.info("Fetching products");
         var service = getService();
@@ -51,12 +58,27 @@ public class BooksPresenter implements Serializable {
                 getExecutor());
     }
 
+    /**
+     * Requests an update of the categories from the service and sets them in
+     * the view. Logs the action of fetching categories.
+     */
     public void requestUpdateCategories() {
         logger.info("Fetching categories");
         var categories = getService().getAllCategories();
         view.setCategories(categories);
     }
 
+    /**
+     * Validates the given set of categories against the available categories
+     * from the service. If any of the given categories are not present in the
+     * available categories, it updates the view to show that some categories
+     * have been deleted and resets the categories in the view.
+     *
+     * @param categories
+     *            the set of categories to validate
+     * @return true if all given categories are valid and present in the
+     *         available categories, false otherwise
+     */
     public boolean validateCategories(Set<Category> categories) {
         var allCategories = getService().getAllCategories();
         var valid = allCategories.containsAll(categories);
@@ -175,6 +197,11 @@ public class BooksPresenter implements Serializable {
         }
     }
 
+    // This method is used to lock and edit a product if it exists and is
+    // unlocked. If the product exists and is not locked, it will be locked and
+    // selected in the view. If the product does not exist, a notification will
+    // be shown in the view. If the product exists but is locked, a notification
+    // will be shown in the view.
     private void lockAndEditIfExistsAndIsUnlocked(String productId, int pid) {
         Product product = findProduct(pid);
         if (product != null) {
@@ -238,8 +265,10 @@ public class BooksPresenter implements Serializable {
         view.showSaveNotification(product.getProductName());
 
         if (newBook) {
+            // Add new product to the view
             view.updateGrid(product);
         } else {
+            // Update product in the view
             view.updateProduct(product);
             unlockBook();
         }
@@ -372,6 +401,11 @@ public class BooksPresenter implements Serializable {
         return VaadinCreateUI.get().getExecutor();
     }
 
+    /**
+     * Represents a change event for books. This class encapsulates the details
+     * of a change made to a book, including the product affected and the type
+     * of change.
+     */
     public static class BooksChanged {
         public enum BookChange {
             SAVE, DELETE
@@ -385,10 +419,20 @@ public class BooksPresenter implements Serializable {
             this.change = change;
         }
 
+        /**
+         * Retrieves the changed product.
+         *
+         * @return the changed {@link Product} instance.
+         */
         public Product getProduct() {
             return product;
         }
 
+        /**
+         * Retrieves the current change associated with the book.
+         *
+         * @return the current BookChange instance.
+         */
         public BookChange getChange() {
             return change;
         }

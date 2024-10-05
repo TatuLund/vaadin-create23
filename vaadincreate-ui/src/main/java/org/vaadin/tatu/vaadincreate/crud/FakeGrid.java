@@ -9,6 +9,29 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+/**
+ * The {@code FakeGrid} class represents a fake grid component. It is used to
+ * display a loading spinner while the actual grid data is being fetched.
+ *
+ * <p>
+ * Usage example:
+ *
+ * <pre>
+ * {@code
+ * FakeGrid fakeGrid = new FakeGrid();
+ * }
+ * </pre>
+ *
+ * <p>
+ * Layout properties:
+ * <ul>
+ * <li>Main layout is set to full height, with no margin or spacing.</li>
+ * <li>Spinner wrapper layout is set to full height, with no margin or spacing,
+ * and the spinner is centered.</li>
+ * <li>Fake header and spinner wrapper are added to the main layout, with the
+ * spinner wrapper expanding to fill available space.</li>
+ * </ul>
+ */
 @SuppressWarnings("serial")
 public class FakeGrid extends Composite {
 

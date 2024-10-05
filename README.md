@@ -1,10 +1,10 @@
 # Vaadin Create '23 demo app (Vaadin 8)
 
-This is show case application for advanced Vaadin 8 topics. The application focuses on UI design and architecture of the UI code. These techniques help to keep old Vaadin 8 applications upto date. The application is built with Vaadin 8.21.0, which is fully compatible with Java 11.
+This is show case application for advanced Vaadin 8 topics. The application focuses on UI design and architecture of the UI code. These techniques help to keep old Vaadin 8 applications upto date. The application is built with Vaadin 8.27, which is fully compatible with Java 11 and 17.
 
 ## Covered topics
 
-The demo app covers various use cases you may encounter in real life application.
+Despites being somewhat artificial this demo app covers various use cases you may encounter in real life application. Source of the demonstrated cases has been actual customer questions I have seen during my career as a software consultant.
 
 - Multi-module project setup (backend, components and ui)
 - AppLayout uses ValoMenu to create responsive application shell
@@ -18,6 +18,7 @@ The demo app covers various use cases you may encounter in real life application
 	- Responsive dashboard layout of Charts using Vaadin responsive CSS.
 	- Async loading and showing no data label during loading.
 	- Multi-axis Chart example.
+	- Automatically update the charts when someone saves or deletes book
 - BooksView
 	- Responsive Grid using BrowserResizeListener, 
 	- Responsive CSS in Grid column
@@ -29,18 +30,29 @@ The demo app covers various use cases you may encounter in real life application
 	- Bookmarkable editor
 	- Description generator showing details in compact mode
 	- Pessimistic locking preventing concurrent edits
+- BookForm
+	- Use shared presenter with BooksView as BookForm is sub-component of BooksView
+	- Demo of how to implement "dirty" state for the fields
+	- So previous value of the field when "dirty"
+	- Use change tracking in Binder, i.e. when user edits the value back to original Binder state is back hasChanges = false
+	- Demo of how to use bean level validation
+	- Custom field demo, NumberField
+	- Side panel design example, see SidePanel
+	- Auto save draft if the browser is closed while form is open
 - Simplified example of access control
 - AdminView
 	- Example of nested sub-navigation using url-parameters and TabSheet component,
 	- Category management view, use Grid as list editor
 	- User management view, use FormLayout light variant
 	- Optimistic locking used for handling concurrent edits
+	- Event based decoupling demo in UserForm
 - AboutView
 	- Demo how to correctly sanitize user input with Jsoup in order to avoid XSS,
 	- CustomLayout example
 - How to use logger in UI module
 - How to create and use application scoped EventBus
 	- Implementation shows how to avoid common caveats of memory leaks, see unit test for proof
+	- This EventBus is used in many ways in the application
 - The custom theme is using BEM (Block Element Modifier) naming scheme to avoid class name conflicts in CSS
 - Example of how to localize / provide translations for texts used in UI
 - Comprehensive set of unit, compomnent, integration and end to end tests
@@ -62,15 +74,15 @@ The demo app covers various use cases you may encounter in real life application
 
 Notes
 
-- Backend module has mock data service only with simulated latency
-- Dependency injection framework such as CDI or Spring is not being used, the demo has neutral stance on purpose
+- Backend module has in memory data service built with H2 database and Hibernate and has simulated latency on service layer.
+- Dependency injection framework such as CDI or Spring is not being used, the demo has neutral stance on purpose and demonstrates that especially small applications can be built without them.
 
 ## This project uses commercial Vaadin products
 
 This is intentional to demonstrate the current state of Vaadin 8 extended maintenance
 The following commercial products are used.
 
-- Vaadin 8.25.0, The latest free version 8.14.3
+- Vaadin 8.27.2, The latest free version 8.14.3
 - Vaadin Charts in stats dashboard view
 - TestBench and TestBench UI Unit Test add-on for testing 
 - AppSecKit for SBOM vulnerability analysis

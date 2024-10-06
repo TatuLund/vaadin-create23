@@ -82,7 +82,12 @@ Notes
 This is intentional to demonstrate the current state of Vaadin 8 extended maintenance
 The following commercial products are used.
 
-- Vaadin 8.27.2, The latest free version 8.14.3
+- Vaadin 8.27.2. The application uses some features it provides. (The latest free version 8.14.3)
+  - Eager UI cleanup
+  - Binder: change tracking
+  - Binder: draft saving
+  - Grid: read only state
+  - ValoMenu: improved API
 - Vaadin Charts in stats dashboard view
 - TestBench and TestBench UI Unit Test add-on for testing 
 - AppSecKit for SBOM vulnerability analysis

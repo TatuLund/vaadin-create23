@@ -110,7 +110,7 @@
         <dependency>
             <groupId>com.vaadin.testbench</groupId>
             <artifactId>vaadin-uiunittest</artifactId>
-            <version>5.0.0-beta3</version>
+            <version>5.0.0-beta4</version>
             <scope>test</scope>
         </dependency>
         <dependency>

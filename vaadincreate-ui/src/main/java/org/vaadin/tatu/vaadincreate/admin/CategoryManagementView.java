@@ -120,6 +120,7 @@ public class CategoryManagementView extends VerticalLayout
             deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
             deleteButton.setDescription(getTranslation(I18n.DELETE));
             deleteButton.setEnabled(category.getId() != null);
+            deleteButton.setDisableOnClick(true);
 
             binder = new BeanValidationBinder<>(Category.class);
             // Check for duplicate category names
@@ -152,6 +153,7 @@ public class CategoryManagementView extends VerticalLayout
             nameField.setPlaceholder(getTranslation(I18n.Category.INSTRUCTION));
             nameField
                     .addFocusListener(e -> newCategoryButton.setEnabled(false));
+            nameField.addBlurListener(e -> newCategoryButton.setEnabled(true));
         }
 
         private void handleSave() {
@@ -185,6 +187,7 @@ public class CategoryManagementView extends VerticalLayout
                 Notification.show(getTranslation(I18n.Category.CATEGORY_DELETED,
                         category.getName()));
             });
+            dialog.addCancelListener(e -> deleteButton.setEnabled(true));
         }
     }
 }

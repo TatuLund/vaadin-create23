@@ -76,6 +76,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
 
         form = (CategoryForm) test(grid).cell(0, gridSize - 1);
         test($(form, Button.class).first()).click();
+        assertTrue($(cats, Button.class).id("new-category").isEnabled());
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("confirm-button")).click();
         assertEquals("Category \"Technology\" removed.",
@@ -194,6 +195,18 @@ public class CategoryManagementViewTest extends AbstractUITest {
         // Assert that optimistic locking is thrown and caught
         assertEquals("Save conflict, try again.",
                 $(Notification.class).last().getCaption());
+        assertTrue($(cats, Button.class).id("new-category").isEnabled());
+    }
+
+    @Test
+    public void focusTextFieldDisablesNewButton() {
+        assertTrue($(cats, Button.class).id("new-category").isEnabled());
+        @SuppressWarnings("unchecked")
+        var grid = (Grid<Category>) $(cats, Grid.class).single();
+        var form = (CategoryForm) test(grid).cell(0, 0);
+        test($(form, TextField.class).first()).focus();
+        assertFalse($(cats, Button.class).id("new-category").isEnabled());
+        test($(form, Button.class).first()).focus();
         assertTrue($(cats, Button.class).id("new-category").isEnabled());
     }
 }

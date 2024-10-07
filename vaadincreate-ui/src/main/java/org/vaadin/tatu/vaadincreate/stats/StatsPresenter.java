@@ -56,8 +56,13 @@ public class StatsPresenter implements EventBusListener, Serializable {
 
             Map<String, Long[]> categoryStats = calculateCategoryStats(service,
                     products);
+            // filter out empty categories
+            categoryStats.entrySet()
+                    .removeIf(entry -> entry.getValue()[0] == 0);
 
             Map<String, Long> priceStats = calculatePriceStats(products);
+            // filter out empty price brackets
+            priceStats.entrySet().removeIf(entry -> entry.getValue() == 0);
 
             view.updateStatsAsync(availabilityStats, categoryStats, priceStats);
             future = null;

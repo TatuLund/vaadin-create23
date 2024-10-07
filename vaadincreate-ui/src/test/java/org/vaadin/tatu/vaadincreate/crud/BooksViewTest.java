@@ -479,6 +479,7 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
+    @SuppressWarnings("java:S1854")
     public void weakLockConcurrentEdit() {
         // Idea of this is to simulate Form being detached due browser
         // crash so
@@ -512,6 +513,7 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
+    @SuppressWarnings("java:S1854")
     public void weakLockConcurrentDelete() {
         // Idea of this is to simulate Form being detached due browser
         // crash so

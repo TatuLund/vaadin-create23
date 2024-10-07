@@ -184,6 +184,7 @@ public class CategoryManagementView extends VerticalLayout
             dialog.addConfirmedListener(e -> {
                 presenter.removeCategory(category);
                 list.removeItem(category);
+                categories.remove(category);
                 Notification.show(getTranslation(I18n.Category.CATEGORY_DELETED,
                         category.getName()));
             });

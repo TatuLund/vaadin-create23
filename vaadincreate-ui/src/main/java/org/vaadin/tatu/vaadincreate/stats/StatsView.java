@@ -153,6 +153,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         var conf = categoryChart.getConfiguration();
 
         // Show count of titles on primary axis
+        conf.removexAxes();
         var titles = categorySeries(categoryStats, 0);
         titles.setName(getTranslation(I18n.Stats.COUNT));
         conf.setSeries(titles);

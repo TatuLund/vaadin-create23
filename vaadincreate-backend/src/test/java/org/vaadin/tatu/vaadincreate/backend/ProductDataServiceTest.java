@@ -10,7 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
@@ -26,22 +28,22 @@ public class ProductDataServiceTest {
     private ProductDataService service;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         service = ProductDataServiceImpl.getInstance();
     }
 
     @Test
-    public void canFetchProducts() throws Exception {
+    public void canFetchProducts() {
         assertFalse(service.getAllProducts().isEmpty());
     }
 
     @Test
-    public void canFetchCategories() throws Exception {
+    public void canFetchCategories() {
         assertFalse(service.getAllCategories().isEmpty());
     }
 
     @Test
-    public void updateTheProduct() throws Exception {
+    public void updateTheProduct() {
         var oldSize = service.getAllProducts().size();
         var p = service.getAllProducts().iterator().next();
         var version = p.getVersion();
@@ -54,7 +56,7 @@ public class ProductDataServiceTest {
     }
 
     @Test
-    public void addNewProduct() throws Exception {
+    public void addNewProduct() {
         var oldSize = service.getAllProducts().size();
         Product p = new Product();
         p.setProductName("A new book");
@@ -66,11 +68,11 @@ public class ProductDataServiceTest {
         assertEquals(oldSize + 1, service.getAllProducts().size());
 
         var foundProduct = service.getProductById(newProduct.getId());
-        assertTrue(foundProduct.equals(newProduct));
+        assertEquals(foundProduct, newProduct);
     }
 
     @Test
-    public void removeProduct() throws Exception {
+    public void removeProduct() {
         var oldSize = service.getAllProducts().size();
         var p = service.getAllProducts().iterator().next();
         var pid = p.getId();
@@ -95,23 +97,25 @@ public class ProductDataServiceTest {
         service.deleteProduct(1000);
     }
 
-    @Test(expected = OptimisticLockException.class)
+    @Test
     public void optimisticLocking() {
         var id = service.getAllProducts().stream().findFirst().get().getId();
         var product = service.getProductById(id);
         var copy = new Product(product);
         service.updateProduct(product);
-        service.updateProduct(copy);
+        assertThrows(OptimisticLockException.class,
+                () -> service.updateProduct(copy));
     }
 
-    @Test(expected = OptimisticLockException.class)
+    @Test
     public void optimisticLockingCategory() {
         var category = service.getAllCategories().stream().skip(2).findFirst()
                 .get();
         var copy = new Category(category);
         var updated = service.updateCategory(category);
         assertNotEquals(updated.getVersion(), copy.getVersion());
-        service.updateCategory(copy);
+        assertThrows(OptimisticLockException.class,
+                () -> service.updateCategory(copy));
     }
 
     @Test
@@ -127,7 +131,7 @@ public class ProductDataServiceTest {
         newCategory.setName("Athletics");
         var updatedCategory = service.updateCategory(newCategory);
         assertEquals(Integer.valueOf(1), updatedCategory.getVersion());
-        assertTrue(updatedCategory.equals(newCategory));
+        assertEquals(updatedCategory, newCategory);
         assertTrue(service.getAllCategories().contains(updatedCategory));
         assertEquals("Athletics", updatedCategory.getName());
 
@@ -168,8 +172,7 @@ public class ProductDataServiceTest {
         var product = new Product();
         service.saveDraft(userName, product);
         draft = service.findDraft(userName);
-        // assertTrue(product.equals(draft));
-        assertFalse(product == draft);
+        assertNotSame(product, draft);
         service.saveDraft(userName, null);
         draft = service.findDraft(userName);
         assertNull(draft);

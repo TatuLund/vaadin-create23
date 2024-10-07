@@ -18,6 +18,8 @@ import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 
 @SuppressWarnings("java:S6548")
 public class ProductDataServiceImpl implements ProductDataService {
+    private static final String ID_CANT_BE_NULL = "id can't be null";
+
     // Service class for managing products
     // This class is a singleton
     private static ProductDataServiceImpl instance;
@@ -44,20 +46,21 @@ public class ProductDataServiceImpl implements ProductDataService {
 
     @Override
     public synchronized Product updateProduct(Product product) {
-        Objects.requireNonNull(product);
+        Objects.requireNonNull(product, "product can't be null");
         randomWait(1);
         return productDao.updateProduct(product);
     }
 
     @Override
     public synchronized void deleteProduct(Integer id) {
-        Objects.requireNonNull(id);
+        Objects.requireNonNull(id, ID_CANT_BE_NULL);
         randomWait(1);
         productDao.deleteProduct(id);
     }
 
     @Override
     public synchronized Product getProductById(Integer id) {
+        Objects.requireNonNull(id, ID_CANT_BE_NULL);
         randomWait(1);
         return productDao.getProduct(id);
     }
@@ -76,7 +79,7 @@ public class ProductDataServiceImpl implements ProductDataService {
 
     @Override
     public synchronized void deleteCategory(Integer id) {
-        Objects.requireNonNull(id);
+        Objects.requireNonNull(id, ID_CANT_BE_NULL);
         var category = productDao.getCategory(id);
         if (category == null) {
             throw new IllegalArgumentException("Category not found");
@@ -87,21 +90,21 @@ public class ProductDataServiceImpl implements ProductDataService {
 
     @Override
     public synchronized Set<Category> findCategoriesByIds(Set<Integer> ids) {
-        Objects.requireNonNull(ids);
+        Objects.requireNonNull(ids, "ids can't be null");
         randomWait(1);
         return productDao.getCategoriesByIds(ids);
     }
 
     @Override
     public synchronized Category updateCategory(Category category) {
-        Objects.requireNonNull(category);
+        Objects.requireNonNull(category, "category can't be null");
         randomWait(1);
         return productDao.updateCategory(category);
     }
 
     @Override
     public void saveDraft(String userName, Product draft) {
-        Objects.requireNonNull(userName);
+        Objects.requireNonNull(userName, "userName can't be null");
         logger.info("Saving draft for user '{}'", userName);
         synchronized (drafts) {
             if (draft == null) {

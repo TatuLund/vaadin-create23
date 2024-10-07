@@ -193,18 +193,26 @@ public class ProductDao {
     public void deleteCategory(Integer id) {
         HibernateUtil.inTransaction(session -> {
             var category = session.get(Category.class, id);
+            if (category == null) {
+                logger.warn("Category with ID ({}) not found", id);
+                return;
+            }
             var list = session.createQuery(
                     "select p from Product p join p.category c where c.id = :id",
                     Product.class).setParameter("id", category.getId()).list();
-            list.forEach(p -> {
-                if (p.getCategory().contains(category)) {
-                    var cats = p.getCategory();
-                    cats.remove(category);
-                    p.setCategory(cats);
-                    session.update(p);
+            list.forEach(product -> {
+                if (product.getCategory().contains(category)) {
+                    var categories = product.getCategory();
+                    categories.remove(category);
+                    product.setCategory(categories);
+                    session.update(product);
+                    logger.info("Updated Product: ({}) '{}'", product.getId(),
+                            product.getProductName());
                 }
             });
             session.delete(category);
+            logger.info("Deleted Category: ({}) '{}'", category.getId(),
+                    category.getName());
         });
     }
 

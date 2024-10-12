@@ -14,6 +14,7 @@ import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
+import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.crud.BooksPresenter;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
@@ -33,6 +34,7 @@ public class StatsViewTest extends AbstractUITest {
     private Map<String, Number> stockTitles;
     private Map<String, Number> stockCounts;
     private CssLayout dashboard;
+    private Category category;
 
     @Before
     public void setup() throws ServiceException {
@@ -45,6 +47,10 @@ public class StatsViewTest extends AbstractUITest {
         dashboard = $(CssLayout.class).styleName(VaadinCreateTheme.DASHBOARD)
                 .first();
         waitForCharts(dashboard);
+
+        category = new Category();
+        category.setName("Empty");
+        category = ui.getProductService().updateCategory(category);
     }
 
     @Test
@@ -66,7 +72,7 @@ public class StatsViewTest extends AbstractUITest {
         waitForCharts(dashboard);
 
         // Update reference stats to reflect new product
-        prices.put("30 - 40 €", 1);
+        prices.put("40 - 50 €", 1);
         availabilities.put("AVAILABLE", 29);
         book.getCategory().forEach(cat -> {
             stockTitles.put(cat.getName(),
@@ -133,12 +139,14 @@ public class StatsViewTest extends AbstractUITest {
                 .findCategoriesByIds(Set.of(1, 2));
         book.setCategory(categories);
         book.setStockCount(100);
-        book.setPrice(BigDecimal.valueOf(35));
+        book.setPrice(BigDecimal.valueOf(45));
         return book;
     }
 
     private static void assertSeries(Map<String, Number> values,
             DataSeries series) {
+        // Asserting size to verify that items with zero count are not included
+        assertEquals(values.values().size(), series.size());
         series.getData().forEach(item -> {
             var name = item.getName();
             var y = item.getY();
@@ -190,6 +198,7 @@ public class StatsViewTest extends AbstractUITest {
 
     @After
     public void cleanUp() {
+        ui.getProductService().deleteCategory(category.getId());
         logout();
         tearDown();
     }

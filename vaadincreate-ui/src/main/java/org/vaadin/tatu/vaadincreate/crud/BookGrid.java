@@ -205,6 +205,13 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         } else {
             getColumns().forEach(c -> c.setHidden(false));
         }
+
+        if (width > 650 && width < 800) {
+            getColumn(AVAILABILITY_ID).setDescriptionGenerator(
+                    book -> book.getAvailability().toString());
+        } else {
+            getColumn(AVAILABILITY_ID).setDescriptionGenerator(null);
+        }
     }
 
     private String createTooltip(Product book) {

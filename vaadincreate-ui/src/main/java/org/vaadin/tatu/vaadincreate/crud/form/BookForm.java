@@ -247,9 +247,6 @@ public class BookForm extends Composite implements HasI18N {
      */
     public void showForm(boolean visible) {
         accessControl.assertAdmin();
-        if (this.visible == visible) {
-            return;
-        }
         this.visible = visible;
         if (visible) {
             clearDirtyIndicators();
@@ -388,9 +385,12 @@ public class BookForm extends Composite implements HasI18N {
 
         // Scroll to the top
         // As this is not a Panel, using JavaScript
-        var scrollScript = String.format(
-                "window.document.getElementById('%s').scrollTop = 0;", getId());
-        Page.getCurrent().getJavaScript().execute(scrollScript);
+        if (isAttached()) {
+            var scrollScript = String.format(
+                    "window.document.getElementById('%s').scrollTop = 0;",
+                    getId());
+            Page.getCurrent().getJavaScript().execute(scrollScript);
+        }
     }
 
     @Override

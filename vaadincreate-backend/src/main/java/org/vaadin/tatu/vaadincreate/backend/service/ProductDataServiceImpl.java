@@ -99,6 +99,11 @@ public class ProductDataServiceImpl implements ProductDataService {
     public synchronized Category updateCategory(Category category) {
         Objects.requireNonNull(category, "category can't be null");
         randomWait(1);
+        if (category.getId() == null
+                && productDao.getCategoryByName(category.getName()) != null) {
+            throw new IllegalArgumentException(
+                    "Category with the same name already exists");
+        }
         return productDao.updateCategory(category);
     }
 

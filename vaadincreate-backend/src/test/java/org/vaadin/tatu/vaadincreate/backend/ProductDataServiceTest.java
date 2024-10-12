@@ -164,6 +164,17 @@ public class ProductDataServiceTest {
         assertTrue(foundBook.getCategory().isEmpty());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void saveDuplicateCategoryThrows() {
+        var category = new Category();
+        category.setName("Duplicate");
+        service.updateCategory(category);
+
+        category = new Category();
+        category.setName("Duplicate");
+        service.updateCategory(category);
+    }
+
     @Test
     public void drafts() {
         var userName = "user";

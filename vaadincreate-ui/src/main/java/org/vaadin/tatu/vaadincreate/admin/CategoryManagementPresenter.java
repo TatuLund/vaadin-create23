@@ -38,7 +38,12 @@ public class CategoryManagementPresenter implements Serializable {
      */
     public void removeCategory(Category category) {
         accessControl.assertAdmin();
-        getService().deleteCategory(category.getId());
+        try {
+            getService().deleteCategory(category.getId());
+            view.showDeleted(category.getName());
+        } catch (IllegalArgumentException e) {
+            view.showDeleteError();
+        }
         logger.info("Category '{}' removed.", category.getName());
     }
 

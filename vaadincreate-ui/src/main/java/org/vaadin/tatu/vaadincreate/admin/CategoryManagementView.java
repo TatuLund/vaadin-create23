@@ -97,6 +97,15 @@ public class CategoryManagementView extends VerticalLayout
         newCategoryButton.setEnabled(true);
     }
 
+    public void showDeleteError() {
+        Notification.show(getTranslation(I18n.Category.DELETE_ERROR),
+                Notification.Type.WARNING_MESSAGE);
+    }
+
+    public void showDeleted(String name) {
+        Notification.show(getTranslation(I18n.Category.CATEGORY_DELETED, name));
+    }
+
     /**
      * A form for editing a category.
      */
@@ -185,8 +194,6 @@ public class CategoryManagementView extends VerticalLayout
                 presenter.removeCategory(category);
                 list.removeItem(category);
                 categories.remove(category);
-                Notification.show(getTranslation(I18n.Category.CATEGORY_DELETED,
-                        category.getName()));
             });
             dialog.addCancelListener(e -> deleteButton.setEnabled(true));
         }

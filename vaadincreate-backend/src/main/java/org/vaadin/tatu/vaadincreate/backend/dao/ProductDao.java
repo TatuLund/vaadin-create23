@@ -216,6 +216,24 @@ public class ProductDao {
         });
     }
 
+    /**
+     * Fetches a Category entity from the database by its name.
+     *
+     * @param name
+     *            the name of the Category to fetch
+     * @return the Category entity with the specified name, or null if no such
+     *         entity exists
+     */
+    public Category getCategoryByName(String name) {
+        logger.info("Fetching Category by name: '{}'", name);
+        return HibernateUtil.inSession(session -> {
+            return session
+                    .createQuery("from Category where name = :name",
+                            Category.class)
+                    .setParameter("name", name).uniqueResult();
+        });
+    }
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 }

@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.admin;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
@@ -208,5 +209,57 @@ public class CategoryManagementViewTest extends AbstractUITest {
         assertFalse($(cats, Button.class).id("new-category").isEnabled());
         test($(form, Button.class).first()).focus();
         assertTrue($(cats, Button.class).id("new-category").isEnabled());
+    }
+
+    @Test
+    public void concurrentDuplicateCategory() {
+        test($(cats, Button.class).id("new-category")).click();
+
+        // Simulate other user saving category while this view is open
+        var category = new Category();
+        category.setName("Duplicate");
+        category = ui.getProductService().updateCategory(category);
+
+        // Attempt adding category with the same name as the other user saved
+        @SuppressWarnings("unchecked")
+        var grid = (Grid<Category>) $(cats, Grid.class).single();
+        var gridSize = test(grid).size();
+        var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
+        test($(form, TextField.class).first()).setValue("Duplicate");
+
+        // Assert that save failed and error shown
+        assertEquals("Save conflict, try again.",
+                $(Notification.class).last().getCaption());
+
+        // Clean-up
+        ui.getProductService().deleteCategory(category.getId());
+    }
+
+    @Test
+    public void concurrentDelete() {
+        // Save a new category "Deleted"
+        test($(cats, Button.class).id("new-category")).click();
+        @SuppressWarnings("unchecked")
+        var grid = (Grid<Category>) $(cats, Grid.class).single();
+        var gridSize = test(grid).size();
+        var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
+        test($(form, TextField.class).first()).setValue("Deleted");
+        assertEquals("Category \"Deleted\" saved.",
+                $(Notification.class).last().getCaption());
+        var category = test(grid).item(gridSize - 1);
+        assertEquals("Deleted", category.getName());
+
+        // Simulate other user deleting the category concurrently
+        ui.getProductService().deleteCategory(category.getId());
+
+        // Attempt to delete the category
+        form = (CategoryForm) test(grid).cell(0, gridSize - 1);
+        test($(form, Button.class).first()).click();
+        var dialog = $(Window.class).id("confirm-dialog");
+        test($(dialog, Button.class).id("confirm-button")).click();
+
+        // Assert that delete failed and error shown
+        assertEquals("Category was already deleted.",
+                $(Notification.class).last().getCaption());
     }
 }

@@ -236,7 +236,7 @@ public class BooksView extends CssLayout
         Utils.access(ui, () -> {
             if (accessControl.isUserInRole(Role.ADMIN)) {
                 form.setVisible(true);
-                if (params.isEmpty()) {
+                if (params == null || params.isEmpty()) {
                     form.showForm(false);
                 }
                 newProduct.setEnabled(true);

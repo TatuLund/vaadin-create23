@@ -40,11 +40,7 @@ public final class CurrentUser {
         }
         var currentUser = (User) session
                 .getAttribute(CURRENT_USER_SESSION_ATTRIBUTE_KEY);
-        if (currentUser == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(currentUser);
-        }
+        return Optional.ofNullable(currentUser);
     }
 
     /**

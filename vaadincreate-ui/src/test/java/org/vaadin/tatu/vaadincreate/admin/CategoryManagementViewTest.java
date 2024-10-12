@@ -2,7 +2,6 @@ package org.vaadin.tatu.vaadincreate.admin;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
@@ -46,7 +45,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void createAndDeleteCategory() throws ServiceException {
+    public void createAndDeleteCategory() {
         test($(cats, Button.class).id("new-category")).click();
         assertFalse($(cats, Button.class).id("new-category").isEnabled());
 
@@ -87,7 +86,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void optimisticLocking() throws ServiceException {
+    public void optimisticLocking() {
         test($(cats, Button.class).id("new-category")).click();
         assertFalse($(cats, Button.class).id("new-category").isEnabled());
 

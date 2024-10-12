@@ -236,7 +236,9 @@ public class BooksView extends CssLayout
         Utils.access(ui, () -> {
             if (accessControl.isUserInRole(Role.ADMIN)) {
                 form.setVisible(true);
-                form.showForm(false);
+                if (params.isEmpty()) {
+                    form.showForm(false);
+                }
                 newProduct.setEnabled(true);
             }
             logger.info("Updating products");
@@ -267,6 +269,7 @@ public class BooksView extends CssLayout
      *            the invalid product ID
      */
     public void showNotValidId(String productId) {
+        form.showForm(false);
         showError(getTranslation(I18n.Books.NOT_VALID_PID, productId));
     }
 

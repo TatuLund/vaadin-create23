@@ -143,7 +143,7 @@ public class AppLayout extends Composite implements HasI18N {
         // ConfirmDialog is shown.
         nav.runAfterLeaveConfirmation(() -> {
             logger.info("User '{}' logout", CurrentUser.get().get().getName());
-            ui.getSession().getSession().invalidate();
+            ui.getSession().close();
             ui.getPage().reload();
         });
     }

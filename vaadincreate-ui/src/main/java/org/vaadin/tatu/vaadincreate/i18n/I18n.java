@@ -30,6 +30,7 @@ public final class I18n {
     public static final String YES = "yes";
     public static final String DISCARD = "discard";
     public static final String DRAFT_FOUND = "draft-found";
+    public static final String EXCEPTION = "exception";
 
     public static final class Books {
         public static final String UPDATED = "updated";

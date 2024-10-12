@@ -33,10 +33,12 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.server.CustomizedSystemMessages;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.server.WrappedSession;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -84,6 +86,11 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         Utils.sessionFixation();
         getPage().reload();
         showAppLayout();
+    }
+
+    public void showInternalError(String message) {
+        Notification.show(getTranslation(I18n.EXCEPTION, message),
+                Type.ERROR_MESSAGE);
     }
 
     private String getInitialTarget() {
@@ -238,10 +245,45 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
         @Override
         protected void servletInitialized() {
+            // Disable session expired notification and redirect to login view
+            getService().setSystemMessagesProvider(systemMessagesInfo -> {
+                CustomizedSystemMessages messages = new CustomizedSystemMessages();
+                messages.setSessionExpiredNotificationEnabled(false);
+                messages.setSessionExpiredURL(null);
+                return messages;
+            });
+
+            // Add session init and destroy listeners
             getService().addSessionInitListener(event -> {
-                VaadinSession s = event.getSession();
-                s.getSession().setMaxInactiveInterval(300);
-                s.addRequestHandler(this::handleRequest);
+                logger.info("Session started");
+                VaadinSession session = event.getSession();
+                session.getSession().setMaxInactiveInterval(300);
+                session.addRequestHandler(this::handleRequest);
+                session.setAttribute(WrappedSession.class,
+                        session.getSession());
+                // Set error handler for the session to catch all exceptions
+                // happening in the session and show them to the user in the UI
+                session.setErrorHandler(errorHandler -> {
+                    var message = errorHandler.getThrowable()
+                            .getLocalizedMessage();
+                    session.getUIs()
+                            .forEach(ui -> ui.access(() -> ((VaadinCreateUI) ui)
+                                    .showInternalError(message)));
+                    logger.error("Exception happened",
+                            errorHandler.getThrowable());
+                });
+            });
+            getService().addSessionDestroyListener(event -> {
+                // The servlet container typically does not immediately
+                // invalidate timed out sessions, so we need to do ourselves if
+                // we want an eager cleanup.
+                var wrappedSession = event.getSession()
+                        .getAttribute(WrappedSession.class);
+                if (wrappedSession != null) {
+                    logger.info("Invalidating session");
+                    wrappedSession.invalidate();
+                }
+                logger.info("Session eneded");
             });
         }
 

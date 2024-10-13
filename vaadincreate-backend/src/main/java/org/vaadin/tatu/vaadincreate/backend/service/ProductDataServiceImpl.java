@@ -37,7 +37,7 @@ public class ProductDataServiceImpl implements ProductDataService {
         logger.info("Generated mock product data");
     }
 
-    public static ProductDataService getInstance() {
+    public static synchronized ProductDataService getInstance() {
         if (instance == null) {
             instance = new ProductDataServiceImpl();
         }

@@ -7,16 +7,20 @@ import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 
+import org.eclipse.jetty.io.EofException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.vaadin.tatu.vaadincreate.admin.AdminView;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.BasicAccessControl;
+import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.AppDataService;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
@@ -228,6 +232,16 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     public ExecutorService getExecutor() {
         if (executor == null) {
             executor = Executors.newSingleThreadExecutor();
+            executor.execute(() -> {
+                // Add user id to MDC for logging
+                var user = (User) getSession().getSession().getAttribute(
+                        CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY);
+                if (user != null) {
+                    var userId = String.format("[%s/%s]",
+                            user.getRole().toString(), user.getName());
+                    MDC.put("userId", userId);
+                }
+            });
         }
         return executor;
     }
@@ -261,16 +275,20 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 session.addRequestHandler(this::handleRequest);
                 session.setAttribute(WrappedSession.class,
                         session.getSession());
-                // Set error handler for the session to catch all exceptions
+                // Set error handler for the session to login all exceptions
                 // happening in the session and show them to the user in the UI
                 session.setErrorHandler(errorHandler -> {
-                    var message = errorHandler.getThrowable()
-                            .getLocalizedMessage();
-                    session.getUIs()
-                            .forEach(ui -> ui.access(() -> ((VaadinCreateUI) ui)
-                                    .showInternalError(message)));
-                    logger.error("Exception happened",
-                            errorHandler.getThrowable());
+                    var throwable = errorHandler.getThrowable();
+                    // It is Jetty vs. Firefox issue, hence not showing to user
+                    // https://github.com/jetty/jetty.project/issues/9763
+                    if (!(throwable instanceof EofException)) {
+                        var message = throwable.getLocalizedMessage();
+                        session.getUIs().forEach(
+                                ui -> ui.access(() -> ((VaadinCreateUI) ui)
+                                        .showInternalError(message)));
+                        logger.error("Exception happened",
+                                errorHandler.getThrowable());
+                    }
                 });
             });
             getService().addSessionDestroyListener(event -> {

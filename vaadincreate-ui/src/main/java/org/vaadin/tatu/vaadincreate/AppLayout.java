@@ -100,7 +100,8 @@ public class AppLayout extends Composite implements HasI18N {
         var item = logout.addItem(getTranslation(I18n.App.LOGOUT),
                 e -> handleConfirmLogoutWhenChanges(ui, nav));
         item.setIcon(VaadinIcons.KEY);
-        item.setDescription(getTranslation(I18n.App.LOGOUT));
+        item.setDescription(
+                getTranslation(I18n.App.LOGOUT_TOOLTIP, getUserName()));
         logout.addStyleName(ValoTheme.MENU_USER);
         menuLayout.addComponent(logout);
 
@@ -122,8 +123,8 @@ public class AppLayout extends Composite implements HasI18N {
             public void afterViewChange(ViewChangeEvent event) {
                 clearSelected();
                 setSelected(event.getViewName());
-                logger.info("User '{}' navigated to view '{}'",
-                        CurrentUser.get().get().getName(), event.getViewName());
+                logger.info("User '{}' navigated to view '{}'", getUserName(),
+                        event.getViewName());
                 menuLayout.removeStyleName(ValoTheme.MENU_VISIBLE);
             }
 
@@ -142,7 +143,7 @@ public class AppLayout extends Composite implements HasI18N {
         // on beforeLeave of the current view. E.g. if BooksView has changes
         // ConfirmDialog is shown.
         nav.runAfterLeaveConfirmation(() -> {
-            logger.info("User '{}' logout", CurrentUser.get().get().getName());
+            logger.info("User '{}' logout", getUserName());
             ui.getSession().close();
             ui.getPage().reload();
         });
@@ -166,8 +167,8 @@ public class AppLayout extends Composite implements HasI18N {
             }
             return canAccess;
         }
-        logger.warn("User '{}' has no permission to view '{}'",
-                CurrentUser.get().get().getName(), view.getName());
+        logger.warn("User '{}' has no permission to view '{}'", getUserName(),
+                view.getName());
         return false;
     }
 
@@ -220,6 +221,11 @@ public class AppLayout extends Composite implements HasI18N {
                 menuItem.addStyleName(ValoTheme.MENU_SELECTED);
             }
         }
+    }
+
+    private static String getUserName() {
+        return CurrentUser.get().isPresent() ? CurrentUser.get().get().getName()
+                : "";
     }
 
     private static Logger logger = LoggerFactory.getLogger(AppLayout.class);

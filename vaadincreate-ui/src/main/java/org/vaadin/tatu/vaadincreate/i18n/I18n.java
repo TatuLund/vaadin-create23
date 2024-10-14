@@ -72,6 +72,7 @@ public final class I18n {
     public static final class App {
         public static final String LOGOUT = "logout";
         public static final String MENU = "menu";
+        public static final String LOGOUT_TOOLTIP = "logout-tooltip";
 
         private App() {
             // private constructor to hide the implicit public one

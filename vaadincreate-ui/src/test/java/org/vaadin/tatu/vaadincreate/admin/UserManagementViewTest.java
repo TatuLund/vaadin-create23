@@ -125,7 +125,7 @@ public class UserManagementViewTest extends AbstractUITest {
         assertEquals("Save conflict, try again.",
                 $(Notification.class).last().getCaption());
         assertInitialState();
-     }
+    }
 
     @SuppressWarnings("unchecked")
     @Test
@@ -149,8 +149,8 @@ public class UserManagementViewTest extends AbstractUITest {
         assertInitialState();
     }
 
-    @SuppressWarnings("unchecked")
     @Test
+    @SuppressWarnings("unchecked")
     public void cancelForm() {
         test($(ComboBox.class).id("user-select")).setInput("User1");
         assertTrue($(FormLayout.class).single().isEnabled());
@@ -159,6 +159,25 @@ public class UserManagementViewTest extends AbstractUITest {
         assertTrue($(Button.class).id("cancel-button").isEnabled());
 
         test($(Button.class).id("cancel-button")).click();
+
+        assertInitialState();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void duplicateName() {
+        $(Button.class).id("new-button").click();
+
+        test($(TextField.class).id("user-field")).setValue("Super");
+        test($(PasswordField.class).id("password-field")).setValue("tester");
+        test($(PasswordField.class).id("password-repeat")).setValue("tester");
+        test($(ComboBox.class).id("role-field")).clickItem(Role.USER);
+
+        test($(Button.class).id("save-button")).click();
+
+        assertEquals("Username \"Super\" is a duplicate.",
+                $(Notification.class).last().getCaption());
+        $(Notification.class).last().close();
 
         assertInitialState();
     }

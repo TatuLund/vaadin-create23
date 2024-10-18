@@ -223,13 +223,25 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     @Override
     public void detach() {
         super.detach();
+        // Unregister this UI instance from the event bus when it is detached
         getEventBus().unregisterEventBusListener(this);
     }
 
+    /**
+     * Retrieves the singleton instance of the EventBus.
+     * 
+     * @return the EventBus instance
+     */
     private EventBus getEventBus() {
         return EventBus.get();
     }
 
+    /**
+     * Retrieves the ExecutorService instance, initializing it if necessary. The
+     * executor is used to run background tasks.
+     * 
+     * @return the ExecutorService instance
+     */
     public ExecutorService getExecutor() {
         if (executor == null) {
             executor = Executors.newSingleThreadExecutor();

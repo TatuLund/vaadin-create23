@@ -7,7 +7,6 @@ import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 
-import org.eclipse.jetty.io.EofException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -78,7 +77,6 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             target = getInitialTarget();
             showAppLayout();
         }
-        getEventBus().registerEventBusListener(this);
     }
 
     private void showLoginView() {
@@ -110,6 +108,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     protected void showAppLayout() {
         var appLayout = new AppLayout(this, getAccessControl());
         setContent(appLayout);
+        getEventBus().registerEventBusListener(this);
 
         // Use String constants for view names, allows easy refactoring if so
         // needed
@@ -294,7 +293,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                     var throwable = errorHandler.getThrowable();
                     // It is Jetty vs. Firefox issue, hence not showing to user
                     // https://github.com/jetty/jetty.project/issues/9763
-                    if (!(throwable instanceof EofException)) {
+                    if (!(throwable.toString()
+                            .contains("org.eclipse.jetty.io.EofException"))) {
                         var message = throwable.getLocalizedMessage();
                         session.getUIs().forEach(
                                 ui -> ui.access(() -> ((VaadinCreateUI) ui)

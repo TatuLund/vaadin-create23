@@ -601,6 +601,32 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
+    public void editProductSaveChanges() {
+        test(grid).click(1, 0);
+
+        var name = $(form, TextField.class).id("product-name").getValue();
+        test($(form, TextField.class).id("product-name"))
+                .setValue("Different book");
+
+        test($(form, Button.class).id("save-button")).click();
+
+        assertEquals("\"Different book\" updated",
+                $(Notification.class).last().getCaption());
+
+        assertFalse(form.isShown());
+        assertTrue(test(grid).styleName(0)
+                .contains(VaadinCreateTheme.BOOKVIEW_GRID_EDITED));
+
+        assertEquals("Different book", test(grid).cell(1, 0));
+
+        test(grid).click(1, 0);
+        test($(form, TextField.class).id("product-name")).setValue(name);
+
+        test($(form, Button.class).id("save-button")).click();
+        assertEquals(name, test(grid).cell(1, 0));
+    }
+
+    @Test
     public void editProductRevertEdit() {
         test(grid).click(1, 0);
 
@@ -772,6 +798,45 @@ public class BooksViewTest extends AbstractUITest {
         assertFalse(form.isShown());
 
         ui.getProductService().deleteProduct(id);
+    }
+
+    @Test
+    public void saveEventRefreshes() {
+        // Create presenter simulating other user
+        var presenter = createBooksPresenter();
+
+        var book = test(grid).item(0);
+
+        // Open second item
+        test(grid).click(1, 1);
+        assertTrue(form.isShown());
+
+        var name = book.getProductName();
+        book.setProductName("Book to be refreshed");
+
+        // Save item in the other presenter, that fires event catched by this
+        // view
+        var saved = presenter.saveProduct(book);
+
+        // Assert that item was properly refreshed in the event and form is not
+        // closed
+        assertEquals("Book to be refreshed", test(grid).cell(1, 0));
+        assertTrue(form.isShown());
+
+        // Cleanup
+        saved.setProductName(name);
+        ui.getProductService().updateProduct(saved);
+    }
+
+    private BooksPresenter createBooksPresenter() {
+        var bookView = new BooksView();
+        // It is not possible to have multiple parallel UIs in this thread
+        view.addComponent(bookView);
+        var presenter = new BooksPresenter(bookView);
+        presenter.requestUpdateProducts();
+        var fake = $(bookView, FakeGrid.class).first();
+        waitWhile(fake, f -> f.isVisible(), 10);
+        return presenter;
     }
 
     @Test

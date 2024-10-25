@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService {
 
     @SuppressWarnings("java:S2142")
     private void randomWait(int count) {
-        int wait = 20 + random.nextInt(30);
+        int wait = 10 + random.nextInt(20);
         try {
             Thread.sleep(wait * (long) count);
         } catch (InterruptedException e) {

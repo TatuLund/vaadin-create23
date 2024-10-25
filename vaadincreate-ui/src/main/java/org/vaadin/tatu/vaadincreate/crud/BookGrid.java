@@ -279,6 +279,15 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         editedProduct = product;
     }
 
+    /**
+     * Returns the id of the last edited product.
+     *
+     * @return int value.
+     */
+    public int getEdited() {
+        return edited;
+    }
+
     private LockedObjects getLockedBooks() {
         return LockedObjects.get();
     }

@@ -131,7 +131,7 @@ public class ProductDataServiceImpl implements ProductDataService {
 
     @SuppressWarnings("java:S2142")
     private void randomWait(int count) {
-        int wait = 50 + random.nextInt(100);
+        int wait = 20 + random.nextInt(40);
         try {
             Thread.sleep(wait * (long) count);
         } catch (InterruptedException e) {

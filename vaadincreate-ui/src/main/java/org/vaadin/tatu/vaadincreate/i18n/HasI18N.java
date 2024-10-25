@@ -5,6 +5,20 @@ import com.vaadin.ui.Component;
 /**
  * Mixin interface for the views that need translation. Has default
  * implementation of getTranslation method.
+ *
+ * Usage example:
+ *
+ * <pre>
+ * public class MyView extends CustomComponent implements HasI18N {
+ *     public MyView() {
+ *         String translatedString = getTranslation("key");
+ *     }
+ * }
+ * </pre>
+ *
+ * @see DefaultI18NProvider
+ * @see I18NProvider
+ * @see I18n
  */
 public interface HasI18N extends Component {
 

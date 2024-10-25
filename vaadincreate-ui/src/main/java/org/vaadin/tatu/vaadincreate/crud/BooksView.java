@@ -14,6 +14,8 @@ import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.crud.BooksPresenter.BooksChanged;
+import org.vaadin.tatu.vaadincreate.crud.BooksPresenter.BooksChanged.BookChange;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
@@ -378,6 +380,8 @@ public class BooksView extends CssLayout
         dataProvider.refreshItem(product);
         form.showForm(false);
         grid.focus();
+        // IMHO this should not be necessary
+        ui.push();
     }
 
     /**
@@ -516,15 +520,31 @@ public class BooksView extends CssLayout
         if (event instanceof LockingEvent) {
             var bookEvent = (LockingEvent) event;
             Utils.access(ui, () -> {
-                if (isAttached()
-                        && grid.getDataProvider() instanceof ListDataProvider) {
+                if (canPush()) {
                     dataProvider.getItems().stream().filter(
                             book -> book.getId().equals(bookEvent.getId()))
-                            .findFirst().ifPresent(product -> dataProvider
-                                    .refreshItem(product));
+                            .findFirst().ifPresent(dataProvider::refreshItem);
                 }
             });
         }
+        if (event instanceof BooksChanged) {
+            var bookEvent = (BooksChanged) event;
+            Utils.access(ui, () -> {
+                if (canPush() && bookEvent.getChange() == BookChange.SAVE
+                        && grid.getEdited() != bookEvent.getProduct().getId()) {
+                    logger.debug("Refreshing item ({}) {}",
+                            bookEvent.getProduct().getId(),
+                            bookEvent.getProduct().getProductName());
+                    grid.setEdited(bookEvent.getProduct());
+                    dataProvider.refreshItem(bookEvent.getProduct());
+                }
+            });
+        }
+    }
+
+    private boolean canPush() {
+        return isAttached()
+                && grid.getDataProvider() instanceof ListDataProvider;
     }
 
     private Product refreshProduct(Product product) {

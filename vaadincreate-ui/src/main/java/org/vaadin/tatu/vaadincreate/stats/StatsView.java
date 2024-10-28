@@ -14,6 +14,7 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.ChartType;
+import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.Lang;
@@ -81,6 +82,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         var conf = priceChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.Stats.PRICES));
         conf.setLang(lang);
+        configureTooltip(conf);
         priceChartWrapper.addComponent(priceChart);
         return priceChartWrapper;
     }
@@ -94,6 +96,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         var conf = categoryChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.CATEGORIES));
         conf.setLang(lang);
+        configureTooltip(conf);
         categoryChartWrapper.addComponent(categoryChart);
         return categoryChartWrapper;
     }
@@ -107,8 +110,15 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         var conf = availabilityChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.Stats.AVAILABILITIES));
         conf.setLang(lang);
+        configureTooltip(conf);
         availabilityChartWrapper.addComponent(availabilityChart);
         return availabilityChartWrapper;
+    }
+
+    private static void configureTooltip(Configuration conf) {
+        conf.getTooltip()
+                .setBackgroundColor(new SolidColor("rgba(50,50,50,0.9)"));
+        conf.getTooltip().getStyle().setColor(new SolidColor("white"));
     }
 
     /**

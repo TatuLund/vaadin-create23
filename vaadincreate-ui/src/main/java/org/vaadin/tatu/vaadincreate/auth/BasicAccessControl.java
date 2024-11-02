@@ -18,7 +18,8 @@ public class BasicAccessControl implements AccessControl {
 
     @Override
     public boolean signIn(String username, String password) {
-        Objects.requireNonNull(username, password);
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(password);
         Optional<User> user = VaadinCreateUI.get().getUserService()
                 .findByName(username);
         if (!user.isPresent()) {

@@ -287,7 +287,7 @@ public class BookForm extends Composite implements HasI18N {
         });
     }
 
-    private static String convertValue(Object value) {
+    private static <T> String convertValue(T value) {
         if (value == null) {
             return "";
         }

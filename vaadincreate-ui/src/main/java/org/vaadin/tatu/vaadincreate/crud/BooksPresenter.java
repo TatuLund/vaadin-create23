@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.crud;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -165,6 +166,8 @@ public class BooksPresenter implements Serializable, EventBusListener {
      *            the ID of the book to lock for editing
      */
     private void lockBook(Product book) {
+        assert book != null : "Book must not be null";
+
         if (editing != null) {
             unlockBook();
         }
@@ -192,8 +195,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
                 newProduct();
             } else {
                 try {
-                    int pid = Integer.parseInt(productId);
-                    lockAndEditIfExistsAndIsUnlocked(productId, pid);
+                    lockAndEditIfExistsAndIsUnlocked(productId);
                 } catch (NumberFormatException e) {
                     view.showNotValidId(productId);
                     logger.warn("Attempt to edit invalid id '{}'", productId);
@@ -207,7 +209,10 @@ public class BooksPresenter implements Serializable, EventBusListener {
     // selected in the view. If the product does not exist, a notification will
     // be shown in the view. If the product exists but is locked, a notification
     // will be shown in the view.
-    private void lockAndEditIfExistsAndIsUnlocked(String productId, int pid) {
+    private void lockAndEditIfExistsAndIsUnlocked(String productId) {
+        assert productId != null;
+
+        int pid = Integer.parseInt(productId);
         Product product = findProduct(pid);
         if (product != null) {
             if (getLockedBooks().isLocked(product) == null) {
@@ -246,9 +251,11 @@ public class BooksPresenter implements Serializable, EventBusListener {
      * Saves the given product
      *
      * @param product
-     *            The product to be saved.
+     *            The product to be saved, not null.
      */
     public Product saveProduct(Product product) {
+        Objects.requireNonNull(product, "Product must not be null");
+
         accessControl.assertAdmin();
         view.clearSelection();
         boolean newBook = product.getId() == null;

@@ -26,6 +26,7 @@ import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -42,6 +43,8 @@ public class AboutView extends VerticalLayout
     private Button editButton;
     private Label adminsNote;
     private TextArea admionsNoteField;
+
+    private UI ui;
 
     public AboutView() {
         var aboutContent = createAboutContent();
@@ -154,7 +157,7 @@ public class AboutView extends VerticalLayout
     @Override
     public void eventFired(Object event) {
         if (event instanceof Message) {
-            getUI().access(() -> {
+            Utils.access(ui, () -> {
                 if (admionsNoteField.isVisible()) {
                     admionsNoteField.setVisible(false);
                     adminsNote.setVisible(true);
@@ -166,6 +169,12 @@ public class AboutView extends VerticalLayout
                 adminsNote.setValue(mes.getMessage());
             });
         }
+    }
+
+    @Override
+    public void attach() {
+        super.attach();
+        ui = getUI();
     }
 
     @Override

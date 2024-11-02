@@ -134,6 +134,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     }
 
     private String htmlFormatAvailability(Product product) {
+        assert product != null : "Product must not be null";
+
         var availability = product.getAvailability();
         var text = availability.toString();
 
@@ -144,6 +146,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     }
 
     private String formatCategories(Product product) {
+        assert product != null : "Product must not be null";
+
         if (product.getCategory() == null || product.getCategory().isEmpty()) {
             return "";
         }
@@ -215,6 +219,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     }
 
     private String createTooltip(Product book) {
+        assert book != null : "Book must not be null";
+
         // This is not actually a tooltip, but on hover popup. Vaadin 8 allows
         // to use HTML in tooltips. which makes it possible to use them like
         // this. When migrating to newer generations of Vaadin, this kind of
@@ -248,6 +254,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
 
     // Helper method to create a span with a caption
     private static String getDescriptionCaptionSpan(String caption) {
+        assert caption != null : "Caption must not be null";
+
         return String.format("<span class='%s'>%s:</span> ",
                 VaadinCreateTheme.BOOKVIEW_GRID_DESCRIPTIONCAPTION, caption);
     }

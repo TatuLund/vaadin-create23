@@ -29,6 +29,7 @@ public class StatsPresenter implements EventBusListener, Serializable {
 
     private StatsView view;
     private transient CompletableFuture<Void> future;
+    private static final String PRODUCTS_NOT_NULL = "Products must not be null";
 
     public StatsPresenter(StatsView view) {
         this.view = view;
@@ -73,6 +74,7 @@ public class StatsPresenter implements EventBusListener, Serializable {
     // brackets and product counts
     private Map<String, Long> calculatePriceStats(
             Collection<Product> products) {
+        assert products != null : PRODUCTS_NOT_NULL;
         return getPriceBrackets(products).stream()
                 .collect(Collectors.toMap(PriceBracket::toString,
                         priceBracket -> products.stream()
@@ -85,6 +87,7 @@ public class StatsPresenter implements EventBusListener, Serializable {
     // category names and product counts
     private Map<String, Long[]> calculateCategoryStats(
             ProductDataService service, Collection<Product> products) {
+        assert products != null : PRODUCTS_NOT_NULL;
         return service.getAllCategories().stream()
                 .collect(Collectors.toMap(Category::getName, category -> {
                     long titles = products.stream().filter(
@@ -101,6 +104,7 @@ public class StatsPresenter implements EventBusListener, Serializable {
     // availability statuses and product counts
     private Map<Availability, Long> calculateAvailabilityStats(
             Collection<Product> products) {
+        assert products != null : PRODUCTS_NOT_NULL;
         return Arrays.stream(Availability.values()).map(availability -> Map
                 .entry(availability, products.stream().filter(
                         product -> product.getAvailability() == availability)
@@ -118,6 +122,8 @@ public class StatsPresenter implements EventBusListener, Serializable {
     }
 
     private List<PriceBracket> getPriceBrackets(Collection<Product> products) {
+        assert products != null : PRODUCTS_NOT_NULL;
+
         var brackets = new ArrayList<PriceBracket>();
         var max = products.stream()
                 .max((p1, p2) -> p1.getPrice().compareTo(p2.getPrice())).get()

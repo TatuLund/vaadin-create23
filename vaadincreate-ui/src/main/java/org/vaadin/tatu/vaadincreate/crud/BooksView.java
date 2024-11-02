@@ -110,8 +110,12 @@ public class BooksView extends CssLayout implements View, HasI18N {
         presenter.init();
     }
 
-    private boolean filterCondition(Object object, String filterText) {
-        return object != null && object.toString().toLowerCase()
+    // Filter the grid data based on the filter text 
+    private static <T> boolean filterCondition(T value, String filterText) {
+        assert filterText != null : "Filter text cannot be null";
+        assert value != null : "Value cannot be null";
+
+        return value != null && value.toString().toLowerCase()
                 .contains(filterText.toLowerCase());
     }
 
@@ -126,6 +130,9 @@ public class BooksView extends CssLayout implements View, HasI18N {
      *         otherwise.
      */
     private boolean passesFilter(Product book, String filterText) {
+        assert filterText != null : "Filter text cannot be null";
+        assert book != null : "Book cannot be null";
+
         filterText = filterText.trim();
         return filterCondition(book.getProductName(), filterText)
                 || filterCondition(book.getAvailability(), filterText)
@@ -422,7 +429,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
         if (product != null) {
             // Ensure the product is up-to-date
             if (product.getId() != null) {
-                product = refreshProduct(product);
+                product = updateProductInDataProvider(product);
                 if (product == null) {
                     showError(getTranslation(I18n.Books.PRODUCT_DELETED));
                     return;
@@ -549,7 +556,9 @@ public class BooksView extends CssLayout implements View, HasI18N {
                 && grid.getDataProvider() instanceof ListDataProvider;
     }
 
-    private Product refreshProduct(Product product) {
+    private Product updateProductInDataProvider(Product product) {
+        assert product != null : "Product cannot be null";
+
         var list = ((List<Product>) dataProvider.getItems());
         var updatedProduct = presenter.findProduct(product.getId());
         if (updatedProduct != null) {

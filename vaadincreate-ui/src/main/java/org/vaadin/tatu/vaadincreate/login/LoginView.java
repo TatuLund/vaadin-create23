@@ -161,8 +161,7 @@ public class LoginView extends Composite implements HasI18N {
 
         forgotPassword = new Button(getTranslation(I18n.Login.FORGOT_PASSWORD));
         buttons.addComponent(forgotPassword);
-        forgotPassword.addClickListener(event -> showNotification(
-                new Notification(getTranslation(I18n.Login.HINT))));
+        forgotPassword.addClickListener(event -> showHintNotification());
         forgotPassword.addStyleName(ValoTheme.BUTTON_LINK);
 
         lang = new LanguageSelect();
@@ -184,12 +183,12 @@ public class LoginView extends Composite implements HasI18N {
     }
 
     private CssLayout buildLoginInformation() {
-        var layout = new CssLayout();
-        layout.setStyleName(VaadinCreateTheme.LOGINVIEW_INFORMATION);
+        var infoLayout = new CssLayout();
+        infoLayout.setStyleName(VaadinCreateTheme.LOGINVIEW_INFORMATION);
         loginInfoText = new Label(getLoginInfoText(), ContentMode.HTML);
         loginInfoText.setSizeFull();
-        layout.addComponent(loginInfoText);
-        return layout;
+        infoLayout.addComponent(loginInfoText);
+        return infoLayout;
     }
 
     // Attempt to log in the user and fire an event to notify listeners.
@@ -198,17 +197,26 @@ public class LoginView extends Composite implements HasI18N {
                 passwordField.getValue())) {
             fireEvent(new LoginEvent(this));
         } else {
-            showNotification(
-                    new Notification(getTranslation(I18n.Login.LOGIN_FAILED),
-                            getTranslation(I18n.Login.LOGIN_FAILED_DESC),
-                            Notification.Type.HUMANIZED_MESSAGE));
+            showLoginFailedNotification();
             usernameField.focus();
         }
     }
 
-    private void showNotification(Notification notification) {
-        // keep the notification visible a little while after moving the
-        // mouse, or until clicked
+    private void showHintNotification() {
+        var notification = new Notification(getTranslation(I18n.Login.HINT));
+        // keep the notification visible a little while after moving the mouse,
+        // or until clicked
+        notification.setDelayMsec(2000);
+        notification.show(Page.getCurrent());
+    }
+
+    private void showLoginFailedNotification() {
+        var notification = new Notification(
+                getTranslation(I18n.Login.LOGIN_FAILED),
+                getTranslation(I18n.Login.LOGIN_FAILED_DESC),
+                Notification.Type.HUMANIZED_MESSAGE);
+        // keep the notification visible a little while after moving the mouse,
+        // or until clicked
         notification.setDelayMsec(2000);
         notification.show(Page.getCurrent());
     }

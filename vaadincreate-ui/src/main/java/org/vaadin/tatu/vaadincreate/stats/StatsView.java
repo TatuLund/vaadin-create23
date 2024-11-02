@@ -116,6 +116,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     }
 
     private static void configureTooltip(Configuration conf) {
+        assert conf != null : "Configuration must not be null";
         conf.getTooltip()
                 .setBackgroundColor(new SolidColor("rgba(50,50,50,0.9)"));
         conf.getTooltip().getStyle().setColor(new SolidColor("white"));
@@ -152,6 +153,8 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
 
     // Update the charts with the new data
     private void updatePriceChart(Map<String, Long> priceStats) {
+        assert priceStats != null : "Price stats must not be null";
+
         var priceSeries = priceSeries(priceStats);
         priceSeries.setName(getTranslation(I18n.Stats.COUNT));
         var conf = priceChart.getConfiguration();
@@ -160,6 +163,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
 
     // Update the charts with the new data
     private void updateCategoryChart(Map<String, Long[]> categoryStats) {
+        assert categoryStats != null : "Category stats must not be null";
         var conf = categoryChart.getConfiguration();
 
         // Show count of titles on primary axis
@@ -185,6 +189,8 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     // Update the charts with the new data
     private void updateAvailabilityChart(
             Map<Availability, Long> availabilityStats) {
+        assert availabilityStats != null : "Availability stats must not be null";
+
         var availabilitySeries = availabilitySeries(availabilityStats);
         availabilitySeries.setName(getTranslation(I18n.Stats.COUNT));
         var conf = availabilityChart.getConfiguration();
@@ -198,6 +204,8 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
 
     private DataSeries categorySeries(Map<String, Long[]> categories,
             int index) {
+        assert categories != null : "Categories must not be null";
+
         var series = new DataSeries();
         categories.forEach((category, count) -> {
             var item = new DataSeriesItem(category, count[index]);
@@ -209,6 +217,8 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
 
     private DataSeries availabilitySeries(
             Map<Availability, Long> availabilities) {
+        assert availabilities != null : "Availabilities must not be null";
+
         var series = new DataSeries();
         availabilities.forEach((availability, count) -> {
             var item = new DataSeriesItem(availability.name(), count);
@@ -220,6 +230,8 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     }
 
     private static SolidColor toColor(Availability availability) {
+        assert availability != null : "Availability must not be null";
+
         String color;
         switch (availability) {
         case COMING:
@@ -236,6 +248,8 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     }
 
     private DataSeries priceSeries(Map<String, Long> prices) {
+        assert prices != null : "Prices must not be null";
+
         var series = new DataSeries();
         prices.forEach((pricebracket, count) -> {
             var item = new DataSeriesItem(pricebracket, count);

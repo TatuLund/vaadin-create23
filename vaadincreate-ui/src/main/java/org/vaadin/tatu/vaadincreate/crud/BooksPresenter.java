@@ -17,8 +17,11 @@ import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.crud.BooksPresenter.BooksChanged.BookChange;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
+import org.vaadin.tatu.vaadincreate.locking.LockedObjects.LockingEvent;
 
 /**
  * This class provides an interface for the logical operations between the CRUD
@@ -30,7 +33,7 @@ import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
  * data.
  */
 @SuppressWarnings("serial")
-public class BooksPresenter implements Serializable {
+public class BooksPresenter implements Serializable, EventBusListener {
 
     private BooksView view;
     private transient CompletableFuture<Void> future;
@@ -48,6 +51,7 @@ public class BooksPresenter implements Serializable {
      */
     public BooksPresenter(BooksView booksView) {
         view = booksView;
+        getEventBus().registerEventBusListener(this);
     }
 
     // This method is used to load products asynchronously.
@@ -107,6 +111,7 @@ public class BooksPresenter implements Serializable {
      */
     public void cancelUpdateProducts() {
         unlockBook();
+        getEventBus().unregisterEventBusListener(this);
         if (future != null) {
             boolean cancelled = future.cancel(true);
             future = null;
@@ -387,6 +392,21 @@ public class BooksPresenter implements Serializable {
             draft = getService().findDraft(userName);
         }
         return draft;
+    }
+
+    @Override
+    public void eventFired(Object event) {
+        if (event instanceof LockingEvent) {
+            var id = ((LockingEvent) event).getId();
+            view.refreshProductAsync(id);
+        }
+        if (event instanceof BooksChanged) {
+            var product = ((BooksChanged) event).getProduct();
+            if (((BooksChanged) event).getChange() != BookChange.SAVE) {
+                return;
+            }
+            view.refreshProductAsync(product);
+        }
     }
 
     private LockedObjects getLockedBooks() {

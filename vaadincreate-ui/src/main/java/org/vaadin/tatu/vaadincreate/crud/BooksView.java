@@ -14,14 +14,9 @@ import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
-import org.vaadin.tatu.vaadincreate.crud.BooksPresenter.BooksChanged;
-import org.vaadin.tatu.vaadincreate.crud.BooksPresenter.BooksChanged.BookChange;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
-import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
-import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
-import org.vaadin.tatu.vaadincreate.locking.LockedObjects.LockingEvent;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.provider.ListDataProvider;
@@ -49,8 +44,7 @@ import com.vaadin.ui.themes.ValoTheme;
  */
 @SuppressWarnings({ "serial", "java:S2160" })
 @RolesPermitted({ Role.USER, Role.ADMIN })
-public class BooksView extends CssLayout
-        implements View, HasI18N, EventBusListener {
+public class BooksView extends CssLayout implements View, HasI18N {
 
     public static final String VIEW_NAME = "inventory";
 
@@ -113,7 +107,6 @@ public class BooksView extends CssLayout
         addComponent(barAndGridLayout);
         addComponent(form);
 
-        getEventBus().registerEventBusListener(this);
         presenter.init();
     }
 
@@ -450,7 +443,6 @@ public class BooksView extends CssLayout
     @Override
     public void detach() {
         super.detach();
-        getEventBus().unregisterEventBusListener(this);
         // If detach happens before completion of data fetch, cancel the fetch
         presenter.cancelUpdateProducts();
         if (getUI().getSession().getSession() == null) {
@@ -515,31 +507,41 @@ public class BooksView extends CssLayout
         return dialog;
     }
 
-    @Override
-    public void eventFired(Object event) {
-        if (event instanceof LockingEvent) {
-            var bookEvent = (LockingEvent) event;
-            Utils.access(ui, () -> {
-                if (canPush()) {
-                    dataProvider.getItems().stream().filter(
-                            book -> book.getId().equals(bookEvent.getId()))
-                            .findFirst().ifPresent(dataProvider::refreshItem);
-                }
-            });
-        }
-        if (event instanceof BooksChanged) {
-            var bookEvent = (BooksChanged) event;
-            Utils.access(ui, () -> {
-                if (canPush() && bookEvent.getChange() == BookChange.SAVE
-                        && grid.getEdited() != bookEvent.getProduct().getId()) {
-                    logger.debug("Refreshing item ({}) {}",
-                            bookEvent.getProduct().getId(),
-                            bookEvent.getProduct().getProductName());
-                    grid.setEdited(bookEvent.getProduct());
-                    dataProvider.refreshItem(bookEvent.getProduct());
-                }
-            });
-        }
+    /**
+     * Refreshes the given product asynchronously.
+     *
+     * @param product
+     *            the product to be refreshed
+     */
+    public void refreshProductAsync(Product product) {
+        Utils.access(ui, () -> {
+            if (canPush() && grid.getEdited() != product.getId()) {
+                logger.debug("Refreshing item ({}) {}", product.getId(),
+                        product.getProductName());
+                grid.setEdited(product);
+                dataProvider.refreshItem(product);
+            }
+        });
+    }
+
+    /**
+     * Refreshes the product asynchronously by its ID. This method uses the
+     * provided UI access utility to ensure that the refresh operation is
+     * performed in a thread-safe manner. If the UI can push updates, it filters
+     * the data provider's items to find the book with the specified ID and
+     * refreshes that item.
+     *
+     * @param id
+     *            the ID of the product to refresh
+     */
+    public void refreshProductAsync(Integer id) {
+        Utils.access(ui, () -> {
+            if (canPush()) {
+                dataProvider.getItems().stream()
+                        .filter(book -> book.getId().equals(id)).findFirst()
+                        .ifPresent(dataProvider::refreshItem);
+            }
+        });
     }
 
     private boolean canPush() {
@@ -559,10 +561,6 @@ public class BooksView extends CssLayout
             dataProvider.refreshAll();
         }
         return updatedProduct;
-    }
-
-    private EventBus getEventBus() {
-        return EventBus.get();
     }
 
     private static Logger logger = LoggerFactory.getLogger(BooksView.class);

@@ -10,7 +10,9 @@ import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.data.BeanValidationBinder;
-import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.data.ValidationResult;
+import com.vaadin.data.Validator;
+import com.vaadin.data.ValueContext;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.ValueChangeMode;
@@ -37,16 +39,26 @@ public class CategoryManagementView extends VerticalLayout
 
     private ComponentList<Category, CategoryForm> list;
 
+    class EscapeListener extends ShortcutListener {
+        EscapeListener() {
+            super("Cancel", KeyCode.ESCAPE, new int[0]);
+        }
+
+        @Override
+        public void handleAction(Object sender, Object target) {
+            presenter.requestUpdateCategories();
+            newCategoryButton.setEnabled(true);
+        }
+    }
+
     @SuppressWarnings("java:S5669")
     public CategoryManagementView() {
         setSizeFull();
         list = new ComponentList<>(CategoryForm::new);
 
         newCategoryButton = new Button(
-                getTranslation(I18n.Category.ADD_NEW_CATEGORY), event -> {
-                    var newCategory = new Category();
-                    list.addItem(newCategory);
-                });
+                getTranslation(I18n.Category.ADD_NEW_CATEGORY),
+                event -> addCategory());
         newCategoryButton.setIcon(VaadinIcons.PLUS_CIRCLE);
         newCategoryButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         newCategoryButton.setDisableOnClick(true);
@@ -56,17 +68,15 @@ public class CategoryManagementView extends VerticalLayout
         h4.addStyleName(ValoTheme.LABEL_H4);
 
         // Cancel the form when the user presses escape
-        addShortcutListener(
-                new ShortcutListener("Cancel", KeyCode.ESCAPE, null) {
-                    @Override
-                    public void handleAction(Object sender, Object target) {
-                        presenter.requestUpdateCategories();
-                        newCategoryButton.setEnabled(true);
-                    }
-                });
+        addShortcutListener(new EscapeListener());
 
         addComponents(h4, newCategoryButton, list);
         setExpandRatio(list, 1);
+    }
+
+    private void addCategory() {
+        var newCategory = new Category();
+        list.addItem(newCategory);
     }
 
     @Override
@@ -107,6 +117,42 @@ public class CategoryManagementView extends VerticalLayout
     }
 
     /**
+     * Validator to ensure that a category is not duplicated.
+     */
+    class CategoryNotDuplicateValidator implements Validator<String> {
+
+        private Category category;
+        private String errorMessage;
+
+        /**
+         * Validator to ensure that a category is not duplicated.
+         *
+         * @param category
+         *            the category to be validated
+         * @param errorMessage
+         *            the error message to be displayed if the category is
+         *            duplicated
+         */
+        public CategoryNotDuplicateValidator(Category category,
+                String errorMessage) {
+            this.category = category;
+            this.errorMessage = errorMessage;
+        }
+
+        @Override
+        public ValidationResult apply(String value, ValueContext context) {
+            var valid = categories.stream()
+                    .filter(item -> !item.equals(category)
+                            && item.getName().equals(value))
+                    .count() == 0;
+            if (valid) {
+                return ValidationResult.ok();
+            }
+            return ValidationResult.error(errorMessage);
+        }
+    }
+
+    /**
      * A form for editing a category.
      */
     class CategoryForm extends Composite {
@@ -134,12 +180,8 @@ public class CategoryManagementView extends VerticalLayout
             binder = new BeanValidationBinder<>(Category.class);
             // Check for duplicate category names
             binder.forField(nameField)
-                    .withValidator(
-                            value -> categories.stream()
-                                    .filter(item -> !item.equals(category)
-                                            && item.getName().equals(value))
-                                    .count() == 0,
-                            getTranslation(I18n.Category.DUPLICATE))
+                    .withValidator(new CategoryNotDuplicateValidator(category,
+                            getTranslation(I18n.Category.DUPLICATE)))
                     .bind("name");
             binder.setBean(category);
             binder.addValueChangeListener(event -> handleSave());

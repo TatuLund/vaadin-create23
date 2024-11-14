@@ -78,6 +78,7 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
         loginForm.$(ComboBoxElement.class).first().getPopupSuggestionElements()
                 .get(0).click();
         loginForm.$(ButtonElement.class).first().click();
+        waitForElementPresent(By.className("applayout"));
     }
 
     public void blur() {
@@ -126,9 +127,6 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
         options.addArguments("--window-size=1280,900");
-        // https://issues.chromium.org/issues/367755364
-        // Headless window is opened in viewport, fix it
-        options.addArguments("--window-position=-2400,-2400");
         setDriver(TestBench.createDriver(new ChromeDriver(options)));
         getDriver().get(getURL(urlFragment));
 
@@ -196,7 +194,7 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
     }
 
     protected void waitForElementPresent(final By by) {
-        waitUntil(ExpectedConditions.presenceOfElementLocated(by), 15);
+        waitUntil(ExpectedConditions.presenceOfElementLocated(by));
     }
 
     protected void waitForElementNotPresent(final By by) {

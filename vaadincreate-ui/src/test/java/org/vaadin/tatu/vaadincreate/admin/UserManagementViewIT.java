@@ -27,8 +27,8 @@ public class UserManagementViewIT extends AbstractViewTest {
     @Override
     public void setup() throws Exception {
         super.setup();
-        login("Admin", "admin");
         open("#!" + AdminView.VIEW_NAME + "/" + UserManagementView.VIEW_NAME);
+        login("Admin", "admin");
     }
 
     @After

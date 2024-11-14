@@ -18,8 +18,8 @@ public class StatsViewIT extends AbstractViewTest {
     @Override
     public void setup() throws Exception {
         super.setup();
-        login("Admin", "admin");
         open("#!" + StatsView.VIEW_NAME);
+        login("Admin", "admin");
     }
 
     @After

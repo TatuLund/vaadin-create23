@@ -15,8 +15,8 @@ public class AboutViewIT extends AbstractViewTest {
     @Override
     public void setup() throws Exception {
         super.setup();
-        login("Admin", "admin");
         open("#!" + AboutView.VIEW_NAME);
+        login("Admin", "admin");
     }
 
     @After

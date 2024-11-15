@@ -153,6 +153,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
         filterField.setStyleName(VaadinCreateTheme.BOOKVIEW_FILTER);
         filterField.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
         filterField.setPlaceholder(getTranslation(I18n.Books.FILTER));
+        filterField.setDescription(getTranslation(I18n.Books.FILTER));
         filterField.setIcon(VaadinIcons.SEARCH);
         ResetButtonForTextField.extend(filterField);
         // Apply the filter to grid's data provider. TextField value is never

@@ -85,6 +85,7 @@ public class LoginView extends Composite implements HasI18N {
         resizeReg = getUI().getPage().addBrowserWindowResizeListener(
                 e -> showLoginInformation(e.getWidth()));
         buildUI();
+        showLoginInformation(getUI().getPage().getBrowserWindowWidth());
         usernameField.focus();
     }
 
@@ -117,8 +118,18 @@ public class LoginView extends Composite implements HasI18N {
     private void showLoginInformation(int width) {
         if (width < 700) {
             layout.removeComponent(loginInformation);
+            usernameField.setPlaceholder(I18n.USERNAME);
+            passwordField.setPlaceholder(I18n.PASSWORD);
+            usernameField.setCaption("");
+            passwordField.setCaption("");
+            lang.setCaption("");
         } else {
             layout.addComponent(loginInformation);
+            usernameField.setPlaceholder("");
+            passwordField.setPlaceholder("");
+            usernameField.setCaption(I18n.USERNAME);
+            passwordField.setCaption(I18n.PASSWORD);
+            lang.setCaption(I18n.Login.LANGUAGE);
         }
     }
 
@@ -162,7 +173,8 @@ public class LoginView extends Composite implements HasI18N {
         forgotPassword = new Button(getTranslation(I18n.Login.FORGOT_PASSWORD));
         buttons.addComponent(forgotPassword);
         forgotPassword.addClickListener(event -> showHintNotification());
-        forgotPassword.addStyleNames(ValoTheme.BUTTON_LINK, VaadinCreateTheme.LOGINVIEW_FORGOTBUTTON);
+        forgotPassword.addStyleNames(ValoTheme.BUTTON_LINK,
+                VaadinCreateTheme.LOGINVIEW_FORGOTBUTTON);
 
         lang = new LanguageSelect();
         lang.setWidth(18, Unit.EM);

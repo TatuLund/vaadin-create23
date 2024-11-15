@@ -90,12 +90,17 @@ public class LoginView extends Composite implements HasI18N {
     }
 
     private void updateTranslations() {
-        usernameField.setCaption(getTranslation(I18n.USERNAME));
-        passwordField.setCaption(getTranslation(I18n.PASSWORD));
+        if (getUI().getPage().getBrowserWindowWidth() < 700) {
+            usernameField.setPlaceholder(getTranslation(I18n.USERNAME));
+            passwordField.setPlaceholder(getTranslation(I18n.PASSWORD));
+        } else {
+            usernameField.setCaption(getTranslation(I18n.USERNAME));
+            passwordField.setCaption(getTranslation(I18n.PASSWORD));
+            lang.setCaption(getTranslation(I18n.Login.LANGUAGE));
+        }
         login.setCaption(getTranslation(I18n.Login.LOGIN_BUTTON));
         forgotPassword.setCaption(getTranslation(I18n.Login.FORGOT_PASSWORD));
         loginInfoText.setValue(getLoginInfoText());
-        lang.setCaption(getTranslation(I18n.Login.LANGUAGE));
         capsLockWarning.setMessage(getTranslation(I18n.Login.CAPSLOCK));
     }
 
@@ -118,8 +123,8 @@ public class LoginView extends Composite implements HasI18N {
     private void showLoginInformation(int width) {
         if (width < 700) {
             layout.removeComponent(loginInformation);
-            usernameField.setPlaceholder(I18n.USERNAME);
-            passwordField.setPlaceholder(I18n.PASSWORD);
+            usernameField.setPlaceholder(getTranslation(I18n.USERNAME));
+            passwordField.setPlaceholder(getTranslation(I18n.PASSWORD));
             usernameField.setCaption("");
             passwordField.setCaption("");
             lang.setCaption("");
@@ -127,9 +132,9 @@ public class LoginView extends Composite implements HasI18N {
             layout.addComponent(loginInformation);
             usernameField.setPlaceholder("");
             passwordField.setPlaceholder("");
-            usernameField.setCaption(I18n.USERNAME);
-            passwordField.setCaption(I18n.PASSWORD);
-            lang.setCaption(I18n.Login.LANGUAGE);
+            usernameField.setCaption(getTranslation(I18n.USERNAME));
+            passwordField.setCaption(getTranslation(I18n.PASSWORD));
+            lang.setCaption(getTranslation(I18n.Login.LANGUAGE));
         }
     }
 

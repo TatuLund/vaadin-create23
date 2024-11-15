@@ -13,7 +13,6 @@ import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.GridElement;
 import com.vaadin.testbench.elements.LabelElement;
-import com.vaadin.testbench.elements.MenuBarElement;
 import com.vaadin.testbench.elements.NotificationElement;
 import com.vaadin.testbench.elements.TextFieldElement;
 import com.vaadin.testbench.elements.UIElement;
@@ -31,7 +30,7 @@ public class CategoryManagementViewIT extends AbstractViewTest {
 
     @After
     public void cleanup() {
-        $(MenuBarElement.class).first().findElement(By.id("logout-2")).click();
+        logout();
     }
 
     @Test

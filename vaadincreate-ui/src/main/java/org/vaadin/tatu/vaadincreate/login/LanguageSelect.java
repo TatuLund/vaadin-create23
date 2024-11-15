@@ -14,7 +14,6 @@ public class LanguageSelect extends ComboBox<Locale> implements HasI18N {
 
     public LanguageSelect() {
         setCaption(getTranslation(I18n.Select.LANGUAGE));
-        setWidth(15, Unit.EM);
         setItems(DefaultI18NProvider.getInstance().getLocales());
         setItemCaptionGenerator(item -> getTranslation(item.getLanguage()));
         setItemIconGenerator(locale -> new ThemeResource(

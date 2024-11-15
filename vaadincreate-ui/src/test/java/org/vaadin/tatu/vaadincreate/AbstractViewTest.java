@@ -20,6 +20,7 @@ import com.vaadin.testbench.TestBenchTestCase;
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.ComboBoxElement;
 import com.vaadin.testbench.elements.FormLayoutElement;
+import com.vaadin.testbench.elements.MenuBarElement;
 import com.vaadin.testbench.elements.PasswordFieldElement;
 import com.vaadin.testbench.elements.TextFieldElement;
 
@@ -79,6 +80,10 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
                 .get(0).click();
         loginForm.$(ButtonElement.class).first().click();
         waitForElementPresent(By.className("applayout"));
+    }
+
+    public void logout() {
+        $(MenuBarElement.class).first().findElement(By.id("logout-2")).click();
     }
 
     public void blur() {

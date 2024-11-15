@@ -1,13 +1,13 @@
 package org.vaadin.tatu.vaadincreate;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.LabelElement;
-import com.vaadin.testbench.elements.MenuBarElement;
 import com.vaadin.testbench.elements.TextAreaElement;
 
 public class AboutViewIT extends AbstractViewTest {
@@ -21,7 +21,7 @@ public class AboutViewIT extends AbstractViewTest {
 
     @After
     public void cleanup() {
-        $(MenuBarElement.class).first().findElement(By.id("logout-2")).click();
+        logout();
     }
 
     @Test
@@ -40,7 +40,7 @@ public class AboutViewIT extends AbstractViewTest {
         // Assert the new value
         waitForElementPresent(By.id("admins-note"));
         note = $(LabelElement.class).id("admins-note");
-        Assert.assertEquals("<b><img>A new message</b>", note.getHTML());
+        assertEquals("<b><img>A new message</b>", note.getHTML());
 
         // Return the old value
         $(ButtonElement.class).id("admin-edit").click();

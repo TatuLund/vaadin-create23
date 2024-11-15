@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
@@ -15,7 +14,6 @@ import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.ComboBoxElement;
 import com.vaadin.testbench.elements.LabelElement;
-import com.vaadin.testbench.elements.MenuBarElement;
 import com.vaadin.testbench.elements.NotificationElement;
 import com.vaadin.testbench.elements.PasswordFieldElement;
 import com.vaadin.testbench.elements.TextFieldElement;
@@ -33,7 +31,7 @@ public class UserManagementViewIT extends AbstractViewTest {
 
     @After
     public void cleanup() {
-        $(MenuBarElement.class).first().findElement(By.id("logout-2")).click();
+        logout();
     }
 
     @Test

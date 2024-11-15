@@ -131,14 +131,14 @@ public class LoginView extends Composite implements HasI18N {
 
         usernameField = new TextField(getTranslation(I18n.USERNAME), "Admin");
         loginForm.addComponent(usernameField);
-        usernameField.setWidth(15, Unit.EM);
+        usernameField.setWidth(18, Unit.EM);
         usernameField.setId("login-username-field");
 
         passwordField = new PasswordField(getTranslation(I18n.PASSWORD));
         loginForm.addComponent(passwordField);
         capsLockWarning = CapsLockWarning.warnFor(passwordField);
         capsLockWarning.setMessage(getTranslation(I18n.Login.CAPSLOCK));
-        passwordField.setWidth(15, Unit.EM);
+        passwordField.setWidth(18, Unit.EM);
         passwordField.setDescription(getTranslation(I18n.Login.HINT));
         passwordField.setId("login-password-field");
         CssLayout buttons = new CssLayout();
@@ -162,9 +162,10 @@ public class LoginView extends Composite implements HasI18N {
         forgotPassword = new Button(getTranslation(I18n.Login.FORGOT_PASSWORD));
         buttons.addComponent(forgotPassword);
         forgotPassword.addClickListener(event -> showHintNotification());
-        forgotPassword.addStyleName(ValoTheme.BUTTON_LINK);
+        forgotPassword.addStyleNames(ValoTheme.BUTTON_LINK, VaadinCreateTheme.LOGINVIEW_FORGOTBUTTON);
 
         lang = new LanguageSelect();
+        lang.setWidth(18, Unit.EM);
         loginForm.addComponent(lang);
         lang.addValueChangeListener(e -> {
             var ui = getUI();

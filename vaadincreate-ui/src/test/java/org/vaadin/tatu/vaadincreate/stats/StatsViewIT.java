@@ -4,13 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 
-import com.vaadin.testbench.elements.MenuBarElement;
 import com.vaadin.testbench.elements.UIElement;
 
 public class StatsViewIT extends AbstractViewTest {
@@ -24,7 +24,7 @@ public class StatsViewIT extends AbstractViewTest {
 
     @After
     public void cleanup() {
-        $(MenuBarElement.class).first().findElement(By.id("logout-2")).click();
+        logout();
     }
 
     @Test
@@ -44,6 +44,8 @@ public class StatsViewIT extends AbstractViewTest {
     public void visual() throws IOException {
         if (visualTests()) {
             waitForElementPresent(By.className("loaded"));
+            // Charts have animation, wait for stabilize before compare
+            driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
             assertTrue($(UIElement.class).first().compareScreen("stats.png"));
         }
     }

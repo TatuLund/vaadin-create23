@@ -19,6 +19,7 @@ public final class VaadinCreateTheme {
     public static final String LOGINVIEW_INFORMATION = "loginview-information";
     public static final String LOGINVIEW_FORM = "loginview-form";
     public static final String LOGINVIEW_CENTER = "loginview-center";
+    public static final String LOGINVIEW_FORGOTBUTTON = "loginview-forgotbutton";
     public static final String LOGINVIEW = "loginview";
 
     public static final String ABOUTVIEW_ADMINSCONTENT = "aboutview-adminscontent";

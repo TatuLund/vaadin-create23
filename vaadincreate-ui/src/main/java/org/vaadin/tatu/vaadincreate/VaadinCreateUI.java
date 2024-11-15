@@ -314,7 +314,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                     logger.info("Invalidating session");
                     wrappedSession.invalidate();
                 }
-                logger.info("Session eneded");
+                logger.info("Session ended");
             });
         }
 

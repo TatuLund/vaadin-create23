@@ -35,6 +35,7 @@ import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -837,6 +838,13 @@ public class BooksViewTest extends AbstractUITest {
         var fake = $(bookView, FakeGrid.class).first();
         waitWhile(fake, f -> f.isVisible(), 10);
         return presenter;
+    }
+
+    @Test
+    public void filterNoMatch() {
+        test($(TextField.class).id("filter-field")).setValue("No match");
+        assertEquals(0, test(grid).size());
+        $(Label.class).styleName(VaadinCreateTheme.BOOKVIEW_NOMATCHES).single();
     }
 
     @Test

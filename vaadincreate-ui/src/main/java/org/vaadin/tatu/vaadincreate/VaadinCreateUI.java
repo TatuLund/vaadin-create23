@@ -231,7 +231,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     public void attach() {
         super.attach();
         // Workaround: https://github.com/vaadin/framework/issues/5772
-        JavaScript.eval(
+        getPage().getJavaScript().execute(
                 "setTimeout(() => document.getElementsByClassName('v-tooltip')[0].style.zIndex=30001, 200);");
     }
 

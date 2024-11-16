@@ -24,6 +24,7 @@ import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -91,7 +92,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         test($(dialog, Button.class).id("confirm-button")).click();
 
         grid = $(BookGrid.class).single();
-        waitForGrid((VerticalLayout) grid.getParent(), grid);
+        waitForGrid((CssLayout) grid.getParent(), grid);
         form = $(BookForm.class).single();
         assertTrue(form.isShown());
         assertNull(service.findDraft("Admin"));
@@ -160,7 +161,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         test($(dialog, Button.class).id("confirm-button")).click();
 
         grid = $(BookGrid.class).single();
-        waitForGrid((VerticalLayout) grid.getParent(), grid);
+        waitForGrid((CssLayout) grid.getParent(), grid);
         form = $(BookForm.class).single();
         assertTrue(form.isShown());
         assertNull(service.findDraft("Admin"));
@@ -241,7 +242,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         test($(dialog, Button.class).id("confirm-button")).click();
 
         grid = $(BookGrid.class).single();
-        waitForGrid((VerticalLayout) grid.getParent(), grid);
+        waitForGrid((CssLayout) grid.getParent(), grid);
         form = $(BookForm.class).single();
         assertTrue(form.isShown());
         assertNull(service.findDraft("Admin"));
@@ -324,7 +325,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         test($(dialog, Button.class).id("confirm-button")).click();
 
         grid = $(BookGrid.class).single();
-        waitForGrid((VerticalLayout) grid.getParent(), grid);
+        waitForGrid((CssLayout) grid.getParent(), grid);
         form = $(BookForm.class).single();
         assertTrue(form.isShown());
         assertNull(service.findDraft("Admin"));

@@ -44,6 +44,7 @@ public final class I18n {
         public static final String UNSAVED_CHANGES = "unsaved-changes";
         public static final String CATEGORIES_DELETED = "categories-deleted";
         public static final String INTERNAL_ERROR = "internal-error";
+        public static final String NO_MATCHES = "no-matches";
 
         private Books() {
             // private constructor to hide the implicit public one

@@ -14,10 +14,10 @@ import com.vaadin.testbench.uiunittest.UIUnitTest;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 
 public abstract class AbstractUITest extends UIUnitTest {
 
@@ -65,7 +65,7 @@ public abstract class AbstractUITest extends UIUnitTest {
      * @param grid
      *            BookGrid grid
      */
-    protected void waitForGrid(VerticalLayout layout, BookGrid grid) {
+    protected void waitForGrid(HasComponents layout, BookGrid grid) {
         assertFalse(grid.isVisible());
 
         var fake = $(layout, FakeGrid.class).first();

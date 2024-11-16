@@ -45,6 +45,8 @@ public final class VaadinCreateTheme {
     public static final String BOOKVIEW_GRID_LOCKED = "bookview-grid-locked";
     public static final String BOOKVIEW_GRID_DESCRIPTIONCAPTION = "bookview-grid-descriptioncaption";
     public static final String BOOKVIEW_AVAILABILITYLABEL = "bookview-availabilitylabel";
+    public static final String BOOKVIEW_GRIDWRAPPER = "bookview-gridwrapper";
+    public static final String BOOKVIEW_NOMATCHES = "bookview-nomatches";
 
     public static final String BOOKFORM_FORM = "bookform-form";
     public static final String BOOKFORM_WRAPPER = "bookform-wrapper";
@@ -69,4 +71,5 @@ public final class VaadinCreateTheme {
     public static final String CHECKBOXGROUP_SCROLL = "scrollable";
 
     public static final String BUTTON_CANCEL = "cancel";
+
 }

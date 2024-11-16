@@ -29,6 +29,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
@@ -59,6 +60,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
 
     private ListDataProvider<Product> dataProvider;
     private FakeGrid fakeGrid;
+    private Label noMatches;
     private String params;
 
     private Product draft;
@@ -69,6 +71,11 @@ public class BooksView extends CssLayout implements View, HasI18N {
         setSizeFull();
         addStyleName(VaadinCreateTheme.BOOKVIEW);
         var topLayout = createTopBar();
+
+        noMatches = new Label(getTranslation(I18n.Books.NO_MATCHES));
+        noMatches.setVisible(false);
+        noMatches.addStyleNames(VaadinCreateTheme.BOOKVIEW_NOMATCHES,
+                ValoTheme.LABEL_FAILURE);
 
         grid = new BookGrid();
         grid.asSingleSelect().addValueChangeListener(event -> {
@@ -96,12 +103,13 @@ public class BooksView extends CssLayout implements View, HasI18N {
         form = new BookForm(presenter);
 
         var barAndGridLayout = new VerticalLayout();
-        barAndGridLayout.addComponent(topLayout);
-        barAndGridLayout.addComponent(fakeGrid);
-        barAndGridLayout.addComponent(grid);
+        var gridWrapper = new CssLayout();
+        gridWrapper.setSizeFull();
+        gridWrapper.addStyleName(VaadinCreateTheme.BOOKVIEW_GRIDWRAPPER);
+        gridWrapper.addComponents(noMatches, grid, fakeGrid);
+        barAndGridLayout.addComponents(topLayout, gridWrapper);
         barAndGridLayout.setSizeFull();
-        barAndGridLayout.setExpandRatio(grid, 1);
-        barAndGridLayout.setExpandRatio(fakeGrid, 1);
+        barAndGridLayout.setExpandRatio(gridWrapper, 1);
         barAndGridLayout.setStyleName(VaadinCreateTheme.BOOKVIEW_GRID);
 
         addComponent(barAndGridLayout);
@@ -110,7 +118,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
         presenter.init();
     }
 
-    // Filter the grid data based on the filter text 
+    // Filter the grid data based on the filter text
     private static <T> boolean filterCondition(T value, String filterText) {
         assert filterText != null : "Filter text cannot be null";
         assert value != null : "Value cannot be null";
@@ -158,8 +166,12 @@ public class BooksView extends CssLayout implements View, HasI18N {
         ResetButtonForTextField.extend(filterField);
         // Apply the filter to grid's data provider. TextField value is never
         // null
-        filterField.addValueChangeListener(event -> dataProvider
-                .setFilter(book -> passesFilter(book, event.getValue())));
+        filterField.addValueChangeListener(event -> {
+            dataProvider
+                    .setFilter(book -> passesFilter(book, event.getValue()));
+            noMatches.setVisible(
+                    grid.getDataCommunicator().getDataProviderSize() == 0);
+        });
 
         newProduct = new Button(getTranslation(I18n.Books.NEW_PRODUCT));
         newProduct.setId("new-product");

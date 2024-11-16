@@ -8,6 +8,21 @@
     .bookview-filter {
       width: round($v-unit-size * 9);
     }
+
+    .bookview-gridwrapper {
+      position: relative
+    }
+  }
+
+  .bookview-nomatches {
+    position: absolute;
+    z-index: 1;
+    top: 36px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 36px);
+    text-align: center;
+    align-content: center;
   }
 
   // For aligning in grid until #15438 is done

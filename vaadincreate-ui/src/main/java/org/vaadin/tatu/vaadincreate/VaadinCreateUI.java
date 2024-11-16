@@ -43,6 +43,7 @@ import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedSession;
 import com.vaadin.shared.ui.ui.Transport;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
@@ -226,6 +227,14 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         getEventBus().unregisterEventBusListener(this);
     }
 
+    @Override
+    public void attach() {
+        super.attach();
+        // Workaround: https://github.com/vaadin/framework/issues/5772
+        JavaScript.eval(
+                "setTimeout(() => document.getElementsByClassName('v-tooltip')[0].style.zIndex=30001, 200);");
+    }
+
     /**
      * Retrieves the singleton instance of the EventBus.
      * 
@@ -281,7 +290,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
             // Add session init and destroy listeners
             getService().addSessionInitListener(event -> {
-                logger.info("Session started");
+                logger.debug("Session started");
                 VaadinSession session = event.getSession();
                 session.getSession().setMaxInactiveInterval(300);
                 session.addRequestHandler(this::handleRequest);
@@ -314,7 +323,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                     logger.info("Invalidating session");
                     wrappedSession.invalidate();
                 }
-                logger.info("Session ended");
+                logger.debug("Session ended");
             });
         }
 

@@ -169,8 +169,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
         filterField.addValueChangeListener(event -> {
             dataProvider
                     .setFilter(book -> passesFilter(book, event.getValue()));
-            noMatches.setVisible(
-                    grid.getDataCommunicator().getDataProviderSize() == 0);
+            updateNoMatchesVisibility();
         });
 
         newProduct = new Button(getTranslation(I18n.Books.NEW_PRODUCT));
@@ -187,6 +186,11 @@ public class BooksView extends CssLayout implements View, HasI18N {
         topLayout.setExpandRatio(filterField, 1);
         topLayout.setStyleName(VaadinCreateTheme.BOOKVIEW_TOOLBAR);
         return topLayout;
+    }
+
+    private void updateNoMatchesVisibility() {
+        noMatches.setVisible(
+                grid.getDataCommunicator().getDataProviderSize() == 0);
     }
 
     @Override
@@ -393,6 +397,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
         dataProvider.refreshItem(product);
         form.showForm(false);
         grid.focus();
+        updateNoMatchesVisibility();
         // IMHO this should not be necessary
         ui.push();
     }
@@ -409,6 +414,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
         dataProvider.refreshAll();
         form.showForm(false);
         grid.focus();
+        updateNoMatchesVisibility();
         grid.scrollToEnd();
     }
 
@@ -421,6 +427,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
     public void removeProduct(Product product) {
         dataProvider.getItems().remove(product);
         dataProvider.refreshAll();
+        updateNoMatchesVisibility();
     }
 
     public void newProduct() {

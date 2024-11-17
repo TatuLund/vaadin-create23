@@ -45,16 +45,20 @@ public class EventBusImpl implements EventBus {
         synchronized (eventListeners) {
             logger.debug("EventBus listenerer ({}) registered",
                     listener.hashCode());
-            eventListeners.put(listener, null);
+            if (eventListeners.put(listener, null) != null) {
+                logger.warn("EventBus listener ({}) was already registered",
+                        listener.hashCode());
+            }
         }
     }
 
     @Override
     public void unregisterEventBusListener(EventBusListener listener) {
         synchronized (eventListeners) {
-            logger.debug("EventBus listenerer ({}) un-registered",
-                    listener.hashCode());
-            eventListeners.remove(listener);
+            if (eventListeners.remove(listener) != null) {
+                logger.debug("EventBus listenerer ({}) un-registered",
+                        listener.hashCode());
+            }
         }
     }
 

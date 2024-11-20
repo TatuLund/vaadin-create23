@@ -38,8 +38,7 @@ public class UserForm extends Composite implements HasI18N {
         form.addStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM);
         username = new TextField(getTranslation(I18n.User.USERNAME));
         username.setId("user-field");
-        var userNameExt = new AttributeExtension();
-        userNameExt.extend(username);
+        var userNameExt = AttributeExtension.of(username);
         userNameExt.setAttribute("autocomplete", "242343243");
         var password = new PasswordField(getTranslation(I18n.PASSWORD));
         password.setId("password-field");

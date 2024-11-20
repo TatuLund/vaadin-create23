@@ -29,7 +29,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
@@ -60,7 +59,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
 
     private ListDataProvider<Product> dataProvider;
     private FakeGrid fakeGrid;
-    private Label noMatches;
+    private NoMatches noMatches = new NoMatches();
     private String params;
 
     private Product draft;
@@ -72,10 +71,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
         addStyleName(VaadinCreateTheme.BOOKVIEW);
         var topLayout = createTopBar();
 
-        noMatches = new Label(getTranslation(I18n.Books.NO_MATCHES));
         noMatches.setVisible(false);
-        noMatches.addStyleNames(VaadinCreateTheme.BOOKVIEW_NOMATCHES,
-                ValoTheme.LABEL_FAILURE);
 
         grid = new BookGrid();
         grid.asSingleSelect().addValueChangeListener(event -> {

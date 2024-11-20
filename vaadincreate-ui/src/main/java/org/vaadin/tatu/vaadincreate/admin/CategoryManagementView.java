@@ -194,8 +194,7 @@ public class CategoryManagementView extends VerticalLayout
 
         private void configureNameField() {
             nameField = new TextField();
-            var nameFieldExt = new AttributeExtension();
-            nameFieldExt.extend(nameField);
+            var nameFieldExt = AttributeExtension.of(nameField);
             nameFieldExt.setAttribute("autocomplete", "off");
             nameField.setId(String.format("name-%s", category.getId()));
             nameField.setValueChangeMode(ValueChangeMode.LAZY);

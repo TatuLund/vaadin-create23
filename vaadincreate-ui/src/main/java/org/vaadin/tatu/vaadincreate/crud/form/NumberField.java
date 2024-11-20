@@ -68,8 +68,7 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
     }
 
     private void setTypeNumber() {
-        var stockFieldExtension = new AttributeExtension();
-        stockFieldExtension.extend(textField);
+        var stockFieldExtension = AttributeExtension.of(textField);
         // Mark the stock count field as numeric.
         // This affects the virtual keyboard shown on mobile devices.
         stockFieldExtension.setAttribute("type", "number");

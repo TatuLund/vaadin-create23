@@ -45,6 +45,7 @@ public final class I18n {
         public static final String CATEGORIES_DELETED = "categories-deleted";
         public static final String INTERNAL_ERROR = "internal-error";
         public static final String NO_MATCHES = "no-matches";
+        public static final String LOADING = "loading";
 
         private Books() {
             // private constructor to hide the implicit public one

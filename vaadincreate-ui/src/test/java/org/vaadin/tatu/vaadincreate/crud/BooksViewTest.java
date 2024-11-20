@@ -846,9 +846,9 @@ public class BooksViewTest extends AbstractUITest {
         test($(TextField.class).id("filter-field")).setValue("No match");
         assertEquals(0, test(grid).size());
         // Assert that no matches label is shown
-        assertTrue(
-                $(Label.class).styleName(VaadinCreateTheme.BOOKVIEW_NOMATCHES)
-                        .single().isVisible());
+        assertTrue($(NoMatches.class)
+                .styleName(VaadinCreateTheme.BOOKVIEW_NOMATCHES).single()
+                .isVisible());
 
         // Add a book with matching name
         test($(view, Button.class).id("new-product")).click();
@@ -862,9 +862,9 @@ public class BooksViewTest extends AbstractUITest {
 
         // Assert that no matches label is not shown
         assertEquals(1, test(grid).size());
-        assertFalse(
-                $(Label.class).styleName(VaadinCreateTheme.BOOKVIEW_NOMATCHES)
-                        .single().isVisible());
+        assertFalse($(NoMatches.class)
+                .styleName(VaadinCreateTheme.BOOKVIEW_NOMATCHES).single()
+                .isVisible());
 
         // Delete the book
         test(grid).click(1, 0);
@@ -873,9 +873,9 @@ public class BooksViewTest extends AbstractUITest {
         test($(dialog, Button.class).id("confirm-button")).click();
         assertEquals(0, test(grid).size());
         // Assert that no matches label is shown again
-        assertTrue(
-                $(Label.class).styleName(VaadinCreateTheme.BOOKVIEW_NOMATCHES)
-                        .single().isVisible());
+        assertTrue($(NoMatches.class)
+                .styleName(VaadinCreateTheme.BOOKVIEW_NOMATCHES).single()
+                .isVisible());
     }
 
     @Test

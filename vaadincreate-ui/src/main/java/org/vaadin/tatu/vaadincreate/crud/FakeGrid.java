@@ -1,6 +1,9 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
+import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Composite;
@@ -33,7 +36,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * </ul>
  */
 @SuppressWarnings("serial")
-public class FakeGrid extends Composite {
+public class FakeGrid extends Composite implements HasI18N {
 
     /**
      * This class represents a fake grid component. It is used to display a
@@ -57,6 +60,11 @@ public class FakeGrid extends Composite {
         fakeHeader.addStyleName(VaadinCreateTheme.FAKEGRID_HEADER);
         var spinner = new Label();
         spinner.addStyleName(ValoTheme.LABEL_SPINNER);
+        var spinnerExtension = AttributeExtension.of(spinner);
+        // Set ARIA attributes for the spinner to make it accessible
+        spinnerExtension.setAttribute("aria-label",
+                getTranslation(I18n.Books.LOADING));
+        spinnerExtension.setAttribute("aria-live", "assertive");
         spinnerWrapper.addComponent(spinner);
         spinnerWrapper.setComponentAlignment(spinner, Alignment.MIDDLE_CENTER);
         layout.addComponents(fakeHeader, spinnerWrapper);

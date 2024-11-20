@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate;
 
 import com.vaadin.shared.JavaScriptExtensionState;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -11,4 +12,5 @@ import java.util.HashMap;
 @SuppressWarnings({ "serial", "java:S1104", "java:S1319" })
 public class AttributeExtensionState extends JavaScriptExtensionState {
     public HashMap<String, String> attributes = new HashMap<>();
+    public ArrayList<String> removals = new ArrayList<>();
 }

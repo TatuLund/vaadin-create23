@@ -12,6 +12,7 @@ window.org_vaadin_tatu_vaadincreate_AttributeExtension = function () {
           }
         }
       }
+      this.getState().removals.forEach(attr => element.removeAttribute(attr));
     }
   };
 };

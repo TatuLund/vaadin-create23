@@ -2,7 +2,7 @@ package org.vaadin.tatu.vaadincreate;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractJavaScriptExtension;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.AbstractComponent;
 
 /**
  * A JavaScript extension for adding arbitrary HTML attributes for components.
@@ -11,14 +11,8 @@ import com.vaadin.ui.TextField;
 @JavaScript("attributeextension/attribute_extension_connector.js")
 public class AttributeExtension extends AbstractJavaScriptExtension {
 
-    /**
-     * Extend the TextField with attribute extension.
-     *
-     * @param target
-     *            A TextField
-     */
-    public void extend(TextField target) {
-        super.extend(target);
+    protected AttributeExtension() {
+        // Non-public constructor to discourage direct instantiation
     }
 
     @Override
@@ -36,6 +30,7 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
      */
     public void setAttribute(String attribute, String value) {
         getState().attributes.put(attribute, value);
+        getState().removals.remove(attribute);
     }
 
     /**
@@ -46,5 +41,18 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
      */
     public void removeAttribute(String attribute) {
         getState().attributes.remove(attribute);
+        getState().removals.add(attribute);
+    }
+
+    /**
+     * Extend the TextField with attribute extension.
+     *
+     * @param target
+     *            A TextField
+     */
+    public static AttributeExtension of(AbstractComponent target) {
+        var extension = new AttributeExtension();
+        extension.extend(target);
+        return extension;
     }
 }

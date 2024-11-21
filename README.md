@@ -27,6 +27,7 @@ Despites being somewhat artificial this demo app covers various use cases you ma
 	- Implement beforeLeave to confirm unsaved changes
 	- Highlight changed fields
 	- Bean level validation example
+	- Display no matches label on Grid when search did not find matches
 	- Bookmarkable editor
 	- Description generator showing details in compact mode
 	- Pessimistic locking preventing concurrent edits

@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
@@ -43,10 +44,10 @@ import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedSession;
 import com.vaadin.shared.ui.ui.Transport;
-import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.themes.ValoTheme;
 
 @Theme("vaadincreate")
 @StyleSheet("vaadin://styles/additional-styles.css")
@@ -92,9 +93,10 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         showAppLayout();
     }
 
-    public void showInternalError(String message) {
-        Notification.show(getTranslation(I18n.EXCEPTION, message),
-                Type.ERROR_MESSAGE);
+    public void showInternalError(String message, String id) {
+        var failure = Notification.show(getTranslation(I18n.EXCEPTION, id),
+                message, Type.ERROR_MESSAGE);
+        failure.setStyleName(ValoTheme.NOTIFICATION_FAILURE);
     }
 
     private String getInitialTarget() {
@@ -278,6 +280,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     @VaadinServletConfiguration(productionMode = false, ui = VaadinCreateUI.class, heartbeatInterval = 60, closeIdleSessions = true)
     public static class Servlet extends VaadinServlet {
 
+        final AtomicInteger exceptionCount = new AtomicInteger(1);
+
         @Override
         protected void servletInitialized() {
             // Disable session expired notification and redirect to login view
@@ -304,11 +308,12 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                     // https://github.com/jetty/jetty.project/issues/9763
                     if (!(throwable.toString()
                             .contains("org.eclipse.jetty.io.EofException"))) {
-                        var message = throwable.getLocalizedMessage();
+                        String id = formatId();
+                        var message = throwable.getMessage();
                         session.getUIs().forEach(
                                 ui -> ui.access(() -> ((VaadinCreateUI) ui)
-                                        .showInternalError(message)));
-                        logger.error("Exception happened",
+                                        .showInternalError(message, id)));
+                        logger.error("Exception happened {}", id,
                                 errorHandler.getThrowable());
                     }
                 });
@@ -325,6 +330,13 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 }
                 logger.debug("Session ended");
             });
+        }
+
+        private String formatId() {
+            return String
+                    .format("#%10s",
+                            String.valueOf(exceptionCount.getAndAdd(1)))
+                    .replace(' ', '0');
         }
 
         // Use request handler to persist the selected language to Cookie

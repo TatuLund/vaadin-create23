@@ -160,6 +160,7 @@ public final class I18n {
         public static final String DUPLICATE = "category-duplicate";
         public static final String INSTRUCTION = "category-instruction";
         public static final String DELETE_ERROR = "category-delete-error";
+        public static final String CATEGORY = "category-name";
 
         private Category() {
             // private constructor to hide the implicit public one

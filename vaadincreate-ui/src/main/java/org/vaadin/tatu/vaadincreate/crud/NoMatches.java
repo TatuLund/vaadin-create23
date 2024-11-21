@@ -21,6 +21,7 @@ public class NoMatches extends Composite implements HasI18N {
         // With this attribute screen reader will announce the content of the
         // label when it becomes visible.
         extension.setAttribute("aria-live", "assertive");
+        extension.setAttribute("role", "alert");
 
         setCompositionRoot(label);
     }

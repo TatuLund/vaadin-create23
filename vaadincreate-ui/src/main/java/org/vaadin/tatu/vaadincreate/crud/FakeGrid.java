@@ -65,6 +65,7 @@ public class FakeGrid extends Composite implements HasI18N {
         spinnerExtension.setAttribute("aria-label",
                 getTranslation(I18n.Books.LOADING));
         spinnerExtension.setAttribute("aria-live", "assertive");
+        spinnerExtension.setAttribute("role", "alert");
         spinnerWrapper.addComponent(spinner);
         spinnerWrapper.setComponentAlignment(spinner, Alignment.MIDDLE_CENTER);
         layout.addComponents(fakeHeader, spinnerWrapper);

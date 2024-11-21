@@ -64,7 +64,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
     @Test
     public void editBookExitContinueWithDraft() throws ServiceException {
         createBook("Draft book");
-        test($(TextField.class).id("filter-field")).setValue("Draft book");
+        test($(FilterField.class).id("filter-field")).setValue("Draft book");
 
         test(grid).click(1, 0);
         var book = test(grid).item(0);
@@ -210,7 +210,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
     public void editBookExitConcurrentEditContinueWithDraft()
             throws ServiceException {
         createBook("Draft book");
-        test($(TextField.class).id("filter-field")).setValue("Draft book");
+        test($(FilterField.class).id("filter-field")).setValue("Draft book");
 
         test(grid).click(1, 0);
         var book = test(grid).item(0);
@@ -296,7 +296,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
     public void editBookExitConcurrentDeleteContinueWithDraft()
             throws ServiceException {
         createBook("Draft book");
-        test($(TextField.class).id("filter-field")).setValue("Draft book");
+        test($(FilterField.class).id("filter-field")).setValue("Draft book");
 
         test(grid).click(1, 0);
         var book = test(grid).item(0);

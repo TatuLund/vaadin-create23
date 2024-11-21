@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
@@ -355,6 +356,13 @@ public class BookForm extends Composite implements HasI18N {
         formLayout.addComponents(saveButton, discardButton, cancelButton,
                 deleteButton);
         formLayout.setExpandRatio(spacer, 1);
+
+        // Set ARIA attributes for the form to make it accessible
+        var attributes = AttributeExtension.of(formLayout);
+        attributes.setAttribute("aria-label",
+                getTranslation(I18n.Books.FORM_OPENED));
+        attributes.setAttribute("role", "alert");
+
         sidePanel.setContent(formLayout);
     }
 

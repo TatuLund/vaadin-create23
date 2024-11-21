@@ -7,6 +7,8 @@
   display: inline-block;
   vertical-align: middle;
   right: 18pt;
+  margin-top: 4px;
+  padding: 1px;
   margin-right: -18pt;
   cursor: pointer;
   width: 16px;
@@ -14,6 +16,10 @@
   background-image: url(resetbutton-default.svg);
   background-position: center center;
   background-repeat: no-repeat;
+}
+
+.resetbuttonfortextfield-resetbutton:focus-visible {
+  outline: 2px solid #4c96d6;
 }
 
 .resetbuttonfortextfield-resetbutton:hover {

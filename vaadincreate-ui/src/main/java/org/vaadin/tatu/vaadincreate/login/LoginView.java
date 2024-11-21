@@ -155,7 +155,6 @@ public class LoginView extends Composite implements HasI18N {
         capsLockWarning = CapsLockWarning.warnFor(passwordField);
         capsLockWarning.setMessage(getTranslation(I18n.Login.CAPSLOCK));
         passwordField.setWidth(18, Unit.EM);
-        passwordField.setDescription(getTranslation(I18n.Login.HINT));
         passwordField.setId("login-password-field");
         CssLayout buttons = new CssLayout();
         buttons.setStyleName("buttons");

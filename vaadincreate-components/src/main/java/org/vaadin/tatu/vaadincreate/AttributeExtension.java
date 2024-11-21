@@ -5,7 +5,8 @@ import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.ui.AbstractComponent;
 
 /**
- * A JavaScript extension for adding arbitrary HTML attributes for components.
+ * A JavaScript extension for adding arbitrary HTML attributes for component's
+ * top level element.
  */
 @SuppressWarnings("serial")
 @JavaScript("attributeextension/attribute_extension_connector.js")
@@ -45,10 +46,10 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
     }
 
     /**
-     * Extend the TextField with attribute extension.
+     * Extend the Component with attribute extension.
      *
      * @param target
-     *            A TextField
+     *            A Component
      */
     public static AttributeExtension of(AbstractComponent target) {
         var extension = new AttributeExtension();

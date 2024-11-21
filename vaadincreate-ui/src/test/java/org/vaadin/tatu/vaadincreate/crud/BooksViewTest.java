@@ -35,7 +35,6 @@ import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -218,7 +217,7 @@ public class BooksViewTest extends AbstractUITest {
         assertEquals("10", test(grid).cell(4, row));
 
         // Find by filter and its the first row
-        test($(TextField.class).id("filter-field")).setValue("Filter book");
+        test($(FilterField.class).id("filter-field")).setValue("Filter book");
         assertEquals(1, test(grid).size());
         assertEquals("Filter book", test(grid).cell(1, 0));
         assertEquals("10.00 €", test(grid).cell(2, 0));
@@ -262,7 +261,7 @@ public class BooksViewTest extends AbstractUITest {
     public void deleteProduct() {
         createBook("Delete book");
 
-        test($(TextField.class).id("filter-field")).setValue("Delete book");
+        test($(FilterField.class).id("filter-field")).setValue("Delete book");
 
         var row = 0;
         var book = test(grid).item(row);
@@ -306,7 +305,7 @@ public class BooksViewTest extends AbstractUITest {
         createBook("Concurrent delete");
 
         // Simulate other user deleting the book
-        test($(TextField.class).id("filter-field"))
+        test($(FilterField.class).id("filter-field"))
                 .setValue("Concurrent delete");
         var book = test(grid).item(0);
         ui.getProductService().deleteProduct(book.getId());
@@ -323,7 +322,7 @@ public class BooksViewTest extends AbstractUITest {
     public void editProduct() {
         createBook("Test book");
 
-        test($(TextField.class).id("filter-field")).setValue("Test book");
+        test($(FilterField.class).id("filter-field")).setValue("Test book");
 
         var row = 0;
         var book = test(grid).item(row);
@@ -340,7 +339,7 @@ public class BooksViewTest extends AbstractUITest {
 
         var edited = ui.getProductService().getProductById(id);
 
-        test($(TextField.class).id("filter-field")).setValue("Edited book");
+        test($(FilterField.class).id("filter-field")).setValue("Edited book");
         var name = (String) test(grid).cell(1, row);
 
         assertEquals("Edited book", name);
@@ -522,7 +521,7 @@ public class BooksViewTest extends AbstractUITest {
         // simulated
         // by doing lock via proxy object.
         createBook("Concurrent delete");
-        test($(TextField.class).id("filter-field"))
+        test($(FilterField.class).id("filter-field"))
                 .setValue("Concurrent delete");
 
         var book = new Product(test(grid).item(0));
@@ -843,7 +842,7 @@ public class BooksViewTest extends AbstractUITest {
     @Test
     public void filterNoMatch() {
         // Search book that does not exists
-        test($(TextField.class).id("filter-field")).setValue("No match");
+        test($(FilterField.class).id("filter-field")).setValue("No match");
         assertEquals(0, test(grid).size());
         // Assert that no matches label is shown
         assertTrue($(NoMatches.class)

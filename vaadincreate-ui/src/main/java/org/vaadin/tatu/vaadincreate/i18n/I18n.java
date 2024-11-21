@@ -46,6 +46,8 @@ public final class I18n {
         public static final String INTERNAL_ERROR = "internal-error";
         public static final String NO_MATCHES = "no-matches";
         public static final String LOADING = "loading";
+        public static final String CLEAR_TEXT = "clear-text";
+        public static final String FORM_OPENED = "form-opened";
 
         private Books() {
             // private constructor to hide the implicit public one

@@ -13,7 +13,7 @@ public class ResetButtonForTextFieldView extends VerticalLayout
     public ResetButtonForTextFieldView() {
         var field = new TextField("Field");
         field.setValue("Value");
-        ResetButtonForTextField.extend(field);
+        ResetButtonForTextField.of(field);
         field.addValueChangeListener(e -> {
             Label label = new Label();
             label.setValue("Value:"+e.getValue());

@@ -45,7 +45,7 @@ public class BooksViewUserTest extends AbstractUITest {
 
     @Test
     public void canSearch_newButtonIsDisabled_clickNotOpeningForm() {
-        test($(TextField.class).id("filter-field")).setValue("debug");
+        test($(FilterField.class).id("filter-field")).setValue("debug");
         assertEquals(3, test(grid).size());
 
         assertFalse(

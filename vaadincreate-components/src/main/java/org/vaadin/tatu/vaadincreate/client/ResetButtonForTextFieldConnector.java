@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.client;
 
 import org.vaadin.tatu.vaadincreate.ResetButtonForTextField;
+import org.vaadin.tatu.vaadincreate.shared.ResetButtonForTextFieldState;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Element;
@@ -43,6 +44,9 @@ public class ResetButtonForTextFieldConnector extends AbstractExtensionConnector
         resetButtonElement = DOM.createDiv();
         var resetButtonStyle = CLASSNAME + "-resetbutton";
         resetButtonElement.addClassName(resetButtonStyle);
+        resetButtonElement.setAttribute("role", "button");
+        resetButtonElement.setAttribute("tabindex", "0");
+        resetButtonElement.setAttribute("aria-label", getState().buttonLabel);
 
         textField.addAttachHandler(this);
         textField.addKeyUpHandler(this);
@@ -106,4 +110,10 @@ public class ResetButtonForTextFieldConnector extends AbstractExtensionConnector
         updateResetButtonVisibility();
         textField.getElement().focus();
     }
+
+    @Override
+    public ResetButtonForTextFieldState getState() {
+        return (ResetButtonForTextFieldState) super.getState();
+    }
+
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
-import org.vaadin.tatu.vaadincreate.ResetButtonForTextField;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
@@ -31,7 +30,6 @@ import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -152,14 +150,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
      * @return the created HorizontalLayout for the top bar
      */
     private HorizontalLayout createTopBar() {
-        var filterField = new TextField();
-        filterField.setId("filter-field");
-        filterField.setStyleName(VaadinCreateTheme.BOOKVIEW_FILTER);
-        filterField.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
-        filterField.setPlaceholder(getTranslation(I18n.Books.FILTER));
-        filterField.setDescription(getTranslation(I18n.Books.FILTER));
-        filterField.setIcon(VaadinIcons.SEARCH);
-        ResetButtonForTextField.extend(filterField);
+        var filterField = new FilterField();
         // Apply the filter to grid's data provider. TextField value is never
         // null
         filterField.addValueChangeListener(event -> {
@@ -234,6 +225,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
         } else {
             form.showForm(false);
             clearSelection();
+            setFragmentParameter("");
             presenter.unlockBook();
             grid.focus();
         }

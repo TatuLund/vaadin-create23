@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.crud.form;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.crud.BookGrid;
 import org.vaadin.tatu.vaadincreate.crud.BooksPresenter;
 import org.vaadin.tatu.vaadincreate.crud.EuroConverter;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -25,6 +27,7 @@ import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.Binder;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.AbstractErrorMessage;
 import com.vaadin.server.Page;
 import com.vaadin.server.UserError;
@@ -126,14 +129,16 @@ public class BookForm extends Composite implements HasI18N {
     private BooksPresenter presenter;
     private boolean visible;
     private boolean isValid;
+    private AttributeExtension attributes;
 
     /**
      * Creates a new BookForm with the given presenter.
      *
      * @param presenter
      *            the presenter for the form.
+     * @param grid
      */
-    public BookForm(BooksPresenter presenter) {
+    public BookForm(BooksPresenter presenter, BookGrid grid) {
         this.presenter = presenter;
         setCompositionRoot(sidePanel);
         buildForm();
@@ -183,6 +188,20 @@ public class BookForm extends Composite implements HasI18N {
         cancelButton.setClickShortcut(KeyCode.ESCAPE);
 
         deleteButton.addClickListener(event -> handleDelete());
+        addShortcutListener(
+                new ShortcutListener("Next", KeyCode.PAGE_DOWN, null) {
+                    @Override
+                    public void handleAction(Object sender, Object target) {
+                        selectNextProduct(presenter, grid);
+                    }
+                });
+        addShortcutListener(
+                new ShortcutListener("Previous", KeyCode.PAGE_UP, null) {
+                    @Override
+                    public void handleAction(Object sender, Object target) {
+                        selectPreviousProduct(presenter, grid);
+                    }
+                });
     }
 
     private void handleSave() {
@@ -322,6 +341,7 @@ public class BookForm extends Composite implements HasI18N {
         productName.setId("product-name");
         productName.setWidthFull();
         productName.setMaxLength(100);
+        AttributeExtension.of(productName).setAttribute("autocomplete", "off");
         CharacterCountExtension.extend(productName);
 
         // Layout price and stockCount horizontally
@@ -358,10 +378,12 @@ public class BookForm extends Composite implements HasI18N {
         formLayout.setExpandRatio(spacer, 1);
 
         // Set ARIA attributes for the form to make it accessible
-        var attributes = AttributeExtension.of(formLayout);
+        attributes = AttributeExtension.of(formLayout);
         attributes.setAttribute("aria-label",
                 getTranslation(I18n.Books.FORM_OPENED));
-        attributes.setAttribute("role", "alert");
+        attributes.setAttribute("role", "form");
+        attributes.setAttribute("aria-keyshortcuts", "Escape PageDown PageUp");
+        attributes.setAttribute("aria-live", "assertive");
 
         sidePanel.setContent(formLayout);
     }
@@ -438,6 +460,34 @@ public class BookForm extends Composite implements HasI18N {
     @Override
     public void focus() {
         productName.focus();
+    }
+
+    private static List<Product> getVisibleItems(BookGrid grid) {
+        return grid.getDataCommunicator().fetchItemsWithRange(0,
+                grid.getDataCommunicator().getDataProviderSize());
+    }
+
+    private void selectPreviousProduct(BooksPresenter presenter,
+            BookGrid grid) {
+        if (getProduct().getId() == null) {
+            return;
+        }
+        var items = getVisibleItems(grid);
+        var current = items.indexOf(getProduct());
+        if (current > 0) {
+            presenter.selectProduct(items.get(current - 1));
+        }
+    }
+
+    private void selectNextProduct(BooksPresenter presenter, BookGrid grid) {
+        if (getProduct().getId() == null) {
+            return;
+        }
+        var items = getVisibleItems(grid);
+        var current = items.indexOf(getProduct());
+        if (current < items.size() - 1) {
+            presenter.selectProduct(items.get(current + 1));
+        }
     }
 
     private static Logger logger = LoggerFactory.getLogger(BookForm.class);

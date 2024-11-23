@@ -1,9 +1,11 @@
 package org.vaadin.tatu.vaadincreate.stats;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
@@ -50,6 +52,10 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
 
     private UI ui;
 
+    private AttributeExtension availabilityChartAttributes;
+    private AttributeExtension priceChartAttributes;
+    private AttributeExtension categoryChartAttributes;
+
     public StatsView() {
         addStyleNames(VaadinCreateTheme.STATSVIEW, ValoTheme.SCROLLABLE);
         dashboard = new CssLayout();
@@ -78,6 +84,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         var priceChartWrapper = new CssLayout();
         priceChart = new Chart(ChartType.PIE);
         priceChart.setId("price-chart");
+        priceChartAttributes = AttributeExtension.of(priceChart);
         priceChartWrapper.addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
         var conf = priceChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.Stats.PRICES));
@@ -93,6 +100,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_WIDE);
         categoryChart = new Chart(ChartType.COLUMN);
         categoryChart.setId("category-chart");
+        categoryChartAttributes = AttributeExtension.of(categoryChart);
         var conf = categoryChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.CATEGORIES));
         conf.setLang(lang);
@@ -105,6 +113,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         var availabilityChartWrapper = new CssLayout();
         availabilityChart = new Chart(ChartType.COLUMN);
         availabilityChart.setId("availability-chart");
+        availabilityChartAttributes = AttributeExtension.of(availabilityChart);
         availabilityChartWrapper
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
         var conf = availabilityChart.getConfiguration();
@@ -159,6 +168,14 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         priceSeries.setName(getTranslation(I18n.Stats.COUNT));
         var conf = priceChart.getConfiguration();
         conf.setSeries(priceSeries);
+
+        priceChartAttributes.setAttribute("role", "figure");
+        priceChartAttributes.setAttribute("tabindex", "0");
+        var alt = getTranslation(I18n.Stats.PRICES) + ":"
+                + priceSeries.getData().stream()
+                        .map(data -> data.getName() + " " + data.getY())
+                        .collect(Collectors.joining(","));
+        priceChartAttributes.setAttribute("aria-label", alt);
     }
 
     // Update the charts with the new data
@@ -184,6 +201,20 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         conf.addSeries(stockCounts);
         stockAxis.setTitle(getTranslation(I18n.IN_STOCK));
         categoryStats.keySet().forEach(cat -> conf.getxAxis().addCategory(cat));
+
+        categoryChartAttributes.setAttribute("role", "figure");
+        categoryChartAttributes.setAttribute("tabindex", "0");
+        var alt1 = getTranslation(I18n.Stats.CATEGORIES) + " "
+                + getTranslation(I18n.Stats.COUNT) + ":"
+                + titles.getData().stream()
+                        .map(data -> data.getName() + " " + data.getY())
+                        .collect(Collectors.joining(","));
+        var alt2 = getTranslation(I18n.Stats.CATEGORIES) + " "
+                + getTranslation(I18n.IN_STOCK) + ":"
+                + stockCounts.getData().stream()
+                        .map(data -> data.getName() + " " + data.getY())
+                        .collect(Collectors.joining(","));
+        categoryChartAttributes.setAttribute("aria-label", alt1 + " " + alt2);
     }
 
     // Update the charts with the new data
@@ -200,6 +231,14 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
                 .map(item -> item.getName()).toArray(String[]::new);
         var axis = conf.getxAxis();
         axis.setCategories(categories);
+
+        availabilityChartAttributes.setAttribute("role", "figure");
+        availabilityChartAttributes.setAttribute("tabindex", "0");
+        var alt = getTranslation(I18n.Stats.AVAILABILITIES) + ":"
+                + availabilitySeries.getData().stream()
+                        .map(data -> data.getName() + " " + data.getY())
+                        .collect(Collectors.joining(","));
+        availabilityChartAttributes.setAttribute("aria-label", alt);
     }
 
     private DataSeries categorySeries(Map<String, Long[]> categories,

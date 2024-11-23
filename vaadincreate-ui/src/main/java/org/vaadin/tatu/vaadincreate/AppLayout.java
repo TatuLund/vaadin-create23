@@ -92,6 +92,7 @@ public class AppLayout extends Composite implements HasI18N {
         toggleButton.addStyleName(ValoTheme.BUTTON_SMALL);
         menuLayout.addComponent(toggleButton);
 
+        AttributeExtension.of(menuItems).setAttribute("role", "menu");
         menuLayout.addComponent(menuItems);
         menuItems.addStyleName(ValoTheme.MENU_ITEMS);
 

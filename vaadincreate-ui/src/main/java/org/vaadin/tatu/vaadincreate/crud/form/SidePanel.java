@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.crud.form;
 
+import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 
 import com.vaadin.ui.Component;
@@ -25,6 +26,7 @@ public class SidePanel extends Composite {
         layout.setId("book-form");
         layout.addStyleNames(VaadinCreateTheme.BOOKFORM,
                 VaadinCreateTheme.BOOKFORM_WRAPPER);
+        AttributeExtension.of(layout).setAttribute("role", "dialog");
 
         setCompositionRoot(layout);
     }

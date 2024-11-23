@@ -368,6 +368,10 @@ public class BooksPresenter implements Serializable, EventBusListener {
         }
     }
 
+    public void selectProduct(Product product) {
+        view.handleSelectionChange(product);
+    }
+
     /**
      * Saves the given product draft.
      *

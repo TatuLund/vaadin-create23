@@ -173,7 +173,8 @@ public class CategoryManagementView extends VerticalLayout
             deleteButton = new Button(VaadinIcons.TRASH,
                     e -> handleConfirmDelete());
             deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
-            deleteButton.setDescription(getTranslation(I18n.DELETE));
+            deleteButton.setDescription(
+                    getTranslation(I18n.DELETE) + ": " + category.getName());
             deleteButton.setEnabled(category.getId() != null);
             deleteButton.setDisableOnClick(true);
 
@@ -196,7 +197,8 @@ public class CategoryManagementView extends VerticalLayout
             nameField = new TextField();
             var nameFieldExt = AttributeExtension.of(nameField);
             nameFieldExt.setAttribute("autocomplete", "off");
-            nameFieldExt.setAttribute("aria-label", getTranslation(I18n.Category.CATEGORY));
+            nameFieldExt.setAttribute("aria-label",
+                    getTranslation(I18n.Category.CATEGORY));
             nameFieldExt.removeAttribute("aria-labelledby");
             nameField.setId(String.format("name-%s", category.getId()));
             nameField.setValueChangeMode(ValueChangeMode.LAZY);

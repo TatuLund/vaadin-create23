@@ -18,6 +18,7 @@ import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
+import com.vaadin.data.HasValue.ValueChangeEvent;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
@@ -74,19 +75,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
         grid = new BookGrid();
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.isUserOriginated()) {
-                if (form.hasChanges()) {
-                    var dialog = createDiscardChangesConfirmDialog();
-                    dialog.open();
-                    dialog.addConfirmedListener(e -> {
-                        presenter.unlockBook();
-                        form.showForm(false);
-                        setFragmentParameter("");
-                    });
-                    dialog.addCancelListener(
-                            e -> grid.select(form.getProduct()));
-                } else {
-                    presenter.rowSelected(event.getValue());
-                }
+                handleSelectionChange(event.getValue());
             }
         });
         grid.setVisible(false);
@@ -94,7 +83,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
         // Display fake Grid while loading data
         fakeGrid = new FakeGrid();
 
-        form = new BookForm(presenter);
+        form = new BookForm(presenter, grid);
 
         var barAndGridLayout = new VerticalLayout();
         var gridWrapper = new CssLayout();
@@ -110,6 +99,24 @@ public class BooksView extends CssLayout implements View, HasI18N {
         addComponent(form);
 
         presenter.init();
+    }
+
+    public void handleSelectionChange(Product product) {
+        if (form.hasChanges()) {
+            var dialog = createDiscardChangesConfirmDialog();
+            dialog.open();
+            dialog.addConfirmedListener(e -> {
+                presenter.unlockBook();
+                form.showForm(false);
+                setFragmentParameter("");
+            });
+            dialog.addCancelListener(e -> grid.select(form.getProduct()));
+        } else {
+            presenter.rowSelected(product);
+            if (product != null) {
+                grid.select(product);
+            }
+        }
     }
 
     // Filter the grid data based on the filter text

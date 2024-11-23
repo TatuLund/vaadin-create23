@@ -99,6 +99,32 @@ $fake-grid-background-color: white;
     }
   }
 
+  span#logout-2:focus-visible {
+    color: white;
+    outline: none;
+    
+    .v-icon {
+      color: $v-focus-color;
+    }
+  }
+
+  span#logout-2:hover {
+    color: white;
+    outline: none;
+    
+    .v-icon {
+      color: $v-focus-color;
+    }
+  }
+
+  div[aria-label="Top of dialog"] {
+  	display: none;
+  }
+
+  div[aria-label="Bottom of Dialog"] {
+  	display: none;
+  }
+
   // Hide spinner buttons from number input
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button {

@@ -175,10 +175,11 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
 
         priceChartAttributes.setAttribute("role", "figure");
         priceChartAttributes.setAttribute("tabindex", "0");
-        var alt = getTranslation(I18n.Stats.PRICES) + ":"
-                + priceSeries.getData().stream()
-                        .map(data -> data.getName() + " " + data.getY())
-                        .collect(Collectors.joining(","));
+        var alt = String.format("%s:%s", getTranslation(I18n.Stats.PRICES),
+                priceSeries
+                        .getData().stream().map(data -> String.format("%s %s",
+                                data.getName(), data.getY()))
+                        .collect(Collectors.joining(",")));
         priceChartAttributes.setAttribute("aria-label", alt);
     }
 
@@ -208,16 +209,19 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
 
         categoryChartAttributes.setAttribute("role", "figure");
         categoryChartAttributes.setAttribute("tabindex", "0");
-        var alt1 = getTranslation(I18n.Stats.CATEGORIES) + " "
-                + getTranslation(I18n.Stats.COUNT) + ":"
-                + titles.getData().stream()
-                        .map(data -> data.getName() + " " + data.getY())
-                        .collect(Collectors.joining(","));
-        var alt2 = getTranslation(I18n.Stats.CATEGORIES) + " "
-                + getTranslation(I18n.IN_STOCK) + ":"
-                + stockCounts.getData().stream()
-                        .map(data -> data.getName() + " " + data.getY())
-                        .collect(Collectors.joining(","));
+        var alt1 = String.format("%s %s:%s",
+                getTranslation(I18n.Stats.CATEGORIES),
+                getTranslation(I18n.Stats.COUNT),
+                titles.getData().stream().map(data -> String.format("%s %s",
+                        data.getName(), data.getY()))
+                        .collect(Collectors.joining(",")));
+        var alt2 = String.format("%s %s:%s",
+                getTranslation(I18n.Stats.CATEGORIES),
+                getTranslation(I18n.IN_STOCK),
+                stockCounts
+                        .getData().stream().map(data -> String.format("%s %s",
+                                data.getName(), data.getY()))
+                        .collect(Collectors.joining(",")));
         categoryChartAttributes.setAttribute("aria-label", alt1 + " " + alt2);
     }
 
@@ -238,10 +242,12 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
 
         availabilityChartAttributes.setAttribute("role", "figure");
         availabilityChartAttributes.setAttribute("tabindex", "0");
-        var alt = getTranslation(I18n.Stats.AVAILABILITIES) + ":"
-                + availabilitySeries.getData().stream()
-                        .map(data -> data.getName() + " " + data.getY())
-                        .collect(Collectors.joining(","));
+        var alt = String.format("%s:%s",
+                getTranslation(I18n.Stats.AVAILABILITIES),
+                availabilitySeries
+                        .getData().stream().map(data -> String.format("%s %s",
+                                data.getName(), data.getY()))
+                        .collect(Collectors.joining(",")));
         availabilityChartAttributes.setAttribute("aria-label", alt);
     }
 

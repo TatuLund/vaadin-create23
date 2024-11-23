@@ -173,8 +173,8 @@ public class CategoryManagementView extends VerticalLayout
             deleteButton = new Button(VaadinIcons.TRASH,
                     e -> handleConfirmDelete());
             deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
-            deleteButton.setDescription(
-                    getTranslation(I18n.DELETE) + ": " + category.getName());
+            deleteButton.setDescription(String.format("%s: %s",
+                    getTranslation(I18n.DELETE), category.getName()));
             deleteButton.setEnabled(category.getId() != null);
             deleteButton.setDisableOnClick(true);
 

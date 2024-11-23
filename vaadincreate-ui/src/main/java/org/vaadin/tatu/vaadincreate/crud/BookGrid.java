@@ -16,6 +16,7 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.renderers.HtmlRenderer;
 import com.vaadin.ui.renderers.NumberRenderer;
@@ -175,6 +176,9 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                 .getNumberInstance(getUI().getLocale());
         decimalFormat.setMaximumFractionDigits(2);
         decimalFormat.setMinimumFractionDigits(2);
+        // Improve Grid browsing experience for screen reader users
+        JavaScript.eval(
+                "setTimeout(() => { const body = document.querySelector('tbody.v-grid-body');Array.from(body.getElementsByTagName('tr')).forEach(el => el.setAttribute('aria-live', 'polite'));}, 1000);");
     }
 
     /**

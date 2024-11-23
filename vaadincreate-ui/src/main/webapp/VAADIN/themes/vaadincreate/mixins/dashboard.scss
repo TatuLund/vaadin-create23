@@ -17,6 +17,7 @@
 
     .dashboard-chart-focusring:focus-visible {
       outline: 2px solid $v-focus-color;
+      border-radius: 2px;
     }
   }
 }

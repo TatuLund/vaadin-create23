@@ -37,8 +37,8 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
 import com.vaadin.ui.Composite;
-import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -120,6 +120,7 @@ public class BookForm extends Composite implements HasI18N {
     protected Button discardButton = new Button(getTranslation(I18n.DISCARD));
     protected Button cancelButton = new Button(getTranslation(I18n.CANCEL));
     protected Button deleteButton = new Button(getTranslation(I18n.DELETE));
+    private Label selectionLabel = new Label();
 
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
@@ -129,7 +130,6 @@ public class BookForm extends Composite implements HasI18N {
     private BooksPresenter presenter;
     private boolean visible;
     private boolean isValid;
-    private AttributeExtension attributes;
 
     /**
      * Creates a new BookForm with the given presenter.
@@ -142,6 +142,9 @@ public class BookForm extends Composite implements HasI18N {
         this.presenter = presenter;
         setCompositionRoot(sidePanel);
         buildForm();
+
+        selectionLabel.setContentMode(ContentMode.HTML);
+        selectionLabel.setValue("<div aria-live='polite' role='alert'></div>");
 
         binder = new BeanValidationBinder<>(Product.class);
         binder.forField(price)
@@ -358,8 +361,6 @@ public class BookForm extends Composite implements HasI18N {
         category.setHeight("170px");
         category.setWidthFull();
 
-        var spacer = new CssLayout();
-
         // Buttons
         saveButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
         saveButton.setId("save-button");
@@ -372,18 +373,18 @@ public class BookForm extends Composite implements HasI18N {
 
         formLayout.addComponents(productName, fieldWrapper, availability,
                 category);
-        formLayout.addComponent(spacer);
+        formLayout.addComponents(selectionLabel);
         formLayout.addComponents(saveButton, discardButton, cancelButton,
                 deleteButton);
-        formLayout.setExpandRatio(spacer, 1);
+        formLayout.setExpandRatio(selectionLabel, 1);
 
         // Set ARIA attributes for the form to make it accessible
-        attributes = AttributeExtension.of(formLayout);
+        var attributes = AttributeExtension.of(formLayout);
+        attributes.setAttribute("tabindex", "0");
         attributes.setAttribute("aria-label",
-                getTranslation(I18n.Books.FORM_OPENED));
+                getTranslation(I18n.Books.PRODUCT_FORM));
         attributes.setAttribute("role", "form");
         attributes.setAttribute("aria-keyshortcuts", "Escape PageDown PageUp");
-        attributes.setAttribute("aria-live", "assertive");
 
         sidePanel.setContent(formLayout);
     }
@@ -421,6 +422,12 @@ public class BookForm extends Composite implements HasI18N {
                     getId());
             Page.getCurrent().getJavaScript().execute(scrollScript);
         }
+
+        // Set ARIA attributes for the form to make it accessible
+        selectionLabel.setValue(String.format(
+                "<div role='alert' aria-live='polite' aria-label='%s %s'></div>",
+                product.getProductName(), getTranslation(I18n.Books.OPENED)));
+
     }
 
     @Override

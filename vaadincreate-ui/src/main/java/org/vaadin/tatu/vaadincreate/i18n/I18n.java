@@ -47,7 +47,8 @@ public final class I18n {
         public static final String NO_MATCHES = "no-matches";
         public static final String LOADING = "loading";
         public static final String CLEAR_TEXT = "clear-text";
-        public static final String FORM_OPENED = "form-opened";
+        public static final String PRODUCT_FORM = "product-form";
+        public static final String OPENED = "opened";
 
         private Books() {
             // private constructor to hide the implicit public one

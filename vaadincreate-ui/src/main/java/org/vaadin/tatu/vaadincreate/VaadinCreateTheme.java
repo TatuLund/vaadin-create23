@@ -58,6 +58,7 @@ public final class VaadinCreateTheme {
     public static final String DASHBOARD = "dashboard";
     public static final String DASHBOARD_CHART_WIDE = "dashboard-chart-wide";
     public static final String DASHBOARD_CHART = "dashboard-chart";
+    public static final String DASHBOARD_CHART_FOCUSRING = "dashboard-chart-focusring";
 
     public static final String COLOR_AVAILABLE = "var(--color-available)";
     public static final String COLOR_COMING = "var(--color-coming)";

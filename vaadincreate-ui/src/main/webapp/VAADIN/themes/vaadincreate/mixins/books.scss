@@ -34,6 +34,12 @@
     }	
   }
 
+  .bookview {
+  	div#book-grid:focus-visible {
+      outline: 2px solid $v-focus-color;
+  	}
+  }
+
   .bookview-grid-edited {
     color: $v-focus-color;
   }

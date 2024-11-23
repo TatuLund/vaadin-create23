@@ -84,6 +84,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         var priceChartWrapper = new CssLayout();
         priceChart = new Chart(ChartType.PIE);
         priceChart.setId("price-chart");
+        priceChart.addStyleName(VaadinCreateTheme.DASHBOARD_CHART_FOCUSRING);
         priceChartAttributes = AttributeExtension.of(priceChart);
         priceChartWrapper.addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
         var conf = priceChart.getConfiguration();
@@ -100,6 +101,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_WIDE);
         categoryChart = new Chart(ChartType.COLUMN);
         categoryChart.setId("category-chart");
+        categoryChart.addStyleName(VaadinCreateTheme.DASHBOARD_CHART_FOCUSRING);
         categoryChartAttributes = AttributeExtension.of(categoryChart);
         var conf = categoryChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.CATEGORIES));
@@ -112,6 +114,8 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
     private CssLayout createAvailabilityChart() {
         var availabilityChartWrapper = new CssLayout();
         availabilityChart = new Chart(ChartType.COLUMN);
+        availabilityChart
+                .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_FOCUSRING);
         availabilityChart.setId("availability-chart");
         availabilityChartAttributes = AttributeExtension.of(availabilityChart);
         availabilityChartWrapper

@@ -177,8 +177,11 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         decimalFormat.setMaximumFractionDigits(2);
         decimalFormat.setMinimumFractionDigits(2);
         // Improve Grid browsing experience for screen reader users
-        JavaScript.eval(
-                "setTimeout(() => { const body = document.querySelector('tbody.v-grid-body');Array.from(body.getElementsByTagName('tr')).forEach(el => el.setAttribute('aria-live', 'polite'));}, 1000);");
+        JavaScript.eval("setTimeout(() => {"
+                + "const body = document.querySelector('tbody.v-grid-body');"
+                + "Array.from(body.getElementsByTagName('tr')).forEach(el => {"
+                + "el.setAttribute('aria-live', 'polite');});"
+                + "}, 1000);");
     }
 
     /**

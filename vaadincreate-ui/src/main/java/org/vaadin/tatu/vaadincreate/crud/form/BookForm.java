@@ -423,11 +423,23 @@ public class BookForm extends Composite implements HasI18N {
             Page.getCurrent().getJavaScript().execute(scrollScript);
         }
 
-        // Set ARIA attributes for the form to make it accessible
-        selectionLabel.setValue(String.format(
-                "<div role='alert' aria-live='polite' aria-label='%s %s'></div>",
-                product.getProductName(), getTranslation(I18n.Books.OPENED)));
+        announceProductOpened(product);
+    }
 
+    // This is horrible, but required to workaround a bug in NVDA
+    private void announceProductOpened(Product product) {
+        if (isAttached()) {
+            var prod = product;
+            selectionLabel.setValue("");
+            getUI().push();
+            getUI().runAfterRoundTrip(() -> {
+                // Set ARIA attributes for the form to make it accessible
+                selectionLabel.setValue(String.format(
+                        "<div role='alert' aria-live='assertive' aria-atomic='true' aria-label='%s %s'></div>",
+                        prod.getProductName(),
+                        getTranslation(I18n.Books.OPENED)));
+            });
+        }
     }
 
     @Override

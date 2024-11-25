@@ -74,11 +74,17 @@ public class ResetButtonForTextFieldConnector extends AbstractExtensionConnector
     el.onclick = $entry(function() {
       self.@org.vaadin.tatu.vaadincreate.client.ResetButtonForTextFieldConnector::clearTextField()();
     });
+    el.onkeydown = $entry(function(e) {
+      if (e.code === 'Space' || e.code === 'Enter') {
+        self.@org.vaadin.tatu.vaadincreate.client.ResetButtonForTextFieldConnector::clearTextField()();
+      }
+    });
     }-*/;
 
     public native void removeResetButtonClickListener(Element el)
     /*-{
     el.onclick = null;
+    el.onkeydown = null;
     }-*/;
 
     @Override

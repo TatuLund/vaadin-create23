@@ -173,6 +173,11 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         var conf = priceChart.getConfiguration();
         conf.setSeries(priceSeries);
 
+        updatePriceChartAccessibilityAttributes(priceSeries);
+    }
+
+    private void updatePriceChartAccessibilityAttributes(
+            DataSeries priceSeries) {
         priceChartAttributes.setAttribute("role", "figure");
         priceChartAttributes.setAttribute("tabindex", "0");
         var alt = String.format("%s:%s", getTranslation(I18n.Stats.PRICES),
@@ -207,6 +212,11 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         stockAxis.setTitle(getTranslation(I18n.IN_STOCK));
         categoryStats.keySet().forEach(cat -> conf.getxAxis().addCategory(cat));
 
+        updateCategoryChartAccessibilityAttributes(titles, stockCounts);
+    }
+
+    private void updateCategoryChartAccessibilityAttributes(DataSeries titles,
+            DataSeries stockCounts) {
         categoryChartAttributes.setAttribute("role", "figure");
         categoryChartAttributes.setAttribute("tabindex", "0");
         var alt1 = String.format("%s %s:%s",
@@ -240,6 +250,11 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         var axis = conf.getxAxis();
         axis.setCategories(categories);
 
+        updateAvailabilityChartAccessibilityAttributes(availabilitySeries);
+    }
+
+    private void updateAvailabilityChartAccessibilityAttributes(
+            DataSeries availabilitySeries) {
         availabilityChartAttributes.setAttribute("role", "figure");
         availabilityChartAttributes.setAttribute("tabindex", "0");
         var alt = String.format("%s:%s",

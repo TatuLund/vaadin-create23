@@ -324,6 +324,12 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
         ui = getUI();
         resizeListener = ui.getPage().addBrowserWindowResizeListener(
                 e -> JavaScript.eval("vaadin.forceLayout()"));
+        // Remove Highcharts desc-banners, they are announced by NVDA
+        JavaScript.eval(
+                "setTimeout(() => Array.from(document.getElementsByTagName('svg'))"
+                        + ".forEach(el => {"
+                        + "const desc = el.getElementsByTagName('desc')[0];"
+                        + "el.removeChild(desc);}), 1000);");
     }
 
     @Override

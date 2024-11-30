@@ -102,19 +102,11 @@ $fake-grid-background-color: white;
   span#logout-2:focus-visible {
     color: white;
     outline: none;
-    
-    .v-icon {
-      color: $v-focus-color;
-    }
   }
 
   span#logout-2:hover {
     color: white;
     outline: none;
-    
-    .v-icon {
-      color: $v-focus-color;
-    }
   }
 
   div[aria-label="Top of dialog"] {
@@ -123,6 +115,40 @@ $fake-grid-background-color: white;
 
   div[aria-label="Bottom of Dialog"] {
   	display: none;
+  }
+
+  .valo-menu-toggle:focus-visible {
+    color: white;
+  }
+ 
+  .valo-menu-toggle:hover {
+    color: white;
+  }
+
+  .valo-menu-item-selected:focus-visible {
+    .v-icon {
+      color: white;
+    }
+  }
+
+  .v-tabsheet-tabitemcell:focus {
+    text-shadow: $v-focus-color 1px 0 1px;
+  }
+
+  .v-tabsheet-tabcontainer:focus-within {
+    box-shadow: 0 1px 0 0 $v-focus-color;
+  }
+
+  .v-formlayout-row:focus-within {
+    .v-caption {
+      color: $v-focus-color;
+    }
+  }
+
+  .v-has-caption:focus-within {
+    .v-caption {
+      color: $v-focus-color;
+    }
   }
 
   // Hide spinner buttons from number input

@@ -42,41 +42,39 @@ public class AboutView extends VerticalLayout
 
     private Button editButton;
     private Label adminsNote;
-    private TextArea admionsNoteField;
+    private TextArea adminsNoteField;
 
     private UI ui;
 
     public AboutView() {
         var aboutContent = createAboutContent();
 
-        admionsNoteField = createTextArea();
-        admionsNoteField.setVisible(false);
+        adminsNoteField = createTextArea();
+        adminsNoteField.setVisible(false);
 
         var adminsContent = new HorizontalLayout();
         adminsContent.addStyleName(VaadinCreateTheme.ABOUTVIEW_ADMINSCONTENT);
         adminsContent.setWidth("500px");
         createAdminsNote();
 
-        adminsContent.addComponents(adminsNote, admionsNoteField);
+        adminsContent.addComponents(adminsNote, adminsNoteField);
         if (accessControl.isUserInRole(Role.ADMIN)) {
             createEditButton();
             editButton.addClickListener(e -> {
-                admionsNoteField.setVisible(true);
+                adminsNoteField.setVisible(true);
                 adminsNote.setVisible(false);
                 editButton.setVisible(false);
-                admionsNoteField.setValue(adminsNote.getValue());
+                adminsNoteField.setValue(adminsNote.getValue());
             });
             adminsContent.addComponent(editButton);
             adminsContent.setComponentAlignment(editButton,
                     Alignment.TOP_RIGHT);
         }
 
-        admionsNoteField.addValueChangeListener(this::handleValueChange);
-        admionsNoteField.setValueChangeMode(ValueChangeMode.BLUR);
-        admionsNoteField.addBlurListener(e -> {
-            adminsNote.setVisible(true);
-            admionsNoteField.setVisible(false);
-            editButton.setVisible(true);
+        adminsNoteField.addValueChangeListener(this::handleValueChange);
+        adminsNoteField.setValueChangeMode(ValueChangeMode.BLUR);
+        adminsNoteField.addBlurListener(e -> {
+            closeEditor();
         });
         setSizeFull();
         setMargin(false);
@@ -85,6 +83,12 @@ public class AboutView extends VerticalLayout
         setComponentAlignment(aboutContent, Alignment.MIDDLE_CENTER);
         setComponentAlignment(adminsContent, Alignment.MIDDLE_CENTER);
         getEventBus().registerEventBusListener(this);
+    }
+
+    private void closeEditor() {
+        adminsNote.setVisible(true);
+        adminsNoteField.setVisible(false);
+        editButton.setVisible(true);
     }
 
     private void handleValueChange(ValueChangeEvent<String> e) {
@@ -158,8 +162,8 @@ public class AboutView extends VerticalLayout
     public void eventFired(Object event) {
         if (event instanceof Message) {
             Utils.access(ui, () -> {
-                if (admionsNoteField.isVisible()) {
-                    admionsNoteField.setVisible(false);
+                if (adminsNoteField.isVisible()) {
+                    adminsNoteField.setVisible(false);
                     adminsNote.setVisible(true);
                     editButton.setVisible(true);
                 }

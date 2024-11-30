@@ -6,6 +6,16 @@
 
   // Medium size changes
   .v-ui[width-range~="0-800px"] {
+    
+    .valo-menu-item {
+      display: none;
+    }
+
+    .valo-menu-valo-menu-visible {
+      .valo-menu-item {
+        display: block;
+      }
+    }
 
     .bookview-availabilitylabel {
       display: none;

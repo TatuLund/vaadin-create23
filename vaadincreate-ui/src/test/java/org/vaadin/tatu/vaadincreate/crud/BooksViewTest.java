@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AboutView;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
+import org.vaadin.tatu.vaadincreate.AppLayout.MenuButton;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
@@ -578,7 +579,7 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(form.isShown());
         assertNotNull(LockedObjects.get().isLocked(book));
 
-        $(Button.class).caption("About").single().click();
+        $(MenuButton.class).caption("About").single().click();
         assertNull(LockedObjects.get().isLocked(book));
     }
 
@@ -668,7 +669,7 @@ public class BooksViewTest extends AbstractUITest {
                 .setValue("Edited book");
         test($(form, NumberField.class).id("stock-count")).setValue(100);
 
-        $(Button.class).caption("About").single().click();
+        $(MenuButton.class).caption("About").single().click();
 
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("confirm-button")).click();

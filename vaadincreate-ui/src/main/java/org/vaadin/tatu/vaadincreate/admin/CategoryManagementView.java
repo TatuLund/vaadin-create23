@@ -6,7 +6,6 @@ import java.util.Collection;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
-import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.data.BeanValidationBinder;
@@ -27,7 +26,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings({ "serial", "java:S2160" })
 public class CategoryManagementView extends VerticalLayout
-        implements TabView, HasI18N {
+        implements TabView {
 
     public static final String VIEW_NAME = "categories";
 
@@ -81,6 +80,7 @@ public class CategoryManagementView extends VerticalLayout
 
     @Override
     public void enter() {
+        openingView(VIEW_NAME);
         presenter.requestUpdateCategories();
         newCategoryButton.setEnabled(true);
     }
@@ -198,7 +198,7 @@ public class CategoryManagementView extends VerticalLayout
             var nameFieldExt = AttributeExtension.of(nameField);
             nameFieldExt.setAttribute("autocomplete", "off");
             nameFieldExt.setAttribute("aria-label",
-                    getTranslation(I18n.Category.CATEGORY));
+                    getTranslation(I18n.Category.CATEGORY_BAME));
             nameFieldExt.removeAttribute("aria-labelledby");
             nameField.setId(String.format("name-%s", category.getId()));
             nameField.setValueChangeMode(ValueChangeMode.LAZY);

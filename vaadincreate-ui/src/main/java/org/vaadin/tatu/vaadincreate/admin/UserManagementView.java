@@ -5,7 +5,6 @@ import java.util.List;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
-import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.data.ValidationException;
@@ -22,8 +21,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings({ "serial", "java:S2160" })
-public class UserManagementView extends VerticalLayout
-        implements TabView, HasI18N {
+public class UserManagementView extends VerticalLayout implements TabView {
 
     public static final String VIEW_NAME = "users";
 
@@ -181,11 +179,12 @@ public class UserManagementView extends VerticalLayout
                 Notification.Type.WARNING_MESSAGE);
         form.clear();
         disableButtons();
-        userSelect.setValue(null);       
+        userSelect.setValue(null);
     }
 
     @Override
     public void enter() {
+        openingView(VIEW_NAME);
         presenter.requestUpdateUsers();
     }
 

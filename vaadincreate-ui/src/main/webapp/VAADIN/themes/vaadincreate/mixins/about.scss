@@ -24,18 +24,4 @@
     box-shadow: $admin-content-shadow;
     background: white;
   }
-
-  .adminview-userform {
-    box-shadow: $light-shadow;
-    background: white;
-    border: $v-grid-border;
-  }
-
-  .adminview-categorygrid {
-    box-shadow: $light-shadow;
-
-    thead {
-      display: none;
-    }
-  }
 }

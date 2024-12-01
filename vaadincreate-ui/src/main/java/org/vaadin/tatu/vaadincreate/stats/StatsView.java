@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.VaadinCreateView;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
-import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
@@ -22,7 +22,6 @@ import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.Lang;
 import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.model.style.SolidColor;
-import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.Registration;
 import com.vaadin.ui.Alignment;
@@ -34,7 +33,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings({ "serial", "java:S2160" })
 @RolesPermitted({ Role.USER, Role.ADMIN })
-public class StatsView extends VerticalLayout implements View, HasI18N {
+public class StatsView extends VerticalLayout implements VaadinCreateView {
 
     public static final String VIEW_NAME = "stats";
 
@@ -325,6 +324,7 @@ public class StatsView extends VerticalLayout implements View, HasI18N {
 
     @Override
     public void enter(ViewChangeEvent event) {
+        openingView(VIEW_NAME);
         // There is no need to fetch data before navigation is complete, thus we
         // trigger it in enter, not in constructor
         presenter.requestUpdateStats();

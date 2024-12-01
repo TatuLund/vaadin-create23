@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.tatu.vaadincreate.AppLayout.MenuButton;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
@@ -58,7 +59,7 @@ public class AboutViewTest extends AbstractUITest {
         // If not sanitized this would be XSS
         test(area).setValue(
                 "<b><img src=1 onerror=alert(document.domain)>A new message</b>");
-        test($(Button.class).id("about")).focus();
+        test($(MenuButton.class).id("about")).focus();
         // Changing field value should hide it
         assertFalse(area.isVisible());
         // Assert the new value
@@ -75,7 +76,7 @@ public class AboutViewTest extends AbstractUITest {
         test($(Button.class).id("admin-edit")).click();
         assertTrue(area.isVisible());
         test(area).setValue(oldText);
-        test($(Button.class).id("about")).focus();
+        test($(MenuButton.class).id("about")).focus();
         assertFalse(area.isVisible());
     }
 

@@ -40,6 +40,7 @@ public class AppLayout extends Composite implements HasI18N {
     private final CssLayout title;
     private final UI ui;
     private AccessControl accessControl;
+    private Label announcer;
 
     /**
      * Constructor.
@@ -92,7 +93,7 @@ public class AppLayout extends Composite implements HasI18N {
         toggleButton.addStyleName(ValoTheme.BUTTON_SMALL);
         menuLayout.addComponent(toggleButton);
 
-        AttributeExtension.of(menuItems).setAttribute("role", "menu");
+        AttributeExtension.of(menuItems).setAttribute("role", "navigation");
         menuLayout.addComponent(menuItems);
         menuItems.addStyleName(ValoTheme.MENU_ITEMS);
 
@@ -122,10 +123,14 @@ public class AppLayout extends Composite implements HasI18N {
         nav.addViewChangeListener(new ViewChangeListener() {
             @Override
             public void afterViewChange(ViewChangeEvent event) {
+                String viewName = event.getViewName();
+                if (viewName.isEmpty()) {
+                    viewName = "about";
+                }
                 clearSelected();
-                setSelected(event.getViewName());
+                setSelected(viewName);
                 logger.info("User '{}' navigated to view '{}'", getUserName(),
-                        event.getViewName());
+                        viewName);
                 menuLayout.removeStyleName(ValoTheme.MENU_VISIBLE);
             }
 
@@ -136,7 +141,33 @@ public class AppLayout extends Composite implements HasI18N {
             }
 
         });
+
+        announcer = new Label();
+        announcer.setContentMode(ContentMode.HTML);
+        announcer.setPrimaryStyleName("announcer");
+        layout.addComponent(announcer);
+
         setCompositionRoot(layout);
+    }
+
+    /**
+     * Announces a message using ARIA live regions to make it accessible to
+     * screen readers. This method sets the ARIA attributes for the form to
+     * ensure the announcement is conveyed to users with assistive technologies.
+     *
+     * @param announcement
+     *            the message to be announced
+     */
+    public void announce(String announcement) {
+        if (isAttached()) {
+            announcer.setValue("");
+            getUI().push();
+            getUI().runAfterRoundTrip(() ->
+            // Set ARIA attributes for the form to make it accessible
+            announcer.setValue(String.format(
+                    "<div role='alert' aria-live='assertive' aria-atomic='true' aria-label='%s'></div>",
+                    announcement)));
+        }
     }
 
     private void handleConfirmLogoutWhenChanges(UI ui, Navigator nav) {
@@ -191,16 +222,8 @@ public class AppLayout extends Composite implements HasI18N {
         if (!hasAccessToView(view)) {
             return;
         }
-        var menuItem = new Button(viewName);
-        menuItem.setId(path);
-        menuItem.setData(path);
-        menuItem.addClickListener(e -> ui.getNavigator().navigateTo(path));
-        menuItem.setPrimaryStyleName(ValoTheme.MENU_ITEM);
-        if (path.equals("")) {
-            menuItem.addStyleName(ValoTheme.MENU_SELECTED);
-        }
+        var menuItem = new MenuButton(viewName, path, icon);
         ui.getNavigator().addView(path, view);
-        menuItem.setIcon(icon);
         menuItems.addComponent(menuItem);
     }
 
@@ -216,17 +239,52 @@ public class AppLayout extends Composite implements HasI18N {
     private void setSelected(String path) {
         var iter = menuItems.iterator();
         while (iter.hasNext()) {
-            var menuItem = iter.next();
-            menuItem.removeStyleName(ValoTheme.MENU_SELECTED);
-            if (((Button) menuItem).getData().toString().equals(path)) {
-                menuItem.addStyleName(ValoTheme.MENU_SELECTED);
-            }
+            var menuItem = (MenuButton) iter.next();
+            menuItem.setSelected(menuItem.getPath().equals(path));
         }
     }
 
     private static String getUserName() {
         return CurrentUser.get().isPresent() ? CurrentUser.get().get().getName()
                 : "";
+    }
+
+    public class MenuButton extends Button {
+
+        private String path;
+        private String caption;
+        private AttributeExtension attributes;
+
+        public MenuButton(String caption, String path, Resource icon) {
+            super(caption);
+            this.path = path;
+            this.caption = caption;
+            setId(path);
+            setData(path);
+            addClickListener(e -> ui.getNavigator().navigateTo(path));
+            setPrimaryStyleName(ValoTheme.MENU_ITEM);
+            if (path.equals("")) {
+                addStyleName(ValoTheme.MENU_SELECTED);
+            }
+            setIcon(icon);
+            attributes = AttributeExtension.of(this);
+            attributes.setAttribute("role", "link");
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setSelected(boolean selected) {
+            if (selected) {
+                addStyleName(ValoTheme.MENU_SELECTED);
+                attributes.setAttribute("aria-label",
+                        caption + " " + getTranslation(I18n.CURRENT_PAGE));
+            } else {
+                removeStyleName(ValoTheme.MENU_SELECTED);
+                attributes.setAttribute("aria-label", caption);
+            }
+        }
     }
 
     private static Logger logger = LoggerFactory.getLogger(AppLayout.class);

@@ -34,8 +34,7 @@ public class ComponentList<T, V extends Component> extends Composite {
         createCategoryListing(provider);
         panel.setSizeFull();
         panel.setContent(grid);
-        panel.addStyleNames(VaadinCreateTheme.ADMINVIEW_CATEGORY_GRID,
-                ValoTheme.PANEL_BORDERLESS);
+        panel.addStyleName(ValoTheme.PANEL_BORDERLESS);
         setCompositionRoot(panel);
     }
 
@@ -97,7 +96,8 @@ public class ComponentList<T, V extends Component> extends Composite {
         grid.setHeaderRowHeight(1);
         grid.setSizeFull();
         grid.setSelectionMode(SelectionMode.NONE);
-        grid.addStyleNames(VaadinCreateTheme.GRID_NO_STRIPES,
+        grid.addStyleNames(VaadinCreateTheme.ADMINVIEW_CATEGORY_GRID,
+                VaadinCreateTheme.GRID_NO_STRIPES,
                 VaadinCreateTheme.GRID_NO_BORDERS,
                 VaadinCreateTheme.GRID_NO_CELL_FOCUS);
         grid.setHeightMode(HeightMode.ROW);

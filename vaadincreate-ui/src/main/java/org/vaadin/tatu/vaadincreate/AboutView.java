@@ -9,13 +9,11 @@ import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
-import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.HasValue.ValueChangeEvent;
 import com.vaadin.icons.VaadinIcons;
-import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.Version;
 import com.vaadin.shared.ui.ContentMode;
@@ -33,7 +31,7 @@ import com.vaadin.ui.themes.ValoTheme;
 @AllPermitted
 @SuppressWarnings({ "serial", "java:S2160" })
 public class AboutView extends VerticalLayout
-        implements View, EventBusListener, HasI18N {
+        implements VaadinCreateView, EventBusListener {
 
     public static final String VIEW_NAME = "about";
 
@@ -73,9 +71,7 @@ public class AboutView extends VerticalLayout
 
         adminsNoteField.addValueChangeListener(this::handleValueChange);
         adminsNoteField.setValueChangeMode(ValueChangeMode.BLUR);
-        adminsNoteField.addBlurListener(e -> {
-            closeEditor();
-        });
+        adminsNoteField.addBlurListener(e -> closeEditor());
         setSizeFull();
         setMargin(false);
         setStyleName(VaadinCreateTheme.ABOUT_VIEW);
@@ -152,6 +148,8 @@ public class AboutView extends VerticalLayout
 
     @Override
     public void enter(ViewChangeEvent event) {
+        openingView(VIEW_NAME);
+
         Message message = getService().getMessage();
         adminsNote.setCaption(
                 Utils.formatDate(message.getDateStamp(), getLocale()));

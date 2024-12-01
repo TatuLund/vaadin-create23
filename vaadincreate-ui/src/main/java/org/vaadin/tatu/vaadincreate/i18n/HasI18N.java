@@ -38,5 +38,4 @@ public interface HasI18N extends Component {
         return I18NProvider.get().getTranslation(key,
                 I18NProvider.getCurrentSupportedLocale(), params);
     }
-
 }

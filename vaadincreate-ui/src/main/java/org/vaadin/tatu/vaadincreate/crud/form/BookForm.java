@@ -37,8 +37,8 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
 import com.vaadin.ui.Composite;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -120,7 +120,6 @@ public class BookForm extends Composite implements HasI18N {
     protected Button discardButton = new Button(getTranslation(I18n.DISCARD));
     protected Button cancelButton = new Button(getTranslation(I18n.CANCEL));
     protected Button deleteButton = new Button(getTranslation(I18n.DELETE));
-    private Label selectionLabel = new Label();
 
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
@@ -142,9 +141,6 @@ public class BookForm extends Composite implements HasI18N {
         this.presenter = presenter;
         setCompositionRoot(sidePanel);
         buildForm();
-
-        selectionLabel.setContentMode(ContentMode.HTML);
-        selectionLabel.setValue("<div aria-live='polite' role='alert'></div>");
 
         binder = new BeanValidationBinder<>(Product.class);
         binder.forField(price)
@@ -256,6 +252,8 @@ public class BookForm extends Composite implements HasI18N {
             availability.setComponentError(new UserError(
                     getTranslation(I18n.Form.AVAILABILITY_MISMATCH),
                     AbstractErrorMessage.ContentMode.TEXT, ErrorLevel.ERROR));
+            VaadinCreateUI.get()
+                    .announce(getTranslation(I18n.Form.AVAILABILITY_MISMATCH));
         } else {
             stockCount.setComponentError(null);
             availability.setComponentError(null);
@@ -371,12 +369,14 @@ public class BookForm extends Composite implements HasI18N {
         deleteButton.setId("delete-button");
         deleteButton.setEnabled(false);
 
+        var spacer = new CssLayout();
+
         formLayout.addComponents(productName, fieldWrapper, availability,
                 category);
-        formLayout.addComponents(selectionLabel);
+        formLayout.addComponents(spacer);
         formLayout.addComponents(saveButton, discardButton, cancelButton,
                 deleteButton);
-        formLayout.setExpandRatio(selectionLabel, 1);
+        formLayout.setExpandRatio(spacer, 1);
 
         // Set ARIA attributes for the form to make it accessible
         var attributes = AttributeExtension.of(formLayout);
@@ -429,16 +429,8 @@ public class BookForm extends Composite implements HasI18N {
     // This is horrible, but required to workaround a bug in NVDA
     private void announceProductOpened(Product product) {
         if (isAttached()) {
-            var prod = product;
-            selectionLabel.setValue("");
-            getUI().push();
-            getUI().runAfterRoundTrip(() -> {
-                // Set ARIA attributes for the form to make it accessible
-                selectionLabel.setValue(String.format(
-                        "<div role='alert' aria-live='assertive' aria-atomic='true' aria-label='%s %s'></div>",
-                        prod.getProductName(),
-                        getTranslation(I18n.Books.OPENED)));
-            });
+            VaadinCreateUI.get().announce(product.getProductName() + " "
+                    + getTranslation(I18n.OPENED));
         }
     }
 

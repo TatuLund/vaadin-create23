@@ -159,6 +159,18 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     }
 
     /**
+     * Announces a message using ARIA live regions to make it accessible to
+     * screen readers. This method sets the ARIA attributes for the form to
+     * ensure the announcement is conveyed to users with assistive technologies.
+     *
+     * @param announcement
+     *            the message to be announced
+     */
+    public void announce(String announcement) {
+        ((AppLayout) getContent()).announce(announcement);
+    }
+
+    /**
      * Get AccessControl in use
      *
      * @return Instance of AccessControl

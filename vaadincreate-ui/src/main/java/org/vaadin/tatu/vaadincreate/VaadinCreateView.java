@@ -1,29 +1,22 @@
-package org.vaadin.tatu.vaadincreate.admin;
+package org.vaadin.tatu.vaadincreate;
 
-import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
+import com.vaadin.navigator.View;
 import com.vaadin.ui.UI;
 
-public interface TabView extends HasI18N {
+public interface VaadinCreateView extends HasI18N, View {
 
     /**
-     * Returns the name of the tab.
+     * Sets the title of the current page and announces the opening of a view.
      *
-     * @return the name of the tab as a String
+     * @param viewName
+     *            the name of the view to be opened
      */
-    public String getTabName();
-
-    /**
-     * Method to be called when the tab is entered.
-     */
-    public void enter();
-
     public default void openingView(String viewName) {
         UI.getCurrent().getPage().setTitle(getTranslation(viewName));
         VaadinCreateUI.get().announce(
                 getTranslation(viewName) + " " + getTranslation(I18n.OPENED));
     }
-
 }

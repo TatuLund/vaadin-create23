@@ -31,6 +31,8 @@ public final class I18n {
     public static final String DISCARD = "discard";
     public static final String DRAFT_FOUND = "draft-found";
     public static final String EXCEPTION = "exception";
+    public static final String CURRENT_PAGE = "current-page";
+    public static final String OPENED = "opened";
 
     public static final class Books {
         public static final String UPDATED = "updated";
@@ -48,7 +50,6 @@ public final class I18n {
         public static final String LOADING = "loading";
         public static final String CLEAR_TEXT = "clear-text";
         public static final String PRODUCT_FORM = "product-form";
-        public static final String OPENED = "opened";
 
         private Books() {
             // private constructor to hide the implicit public one
@@ -163,7 +164,7 @@ public final class I18n {
         public static final String DUPLICATE = "category-duplicate";
         public static final String INSTRUCTION = "category-instruction";
         public static final String DELETE_ERROR = "category-delete-error";
-        public static final String CATEGORY = "category-name";
+        public static final String CATEGORY_BAME = "category-name";
 
         private Category() {
             // private constructor to hide the implicit public one

@@ -8,19 +8,18 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.VaadinCreateView;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
-import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
-import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewBeforeLeaveEvent;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Alignment;
@@ -42,7 +41,7 @@ import com.vaadin.ui.themes.ValoTheme;
  */
 @SuppressWarnings({ "serial", "java:S2160" })
 @RolesPermitted({ Role.USER, Role.ADMIN })
-public class BooksView extends CssLayout implements View, HasI18N {
+public class BooksView extends CssLayout implements VaadinCreateView {
 
     public static final String VIEW_NAME = "inventory";
 
@@ -194,6 +193,7 @@ public class BooksView extends CssLayout implements View, HasI18N {
 
     @Override
     public void enter(ViewChangeEvent event) {
+        openingView(VIEW_NAME);
         draft = presenter.getDraft();
         params = event.getParameters();
         if (!accessControl.isUserInRole(Role.ADMIN)) {

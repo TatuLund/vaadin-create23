@@ -64,11 +64,23 @@ Despites being somewhat artificial this demo app covers various use cases you ma
     - Use UI Unit Testing for verifying various concurrent user actions scenarios
     - Verify the most important parts with end to end tests using TestBench
     - Include few Screenshot tests to verify visuals
+- Accessiblility
+    - In most of the views some additional attributes are set for better accessibility
+    - In StatsView Charts are having role "figure" and "aria-label" set for audible version of data
+    - In BooksView the BookGrid has rows set "aria-live" for better situational awarenes
+    - The loading indicator in BooksView has audible alert
+    - The label that appears when there is no books matching filter is audible
+    - VaadinCreateUI offers "announce" method, that produces audible notification, which used e.g. when view is opened or form is opened
+    - AppLayout menu has role "navigation" and the navigation buttons role "link". The buttons also have "aria-label" set according to whether the view is a current view or not.
+    - In some places tooltips are used as audible hints
+    - Keyboard navigation has been adjusted for better usability with assistive technologies
+    - Tabindex and visual focus ring is used to improve situational awateness
+    - Using focus color in focused fields labels
 
 - Components module has examples of GWT and JavaScript extensions
 	- Reset button for text field extension with client side GWT,
 	- Character counter for TextArea and TextField showing remaining characters extension with GWT,
-	- Attribute extensions (used in form's number input) using JavaScript,
+	- Attribute extension using JavaScript. It used in form's number input, and is an essential instrument to adjust the accessibility attributes in various places.
 	- Java 11 code used in widgets,
 	- ConfirmDialog server side composition component,
 	- Suite of unit and integration tests for the components and standalone test UI for them

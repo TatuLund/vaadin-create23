@@ -124,8 +124,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         appLayout.addView(AdminView.class, getTranslation(AdminView.VIEW_NAME),
                 VaadinIcons.USERS, AdminView.VIEW_NAME);
 
-        Product draft = getProductService()
-                .findDraft(getAccessControl().getPrincipalName());
+        Product draft = getProductService().findDraft(CurrentUser.get().get());
         if (draft != null) {
             handleDraft(draft);
         }
@@ -147,8 +146,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 .navigateTo(String.format("%s/%s", BooksView.VIEW_NAME, id)));
         dialog.addCancelListener(e -> {
             logger.info("Draft discarded");
-            getProductService().saveDraft(getAccessControl().getPrincipalName(),
-                    null);
+            getProductService().saveDraft(CurrentUser.get().get(), null);
             getNavigator().navigateTo(target);
         });
         dialog.open();

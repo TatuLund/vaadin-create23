@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.service.ProductDataServiceImpl;
+import org.vaadin.tatu.vaadincreate.backend.service.UserServiceImpl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -177,15 +178,17 @@ public class ProductDataServiceTest {
 
     @Test
     public void drafts() {
-        var userName = "user";
-        var draft = service.findDraft(userName);
+        var userService = UserServiceImpl.getInstance();
+        var user = userService.findByName("Admin").get();
+
+        var draft = service.findDraft(user);
         assertNull(draft);
         var product = new Product();
-        service.saveDraft(userName, product);
-        draft = service.findDraft(userName);
+        service.saveDraft(user, product);
+        draft = service.findDraft(user);
         assertNotSame(product, draft);
-        service.saveDraft(userName, null);
-        draft = service.findDraft(userName);
+        service.saveDraft(user, null);
+        draft = service.findDraft(user);
         assertNull(draft);
     }
 }

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.AppDataService;
+import org.vaadin.tatu.vaadincreate.backend.dao.MessageDao;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 
@@ -12,7 +13,7 @@ import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 public class AppDataServiceImpl implements AppDataService {
     private static AppDataServiceImpl instance;
 
-    private Message message;
+    private MessageDao messageDao = new MessageDao();
 
     public static synchronized AppDataService getInstance() {
         if (instance == null) {
@@ -22,20 +23,21 @@ public class AppDataServiceImpl implements AppDataService {
     }
 
     private AppDataServiceImpl() {
-        message = new Message(MockDataGenerator.createMessage(),
+        var message = new Message(MockDataGenerator.createMessage(),
                 LocalDateTime.now());
+        messageDao.updateMessage(message);
         logger.info("Generated mock app data");
     }
 
     @Override
     public synchronized Message updateMessage(String message) {
-        this.message = new Message(message, LocalDateTime.now());
-        return this.message;
+        var messageEntity = new Message(message, LocalDateTime.now());
+        return messageDao.updateMessage(messageEntity);
     }
 
     @Override
     public synchronized Message getMessage() {
-        return message;
+        return messageDao.getLastMessage();
     }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());

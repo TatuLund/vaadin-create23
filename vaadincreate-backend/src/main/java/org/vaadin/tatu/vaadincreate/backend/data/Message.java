@@ -1,16 +1,20 @@
 package org.vaadin.tatu.vaadincreate.backend.data;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@SuppressWarnings("serial")
-public class Message implements Serializable {
+import javax.persistence.Entity;
+
+@SuppressWarnings({ "serial", "java:S2160" })
+@Entity
+public class Message extends AbstractEntity {
 
     private String message;
     private LocalDateTime dateStamp;
 
+    public Message() {
+    }
+
     public Message(String message, LocalDateTime dateStamp) {
-        super();
         this.message = message;
         this.dateStamp = dateStamp;
     }

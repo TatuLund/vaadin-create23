@@ -13,5 +13,7 @@
         <mapping class="org.vaadin.tatu.vaadincreate.backend.data.Product"/>
         <mapping class="org.vaadin.tatu.vaadincreate.backend.data.Category"/>
         <mapping class="org.vaadin.tatu.vaadincreate.backend.data.User"/>
+        <mapping class="org.vaadin.tatu.vaadincreate.backend.data.Draft"/>
+        <mapping class="org.vaadin.tatu.vaadincreate.backend.data.Message"/>
     </session-factory>
 </hibernate-configuration>

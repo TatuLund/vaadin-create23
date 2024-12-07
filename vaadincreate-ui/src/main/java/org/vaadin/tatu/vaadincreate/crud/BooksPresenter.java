@@ -40,7 +40,6 @@ public class BooksPresenter implements Serializable, EventBusListener {
     private transient CompletableFuture<Void> future;
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
-    private final String userName = accessControl.getPrincipalName();
     private Product editing;
     private Product draft;
 
@@ -379,7 +378,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
      *            the product draft to be saved
      */
     public void saveDraft(Product draft) {
-        getService().saveDraft(userName, draft);
+        getService().saveDraft(CurrentUser.get().get(), draft);
         this.draft = draft;
     }
 
@@ -388,7 +387,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
      */
     public void removeDraft() {
         draft = null;
-        getService().saveDraft(userName, null);
+        getService().saveDraft(CurrentUser.get().get(), null);
     }
 
     /**
@@ -400,7 +399,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
      */
     public Product getDraft() {
         if (draft == null) {
-            draft = getService().findDraft(userName);
+            draft = getService().findDraft(CurrentUser.get().get());
         }
         return draft;
     }

@@ -1,8 +1,6 @@
 package org.vaadin.tatu.vaadincreate.backend.service;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
@@ -11,9 +9,12 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
+import org.vaadin.tatu.vaadincreate.backend.dao.DraftDao;
 import org.vaadin.tatu.vaadincreate.backend.dao.ProductDao;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
+import org.vaadin.tatu.vaadincreate.backend.data.Draft;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 
 @SuppressWarnings("java:S6548")
@@ -24,7 +25,7 @@ public class ProductDataServiceImpl implements ProductDataService {
     // This class is a singleton
     private static ProductDataServiceImpl instance;
     private ProductDao productDao = new ProductDao();
-    private Map<String, Product> drafts = new HashMap<>();
+    private DraftDao draftDao = new DraftDao();
     Random random = new Random();
 
     private ProductDataServiceImpl() {
@@ -108,25 +109,23 @@ public class ProductDataServiceImpl implements ProductDataService {
     }
 
     @Override
-    public void saveDraft(String userName, Product draft) {
-        Objects.requireNonNull(userName, "userName can't be null");
-        logger.info("Saving draft for user '{}'", userName);
-        synchronized (drafts) {
-            if (draft == null) {
-                drafts.remove(userName);
-            } else {
-                drafts.put(userName, new Product(draft));
-            }
+    public void saveDraft(User user, Product draftProduct) {
+        Objects.requireNonNull(user, "user can't be null");
+        logger.info("Saving draft for user '{}'", user.getName());
+        if (draftProduct == null) {
+            draftDao.deleteDraft(user);
+        } else {
+            var draft = new Draft(draftProduct, user);
+            draftDao.updateDraft(draft);
         }
     }
 
     @Override
-    public Product findDraft(String userName) {
-        Objects.requireNonNull(userName, "userName can't be null");
-        logger.info("Finding draft for user '{}'", userName);
-        synchronized (drafts) {
-            return drafts.get(userName);
-        }
+    public Product findDraft(User user) {
+        Objects.requireNonNull(user, "user can't be null");
+        logger.info("Finding draft for user '{}'", user.getName());
+        var draft = draftDao.findDraft(user);
+        return draft != null ? draft.toProduct() : null;
     }
 
     @SuppressWarnings("java:S2142")

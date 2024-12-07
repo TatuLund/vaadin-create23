@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.service.ProductDataServiceImpl;
 
 /**
@@ -86,21 +87,21 @@ public interface ProductDataService {
     /**
      * Save draft Product for the user.
      *
-     * @param userName
-     *            The name of the user. If null, draft will be removed.
+     * @param user
+     *            The user. If null, draft will be removed.
      * @param draft
      *            Product
      */
-    public abstract void saveDraft(String userName, Product draft);
+    public abstract void saveDraft(User user, Product draft);
 
     /**
      * Find the last draft of the user.
      *
-     * @param userName
-     *            Name of the user
+     * @param user
+     *            The user
      * @return Product or null if user does not have draft
      */
-    public abstract Product findDraft(String userName);
+    public abstract Product findDraft(User user);
 
     public static ProductDataService get() {
         return ProductDataServiceImpl.getInstance();

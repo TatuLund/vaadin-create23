@@ -15,8 +15,10 @@ import org.vaadin.tatu.vaadincreate.AboutView;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
+import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.crud.form.AvailabilitySelector;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
 import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
@@ -38,6 +40,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
     private BooksView view;
     private VerticalLayout layout;
     private ProductDataService service;
+    private User user;
 
     @Before
     public void setup() throws ServiceException {
@@ -53,6 +56,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         grid = $(layout, BookGrid.class).single();
         waitForGrid(layout, grid);
         form = $(view, BookForm.class).single();
+        user = CurrentUser.get().get();
     }
 
     @After
@@ -80,7 +84,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         // This will close the ui by force, same as closing browser
         tearDown();
 
-        assertNotNull(service.findDraft("Admin"));
+        assertNotNull(service.findDraft(user));
 
         // Start again
         ui = new VaadinCreateUI();
@@ -95,7 +99,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         waitForGrid((CssLayout) grid.getParent(), grid);
         form = $(BookForm.class).single();
         assertTrue(form.isShown());
-        assertNull(service.findDraft("Admin"));
+        assertNull(service.findDraft(user));
 
         assertEquals("Modified book",
                 $(form, TextField.class).id("product-name").getValue());
@@ -149,7 +153,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         // This will close the ui by force, same as closing browser
         tearDown();
 
-        assertNotNull(service.findDraft("Admin"));
+        assertNotNull(service.findDraft(user));
 
         // Start again
         ui = new VaadinCreateUI();
@@ -164,7 +168,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         waitForGrid((CssLayout) grid.getParent(), grid);
         form = $(BookForm.class).single();
         assertTrue(form.isShown());
-        assertNull(service.findDraft("Admin"));
+        assertNull(service.findDraft(user));
 
         assertEquals("Modified book",
                 $(form, TextField.class).id("product-name").getValue());
@@ -224,7 +228,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         // This will close the ui by force, same as closing browser
         tearDown();
 
-        assertNotNull(service.findDraft("Admin"));
+        assertNotNull(service.findDraft(user));
 
         // Simulate other user editing book
         var edited = service.getProductById(book.getId());
@@ -245,7 +249,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         waitForGrid((CssLayout) grid.getParent(), grid);
         form = $(BookForm.class).single();
         assertTrue(form.isShown());
-        assertNull(service.findDraft("Admin"));
+        assertNull(service.findDraft(user));
 
         assertEquals("Modified book",
                 $(form, TextField.class).id("product-name").getValue());
@@ -310,7 +314,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         // This will close the ui by force, same as closing browser
         tearDown();
 
-        assertNotNull(service.findDraft("Admin"));
+        assertNotNull(service.findDraft(user));
 
         // Simulate other user editing book
         service.deleteProduct(book.getId());
@@ -328,7 +332,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         waitForGrid((CssLayout) grid.getParent(), grid);
         form = $(BookForm.class).single();
         assertTrue(form.isShown());
-        assertNull(service.findDraft("Admin"));
+        assertNull(service.findDraft(user));
 
         assertEquals("Product was deleted.",
                 $(Notification.class).last().getCaption());
@@ -389,7 +393,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         // This will close the ui by force, same as closing browser
         tearDown();
 
-        assertNotNull(service.findDraft("Admin"));
+        assertNotNull(service.findDraft(user));
 
         // Start again
         ui = new VaadinCreateUI();
@@ -400,7 +404,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("cancel-button")).click();
 
-        assertNull(service.findDraft("Admin"));
+        assertNull(service.findDraft(user));
 
         var about = $(AboutView.class).single();
         assertNotNull(about);

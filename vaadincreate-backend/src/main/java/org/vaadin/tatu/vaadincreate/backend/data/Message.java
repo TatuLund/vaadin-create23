@@ -2,13 +2,20 @@ package org.vaadin.tatu.vaadincreate.backend.data;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.validation.constraints.NotNull;
 
 @SuppressWarnings({ "serial", "java:S2160" })
 @Entity
 public class Message extends AbstractEntity {
 
+    @Column(name = "message")
+    @NotNull
     private String message;
+
+    @Column(name = "date_stamp")
+    @NotNull
     private LocalDateTime dateStamp;
 
     public Message() {

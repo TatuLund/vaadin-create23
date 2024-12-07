@@ -191,4 +191,26 @@ public class ProductDataServiceTest {
         draft = service.findDraft(user);
         assertNull(draft);
     }
+
+    @Test
+    public void saveDraft_removeCategoryUsedInDraft() {
+        var userService = UserServiceImpl.getInstance();
+        var user = userService.findByName("Admin").get();
+
+        var draft = service.findDraft(user);
+        assertNull(draft);
+
+        var category = new Category();
+        category.setName("Draft category");
+        var newCategory = service.updateCategory(category);
+
+        var product = new Product();
+        product.setProductName("Draft product");
+        product.setCategory(Set.of(newCategory));
+        service.saveDraft(user, product);
+
+        service.deleteCategory(newCategory.getId());
+        draft = service.findDraft(user);
+        assertTrue(draft.getCategory().isEmpty());
+    }   
 }

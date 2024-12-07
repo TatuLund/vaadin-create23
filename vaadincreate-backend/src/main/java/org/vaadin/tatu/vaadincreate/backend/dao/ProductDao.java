@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
+import org.vaadin.tatu.vaadincreate.backend.data.Draft;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 
 /**
@@ -182,10 +183,11 @@ public class ProductDao {
     /**
      * Deletes a category by its ID. This method performs the following steps:
      * 1. Retrieves the category from the database using the provided ID. 2.
-     * Finds all products associated with the category. 3. For each product,
-     * removes the category from its list of categories and updates the product
-     * in the database. 4. Deletes the category from the database. All
-     * operations are performed within a single transaction.
+     * Finds all products and drafts associated with the category. 3. For each
+     * product and draft, removes the category from its list of categories and
+     * updates the product or draft in the database. 4. Deletes the category
+     * from the database. All operations are performed within a single
+     * transaction.
      *
      * @param id
      *            the ID of the category to be deleted
@@ -197,10 +199,10 @@ public class ProductDao {
                 logger.warn("Category with ID ({}) not found", id);
                 return;
             }
-            var list = session.createQuery(
+            var products = session.createQuery(
                     "select p from Product p join p.category c where c.id = :id",
                     Product.class).setParameter("id", category.getId()).list();
-            list.forEach(product -> {
+            products.forEach(product -> {
                 if (product.getCategory().contains(category)) {
                     var categories = product.getCategory();
                     categories.remove(category);
@@ -208,6 +210,19 @@ public class ProductDao {
                     session.update(product);
                     logger.info("Updated Product: ({}) '{}'", product.getId(),
                             product.getProductName());
+                }
+            });
+            var drafts = session.createQuery(
+                    "select d from Draft d join d.category c where c.id = :id",
+                    Draft.class).setParameter("id", category.getId()).list();
+            drafts.forEach(draft -> {
+                if (draft.getCategory().contains(category)) {
+                    var categories = draft.getCategory();
+                    categories.remove(category);
+                    draft.setCategory(categories);
+                    session.update(draft);
+                    logger.info("Updated Draft: ({}) '{}'", draft.getId(),
+                            draft.getProductName());
                 }
             });
             session.delete(category);

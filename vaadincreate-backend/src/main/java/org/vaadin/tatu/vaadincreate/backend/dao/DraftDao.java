@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.data.Draft;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 
+/**
+ * Data access object for managing drafts.
+ */
 @SuppressWarnings("java:S1602")
 public class DraftDao {
 

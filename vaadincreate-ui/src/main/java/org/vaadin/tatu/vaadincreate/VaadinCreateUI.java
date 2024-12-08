@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate;
 
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,6 +39,8 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.CustomizedSystemMessages;
+import com.vaadin.server.DefaultDeploymentConfiguration;
+import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinServlet;
@@ -291,6 +294,19 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     public static class Servlet extends VaadinServlet {
 
         final AtomicInteger exceptionCount = new AtomicInteger(1);
+
+        @Override
+        protected DeploymentConfiguration createDeploymentConfiguration(
+                Properties initParameters) {
+            var env = System.getProperty("vaadin.productionMode");
+            var productionMode = "false";
+            if (env != null) {
+                productionMode = env.equals("true") ? "true" : "false";
+            }
+            initParameters.put("productionMode", productionMode);
+            return new DefaultDeploymentConfiguration(getClass(),
+                    initParameters);
+        }
 
         @Override
         protected void servletInitialized() {

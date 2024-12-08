@@ -16,6 +16,7 @@ public class UserServiceImpl implements UserService {
 
     private UserDao userDao = new UserDao();
     private Random random = new Random();
+    private boolean slow = false;
 
     private static UserServiceImpl instance;
 
@@ -27,9 +28,16 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserServiceImpl() {
-        var users = MockDataGenerator.createUsers();
-        users.forEach(user -> userDao.updateUser(user));
-        logger.info("Generated mock user data");
+        var backendMode = System.getProperty("backend.mode");
+        if (backendMode != null && backendMode.equals("slow")) {
+            slow = true;
+        }
+        var env = System.getProperty("generate.data");
+        if (env == null || env.equals("true")) {
+            var users = MockDataGenerator.createUsers();
+            users.forEach(user -> userDao.updateUser(user));
+            logger.info("Generated mock user data");
+        }
     }
 
     @Override
@@ -74,6 +82,9 @@ public class UserServiceImpl implements UserService {
 
     @SuppressWarnings("java:S2142")
     private void randomWait(int count) {
+        if (!slow) {
+            return;
+        }
         int wait = 10 + random.nextInt(20);
         try {
             Thread.sleep(wait * (long) count);

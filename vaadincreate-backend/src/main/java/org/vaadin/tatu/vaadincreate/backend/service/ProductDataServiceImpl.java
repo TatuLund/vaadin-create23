@@ -26,16 +26,24 @@ public class ProductDataServiceImpl implements ProductDataService {
     private static ProductDataServiceImpl instance;
     private ProductDao productDao = new ProductDao();
     private DraftDao draftDao = new DraftDao();
-    Random random = new Random();
+    private Random random = new Random();
+    private boolean slow = false;
 
     private ProductDataServiceImpl() {
-        var categories = MockDataGenerator.createCategories();
-        categories.forEach(cat -> productDao.updateCategory(cat));
-        var savedCategories = productDao.getAllCategories().stream()
-                .collect(Collectors.toList());
-        var products = MockDataGenerator.createProducts(savedCategories);
-        products.forEach(prod -> productDao.updateProduct(prod));
-        logger.info("Generated mock product data");
+        var backendMode = System.getProperty("backend.mode");
+        if (backendMode != null && backendMode.equals("slow")) {
+            slow = true;
+        }
+        var env = System.getProperty("generate.data");
+        if (env == null || env.equals("true")) {
+            var categories = MockDataGenerator.createCategories();
+            categories.forEach(cat -> productDao.updateCategory(cat));
+            var savedCategories = productDao.getAllCategories().stream()
+                    .collect(Collectors.toList());
+            var products = MockDataGenerator.createProducts(savedCategories);
+            products.forEach(prod -> productDao.updateProduct(prod));
+            logger.info("Generated mock product data");
+        }
     }
 
     public static synchronized ProductDataService getInstance() {
@@ -81,6 +89,7 @@ public class ProductDataServiceImpl implements ProductDataService {
     @Override
     public synchronized void deleteCategory(Integer id) {
         Objects.requireNonNull(id, ID_CANT_BE_NULL);
+        randomWait(2);
         var category = productDao.getCategory(id);
         if (category == null) {
             throw new IllegalArgumentException("Category not found");
@@ -111,6 +120,7 @@ public class ProductDataServiceImpl implements ProductDataService {
     @Override
     public void saveDraft(User user, Product draftProduct) {
         Objects.requireNonNull(user, "user can't be null");
+        randomWait(1);
         logger.info("Saving draft for user '{}'", user.getName());
         if (draftProduct == null) {
             draftDao.deleteDraft(user);
@@ -130,6 +140,9 @@ public class ProductDataServiceImpl implements ProductDataService {
 
     @SuppressWarnings("java:S2142")
     private void randomWait(int count) {
+        if (!slow) {
+            return;
+        }
         int wait = 20 + random.nextInt(40);
         try {
             Thread.sleep(wait * (long) count);

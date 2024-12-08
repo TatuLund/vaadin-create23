@@ -23,10 +23,13 @@ public class AppDataServiceImpl implements AppDataService {
     }
 
     private AppDataServiceImpl() {
-        var message = new Message(MockDataGenerator.createMessage(),
-                LocalDateTime.now());
-        messageDao.updateMessage(message);
-        logger.info("Generated mock app data");
+        var env = System.getProperty("generate.data");
+        if (env == null || env.equals("true")) {
+            var message = new Message(MockDataGenerator.createMessage(),
+                    LocalDateTime.now());
+            messageDao.updateMessage(message);
+            logger.info("Generated mock app data");
+        }
     }
 
     @Override

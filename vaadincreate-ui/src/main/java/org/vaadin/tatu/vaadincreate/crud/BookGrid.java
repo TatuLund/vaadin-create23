@@ -177,11 +177,14 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         decimalFormat.setMaximumFractionDigits(2);
         decimalFormat.setMinimumFractionDigits(2);
         // Improve Grid browsing experience for screen reader users
-        JavaScript.eval("setTimeout(() => {"
-                + "const body = document.querySelector('tbody.v-grid-body');"
-                + "Array.from(body.getElementsByTagName('tr')).forEach(el => {"
-                + "el.setAttribute('aria-live', 'polite');});"
-                + "}, 1000);");
+        JavaScript.eval("""
+                setTimeout(() => {
+                    const body = document.querySelector('tbody.v-grid-body');
+                    Array.from(body.getElementsByTagName('tr')).forEach(el => {
+                        el.setAttribute('aria-live', 'polite');
+                    });
+                }, 1000);
+                """);
     }
 
     /**
@@ -238,25 +241,26 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         }
         var converter = new EuroConverter(
                 getTranslation(I18n.Grid.CANNOT_CONVERT));
-        StringBuilder unsanitized = new StringBuilder();
-        unsanitized.append("<div>")
-                .append(getDescriptionCaptionSpan(
-                        getTranslation(I18n.PRODUCT_NAME)))
-                .append(" <b>").append(book.getProductName()).append("</b><br>")
-                .append(getDescriptionCaptionSpan(getTranslation(I18n.PRICE)))
-                .append(Utils.convertToPresentation(book.getPrice(), converter))
-                .append("<br>")
-                .append(getDescriptionCaptionSpan(
-                        getTranslation(I18n.AVAILABILITY)))
-                .append(Utils.createAvailabilityIcon(book.getAvailability()))
-                .append("<br>")
-                .append(getDescriptionCaptionSpan(
-                        getTranslation(I18n.IN_STOCK)))
-                .append(book.getStockCount()).append("<br>")
-                .append(getDescriptionCaptionSpan(
-                        getTranslation(I18n.CATEGORIES)))
-                .append(formatCategories(book)).append("</div>");
-        return Utils.sanitize(unsanitized.toString());
+        String unsanitized = """
+                <div>
+                    %s <b>%s</b><br>
+                    %s %s<br>
+                    %s %s<br>
+                    %s %d<br>
+                    %s %s
+                </div>
+                """.formatted(
+                getDescriptionCaptionSpan(getTranslation(I18n.PRODUCT_NAME)),
+                book.getProductName(),
+                getDescriptionCaptionSpan(getTranslation(I18n.PRICE)),
+                Utils.convertToPresentation(book.getPrice(), converter),
+                getDescriptionCaptionSpan(getTranslation(I18n.AVAILABILITY)),
+                Utils.createAvailabilityIcon(book.getAvailability()),
+                getDescriptionCaptionSpan(getTranslation(I18n.IN_STOCK)),
+                book.getStockCount(),
+                getDescriptionCaptionSpan(getTranslation(I18n.CATEGORIES)),
+                formatCategories(book));
+        return Utils.sanitize(unsanitized);
     }
 
     // Helper method to create a span with a caption

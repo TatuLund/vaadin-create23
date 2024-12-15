@@ -36,32 +36,41 @@ public class EventBusTest {
         var listener1 = new TestListener();
         var listener2 = new TestListener();
         var listener3 = new TestListener();
-        var event = "Hello";
+        var event = new Event("Hello");
         eventBus.post(event);
-        Assert.assertTrue(out.toString().contains("event fired for 3 recipients."));
+        Assert.assertTrue(
+                out.toString().contains("event fired for 3 recipients."));
         Assert.assertEquals(1, listener1.getEventCount());
-        Assert.assertEquals("Hello", listener1.getLastEvent());
+        Assert.assertEquals("Hello", listener1.getLastEvent().toString());
         Assert.assertEquals(1, listener2.getEventCount());
-        Assert.assertEquals("Hello", listener2.getLastEvent());
+        Assert.assertEquals("Hello", listener2.getLastEvent().toString());
 
         listener1.remove();
         listener3 = null;
-        
+
         System.gc();
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
         }
 
-        event = "World";
+        event = new Event("World");
         eventBus.post(event);
         Assert.assertEquals(1, listener1.getEventCount());
-        Assert.assertEquals("Hello", listener1.getLastEvent());
+        Assert.assertEquals("Hello", listener1.getLastEvent().toString());
         Assert.assertEquals(2, listener2.getEventCount());
-        Assert.assertEquals("World", listener2.getLastEvent());
-        Assert.assertTrue(out.toString().contains("event fired for 1 recipients."));
+        Assert.assertEquals("World", listener2.getLastEvent().toString());
+        Assert.assertTrue(
+                out.toString().contains("event fired for 1 recipients."));
 
         listener2.remove();
+    }
+
+    record Event(String message) {
+        @Override
+        public final String toString() {
+            return message;
+        }
     }
 
     public static class TestListener implements EventBusListener {

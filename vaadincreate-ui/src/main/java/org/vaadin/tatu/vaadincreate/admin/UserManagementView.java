@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.admin;
 
 import java.util.List;
 
+import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
@@ -38,8 +39,13 @@ public class UserManagementView extends VerticalLayout implements TabView {
     private Button cancel;
 
     public UserManagementView() {
+        var attributes = AttributeExtension.of(this);
+        attributes.setAttribute("role", "region");
+        attributes.setAttribute("aria-labelledby", "view-name");
+
         var title = new Label(getTranslation(I18n.User.EDIT_USERS));
         title.addStyleName(ValoTheme.LABEL_H4);
+        title.setId("view-name");
 
         form = new UserForm();
         form.setEnabled(false);

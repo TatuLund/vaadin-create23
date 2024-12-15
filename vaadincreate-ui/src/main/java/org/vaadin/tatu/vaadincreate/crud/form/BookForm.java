@@ -312,14 +312,13 @@ public class BookForm extends Composite implements HasI18N {
         if (value == null) {
             return "";
         }
-        if (value instanceof BigDecimal) {
+        if (value instanceof BigDecimal price) {
             var euroConverter = new EuroConverter("");
-            return Utils.convertToPresentation((BigDecimal) value,
-                    euroConverter);
+            return Utils.convertToPresentation(price, euroConverter);
         }
-        if (value instanceof Availability) {
+        if (value instanceof Availability availability) {
             return String.format("%s<span style='margin-right: 5px'>%s</span>",
-                    Utils.createAvailabilityIcon((Availability) value),
+                    Utils.createAvailabilityIcon(availability),
                     value.toString());
         }
         return value.toString();
@@ -334,7 +333,7 @@ public class BookForm extends Composite implements HasI18N {
     }
 
     private void buildForm() {
-        var formLayout = new VerticalLayout();
+        var formLayout = new Form();
         formLayout.setHeightFull();
         formLayout.setMargin(false);
         formLayout.addStyleName(VaadinCreateTheme.BOOKFORM_FORM);
@@ -377,14 +376,6 @@ public class BookForm extends Composite implements HasI18N {
         formLayout.addComponents(saveButton, discardButton, cancelButton,
                 deleteButton);
         formLayout.setExpandRatio(spacer, 1);
-
-        // Set ARIA attributes for the form to make it accessible
-        var attributes = AttributeExtension.of(formLayout);
-        attributes.setAttribute("tabindex", "0");
-        attributes.setAttribute("aria-label",
-                getTranslation(I18n.Books.PRODUCT_FORM));
-        attributes.setAttribute("role", "form");
-        attributes.setAttribute("aria-keyshortcuts", "Escape PageDown PageUp");
 
         sidePanel.setContent(formLayout);
     }
@@ -498,6 +489,31 @@ public class BookForm extends Composite implements HasI18N {
         var current = items.indexOf(getProduct());
         if (current < items.size() - 1) {
             presenter.selectProduct(items.get(current + 1));
+        }
+    }
+
+    /**
+     * A form component that extends VerticalLayout and sets ARIA attributes to
+     * enhance accessibility. The form is given a tabindex, an aria-label for
+     * screen readers, a role of "form", and aria-keyshortcuts for keyboard
+     * navigation.
+     */
+    public class Form extends VerticalLayout {
+
+        /**
+         * Constructs a new Form instance and sets ARIA attributes to enhance
+         * accessibility.
+         */
+        public Form() {
+            super();
+            // Set ARIA attributes for the form to make it accessible
+            var attributes = AttributeExtension.of(this);
+            attributes.setAttribute("tabindex", "0");
+            attributes.setAttribute("aria-label",
+                    getTranslation(I18n.Books.PRODUCT_FORM));
+            attributes.setAttribute("role", "form");
+            attributes.setAttribute("aria-keyshortcuts",
+                    "Escape PageDown PageUp");
         }
     }
 

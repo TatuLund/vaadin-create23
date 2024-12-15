@@ -27,5 +27,6 @@ public class FilterField extends TextField implements HasI18N {
         resetButton.setButtonLabel(getTranslation(I18n.Books.CLEAR_TEXT));
         var attributes = AttributeExtension.of(this);
         attributes.setAttribute("autocomplete", "off");
+        attributes.setAttribute("role", "searchbox");
     }
 }

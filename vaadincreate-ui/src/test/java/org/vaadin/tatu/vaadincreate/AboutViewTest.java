@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.tatu.vaadincreate.AboutView.MessageEvent;
 import org.vaadin.tatu.vaadincreate.AppLayout.MenuButton;
-import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
 import com.vaadin.server.ServiceException;
@@ -86,7 +86,7 @@ public class AboutViewTest extends AbstractUITest {
         var area = $(TextArea.class).id("admins-text-area");
         assertTrue(area.isVisible());
 
-        EventBus.get().post(new Message("Hello", LocalDateTime.now()));
+        EventBus.get().post(new MessageEvent("Hello", LocalDateTime.now()));
 
         waitWhile(view, n -> $(Notification.class).last() == null, 2);
         var notification = $(Notification.class).last();

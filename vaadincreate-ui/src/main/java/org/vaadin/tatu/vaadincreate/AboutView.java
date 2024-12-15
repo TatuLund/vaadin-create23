@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate;
 
+import java.time.LocalDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
@@ -97,7 +99,8 @@ public class AboutView extends VerticalLayout
             adminsNote.setCaption(
                     Utils.formatDate(mes.getDateStamp(), getLocale()));
             adminsNote.setValue(mes.getMessage());
-            getEventBus().post(mes);
+            getEventBus().post(
+                    new MessageEvent(mes.getMessage(), mes.getDateStamp()));
             logger.info("Admin message updated");
         }
     }
@@ -158,17 +161,16 @@ public class AboutView extends VerticalLayout
 
     @Override
     public void eventFired(Object event) {
-        if (event instanceof Message) {
+        if (event instanceof MessageEvent message) {
             Utils.access(ui, () -> {
                 if (adminsNoteField.isVisible()) {
                     adminsNoteField.setVisible(false);
                     adminsNote.setVisible(true);
                     editButton.setVisible(true);
                 }
-                Message mes = (Message) event;
                 adminsNote.setCaption(
-                        Utils.formatDate(mes.getDateStamp(), getLocale()));
-                adminsNote.setValue(mes.getMessage());
+                        Utils.formatDate(message.timeStamp(), getLocale()));
+                adminsNote.setValue(message.message());
             });
         }
     }
@@ -191,6 +193,9 @@ public class AboutView extends VerticalLayout
 
     private AppDataService getService() {
         return VaadinCreateUI.get().getAppService();
+    }
+
+    public record MessageEvent(String message, LocalDateTime timeStamp) {
     }
 
     private static Logger logger = LoggerFactory.getLogger(AboutView.class);

@@ -26,8 +26,7 @@ public class LockedObjectsTest {
 
     @Before
     public void init() {
-        objects = IntStream.range(0, 10).mapToObj(i -> new MockObject(i))
-                .collect(Collectors.toList());
+        objects = IntStream.range(0, 10).mapToObj(MockObject::new).toList();
     }
 
     @Test
@@ -40,20 +39,20 @@ public class LockedObjectsTest {
         assertEquals(user, lockedObjects.isLocked(objects.get(0)));
         var event = listener.getLastEvent();
         assertEquals(1, listener.getEventCount());
-        assertEquals(user, event.getUser());
-        assertEquals(objects.get(0).getId(), event.getId());
-        assertEquals(MockObject.class, event.getType());
-        assertTrue(event.isLocked());
+        assertEquals(user, event.user());
+        assertEquals(objects.get(0).getId(), event.id());
+        assertEquals(MockObject.class, event.type());
+        assertTrue(event.locked());
 
         lockedObjects.unlock(objects.get(0));
 
         assertEquals(null, lockedObjects.isLocked(objects.get(0)));
         event = listener.getLastEvent();
         assertEquals(2, listener.getEventCount());
-        assertEquals(user, event.getUser());
-        assertEquals(objects.get(0).getId(), event.getId());
-        assertEquals(MockObject.class, event.getType());
-        assertFalse(event.isLocked());
+        assertEquals(user, event.user());
+        assertEquals(objects.get(0).getId(), event.id());
+        assertEquals(MockObject.class, event.type());
+        assertFalse(event.locked());
 
         listener.remove();
     }

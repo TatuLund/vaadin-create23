@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,7 @@ public class ProductDataServiceImpl implements ProductDataService {
             var categories = MockDataGenerator.createCategories();
             categories.forEach(cat -> productDao.updateCategory(cat));
             var savedCategories = productDao.getAllCategories().stream()
-                    .collect(Collectors.toList());
+                    .toList();
             var products = MockDataGenerator.createProducts(savedCategories);
             products.forEach(prod -> productDao.updateProduct(prod));
             logger.info("Generated mock product data");

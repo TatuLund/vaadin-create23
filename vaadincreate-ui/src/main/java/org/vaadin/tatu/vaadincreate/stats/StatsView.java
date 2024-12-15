@@ -41,19 +41,15 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
 
     private CssLayout dashboard;
 
-    private Chart availabilityChart;
-    private Chart categoryChart;
-    private Chart priceChart;
+    private CustomChart availabilityChart;
+    private CustomChart categoryChart;
+    private CustomChart priceChart;
 
     private Lang lang;
 
     private Registration resizeListener;
 
     private UI ui;
-
-    private AttributeExtension availabilityChartAttributes;
-    private AttributeExtension priceChartAttributes;
-    private AttributeExtension categoryChartAttributes;
 
     public StatsView() {
         addStyleNames(VaadinCreateTheme.STATSVIEW, ValoTheme.SCROLLABLE);
@@ -81,10 +77,9 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
 
     private CssLayout createPriceChart() {
         var priceChartWrapper = new CssLayout();
-        priceChart = new Chart(ChartType.PIE);
+        priceChart = new CustomChart(ChartType.PIE);
         priceChart.setId("price-chart");
         priceChart.addStyleName(VaadinCreateTheme.DASHBOARD_CHART_FOCUSRING);
-        priceChartAttributes = AttributeExtension.of(priceChart);
         priceChartWrapper.addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
         var conf = priceChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.Stats.PRICES));
@@ -98,10 +93,9 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         var categoryChartWrapper = new CssLayout();
         categoryChartWrapper
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_WIDE);
-        categoryChart = new Chart(ChartType.COLUMN);
+        categoryChart = new CustomChart(ChartType.COLUMN);
         categoryChart.setId("category-chart");
         categoryChart.addStyleName(VaadinCreateTheme.DASHBOARD_CHART_FOCUSRING);
-        categoryChartAttributes = AttributeExtension.of(categoryChart);
         var conf = categoryChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.CATEGORIES));
         conf.setLang(lang);
@@ -112,11 +106,10 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
 
     private CssLayout createAvailabilityChart() {
         var availabilityChartWrapper = new CssLayout();
-        availabilityChart = new Chart(ChartType.COLUMN);
+        availabilityChart = new CustomChart(ChartType.COLUMN);
         availabilityChart
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_FOCUSRING);
         availabilityChart.setId("availability-chart");
-        availabilityChartAttributes = AttributeExtension.of(availabilityChart);
         availabilityChartWrapper
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
         var conf = availabilityChart.getConfiguration();
@@ -177,14 +170,14 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
 
     private void updatePriceChartAccessibilityAttributes(
             DataSeries priceSeries) {
-        priceChartAttributes.setAttribute("role", "figure");
-        priceChartAttributes.setAttribute("tabindex", "0");
+        priceChart.setAttribute("role", "figure");
+        priceChart.setAttribute("tabindex", "0");
         var alt = String.format("%s:%s", getTranslation(I18n.Stats.PRICES),
                 priceSeries
                         .getData().stream().map(data -> String.format("%s %s",
                                 data.getName(), data.getY()))
                         .collect(Collectors.joining(",")));
-        priceChartAttributes.setAttribute("aria-label", alt);
+        priceChart.setAttribute("aria-label", alt);
     }
 
     // Update the charts with the new data
@@ -216,8 +209,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
 
     private void updateCategoryChartAccessibilityAttributes(DataSeries titles,
             DataSeries stockCounts) {
-        categoryChartAttributes.setAttribute("role", "figure");
-        categoryChartAttributes.setAttribute("tabindex", "0");
+        categoryChart.setAttribute("role", "figure");
+        categoryChart.setAttribute("tabindex", "0");
         var alt1 = String.format("%s %s:%s",
                 getTranslation(I18n.Stats.CATEGORIES),
                 getTranslation(I18n.Stats.COUNT),
@@ -231,7 +224,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
                         .getData().stream().map(data -> String.format("%s %s",
                                 data.getName(), data.getY()))
                         .collect(Collectors.joining(",")));
-        categoryChartAttributes.setAttribute("aria-label", alt1 + " " + alt2);
+        categoryChart.setAttribute("aria-label", alt1 + " " + alt2);
     }
 
     // Update the charts with the new data
@@ -254,15 +247,15 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
 
     private void updateAvailabilityChartAccessibilityAttributes(
             DataSeries availabilitySeries) {
-        availabilityChartAttributes.setAttribute("role", "figure");
-        availabilityChartAttributes.setAttribute("tabindex", "0");
+        availabilityChart.setAttribute("role", "figure");
+        availabilityChart.setAttribute("tabindex", "0");
         var alt = String.format("%s:%s",
                 getTranslation(I18n.Stats.AVAILABILITIES),
                 availabilitySeries
                         .getData().stream().map(data -> String.format("%s %s",
                                 data.getName(), data.getY()))
                         .collect(Collectors.joining(",")));
-        availabilityChartAttributes.setAttribute("aria-label", alt);
+        availabilityChart.setAttribute("aria-label", alt);
     }
 
     private DataSeries categorySeries(Map<String, Long[]> categories,
@@ -333,18 +326,22 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
     @Override
     public void attach() {
         super.attach();
+        ui = getUI();
         // Vaadin responsive forces layout only when break point changes,
         // however Chart requires re-layout also when window size changes
         // when using non-fixed sizes.
-        ui = getUI();
         resizeListener = ui.getPage().addBrowserWindowResizeListener(
                 e -> JavaScript.eval("vaadin.forceLayout()"));
+
         // Remove Highcharts desc-banners, they are announced by NVDA
-        JavaScript.eval(
-                "setTimeout(() => Array.from(document.getElementsByTagName('svg'))"
-                        + ".forEach(el => {"
-                        + "const desc = el.getElementsByTagName('desc')[0];"
-                        + "el.removeChild(desc);}), 1000);");
+        JavaScript
+                .eval("""
+                        setTimeout(() => Array.from(document.getElementsByTagName('svg'))
+                            .forEach(el => {
+                                const desc = el.getElementsByTagName('desc')[0];
+                                el.removeChild(desc);
+                            }), 1000);
+                        """);
     }
 
     @Override
@@ -357,6 +354,30 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
     public void setLoading() {
         dashboard.removeStyleName("loaded");
         categoryChart.getConfiguration().removeyAxes();
+    }
+
+    /**
+     * CustomChart is an extension of the Chart class that allows for setting
+     * custom attributes. It uses the AttributeExtension to manage these
+     * attributes.
+     */
+    public static class CustomChart extends Chart {
+        private AttributeExtension attributes;
+
+        public CustomChart(ChartType type) {
+            super(type);
+            attributes = AttributeExtension.of(this);
+        }
+
+        /**
+         * Sets an attribute with the specified key and value.
+         *
+         * @param key the attribute key
+         * @param value the attribute value
+         */
+        public void setAttribute(String key, String value) {
+            attributes.setAttribute(key, value);
+        }
     }
 
     private static Logger logger = LoggerFactory.getLogger(StatsView.class);

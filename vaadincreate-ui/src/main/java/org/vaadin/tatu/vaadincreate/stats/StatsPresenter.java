@@ -157,13 +157,7 @@ public class StatsPresenter implements EventBusListener, Serializable {
         }
     }
 
-    private static class PriceBracket {
-        private int max;
-
-        public PriceBracket(int max) {
-            this.max = max;
-        }
-
+    private record PriceBracket(int max) {
         public boolean isInPriceBracket(BigDecimal price) {
             return price.doubleValue() < max
                     && price.doubleValue() >= (max - 10);

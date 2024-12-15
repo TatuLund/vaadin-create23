@@ -19,8 +19,8 @@ import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.crud.BooksPresenter;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
 import org.vaadin.tatu.vaadincreate.crud.FakeGrid;
+import org.vaadin.tatu.vaadincreate.stats.StatsView.CustomChart;
 
-import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.CssLayout;
@@ -115,15 +115,15 @@ public class StatsViewTest extends AbstractUITest {
     private void assertStatistics(Map<String, Number> prices,
             Map<String, Number> availabilities, Map<String, Number> stockTitles,
             Map<String, Number> stockCounts) {
-        var chart = $(Chart.class).id("price-chart");
+        var chart = $(CustomChart.class).id("price-chart");
         var series = (DataSeries) chart.getConfiguration().getSeries().get(0);
         assertSeries(prices, series);
 
-        chart = $(Chart.class).id("availability-chart");
+        chart = $(CustomChart.class).id("availability-chart");
         series = (DataSeries) chart.getConfiguration().getSeries().get(0);
         assertSeries(availabilities, series);
 
-        chart = $(Chart.class).id("category-chart");
+        chart = $(CustomChart.class).id("category-chart");
         series = (DataSeries) chart.getConfiguration().getSeries().get(0);
         assertSeries(stockTitles, series);
 

@@ -40,7 +40,7 @@ public class UserForm extends Composite implements HasI18N {
         username = new TextField(getTranslation(I18n.User.USERNAME));
         username.setId("user-field");
         var userNameExt = AttributeExtension.of(username);
-        userNameExt.setAttribute("autocomplete", "242343243");
+        userNameExt.setAttribute("autocomplete", "off");
         var password = new PasswordField(getTranslation(I18n.PASSWORD));
         password.setId("password-field");
         password2 = new PasswordField(getTranslation(I18n.User.PASSWD_REPEAT));

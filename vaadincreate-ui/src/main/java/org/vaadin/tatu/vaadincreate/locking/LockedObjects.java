@@ -47,54 +47,6 @@ public interface LockedObjects {
     /**
      * Locking event, which will be fired when object is locked or unlocked.
      */
-    public static class LockingEvent implements Serializable {
-        private Integer id;
-        private User user;
-        private Class<?> type;
-        private boolean locked;
-
-        public LockingEvent(Class<?> type, Integer id, User user,
-                boolean locked) {
-            this.id = id;
-            this.type = type;
-            this.user = user;
-            this.locked = locked;
-        }
-
-        /**
-         * Get user who triggered the locking event.
-         *
-         * @return The user
-         */
-        public User getUser() {
-            return user;
-        }
-
-        /**
-         * Get id of the object.
-         *
-         * @return Integer value
-         */
-        public Integer getId() {
-            return id;
-        }
-
-        /**
-         * Get the type of the object.
-         *
-         * @return The type
-         */
-        public Class<?> getType() {
-            return type;
-        }
-
-        /**
-         * Check if the event was due locking or unlocking of the object.
-         *
-         * @return boolean value
-         */
-        public boolean isLocked() {
-            return locked;
-        }
+    public record LockingEvent(Class<?> type, Integer id, User user, boolean locked) implements Serializable {
     }
 }

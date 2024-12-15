@@ -12,6 +12,7 @@ import javax.servlet.http.Cookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.vaadin.tatu.vaadincreate.AboutView.MessageEvent;
 import org.vaadin.tatu.vaadincreate.admin.AdminView;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.BasicAccessControl;
@@ -19,7 +20,6 @@ import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.AppDataService;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
-import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
@@ -223,13 +223,11 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     @Override
     public void eventFired(Object event) {
-        if (event instanceof Message) {
-            Message message = (Message) event;
-
+        if (event instanceof MessageEvent message) {
             access(() -> {
                 var note = new Notification(
-                        Utils.formatDate(message.getDateStamp(), getLocale()),
-                        message.getMessage(), Type.TRAY_NOTIFICATION, true);
+                        Utils.formatDate(message.timeStamp(), getLocale()),
+                        message.message(), Type.TRAY_NOTIFICATION, true);
                 note.show(getPage());
             });
         }

@@ -406,13 +406,13 @@ public class BooksPresenter implements Serializable, EventBusListener {
 
     @Override
     public void eventFired(Object event) {
-        if (event instanceof LockingEvent) {
-            var id = ((LockingEvent) event).getId();
+        if (event instanceof LockingEvent lockingEvent) {
+            var id = lockingEvent.id();
             view.refreshProductAsync(id);
         }
-        if (event instanceof BooksChanged) {
-            var product = ((BooksChanged) event).getProduct();
-            if (((BooksChanged) event).getChange() != BookChange.SAVE) {
+        if (event instanceof BooksChanged booksChanged) {
+            var product = booksChanged.product();
+            if (((BooksChanged) event).change() != BookChange.SAVE) {
                 return;
             }
             view.refreshProductAsync(product);
@@ -432,39 +432,13 @@ public class BooksPresenter implements Serializable, EventBusListener {
     }
 
     /**
-     * Represents a change event for books. This class encapsulates the details
+     * Represents a change event for books. This record encapsulates the details
      * of a change made to a book, including the product affected and the type
      * of change.
      */
-    public static class BooksChanged {
+    public record BooksChanged(Product product, BookChange change) {
         public enum BookChange {
             SAVE, DELETE
-        }
-
-        private Product product;
-        private BookChange change;
-
-        public BooksChanged(Product product, BookChange change) {
-            this.product = product;
-            this.change = change;
-        }
-
-        /**
-         * Retrieves the changed product.
-         *
-         * @return the changed {@link Product} instance.
-         */
-        public Product getProduct() {
-            return product;
-        }
-
-        /**
-         * Retrieves the current change associated with the book.
-         *
-         * @return the current BookChange instance.
-         */
-        public BookChange getChange() {
-            return change;
         }
     }
 

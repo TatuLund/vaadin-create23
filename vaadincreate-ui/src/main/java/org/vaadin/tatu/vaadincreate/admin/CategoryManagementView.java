@@ -25,8 +25,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings({ "serial", "java:S2160" })
-public class CategoryManagementView extends VerticalLayout
-        implements TabView {
+public class CategoryManagementView extends VerticalLayout implements TabView {
 
     public static final String VIEW_NAME = "categories";
 
@@ -53,6 +52,10 @@ public class CategoryManagementView extends VerticalLayout
     @SuppressWarnings("java:S5669")
     public CategoryManagementView() {
         setSizeFull();
+        var attributes = AttributeExtension.of(this);
+        attributes.setAttribute("role", "region");
+        attributes.setAttribute("aria-labelledby", "view-name");
+
         list = new ComponentList<>(CategoryForm::new);
 
         newCategoryButton = new Button(
@@ -63,13 +66,14 @@ public class CategoryManagementView extends VerticalLayout
         newCategoryButton.setDisableOnClick(true);
         newCategoryButton.setId("new-category");
 
-        var h4 = new Label(getTranslation(I18n.Category.EDIT_CATEGORIES));
-        h4.addStyleName(ValoTheme.LABEL_H4);
+        var viewName = new Label(getTranslation(I18n.Category.EDIT_CATEGORIES));
+        viewName.addStyleName(ValoTheme.LABEL_H4);
+        viewName.setId("view-name");
 
         // Cancel the form when the user presses escape
         addShortcutListener(new EscapeListener());
 
-        addComponents(h4, newCategoryButton, list);
+        addComponents(viewName, newCategoryButton, list);
         setExpandRatio(list, 1);
     }
 

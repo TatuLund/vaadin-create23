@@ -43,7 +43,7 @@ public class BooksViewErrorTest extends AbstractUITest {
     }
 
     @Test
-    public void error() {
+    public void when_books_view_is_entered_with_badbumber_as_url_parameter_form_is_not_shown_and_error_is_shown() {
         assertEquals("Product id \"badnumber\" not valid or found.",
                 $(Notification.class).last().getCaption());
         assertFalse(form.isShown());

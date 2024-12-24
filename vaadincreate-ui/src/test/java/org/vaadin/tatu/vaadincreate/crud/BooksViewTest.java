@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collections;
-import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
@@ -69,50 +68,60 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void selectProduct() {
+    public void browsing_products_keeps_focus_in_grid() {
         for (int i = 0; i < test(grid).size(); i += 10) {
 
+            // WHEN: Clicking on a row
             test(grid).click(1, i);
+
+            // THEN: Focus is still in the grid
             assertTrue(test(grid).isFocused());
 
-            var book = test(grid).item(i);
-            assertEquals(book.getProductName(),
-                    $(form, TextField.class).id("product-name").getValue());
-            var price = $(form, TextField.class).id("price");
-            var converter = new EuroConverter("");
-            assertEquals(
-                    converter.convertToPresentation(book.getPrice(),
-                            new ValueContext(null, price, ui.getLocale())),
-                    price.getValue());
-            assertEquals(Integer.valueOf(book.getStockCount()),
-                    $(form, NumberField.class).id("stock-count").getValue());
+            then_form_is_filled_with_values_from_grid_row(i);
+            then_selected_categories_are_shown_first();
 
-            assertEquals(book.getAvailability(),
-                    $(form, AvailabilitySelector.class).id("availability")
-                            .getValue());
-            assertEquals(book.getCategory(),
-                    $(form, CheckBoxGroup.class).id("category").getValue());
-
-            verifySelectedCategoriesAreTheFirst();
-
+            // WHEN: Clicking the row again
             test(grid).click(1, i);
 
-            assertEquals("",
-                    $(form, TextField.class).id("product-name").getValue());
-            assertEquals(Integer.valueOf(0),
-                    $(form, NumberField.class).id("stock-count").getValue());
-            assertEquals("0.00 €",
-                    $(form, TextField.class).id("price").getValue());
-            assertEquals(Availability.COMING,
-                    $(form, AvailabilitySelector.class).id("availability")
-                            .getValue());
-            assertEquals(Collections.emptySet(),
-                    $(form, CheckBoxGroup.class).id("category").getValue());
+            // THEN: Form is closed
+            assertFalse(form.isShown());
+            then_form_fields_are_reset_state();
         }
 
     }
 
-    private void verifySelectedCategoriesAreTheFirst() {
+    private void then_form_is_filled_with_values_from_grid_row(int i) {
+        var book = test(grid).item(i);
+        assertEquals(book.getProductName(),
+                $(form, TextField.class).id("product-name").getValue());
+        var price = $(form, TextField.class).id("price");
+        var converter = new EuroConverter("");
+        assertEquals(
+                converter.convertToPresentation(book.getPrice(),
+                        new ValueContext(null, price, ui.getLocale())),
+                price.getValue());
+        assertEquals(book.getStockCount(),
+                $(form, NumberField.class).id("stock-count").getValue());
+
+        assertEquals(book.getAvailability(), $(form, AvailabilitySelector.class)
+                .id("availability").getValue());
+        assertEquals(book.getCategory(),
+                $(form, CheckBoxGroup.class).id("category").getValue());
+    }
+
+    private void then_form_fields_are_reset_state() {
+        assertEquals("",
+                $(form, TextField.class).id("product-name").getValue());
+        assertEquals(Integer.valueOf(0),
+                $(form, NumberField.class).id("stock-count").getValue());
+        assertEquals("0.00 €", $(form, TextField.class).id("price").getValue());
+        assertEquals(Availability.COMING, $(form, AvailabilitySelector.class)
+                .id("availability").getValue());
+        assertEquals(Collections.emptySet(),
+                $(form, CheckBoxGroup.class).id("category").getValue());
+    }
+
+    private void then_selected_categories_are_shown_first() {
         // Verify that the selected categories are the first in the list
         var items = $(form, CheckBoxGroup.class).id("category")
                 .getDataCommunicator().fetchItemsWithRange(0,
@@ -127,12 +136,17 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void crossValidationAndDiscard() {
+    @SuppressWarnings({ "unchecked", "java:S5961" })
+    public void input_wrong_stock_count_vs_availability_shows_validation_error_and_cancel_shows_confirm_dialog_and_after_discarding_edits_cancel_closes_form() {
+        // WHEN: Opening empty product form
         test($(view, Button.class).id("new-product")).click();
+
+        // THEN: Discard and save buttons on the form are disabled
         assertFalse($(form, Button.class).id("discard-button").isEnabled());
         assertFalse($(form, Button.class).id("save-button").isEnabled());
 
+        // WHEN: Filling the form with wrong stock count and availability and
+        // clicking save button
         test($(form, TextField.class).id("product-name")).setValue("Te");
         test($(form, AvailabilitySelector.class).id("availability"))
                 .clickItem(Availability.COMING);
@@ -143,6 +157,9 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, CheckBoxGroup.class).id("category")).clickItem(cat);
 
         test($(form, Button.class).id("save-button")).click();
+
+        // THEN: Form is still shown and save button is disabled and validation
+        // error is shown in stock count and availability fields
         assertFalse($(form, Button.class).id("save-button").isEnabled());
         assertTrue(test($(form, AvailabilitySelector.class).id("availability"))
                 .isInvalid());
@@ -156,39 +173,58 @@ public class BooksViewTest extends AbstractUITest {
                 test($(form, NumberField.class).id("stock-count"))
                         .errorMessage());
 
+        // WHEN: Inputting correct stock count
         test($(form, NumberField.class).id("stock-count")).setValue(0);
+
+        // THEN: Validation error is removed from stock count and availability
+        // and save button is enabled
         assertFalse(test($(form, AvailabilitySelector.class).id("availability"))
                 .isInvalid());
         assertFalse(
                 test($(form, NumberField.class).id("stock-count")).isInvalid());
         assertTrue($(form, Button.class).id("save-button").isEnabled());
 
+        // WHEN: Cancelling the form by clicking cancel button
         test($(form, Button.class).caption("Cancel").single()).click();
 
+        // THEN: Confirm dialog is shown
         var dialog = $(Window.class).id("confirm-dialog");
+
+        // WHEN: Cancelling the cancel
         test($(dialog, Button.class).id("cancel-button")).click();
 
+        // THEN: Form is still shown
         assertTrue(form.isShown());
 
+        // WHEN: Clicking discard button
         test($(form, Button.class).caption("Discard").single()).click();
+
+        // THEN: The fields have empty and default values
         assertEquals("",
                 $(form, TextField.class).id("product-name").getValue());
         assertEquals("0.00 €", $(form, TextField.class).id("price").getValue());
         assertTrue($(form, CheckBoxGroup.class).id("category").getValue()
                 .isEmpty());
 
+        // WHEN: Cancelling the form by clicking cancel button
         test($(form, Button.class).caption("Cancel").single()).click();
+
+        // THEN: The form is closed and grid is focused
         assertFalse(form.isShown());
         assertTrue(test(grid).isFocused());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void addProduct() {
+    @SuppressWarnings({ "unchecked", "java:S5961" })
+    public void creating_new_product_and_saving_it() {
+        // WHEN: Opening empty product form
         test($(view, Button.class).id("new-product")).click();
 
+        // THEN: Form is shown and product name field is focused
         assertTrue(
                 test($(form, TextField.class).id("product-name")).isFocused());
+
+        // WHEN: Filling the form
         test($(form, TextField.class).id("product-name"))
                 .setValue("Filter book");
         test($(form, TextField.class).id("price")).setValue("10.0 €");
@@ -196,29 +232,37 @@ public class BooksViewTest extends AbstractUITest {
                 .clickItem(Availability.AVAILABLE);
         test($(form, NumberField.class).id("stock-count")).setValue(10);
 
+        // WHEN: Selecting a category
         var cat = ui.getProductService().getAllCategories().stream().findFirst()
                 .get();
         test($(form, CheckBoxGroup.class).id("category")).clickItem(cat);
-        verifySelectedCategoriesAreTheFirst();
+        then_selected_categories_are_shown_first();
 
+        // WHEN: Saving the form
         test($(form, Button.class).id("save-button")).click();
 
+        // THEN: Notification is shown with the book name, form is closed and
+        // grid is focused
+        assertFalse(form.isShown());
         assertTrue(test(grid).isFocused());
-
         assertTrue($(Notification.class).last().getCaption()
                 .contains("Filter book"));
 
+        // THEN: The book is added to the backend
         assertTrue(ui.getProductService().getAllProducts().stream()
                 .anyMatch(b -> b.getProductName().equals("Filter book")));
 
-        // New book is added to the end
+        // THEN: The new book is added to the end
         int row = test(grid).size() - 1;
         assertEquals("Filter book", test(grid).cell(1, row));
         assertEquals("10.00 €", test(grid).cell(2, row));
         assertEquals("10", test(grid).cell(4, row));
 
-        // Find by filter and its the first row
+        // WHEN: Searching for the book
         test($(FilterField.class).id("filter-field")).setValue("Filter book");
+
+        // THEN: The book is found at the first row and the row contains the new
+        // book
         assertEquals(1, test(grid).size());
         assertEquals("Filter book", test(grid).cell(1, 0));
         assertEquals("10.00 €", test(grid).cell(2, 0));
@@ -229,10 +273,14 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void addAndCancel() {
+    public void filling_new_product_and_cancelling_it_will_show_confirm_dialog() {
+        // WHEN: Opening empty product form
         test($(view, Button.class).id("new-product")).click();
+
+        // THEN: Form is shown
         assertTrue(form.isShown());
 
+        // WHEN: Filling the form and canceling it
         test($(form, TextField.class).id("product-name")).setValue("New book");
         test($(form, TextField.class).id("price")).setValue("10.0 €");
         test($(form, AvailabilitySelector.class).id("availability"))
@@ -241,46 +289,63 @@ public class BooksViewTest extends AbstractUITest {
 
         test($(form, Button.class).caption("Cancel").single()).click();
 
+        // THEN: Confirm dialog is shown
         var dialog = $(Window.class).id("confirm-dialog");
+
+        // WHEN: Confirming the cancel
         test($(dialog, Button.class).id("confirm-button")).click();
 
+        // THEN: Form is closed and grid is focused
         assertFalse(form.isShown());
         assertTrue(test(grid).isFocused());
     }
 
     @Test
-    public void addAndCancelEmpty() {
+    public void opening_empty_product_form_can_be_cancelled_without_confirmation() {
+        // WHEN: Opening empty product form
         test($(view, Button.class).id("new-product")).click();
+
+        // THEN: Form is shown
         assertTrue(form.isShown());
 
+        // WHEN: Canceling the form
         test($(form, Button.class).caption("Cancel").single()).click();
+
+        // THEN: Form is closed and grid is focused
         assertFalse(form.isShown());
         assertTrue(test(grid).isFocused());
     }
 
     @Test
-    public void deleteProduct() {
+    public void delete_product_requires_confirming() {
+        // GIVEN: A book
         createBook("Delete book");
 
+        // WHEN: Searching for the book
         test($(FilterField.class).id("filter-field")).setValue("Delete book");
 
+        // THEN: The book is found at the first row
         var row = 0;
         var book = test(grid).item(row);
         var id = book.getId();
         assertEquals("Delete book", book.getProductName());
-        test(grid).click(1, row);
 
+        // WHEN: Deleting the book
+        test(grid).click(1, row);
         test($(form, Button.class).id("delete-button")).click();
 
+        // THEN: Confirm dialog is shown
         var dialog = $(Window.class).id("confirm-dialog");
+
+        // WHEN: Confirming the delete
         test($(dialog, Button.class).id("confirm-button")).click();
 
+        // THEN: Notification is shown with the book name, form is closed, book
+        // is deleted and grid is empty
         assertTrue($(Notification.class).last().getCaption()
                 .contains(book.getProductName()));
         assertFalse(form.isShown());
-
         assertEquals(null, ui.getProductService().getProductById(id));
-
         assertEquals(0, test(grid).size());
     }
 
@@ -292,7 +357,7 @@ public class BooksViewTest extends AbstractUITest {
                 .clickItem(Availability.AVAILABLE);
         test($(TextField.class).id("price")).setValue("35.0 €");
         var categories = VaadinCreateUI.get().getProductService()
-                .getAllCategories().stream().collect(Collectors.toList());
+                .getAllCategories().stream().toList();
         test($(CheckBoxGroup.class).id("category"))
                 .clickItem(categories.get(1));
         test($(CheckBoxGroup.class).id("category"))
@@ -302,16 +367,25 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void concurrentDelete() {
+    public void attempting_to_open_product_deleted_concurrently_by_other_user_will_show_error() {
+        // GIVEN: A book
         createBook("Concurrent delete");
 
-        // Simulate other user deleting the book
+        // WHEN: Searching for the book
         test($(FilterField.class).id("filter-field"))
                 .setValue("Concurrent delete");
+
+        // THEN: The book is found at the first row
         var book = test(grid).item(0);
+
+        // WHEN: Simulating other user deleting the book
         ui.getProductService().deleteProduct(book.getId());
 
+        // WHEN: Clicking the row
         test(grid).click(1, 0);
+
+        // THEN: Error notification is shown and form is not opened and grid is
+        // empty
         assertEquals("Product was deleted.",
                 $(Notification.class).last().getCaption());
         assertFalse(form.isShown());
@@ -320,47 +394,68 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void editProduct() {
+    public void editing_product_and_saving_it_will_show_it_highlighted_in_grid() {
+        // GIVEN: A book
         createBook("Test book");
 
+        // WHEN: Searching for the book
         test($(FilterField.class).id("filter-field")).setValue("Test book");
 
+        // THEN: The book is found at the first row
         var row = 0;
         var book = test(grid).item(row);
+
+        // WHEN: Clicking the first row
         test(grid).click(1, row);
+
+        // THEN: Form is shown
         assertTrue(form.isShown());
 
         var id = book.getId();
         assertNotNull(id);
 
+        // WHEN: Editing the book and saving it
         test($(form, TextField.class).id("product-name"))
                 .setValue("Edited book");
         test($(form, Button.class).id("save-button")).click();
+
+        // THEN: Form is closed
         assertFalse(form.isShown());
 
         var edited = ui.getProductService().getProductById(id);
 
+        // WHEN: Searching for the edited book
         test($(FilterField.class).id("filter-field")).setValue("Edited book");
-        var name = (String) test(grid).cell(1, row);
 
+        // THEN: The edited book is found at the first row and the row is
+        // highlighted
+        var name = (String) test(grid).cell(1, row);
         assertEquals("Edited book", name);
         assertEquals("Edited book", edited.getProductName());
         assertEquals(VaadinCreateTheme.BOOKVIEW_GRID_EDITED,
                 test(grid).styleName(0));
 
+        // FINALLY: Delete the book to avoid side effects
         ui.getProductService().deleteProduct(id);
     }
 
     @Test
-    public void editAndCancel() {
+    public void clicking_cancel_button_in_form_having_changes_will_show_confirm_dialog_and_confirming_cancel_will_close_form_and_unlock_product_and_return_focus_to_grid() {
         var book = test(grid).item(0);
+
+        // WHEN: Opening product from the first row and changing the product
         test(grid).click(1, 0);
         assertTrue(form.isShown());
 
         test($(form, TextField.class).id("product-name"))
                 .setValue("Edited book");
 
+        // WHEN: Clicking cancel button
         test($(form, Button.class).caption("Cancel").single()).click();
+
+        // THEN: Edited field is marked as dirty and has the original value is
+        // shown in the description and the product is still locked and confirm
+        // dialog is shown
         assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
         assertTrue($(form, TextField.class).id("product-name").getDescription()
@@ -368,8 +463,12 @@ public class BooksViewTest extends AbstractUITest {
         assertNotNull(LockedObjects.get().isLocked(book));
 
         var dialog = $(Window.class).id("confirm-dialog");
+
+        // WHEN: Clicking confirm button on the confirm dialog
         test($(dialog, Button.class).id("confirm-button")).click();
 
+        // THEN: The form is closed and the product is unlocked and the grid is
+        // focused
         assertFalse(form.isShown());
         assertTrue(test(grid).isFocused());
 
@@ -377,52 +476,76 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void editAndSelectAndConfirmCancel() {
+    public void when_clicking_another_row_when_opened_form_has_changes_confirm_dialog_is_shown_and_field_is_marked_dirty_confirming_dialog_will_close_the_form_and_reopening_form_will_not_have_field_dirty() {
         var book = test(grid).item(0);
+
+        // WHEN: Opening product from the first row
         test(grid).click(1, 0);
+
+        // THEN: Form is shown
         assertTrue(form.isShown());
 
+        // WHEN: Changing the product and clicking an another product
         test($(form, TextField.class).id("product-name"))
                 .setValue("Changed book");
-
         test(grid).click(1, 1);
+
+        // THEN: The edited field is marked as dirty and has the original value
+        // is shown in the description and the confirm dialog is shown
         assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
         assertTrue($(form, TextField.class).id("product-name").getDescription()
                 .contains(book.getProductName()));
         var dialog = $(Window.class).id("confirm-dialog");
+
+        // WHEN: Clicking confirm button on the confirm dialog
         test($(dialog, Button.class).id("confirm-button")).click();
+
+        // THEN: The form is closed
         assertFalse(form.isShown());
 
+        // WHEN: Opening the first row again
         test(grid).click(1, 0);
+
+        // THEN: The form is shown and the field is no longer marked as dirty
         assertTrue(form.isShown());
         assertFalse($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
         assertNull(
                 $(form, TextField.class).id("product-name").getDescription());
 
-        // Close form gracefully to avoid side effects
+        // FINALLY: Close form gracefully to avoid side effects
         test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
     }
 
     @Test
-    public void editAndSelectAndCancelCancel() {
+    public void clicking_other_row_when_form_has_edits_will_show_confirm_dialog_and_edited_field_is_marked_dirty_clicking_discard_will_revert_edits_and_field_is_no_longer_dirty() {
         var book = test(grid).item(0);
+        var productName = book.getProductName();
+
+        // WHEN: Opening product from the first row and changing the product
         test(grid).click(1, 0);
         assertTrue(form.isShown());
 
         test($(form, TextField.class).id("product-name"))
                 .setValue("Changed book");
 
+        // WHEN: Clicking an another product
         test(grid).click(1, 1);
+
+        // THEN: The edited field is marked as dirty and has the original value
+        // is shown in the description and the confirm dialog is shown
         assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
         assertTrue($(form, TextField.class).id("product-name").getDescription()
                 .contains(book.getProductName()));
         var dialog = $(Window.class).id("confirm-dialog");
+
+        // WHEN: Clicking cancel button on the confirm dialog
         test($(dialog, Button.class).id("cancel-button")).click();
 
+        // THEN: The form is still shown and the field is still marked as dirty
         assertTrue(form.isShown());
         assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
@@ -431,51 +554,75 @@ public class BooksViewTest extends AbstractUITest {
 
         assertEquals(book, grid.getSelectedRow());
 
+        // WHEN: Clicking the discard button
         test($(form, Button.class).id("discard-button")).click();
+
+        // THEN: The field is no longer marked as dirty and the description is
+        // not shown and the original value is shown in the field
         assertFalse($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
         assertNull(
                 $(form, TextField.class).id("product-name").getDescription());
+        assertEquals(productName,
+                $(form, TextField.class).id("product-name").getValue());
 
+        // WHEN: Clicking cancel button
         test($(form, Button.class).id("cancel-button")).click();
+
+        // THEN: The form is closed
         assertFalse(form.isShown());
     }
 
     @Test
-    public void openProductChangedByOtherUser() {
+    public void opening_product_changed_by_other_user_is_showing_the_changes_made_by_him() {
         var book = test(grid).item(0);
 
-        // Simulate other user persisting a change to the database
+        // WHEN: Other user is persisting a change to the database
         var edited = ui.getProductService().getProductById(book.getId());
         var productName = edited.getProductName();
         edited.setProductName("Touched book");
         var saved = ui.getProductService().updateProduct(edited);
 
+        // WHEN: Opening the product by the first user
         test(grid).click(1, 0);
-        assertTrue(form.isShown());
 
-        // Assert that change is visible when product is opened
+        // THEN: Form is shown and product name is upto date in the form and in
+        // the grid
+        assertTrue(form.isShown());
         assertEquals("Touched book",
                 $(form, TextField.class).id("product-name").getValue());
 
         var name = (String) test(grid).cell(1, 0);
         assertEquals("Touched book", name);
 
+        // WHEN: Clicking cancel button
         test($(form, Button.class).id("cancel-button")).click();
+
+        // THEN: Form is closed
         assertFalse(form.isShown());
 
+        // FINALLY: Reset the name back to original in order to avoid side
+        // effects
         edited.setProductName(productName);
         ui.getProductService().updateProduct(saved);
     }
 
     @Test
-    public void editLockedProduct() {
+    public void it_is_not_possible_To_open_locked_row_and_grid_shows_locked_by_tooltip() {
+        // GIVEN: A locked book
         var book = test(grid).item(15);
         LockedObjects.get().lock(book, CurrentUser.get().get());
 
+        // THEN: The row has the locked by tooltip
         assertEquals("Edited by Admin", test(grid).description(15));
+
+        // WHEN: Clicking the row
         test(grid).click(1, 15);
+
+        // THEN: Form is not shown
         assertFalse(form.isShown());
+
+        // FINALLY: Unlock the book
         LockedObjects.get().unlock(book);
     }
 
@@ -483,10 +630,8 @@ public class BooksViewTest extends AbstractUITest {
     @SuppressWarnings("java:S1854")
     public void weakLockConcurrentEdit() {
         // Idea of this is to simulate Form being detached due browser
-        // crash so
-        // that form no longer holds the product reference. Here it is
-        // simulated
-        // by doing lock via proxy object.
+        // crash so that form no longer holds the product reference. Here it is
+        // simulated by doing lock via proxy object.
         var book = new Product(test(grid).item(0));
         LockedObjects.get().lock(book, CurrentUser.get().get());
         assertEquals("Edited by Admin", test(grid).description(0));
@@ -517,10 +662,8 @@ public class BooksViewTest extends AbstractUITest {
     @SuppressWarnings("java:S1854")
     public void weakLockConcurrentDelete() {
         // Idea of this is to simulate Form being detached due browser
-        // crash so
-        // that form no longer holds the product reference. Here it is
-        // simulated
-        // by doing lock via proxy object.
+        // crash so that form no longer holds the product reference. Here it is
+        // simulated by doing lock via proxy object.
         createBook("Concurrent delete");
         test($(FilterField.class).id("filter-field"))
                 .setValue("Concurrent delete");
@@ -552,57 +695,83 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void lockBookUnlockBook() {
+    public void opening_product_form_will_lock_the_product_and_locked_product_will_be_unlocked_when_product_in_form_is_changed() {
+        // GIVEN: The book from the first row is not locked
         var book = test(grid).item(0);
         assertNull(LockedObjects.get().isLocked(book));
 
+        // WHEN: Opening product from the first row
         test(grid).click(1, 0);
+
+        // THEN: Form is shown and book is locked
         assertTrue(form.isShown());
         assertNotNull(LockedObjects.get().isLocked(book));
 
+        // WHEN: Clicking the second row
         test(grid).click(1, 1);
+
+        // THEN: Form is shown and the book from the first row is not locked and
+        // the book from the second row is locked
         assertTrue(form.isShown());
         assertNull(LockedObjects.get().isLocked(book));
         assertNotNull(LockedObjects.get().isLocked(test(grid).item(1)));
 
+        // WHEN: Clicking the second row again
         test(grid).click(1, 1);
+
+        // THEN: Form is closed and the book from the second row is not locked
         assertFalse(form.isShown());
         assertNull(LockedObjects.get().isLocked(test(grid).item(1)));
     }
 
     @Test
-    public void lockBookUnlockOnNavigate() {
+    public void product_is_locked_when_opened_and_when_navigating_to_other_view_it_is_unlocked() {
+        // GIVEN: The book from the first row is not locked
         var book = test(grid).item(0);
         assertNull(LockedObjects.get().isLocked(book));
 
+        // WHEN: Clicking the first row
         test(grid).click(1, 0);
+
+        // THEN: Form is shown and book is locked
         assertTrue(form.isShown());
         assertNotNull(LockedObjects.get().isLocked(book));
 
+        // WHEN: Navigating to another view
         $(MenuButton.class).caption("About").single().click();
+
+        // THEN: The book is unlocked
         assertNull(LockedObjects.get().isLocked(book));
     }
 
     @Test
-    public void editProductDiscardChanges() {
+    public void clicking_another_row_when_form_with_changes_is_open_will_show_confirm_dialog() {
+        // WHEN: Opening product from the first row and changing the product
         test(grid).click(1, 0);
 
         test($(form, TextField.class).id("product-name"))
                 .setValue("Edited book");
         test($(form, NumberField.class).id("stock-count")).setValue(100);
 
+        // WHEN: Clicking an another product
         test(grid).click(1, 1);
 
+        // THEN: Confirm dialog is shown
         var dialog = $(Window.class).id("confirm-dialog");
+
+        // WHEN: Clicking confirm button
         test($(dialog, Button.class).id("confirm-button")).click();
 
+        // THEN: The form is closed and row is not marked as locked
         assertFalse(form.isShown());
         assertFalse(test(grid).styleName(0)
                 .contains(VaadinCreateTheme.BOOKVIEW_GRID_LOCKED));
     }
 
     @Test
-    public void editProductSaveChanges() {
+    public void editing_product_and_saving_changes_are_shown_in_grid() {
+        // WHEN: Opening product from the first row and changing the product and
+        // clicking save button
         test(grid).click(1, 0);
 
         var name = $(form, TextField.class).id("product-name").getValue();
@@ -611,15 +780,18 @@ public class BooksViewTest extends AbstractUITest {
 
         test($(form, Button.class).id("save-button")).click();
 
+        // THEN: Notification is shown with the book name, form is closed
         assertEquals("\"Different book\" updated",
                 $(Notification.class).last().getCaption());
-
         assertFalse(form.isShown());
+
+        // THEN: The edited row is highlighted and has the new name
         assertTrue(test(grid).styleName(0)
                 .contains(VaadinCreateTheme.BOOKVIEW_GRID_EDITED));
-
         assertEquals("Different book", test(grid).cell(1, 0));
 
+        // FINALLY: Reset the name back to original in order to avoid side
+        // effects
         test(grid).click(1, 0);
         test($(form, TextField.class).id("product-name")).setValue(name);
 
@@ -628,7 +800,8 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void editProductRevertEdit() {
+    public void changing_product_and_reverting_edits_manually_by_editing_will_not_keep_form_dirty() {
+        // WHEN: Opening product from the first row and changing the product
         test(grid).click(1, 0);
 
         var name = $(form, TextField.class).id("product-name").getValue();
@@ -637,43 +810,51 @@ public class BooksViewTest extends AbstractUITest {
                 .setValue("Edited book");
         test($(form, NumberField.class).id("stock-count")).setValue(100);
 
-        // Assert that change was detected
+        // THEN: Save and discard buttons are enabled
         assertTrue($(form, Button.class).id("save-button").isEnabled());
         assertTrue($(form, Button.class).id("discard-button").isEnabled());
 
-        // Revert edits
+        // WHEN: Reverting the changes
         test($(form, TextField.class).id("product-name")).setValue(name);
         test($(form, NumberField.class).id("stock-count")).setValue(count);
 
-        // Assert that change was detected
+        // THEN: Save and discard buttons are disabled
         assertFalse($(form, Button.class).id("save-button").isEnabled());
         assertFalse($(form, Button.class).id("discard-button").isEnabled());
 
-        // Attempt to change item
+        // WHEN: Clicking an another product
         test(grid).click(1, 1);
 
+        // THEN: Form is shown and the fields are updated with the new product
         assertTrue(form.isShown());
-        // Assert that form content was updated
         assertEquals($(form, TextField.class).id("product-name").getValue(),
                 test(grid).cell(1, 1));
 
+        // FINALLY: Close form gracefully to avoid side effects
         test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
     }
 
     @Test
-    public void editProductDiscardChangesWhenNavigate() {
+    public void confirm_dialog_is_shown_when_menu_button_is_clicked_if_product_has_changes() {
+        // WHEN: Opening product from the first row and changing the product
         test(grid).click(1, 0);
 
         test($(form, TextField.class).id("product-name"))
                 .setValue("Edited book");
         test($(form, NumberField.class).id("stock-count")).setValue(100);
 
+        // WHEN: Clicking about button from the menu
         $(MenuButton.class).caption("About").single().click();
 
+        // THEN: Confirm dialog is shown
         var dialog = $(Window.class).id("confirm-dialog");
+
+        // WHEN: Clicking confirm button
         test($(dialog, Button.class).id("confirm-button")).click();
 
+        // THEN: The form is closed and the about view is shown and book view is
+        // not shown
         assertFalse(form.isShown());
 
         assertEquals(1, $(AboutView.class).size());
@@ -681,33 +862,42 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void editProductDiscardChangesWhenLogout() {
+    public void confirm_dialog_is_shown_when_logout_button_is_clicked_if_product_has_changes() {
+        // WHEN: Opening product from the first row and changing the product
         test(grid).click(1, 0);
 
         test($(form, TextField.class).id("product-name"))
                 .setValue("Edited book");
         test($(form, NumberField.class).id("stock-count")).setValue(100);
 
+        // WHEN: Clicking logout button
         logout();
 
+        // THEN: Confirm dialog is shown and book view is still open and form is
+        // still shown
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("cancel-button")).click();
 
         assertEquals(1, $(BooksView.class).size());
         assertTrue(form.isShown());
 
-        // Close form gracefully to avoid side effects
+        // FINALLY: Close form gracefully to avoid side effects
         test($(form, Button.class).id("discard-button")).click();
         test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
     }
 
     @Test
-    public void validationError() {
+    public void validation_is_shown_when_product_name_is_empty() {
+        // WHEN: Opening product from the first row and clearing the product
+        // name and focusing on stock count
         test(grid).click(1, 0);
 
         test($(form, TextField.class).id("product-name")).setValue("");
         test($(form, NumberField.class).id("stock-count")).focus();
+
+        // THEN: Validation error is shown in product name field and the field
+        // is invalid
         assertTrue(
                 test($(form, TextField.class).id("product-name")).isInvalid());
         assertEquals(
@@ -715,42 +905,53 @@ public class BooksViewTest extends AbstractUITest {
                 test($(form, TextField.class).id("product-name"))
                         .errorMessage());
 
+        // WHEN: Clicking discard button
         test($(form, Button.class).id("discard-button")).click();
+
+        // THEN: Clicking discard button closes the form without showing the
+        // confirm dialog
         test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void categoriesValid() {
+    public void when_saving_product_with_concurrently_deleted_categoty_error_is_shown() {
+        // GIVEN: A category
         var category = new Category();
         category.setName("Science");
         category = ui.getProductService().updateCategory(category);
         assertNotNull(category.getId());
 
+        // WHEN: Opening product from the first row
         test(grid).click(1, 0);
 
-        // Simulate other user deleting the category while editor is
+        // WHEN: Simulating other user deleting the category while editor is
         // open
         ui.getProductService().deleteCategory(category.getId());
 
+        // WHEN: Using the category in the product and saving the product
         test($(form, CheckBoxGroup.class).id("category")).clickItem(category);
         test($(form, Button.class).id("save-button")).click();
 
+        // THEN: Error is shown
         assertEquals("One or more of the selected categories were deleted.",
                 $(Notification.class).last().getCaption());
 
+        // WHEN: Clicking cancel button
         test($(form, Button.class).id("cancel-button")).click();
+
+        // THEN: Form is closed
         assertFalse(form.isShown());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void sanitation() {
-        // Make window small in order to show tooltip
+    @SuppressWarnings({ "unchecked", "java:S5961" })
+    public void tooltip_in_narrow_mode_and_edited_field_has_content_sanitized_to_prevent_xss() {
+        // WHEN: Making window small in order to show tooltip
         ui.getPage().updateBrowserWindowSize(500, 1024, true);
 
-        // Create a book with offending content
+        // WHEN: Creating a book with offending content
         test($(view, Button.class).id("new-product")).click();
         test($(form, TextField.class).id("product-name")).setValue(
                 "<b><img src=1 onerror=alert(document.domain)>A new book</b>");
@@ -762,64 +963,79 @@ public class BooksViewTest extends AbstractUITest {
         var cat = ui.getProductService().getAllCategories().stream().findFirst()
                 .get();
         test($(form, CheckBoxGroup.class).id("category")).clickItem(cat);
+
+        // WHEN: Clicking save button
         test($(form, Button.class).id("save-button")).click();
+
+        // THEN: Form is closed and the product is on the last row
         assertFalse(form.isShown());
 
         int row = test(grid).size() - 1;
 
-        // Assert JS sanitized
+        // THEN: The JS sanitized away and the text content remain
         assertFalse(test(grid).description(row).contains("alert"));
-        // Assert text content remain
         assertTrue(test(grid).description(row).contains("A new book"));
 
+        // WHEN: Clicking the row
         test(grid).click(1, row);
         var id = test(grid).item(row).getId();
         assertNotNull(id);
 
+        // THEN: Form is shown
         assertTrue(form.isShown());
 
+        // WHEN: Editing the book and clicking cancel button
         test($(form, TextField.class).id("product-name"))
                 .setValue("The new book");
-
         test($(form, Button.class).id("cancel-button")).click();
+
+        // THEN: Confirm dialog is shown
         var dialog = $(Window.class).id("confirm-dialog");
+
+        // WHEN: Canceling the cancel operation
         test($(dialog, Button.class).id("cancel-button")).click();
 
+        // THEN: Form is still shown and field is dirty and has tooltip with the
+        // original content where JS is sanitized and text content remain
         assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        // Assert JS sanitized
         assertFalse($(form, TextField.class).id("product-name").getDescription()
                 .contains("alert"));
-        // Assert text content remain
         assertTrue($(form, TextField.class).id("product-name").getDescription()
                 .contains("A new book"));
 
+        // WHEN: Clicking discard button
         test($(form, Button.class).id("discard-button")).click();
+
+        // THEN: Cancel button is clicked and form is closed without showing the
+        // confirm dialog
         test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
 
+        // Cleanup
         ui.getProductService().deleteProduct(id);
     }
 
     @Test
-    public void saveEventRefreshes() {
-        // Create presenter simulating other user
+    public void save_event_received_by_presenter_refreshes_grid() {
+        // GIVEN: Create presenter simulating other user
         var presenter = createBooksPresenter();
-
+        // GIVEN: Book on the first row
         var book = test(grid).item(0);
 
-        // Open second item
+        // WHEN: Opening the book on the second row
         test(grid).click(1, 1);
+
+        // THEN: Form is shown
         assertTrue(form.isShown());
 
+        // WHEN: Save item in the other presenter, that fires event catched by
+        // this view
         var name = book.getProductName();
         book.setProductName("Book to be refreshed");
-
-        // Save item in the other presenter, that fires event catched by this
-        // view
         var saved = presenter.saveProduct(book);
 
-        // Assert that item was properly refreshed in the event and form is not
+        // THEN: That item was properly refreshed in the event and form is not
         // closed
         assertEquals("Book to be refreshed", test(grid).cell(1, 0));
         assertTrue(form.isShown());
@@ -841,16 +1057,17 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void filterNoMatch() {
-        // Search book that does not exists
+    public void searching_product_with_no_match_will_show_no_matches_and_adding_product_with_that_name_will_remove_no_matches_and_deleting_the_product_will_show_no_matches_again() {
+        // WHEN: Searching book that does not exists
         test($(FilterField.class).id("filter-field")).setValue("No match");
+
+        // THEN: rGid is empty and no matches label is shown
         assertEquals(0, test(grid).size());
-        // Assert that no matches label is shown
         assertTrue($(NoMatches.class)
                 .styleName(VaadinCreateTheme.BOOKVIEW_NOMATCHES).single()
                 .isVisible());
 
-        // Add a book with matching name
+        // WHEN: Adding a book with matching name
         test($(view, Button.class).id("new-product")).click();
         test($(form, TextField.class).id("product-name"))
                 .setValue("No match book");
@@ -860,17 +1077,19 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, NumberField.class).id("stock-count")).setValue(10);
         test($(form, Button.class).id("save-button")).click();
 
-        // Assert that no matches label is not shown
+        // THEN: Grid has one item and no matches label is hidden
         assertEquals(1, test(grid).size());
         assertFalse($(NoMatches.class)
                 .styleName(VaadinCreateTheme.BOOKVIEW_NOMATCHES).single()
                 .isVisible());
 
-        // Delete the book
+        // WHEN: Deleting the book
         test(grid).click(1, 0);
         test($(form, Button.class).id("delete-button")).click();
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("confirm-button")).click();
+
+        // THEN: Grid is empty and no matches label is shown
         assertEquals(0, test(grid).size());
         // Assert that no matches label is shown again
         assertTrue($(NoMatches.class)
@@ -878,18 +1097,22 @@ public class BooksViewTest extends AbstractUITest {
                 .isVisible());
     }
 
+    @SuppressWarnings("java:S5961")
     @Test
-    public void resizeTest() {
+    public void different_columns_are_shown_based_on_browser_window_width() {
+        // WHEN: Making window large
         ui.getPage().updateBrowserWindowSize(1600, 1024, true);
 
+        // THEN: All columns are shown and no description is shown
         grid.getColumns().forEach(col -> {
             assertFalse(col.isHidden());
         });
-
         assertEquals(null, test(grid).description(0));
 
+        // WHEN: Making window smaller
         ui.getPage().updateBrowserWindowSize(1200, 1024, true);
 
+        // THEN: First and last columns are hidden and no description is shown
         assertTrue(grid.getColumns().get(0).isHidden());
         assertFalse(grid.getColumns().get(1).isHidden());
         assertFalse(grid.getColumns().get(2).isHidden());
@@ -899,8 +1122,11 @@ public class BooksViewTest extends AbstractUITest {
 
         assertEquals(null, test(grid).description(0));
 
+        // WHEN: Making window even smaller
         ui.getPage().updateBrowserWindowSize(900, 1024, true);
 
+        // THEN: First, fith and last columns are hidden and description is
+        // still not shown
         assertTrue(grid.getColumns().get(0).isHidden());
         assertFalse(grid.getColumns().get(1).isHidden());
         assertFalse(grid.getColumns().get(2).isHidden());
@@ -910,8 +1136,11 @@ public class BooksViewTest extends AbstractUITest {
 
         assertEquals(null, test(grid).description(0));
 
+        // WHEN: Making window even smaller
         ui.getPage().updateBrowserWindowSize(500, 1024, true);
 
+        // THEN: Only second and third columns are shown and description is
+        // shown
         assertTrue(grid.getColumns().get(0).isHidden());
         assertFalse(grid.getColumns().get(1).isHidden());
         assertFalse(grid.getColumns().get(2).isHidden());
@@ -924,19 +1153,23 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void sortingByPrice() {
+    public void clicking_sorting_grid_by_price_will_sort_ascending_second_click_descending() {
         int size = test(grid).size();
 
+        // WHEN: Clicking price column sorting toggle
         test(grid).toggleColumnSorting(2);
 
+        // THEN: Grid is sorted by price in ascending order
         for (int i = 1; i < size; i++) {
             var result = test(grid).item(i - 1).getPrice()
                     .compareTo(test(grid).item(i).getPrice());
             assertTrue(result <= 0);
         }
 
+        // WHEN: Clicking price column sorting toggle again
         test(grid).toggleColumnSorting(2);
 
+        // THEN: Grid is sorted by price in descending order
         for (int i = 1; i < size; i++) {
             var result = test(grid).item(i - 1).getPrice()
                     .compareTo(test(grid).item(i).getPrice());
@@ -945,19 +1178,23 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void sortingByName() {
+    public void clicking_sorting_grid_by_name_will_sort_ascending_second_click_descending() {
         int size = test(grid).size();
 
+        // WHEN: Clicking name column sorting toggle
         test(grid).toggleColumnSorting(1);
 
+        // THEN: Grid is sorted by name in alphabetically ascending order
         for (int i = 1; i < size; i++) {
             var result = ((String) test(grid).cell(1, i - 1))
                     .compareToIgnoreCase((String) test(grid).cell(1, i));
             assertTrue(result <= 0);
         }
 
+        // WHEN: Clicking name column sorting toggle again
         test(grid).toggleColumnSorting(1);
 
+        // THEN: Grid is sorted by name in alphabetically descending order
         for (int i = 1; i < size; i++) {
             var result = ((String) test(grid).cell(1, i - 1))
                     .compareToIgnoreCase((String) test(grid).cell(1, i));
@@ -966,7 +1203,9 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void isSerializable() throws IOException, ClassNotFoundException {
+    @SuppressWarnings({ "unused", "java:S2699" })
+    public void book_view_is_serializable()
+            throws IOException, ClassNotFoundException {
         var bs = new ByteArrayOutputStream();
         var os = new ObjectOutputStream(bs);
         os.writeObject(ui.getSession());

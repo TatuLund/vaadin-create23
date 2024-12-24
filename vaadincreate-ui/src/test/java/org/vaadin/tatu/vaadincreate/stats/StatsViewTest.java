@@ -54,19 +54,19 @@ public class StatsViewTest extends AbstractUITest {
     }
 
     @Test
-    public void chartSeriesAreCorrectBeforeAndAfterBookEvents() {
+    public void chart_series_will_be_automatically_updated_when_book_update_and_delete_events_are_observed() {
         // Setup reference stats
         prices = referencePrices();
         availabilities = referenceAvailabilities();
         stockTitles = referenceStockTitles();
         stockCounts = referenceStockCounts();
 
-        // Assert that actual stats are the same
-        assertStatistics(prices, availabilities, stockTitles, stockCounts);
+        // Assert that initial stats are the same
+        then_statistics_match_given_reference(prices, availabilities, stockTitles, stockCounts);
 
         var presenter = createBooksPresenter();
 
-        // Simulate other user saving a new product
+        // WHEN: other user is saving a new product
         var book = createBook();
         var savedBook = presenter.saveProduct(book);
         waitForCharts(dashboard);
@@ -84,9 +84,9 @@ public class StatsViewTest extends AbstractUITest {
         });
 
         // Assert that actual stats have been updated
-        assertStatistics(prices, availabilities, stockTitles, stockCounts);
+        then_statistics_match_given_reference(prices, availabilities, stockTitles, stockCounts);
 
-        // Simulate other user deleting the book
+        // WHEN: other user is deleting the book
         presenter.deleteProduct(savedBook);
         waitForCharts(dashboard);
 
@@ -97,7 +97,7 @@ public class StatsViewTest extends AbstractUITest {
         stockCounts = referenceStockCounts();
 
         // Assert that actual stats are back to original
-        assertStatistics(prices, availabilities, stockTitles, stockCounts);
+        then_statistics_match_given_reference(prices, availabilities, stockTitles, stockCounts);
 
     }
 
@@ -112,23 +112,23 @@ public class StatsViewTest extends AbstractUITest {
         return presenter;
     }
 
-    private void assertStatistics(Map<String, Number> prices,
+    private void then_statistics_match_given_reference(Map<String, Number> prices,
             Map<String, Number> availabilities, Map<String, Number> stockTitles,
             Map<String, Number> stockCounts) {
         var chart = $(CustomChart.class).id("price-chart");
         var series = (DataSeries) chart.getConfiguration().getSeries().get(0);
-        assertSeries(prices, series);
+        then_data_series_values_matches_given_reference_values(prices, series);
 
         chart = $(CustomChart.class).id("availability-chart");
         series = (DataSeries) chart.getConfiguration().getSeries().get(0);
-        assertSeries(availabilities, series);
+        then_data_series_values_matches_given_reference_values(availabilities, series);
 
         chart = $(CustomChart.class).id("category-chart");
         series = (DataSeries) chart.getConfiguration().getSeries().get(0);
-        assertSeries(stockTitles, series);
+        then_data_series_values_matches_given_reference_values(stockTitles, series);
 
         series = (DataSeries) chart.getConfiguration().getSeries().get(1);
-        assertSeries(stockCounts, series);
+        then_data_series_values_matches_given_reference_values(stockCounts, series);
     }
 
     private static Product createBook() {
@@ -143,7 +143,7 @@ public class StatsViewTest extends AbstractUITest {
         return book;
     }
 
-    private static void assertSeries(Map<String, Number> values,
+    private static void then_data_series_values_matches_given_reference_values(Map<String, Number> values,
             DataSeries series) {
         // Asserting size to verify that items with zero count are not included
         assertEquals(values.values().size(), series.size());

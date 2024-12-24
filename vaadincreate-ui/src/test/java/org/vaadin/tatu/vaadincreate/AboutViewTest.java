@@ -39,7 +39,7 @@ public class AboutViewTest extends AbstractUITest {
             route = "";
         }
 
-        var layout = $(view, VerticalLayout.class).first();
+        $(view, VerticalLayout.class).first();
     }
 
     @After
@@ -49,30 +49,35 @@ public class AboutViewTest extends AbstractUITest {
     }
 
     @Test
-    public void leaveMessageSanitized() {
+    public void when_entering_message_with_offending_content_it_is_being_sanitized() {
         var note = $(Label.class).id("admins-note");
         var oldText = note.getValue();
 
+        // WHEN: Clicking edit button
         test($(Button.class).id("admin-edit")).click();
+
+        // THEN: Text area is shown
         var area = $(TextArea.class).id("admins-text-area");
         assertTrue(area.isVisible());
-        // If not sanitized this would be XSS
+
+        // WHEN: Changing the value that contains XSS and clicking outside
         test(area).setValue(
                 "<b><img src=1 onerror=alert(document.domain)>A new message</b>");
         test($(MenuButton.class).id("about")).focus();
-        // Changing field value should hide it
+
+        // THEN: Text area is hidden and label is updated with sanitized value
         assertFalse(area.isVisible());
-        // Assert the new value
         note = $(Label.class).id("admins-note");
         assertEquals("<b><img>A new message</b>", note.getValue());
 
+        // THEN: A notification is shown with sanitized value
         waitWhile(view, n -> $(Notification.class).last() == null, 2);
         var notification = $(Notification.class).last();
         assertEquals("<b><img>A new message</b>",
                 notification.getDescription());
         assertEquals(note.getCaption(), notification.getCaption());
 
-        // Return the old value
+        // Return the old value for cleanup
         test($(Button.class).id("admin-edit")).click();
         assertTrue(area.isVisible());
         test(area).setValue(oldText);
@@ -81,13 +86,19 @@ public class AboutViewTest extends AbstractUITest {
     }
 
     @Test
-    public void messageFromEventShown() {
+    public void when_posting_a_new_message_event_it_is_shown_in_notification() {
+        // WHEN: Clicking edit button
         test($(Button.class).id("admin-edit")).click();
+
+        // THEN: Text area is shown
         var area = $(TextArea.class).id("admins-text-area");
         assertTrue(area.isVisible());
 
+        // WHEN: Posting a new message event
         EventBus.get().post(new MessageEvent("Hello", LocalDateTime.now()));
 
+        // THEN: Text area is hidden, a notification is shown and the message is
+        // in the label
         waitWhile(view, n -> $(Notification.class).last() == null, 2);
         var notification = $(Notification.class).last();
 

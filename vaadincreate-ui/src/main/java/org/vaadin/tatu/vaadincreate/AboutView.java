@@ -15,8 +15,12 @@ import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.HasValue.ValueChangeEvent;
+import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutAction.ModifierKey;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.shared.Registration;
 import com.vaadin.shared.Version;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.shared.ui.ValueChangeMode;
@@ -45,6 +49,8 @@ public class AboutView extends VerticalLayout
     private TextArea adminsNoteField;
 
     private UI ui;
+
+    private Registration saveRegistration;
 
     public AboutView() {
         var aboutContent = createAboutContent();
@@ -87,6 +93,9 @@ public class AboutView extends VerticalLayout
         adminsNote.setVisible(true);
         adminsNoteField.setVisible(false);
         editButton.setVisible(true);
+        if (saveRegistration != null) {
+            saveRegistration.remove();
+        }
     }
 
     private void handleValueChange(ValueChangeEvent<String> e) {
@@ -122,6 +131,7 @@ public class AboutView extends VerticalLayout
     }
 
     // Create text area for editing admins note
+    @SuppressWarnings("java:S3878")
     private TextArea createTextArea() {
         var textArea = new TextArea();
         textArea.setId("admins-text-area");
@@ -130,6 +140,15 @@ public class AboutView extends VerticalLayout
         textArea.setIcon(VaadinIcons.FILE_TEXT_O);
         textArea.setCaption("HTML");
         textArea.setPlaceholder("max 250 chars");
+        textArea.addFocusListener(e -> saveRegistration = textArea
+                .addShortcutListener(new ShortcutListener("Save", KeyCode.S,
+                        new int[] { ModifierKey.CTRL }) {
+                    @Override
+                    public void handleAction(Object sender, Object target) {
+                        textArea.setValue(textArea.getValue().trim());
+                        closeEditor();
+                    }
+                }));
         CharacterCountExtension.extend(textArea);
         return textArea;
     }

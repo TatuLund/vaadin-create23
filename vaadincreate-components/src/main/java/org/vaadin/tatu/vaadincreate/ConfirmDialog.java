@@ -73,18 +73,20 @@ public class ConfirmDialog extends Composite {
         }
         var content = new VerticalLayout();
         content.setSizeFull();
-        cancelButton = new Button("Cancel", e -> {
+        cancelButton = new Button("Cancel");
+        cancelButton.addClickListener(e -> {
+            cancelButton.removeClickShortcut();
             fireEvent(new CancelEvent(this));
             window.close();
         });
         cancelButton.setId("cancel-button");
-        cancelButton.setClickShortcut(KeyCode.ESCAPE);
-        confirmButton = new Button("Confirm", e -> {
+        confirmButton = new Button("Confirm");
+        confirmButton.addClickListener(e -> {
+            confirmButton.removeClickShortcut();
             fireEvent(new ConfirmedEvent(this));
             window.close();
         });
         confirmButton.setId("confirm-button");
-        confirmButton.setClickShortcut(KeyCode.ENTER);
         confirmButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
         var buttons = new HorizontalLayout();
         buttons.addComponents(cancelButton, confirmButton);
@@ -123,6 +125,8 @@ public class ConfirmDialog extends Composite {
      */
     public void open() {
         UI.getCurrent().addWindow(window);
+        cancelButton.setClickShortcut(KeyCode.ESCAPE);
+        confirmButton.setClickShortcut(KeyCode.ENTER);
     }
 
     /**

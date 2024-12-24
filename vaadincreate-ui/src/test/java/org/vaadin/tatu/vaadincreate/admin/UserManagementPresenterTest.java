@@ -11,7 +11,6 @@ import com.vaadin.server.ServiceException;
 public class UserManagementPresenterTest extends AbstractUITest {
 
     private VaadinCreateUI ui;
-    private AdminView view;
     private UserManagementPresenter presenter;
 
     @Before

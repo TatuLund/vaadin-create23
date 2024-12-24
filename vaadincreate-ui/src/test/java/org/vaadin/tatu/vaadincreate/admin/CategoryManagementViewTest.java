@@ -45,7 +45,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void createAndDeleteCategory() {
+    public void create_and_delete_category() {
         test($(cats, Button.class).id("new-category")).click();
         assertFalse($(cats, Button.class).id("new-category").isEnabled());
 
@@ -86,7 +86,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void optimisticLocking() {
+    public void updating_category_updated_by_other_user_will_show_save_conflict_and_will_refresh_the_list() {
         test($(cats, Button.class).id("new-category")).click();
         assertFalse($(cats, Button.class).id("new-category").isEnabled());
 
@@ -129,7 +129,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void duplicateCategory() {
+    public void input_duplicate_category_will_show_duplicate_category_validation_error() {
         test($(cats, Button.class).id("new-category")).click();
         @SuppressWarnings("unchecked")
         var grid = (Grid<Category>) $(cats, Grid.class).single();
@@ -142,7 +142,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void categoryLength() {
+    public void input_too_short_name_will_show_category_length_validation_error() {
         test($(cats, Button.class).id("new-category")).click();
         @SuppressWarnings("unchecked")
         var grid = (Grid<Category>) $(cats, Grid.class).single();
@@ -155,7 +155,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void newButtonEnabledAfterTabChange() {
+    public void new_category_button_is_enabled_after_tab_change() {
         test($(cats, Button.class).id("new-category")).click();
         @SuppressWarnings("unchecked")
         var grid = (Grid<Category>) $(cats, Grid.class).single();
@@ -170,7 +170,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void updateDeletedCategoryShowsSaveConflict() {
+    public void updating_category_deleted_by_other_user_will_show_save_conflict_error() {
         // Simulate other user saving category
         Category cat = new Category();
         cat.setName("Horrors");
@@ -199,7 +199,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void focusTextFieldDisablesNewButton() {
+    public void focusing_textfield_will_disable_new_category_button() {
         assertTrue($(cats, Button.class).id("new-category").isEnabled());
         @SuppressWarnings("unchecked")
         var grid = (Grid<Category>) $(cats, Grid.class).single();
@@ -211,7 +211,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void concurrentDuplicateCategory() {
+    public void concurrent_adding_of_duplicate_category_will_show_error() {
         test($(cats, Button.class).id("new-category")).click();
 
         // Simulate other user saving category while this view is open
@@ -235,7 +235,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void concurrentDelete() {
+    public void concurrent_delete_will_show_error() {
         // Save a new category "Deleted"
         test($(cats, Button.class).id("new-category")).click();
         @SuppressWarnings("unchecked")
@@ -243,6 +243,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var gridSize = test(grid).size();
         var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
         test($(form, TextField.class).first()).setValue("Deleted");
+
         assertEquals("Category \"Deleted\" saved.",
                 $(Notification.class).last().getCaption());
         var category = test(grid).item(gridSize - 1);

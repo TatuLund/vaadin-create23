@@ -25,7 +25,6 @@ import com.vaadin.ui.Window;
 public class UserManagementViewTest extends AbstractUITest {
 
     private VaadinCreateUI ui;
-    private AdminView view;
 
     @Before
     public void setup() throws ServiceException {
@@ -33,8 +32,7 @@ public class UserManagementViewTest extends AbstractUITest {
         mockVaadin(ui);
         login();
 
-        view = navigate(
-                AdminView.VIEW_NAME + "/" + UserManagementView.VIEW_NAME,
+        navigate(AdminView.VIEW_NAME + "/" + UserManagementView.VIEW_NAME,
                 AdminView.class);
     }
 
@@ -45,11 +43,11 @@ public class UserManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void initialState() {
-        assertInitialState();
+    public void verify_that_initially_the_form_is_empty_and_buttons_are_not_enabled() {
+        then_form_is_empty_and_buttons_are_disabled();
     }
 
-    public void assertInitialState() {
+    private void then_form_is_empty_and_buttons_are_disabled() {
         assertFalse($(Button.class).id("delete-button").isEnabled());
         assertFalse($(Button.class).id("save-button").isEnabled());
         assertFalse($(Button.class).id("cancel-button").isEnabled());
@@ -63,23 +61,31 @@ public class UserManagementViewTest extends AbstractUITest {
         assertNull($(ComboBox.class).id("role-field").getValue());
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "java:S5961" })
     @Test
-    public void addUser() {
-        $(Button.class).id("new-button").click();
+    public void add_user_while_asserting_input_validation_clicking_save_will_show_message_and_clear_the_form_concurrent_edit_will_result_an_error() {
+        // WHEN: Clicking new user button
+        test($(Button.class).id("new-button")).click();
 
+        // THEN: Form is enabled and focused on the first field
         var save = $(Button.class).id("save-button");
-
         assertFalse($(Button.class).id("delete-button").isEnabled());
         assertFalse(save.isEnabled());
-
         assertTrue($(FormLayout.class).single().isEnabled());
         assertTrue(test($(TextField.class).id("user-field")).isFocused());
+
+        // WHEN: Filling user name
         test($(TextField.class).id("user-field")).setValue("Tester");
+
+        // THEN: Save button is disabled and cancel button is enabled
         assertFalse(save.isEnabled());
         assertTrue($(Button.class).id("cancel-button").isEnabled());
 
+        // WHEN: Filling password
         test($(PasswordField.class).id("password-field")).setValue("tester");
+
+        // THEN: Password field is invalid, validation message is shown and save
+        // button is disabled
         assertTrue(
                 test($(PasswordField.class).id("password-field")).isInvalid());
         assertEquals("Passwords do not match",
@@ -87,49 +93,62 @@ public class UserManagementViewTest extends AbstractUITest {
                         .errorMessage());
         assertFalse(save.isEnabled());
 
+        // WHEN: Filling password repeat
         test($(PasswordField.class).id("password-repeat")).setValue("tester");
+
+        // THEN: Password field is valid, save button is disabled and role is
+        // invalid and validation message is shown
         assertFalse(
                 test($(PasswordField.class).id("password-field")).isInvalid());
         assertFalse(save.isEnabled());
-
         assertTrue(test($(ComboBox.class).id("role-field")).isInvalid());
         assertEquals("The role is mandatory",
                 test($(ComboBox.class).id("role-field")).errorMessage());
-        test($(ComboBox.class).id("role-field")).clickItem(Role.USER);
-        assertFalse(test($(ComboBox.class).id("role-field")).isInvalid());
 
+        // WHEN: Filling role
+        test($(ComboBox.class).id("role-field")).clickItem(Role.USER);
+
+        // THEN: Role is valid, save button is enabled and delete button is
+        // disabled
+        assertFalse(test($(ComboBox.class).id("role-field")).isInvalid());
         assertFalse($(Button.class).id("delete-button").isEnabled());
         assertTrue(save.isEnabled());
 
+        // WHEN: Clicking save
         test(save).click();
 
+        // THEN: Notification is shown and form is cleared
         assertEquals("User \"Tester\" saved.",
                 $(Notification.class).last().getCaption());
-        assertInitialState();
 
-        // Check that new user is there
+        then_form_is_empty_and_buttons_are_disabled();
+
+        // WHEN: Selecting the saved user
         test($(ComboBox.class).id("user-select")).setInput("Tester");
+
+        // THEN: Form is enabled and fields are filled
         assertTrue($(FormLayout.class).single().isEnabled());
         assertEquals("Tester", $(TextField.class).id("user-field").getValue());
 
-        // Simulate other user editing the user
+        // WHEN: Simulating other user editing the saved user
         var user = ui.getUserService().findByName("Tester").get();
         ui.getUserService().updateUser(user);
 
-        // Edit the user again
+        // WHEN: Editing the newly saved user and clicking save button
         test($(ComboBox.class).id("user-select")).setInput("Tester");
         test($(TextField.class).id("user-field")).setValue("Mocker");
         test(save).click();
 
-        // Assert that optimistic locking is thrown and cought
+        // THEN: Save conflict message is shown and form is cleared
         assertEquals("Save conflict, try again.",
                 $(Notification.class).last().getCaption());
-        assertInitialState();
+
+        then_form_is_empty_and_buttons_are_disabled();
     }
 
     @SuppressWarnings("unchecked")
     @Test
-    public void deleteUser() {
+    public void clicking_delete_will_present_confirm_dialog_and_confirming_will_show_delete_message_and_form_will_be_cleared() {
         test($(ComboBox.class).id("user-select")).setInput("User0");
         assertTrue($(FormLayout.class).single().isEnabled());
 
@@ -146,12 +165,13 @@ public class UserManagementViewTest extends AbstractUITest {
         assertFalse($(FormLayout.class).single().isEnabled());
 
         test($(ComboBox.class).id("user-select")).setInput("User0");
-        assertInitialState();
+        then_form_is_empty_and_buttons_are_disabled();
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void cancelForm() {
+    public void clicking_cancel_will_clear_the_form() {
+        // WHEN: Editing a user and clicking cancel
         test($(ComboBox.class).id("user-select")).setInput("User1");
         assertTrue($(FormLayout.class).single().isEnabled());
 
@@ -160,13 +180,15 @@ public class UserManagementViewTest extends AbstractUITest {
 
         test($(Button.class).id("cancel-button")).click();
 
-        assertInitialState();
+        // THEN: The form is cleared
+        then_form_is_empty_and_buttons_are_disabled();
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void duplicateName() {
-        $(Button.class).id("new-button").click();
+    public void saving_with_duplicate_name_will_show_error() {
+        // WHEN: Adding a new user with a duplicate name
+        test($(Button.class).id("new-button")).click();
 
         test($(TextField.class).id("user-field")).setValue("Super");
         test($(PasswordField.class).id("password-field")).setValue("tester");
@@ -175,10 +197,11 @@ public class UserManagementViewTest extends AbstractUITest {
 
         test($(Button.class).id("save-button")).click();
 
+        // THEN: An error message is shown
         assertEquals("Username \"Super\" is a duplicate.",
                 $(Notification.class).last().getCaption());
         $(Notification.class).last().close();
 
-        assertInitialState();
+        then_form_is_empty_and_buttons_are_disabled();
     }
 }

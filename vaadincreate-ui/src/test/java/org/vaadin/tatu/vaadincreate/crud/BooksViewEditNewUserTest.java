@@ -43,7 +43,7 @@ public class BooksViewEditNewUserTest extends AbstractUITest {
     }
 
     @Test
-    public void editWithId() {
+    public void when_user_opens_books_view_with_new_as_parameter_form_is_not_being_shown_and_parameter_is_stripped() {
         assertFalse(form.isShown());
         assertEquals("!inventory/", Page.getCurrent().getUriFragment());
     }

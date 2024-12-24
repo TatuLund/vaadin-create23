@@ -53,7 +53,7 @@ public class BooksViewEditLockedIdTest extends AbstractUITest {
     }
 
     @Test
-    public void editWithLockedIdShowsError() {
+    public void when_books_view_is_entered_with_product_id_as_url_parameter_that_belongs_to_locked_book_error_is_shown() {
         assertEquals("Product id \"" + id + "\" is locked.",
                 $(Notification.class).last().getCaption());
         assertFalse(form.isShown());

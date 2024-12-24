@@ -10,6 +10,7 @@ import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.data.ValidationException;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -90,7 +91,7 @@ public class UserManagementView extends VerticalLayout implements TabView {
         // Save button is enabled when the form is valid
         save = new Button(getTranslation(I18n.SAVE));
         save.addStyleName(ValoTheme.BUTTON_PRIMARY);
-        save.setClickShortcut(KeyCode.ENTER);
+        save.setClickShortcut(KeyCode.S, ModifierKey.CTRL);
         save.setId("save-button");
         save.addClickListener(event -> handleSave());
 
@@ -178,6 +179,13 @@ public class UserManagementView extends VerticalLayout implements TabView {
         } catch (ValidationException e1) {
             // NOP
         }
+    }
+
+    @Override
+    public void detach() {
+        super.detach();
+        cancel.removeClickShortcut();
+        save.removeClickShortcut();
     }
 
     public void showSaveConflict() {

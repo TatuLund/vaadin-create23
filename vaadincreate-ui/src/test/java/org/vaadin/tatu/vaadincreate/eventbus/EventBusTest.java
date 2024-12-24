@@ -32,6 +32,7 @@ public class EventBusTest {
     }
 
     @Test
+    @SuppressWarnings({ "unused", "java:S1854", "java:S2925" })
     public void eventFiredAndRemoval() {
         var listener1 = new TestListener();
         var listener2 = new TestListener();
@@ -52,6 +53,7 @@ public class EventBusTest {
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
+            // Ignore
         }
 
         event = new Event("World");

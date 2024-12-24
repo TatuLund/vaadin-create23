@@ -50,10 +50,13 @@ public class BooksViewNewTest extends AbstractUITest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void newProduct() {
+    public void when_books_view_is_entered_with_new_as_url_parameter_form_is_shown_for_new_product_which_can_be_entered_and_saved() {
+        // THEN: The form is shown and the first field is focused
         assertTrue(form.isShown());
         assertTrue(
                 test($(form, TextField.class).id("product-name")).isFocused());
+
+        // WHEN: The form is filled and save button is clicked
         test($(form, TextField.class).id("product-name"))
                 .setValue("A new product");
         test($(form, TextField.class).id("price")).setValue("10.0 €");
@@ -67,19 +70,26 @@ public class BooksViewNewTest extends AbstractUITest {
 
         test($(form, Button.class).id("save-button")).click();
 
+        // THEN: The form is hidden, a notification is shown, the grid is
+        // focused
         assertTrue($(Notification.class).last().getCaption()
                 .contains("A new product"));
         assertFalse(form.isShown());
 
         assertTrue(test(grid).isFocused());
+
+        // THEN: The product is in the database
         assertTrue(ui.getProductService().getAllProducts().stream()
                 .anyMatch(b -> b.getProductName().equals("A new product")));
 
+        // THEN: The product is in the grid as the last row and the data is
+        // correct
         int row = test(grid).size() - 1;
         assertEquals("A new product", test(grid).cell(1, row));
         assertEquals("10.00 €", test(grid).cell(2, row));
         assertEquals("10", test(grid).cell(4, row));
 
+        // Clean up
         ui.getProductService().deleteProduct(test(grid).item(row).getId());
     }
 

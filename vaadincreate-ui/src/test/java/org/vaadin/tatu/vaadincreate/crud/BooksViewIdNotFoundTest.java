@@ -43,7 +43,7 @@ public class BooksViewIdNotFoundTest extends AbstractUITest {
     }
 
     @Test
-    public void error() {
+    public void erwhen_books_view_is_entered_with_invalid_product_id_as_url_parameter_form_is_not_shown_and_error_is_shownror() {
         assertEquals("Product id \"12345\" not valid or found.",
                 $(Notification.class).last().getCaption());
         assertFalse(form.isShown());

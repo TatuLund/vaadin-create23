@@ -27,10 +27,12 @@ import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.Binder;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.AbstractErrorMessage;
 import com.vaadin.server.Page;
 import com.vaadin.server.UserError;
+import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.shared.ui.ErrorLevel;
 import com.vaadin.ui.AbstractComponent;
@@ -129,72 +131,77 @@ public class BookForm extends Composite implements HasI18N {
     private BooksPresenter presenter;
     private boolean visible;
     private boolean isValid;
+    private Registration pageDownRegistration;
+        private Registration pageUpRegistration;
+    
+        /**
+         * Creates a new BookForm with the given presenter.
+         *
+         * @param presenter
+         *            the presenter for the form.
+         * @param grid
+         */
+        @SuppressWarnings("java:S5669")
+        public BookForm(BooksPresenter presenter, BookGrid grid) {
+            this.presenter = presenter;
+            setCompositionRoot(sidePanel);
+            buildForm();
+    
+            binder = new BeanValidationBinder<>(Product.class);
+            binder.forField(price)
+                    .withConverter(new EuroConverter(
+                            getTranslation(I18n.Form.CANNOT_CONVERT)))
+                    .bind("price");
+            binder.forField(stockCount).bind("stockCount");
+    
+            category.setItemCaptionGenerator(Category::getName);
+            binder.forField(category).bind("category");
+    
+            // Add bean level validation for Availability vs. Stock count cross
+            // checking.
+            binder.withValidator(this::checkAvailabilityVsStockCount, "Error");
+    
+            binder.bindInstanceFields(this);
+            binder.setChangeDetectionEnabled(true);
+    
+            // enable/disable save button while editing
+            binder.addStatusChangeListener(event -> {
+                isValid = !event.hasValidationErrors();
+                if (isValid) {
+                    setStockCountAndAvailabilityInvalid(false);
+                }
+                if (!isValid) {
+                    saveButton.setEnabled(false);
+                }
+            });
+    
+            binder.addValueChangeListener(event -> {
+                var hasChanges = binder.hasChanges();
+                saveButton.setEnabled(hasChanges && isValid);
+                discardButton.setEnabled(hasChanges);
+            });
+    
+            saveButton.addClickListener(event -> handleSave());
+            saveButton.setClickShortcut(KeyCode.S, ModifierKey.CTRL);
+    
+            discardButton.addClickListener(event -> {
+                presenter.editProduct(currentProduct);
+                updateDirtyIndicators();
+            });
+    
+            cancelButton.addClickListener(event -> presenter.cancelProduct());
+            cancelButton.setClickShortcut(KeyCode.ESCAPE);
+    
+            deleteButton.addClickListener(event -> handleDelete());
 
-    /**
-     * Creates a new BookForm with the given presenter.
-     *
-     * @param presenter
-     *            the presenter for the form.
-     * @param grid
-     */
-    public BookForm(BooksPresenter presenter, BookGrid grid) {
-        this.presenter = presenter;
-        setCompositionRoot(sidePanel);
-        buildForm();
-
-        binder = new BeanValidationBinder<>(Product.class);
-        binder.forField(price)
-                .withConverter(new EuroConverter(
-                        getTranslation(I18n.Form.CANNOT_CONVERT)))
-                .bind("price");
-        binder.forField(stockCount).bind("stockCount");
-
-        category.setItemCaptionGenerator(Category::getName);
-        binder.forField(category).bind("category");
-
-        // Add bean level validation for Availability vs. Stock count cross
-        // checking.
-        binder.withValidator(this::checkAvailabilityVsStockCount, "Error");
-
-        binder.bindInstanceFields(this);
-        binder.setChangeDetectionEnabled(true);
-
-        // enable/disable save button while editing
-        binder.addStatusChangeListener(event -> {
-            isValid = !event.hasValidationErrors();
-            if (isValid) {
-                setStockCountAndAvailabilityInvalid(false);
-            }
-            if (!isValid) {
-                saveButton.setEnabled(false);
-            }
-        });
-
-        binder.addValueChangeListener(event -> {
-            var hasChanges = binder.hasChanges();
-            saveButton.setEnabled(hasChanges && isValid);
-            discardButton.setEnabled(hasChanges);
-        });
-
-        saveButton.addClickListener(event -> handleSave());
-
-        discardButton.addClickListener(event -> {
-            presenter.editProduct(currentProduct);
-            updateDirtyIndicators();
-        });
-
-        cancelButton.addClickListener(event -> presenter.cancelProduct());
-        cancelButton.setClickShortcut(KeyCode.ESCAPE);
-
-        deleteButton.addClickListener(event -> handleDelete());
-        addShortcutListener(
-                new ShortcutListener("Next", KeyCode.PAGE_DOWN, null) {
-                    @Override
-                    public void handleAction(Object sender, Object target) {
-                        selectNextProduct(presenter, grid);
-                    }
-                });
-        addShortcutListener(
+            pageDownRegistration = addShortcutListener(
+                    new ShortcutListener("Next", KeyCode.PAGE_DOWN, null) {
+                        @Override
+                        public void handleAction(Object sender, Object target) {
+                            selectNextProduct(presenter, grid);
+                        }
+                    });
+            pageUpRegistration = addShortcutListener(
                 new ShortcutListener("Previous", KeyCode.PAGE_UP, null) {
                     @Override
                     public void handleAction(Object sender, Object target) {
@@ -428,6 +435,10 @@ public class BookForm extends Composite implements HasI18N {
     @Override
     public void detach() {
         super.detach();
+        cancelButton.removeClickShortcut();
+        saveButton.removeClickShortcut();
+        pageDownRegistration.remove();
+        pageUpRegistration.remove();
         if (isShown() && binder.hasChanges()) {
             logger.info(
                     "Browser closed before saving changes, draft product autosaved.");

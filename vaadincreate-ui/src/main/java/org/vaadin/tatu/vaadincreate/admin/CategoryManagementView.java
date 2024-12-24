@@ -14,6 +14,7 @@ import com.vaadin.data.Validator;
 import com.vaadin.data.ValueContext;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Composite;
@@ -36,6 +37,8 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
     private Collection<Category> categories;
 
     private ComponentList<Category, CategoryForm> list;
+
+    private Registration shortcutRegistration;
 
     class EscapeListener extends ShortcutListener {
         EscapeListener() {
@@ -71,7 +74,7 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
         viewName.setId("view-name");
 
         // Cancel the form when the user presses escape
-        addShortcutListener(new EscapeListener());
+        shortcutRegistration = addShortcutListener(new EscapeListener());
 
         addComponents(viewName, newCategoryButton, list);
         setExpandRatio(list, 1);
@@ -80,6 +83,12 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
     private void addCategory() {
         var newCategory = new Category();
         list.addItem(newCategory);
+    }
+
+    @Override
+    public void detach() {
+        super.detach();
+        shortcutRegistration.remove();
     }
 
     @Override

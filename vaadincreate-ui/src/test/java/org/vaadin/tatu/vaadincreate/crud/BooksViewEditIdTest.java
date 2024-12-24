@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.Set;
 
 import org.junit.After;
@@ -65,7 +64,10 @@ public class BooksViewEditIdTest extends AbstractUITest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void editWithId() {
+    public void when_opening_applicaiton_with_product_id_url_parameter_will_open_books_view_with_form_open_with_given_product_id_and_product_can_be_modified_and_saved() {
+        // THEN: The form is shown, grid is focused and the product in the grid
+        // is selected, and the form is populated with the product data, and the
+        // product is locked
         var product = ui.getProductService().getProductById(id);
         assertNotNull(LockedObjects.get().isLocked(product));
 
@@ -81,7 +83,7 @@ public class BooksViewEditIdTest extends AbstractUITest {
                 new ValueContext(null, price, ui.getLocale()));
         assertEquals(priceString,
                 $(form, TextField.class).id("price").getValue());
-        assertEquals(Integer.valueOf(product.getStockCount()),
+        assertEquals(product.getStockCount(),
                 $(form, NumberField.class).id("stock-count").getValue());
         assertEquals(product.getAvailability(),
                 $(form, AvailabilitySelector.class).id("availability")
@@ -89,6 +91,7 @@ public class BooksViewEditIdTest extends AbstractUITest {
         assertEquals(product.getCategory(),
                 $(form, CheckBoxGroup.class).id("category").getValue());
 
+        // WHEN: Modifying the product and clicking save button
         test($(form, TextField.class).id("product-name"))
                 .setValue("Modified book");
         test($(form, TextField.class).id("price")).setValue("10.0 €");
@@ -102,6 +105,8 @@ public class BooksViewEditIdTest extends AbstractUITest {
 
         test($(form, Button.class).id("save-button")).click();
 
+        // THEN: The form is hidden, a notification is shown, the product is
+        // saved with the new data
         assertTrue($(Notification.class).last().getCaption()
                 .contains("Modified book"));
         assertFalse(form.isShown());

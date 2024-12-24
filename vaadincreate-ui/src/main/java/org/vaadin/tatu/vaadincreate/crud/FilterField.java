@@ -6,12 +6,18 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
+import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutAction.ModifierKey;
+import com.vaadin.event.FocusShortcut;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.shared.Registration;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "java:S2160" })
 public class FilterField extends TextField implements HasI18N {
+
+    private Registration shortcutRegistration;
 
     /**
      * A custom text field component for filtering book entries.
@@ -28,5 +34,18 @@ public class FilterField extends TextField implements HasI18N {
         var attributes = AttributeExtension.of(this);
         attributes.setAttribute("autocomplete", "off");
         attributes.setAttribute("role", "searchbox");
+        setShortcut();
+    }
+
+    @SuppressWarnings("java:S3878")
+    private void setShortcut() {
+        shortcutRegistration = addShortcutListener(new FocusShortcut(this,
+                KeyCode.F, new int[] { ModifierKey.CTRL }));
+    }
+
+    @Override
+    public void detach() {
+        super.detach();
+        shortcutRegistration.remove();
     }
 }

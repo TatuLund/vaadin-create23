@@ -49,7 +49,7 @@ public class AppLayoutTest extends UIUnitTest {
     }
 
     @Test
-    public void testAppLayoutAccessControlUserFail() throws ServiceException {
+    public void testAppLayoutAccessControlUserFail() {
         // App mocks
         var accessControl = new MockAccessControl("User");
         mockApp(ui, accessControl);
@@ -88,6 +88,7 @@ public class AppLayoutTest extends UIUnitTest {
         Label label = null;
 
         public MockView() {
+            // public no arg constructor
         }
 
         @Override

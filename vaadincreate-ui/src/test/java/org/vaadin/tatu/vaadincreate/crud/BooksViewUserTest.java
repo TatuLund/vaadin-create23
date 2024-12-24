@@ -14,7 +14,6 @@ import static org.junit.Assert.assertFalse;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.TextField;
 
 public class BooksViewUserTest extends AbstractUITest {
 
@@ -44,14 +43,20 @@ public class BooksViewUserTest extends AbstractUITest {
     }
 
     @Test
-    public void canSearch_newButtonIsDisabled_clickNotOpeningForm() {
-        test($(FilterField.class).id("filter-field")).setValue("debug");
-        assertEquals(3, test(grid).size());
-
+    public void _user_can_search_prodcuts_and_new_button_is_disabled_and_clicing_row_does_not_open_form() {
         assertFalse(
                 test($(view, Button.class).id("new-product")).isInteractable());
 
+        // WHEN: user searches for debug
+        test($(FilterField.class).id("filter-field")).setValue("debug");
+
+        // THEN: only 3 products are shown
+        assertEquals(3, test(grid).size());
+
+        // WHEN: user clicks on the first row
         test(grid).click(1, 0);
+
+        // THEN: form is not shown
         assertFalse(form.isShown());
     }
 }

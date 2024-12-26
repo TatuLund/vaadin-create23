@@ -139,6 +139,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     // Handle draft product found in the database and ask user what to do with
     // it.
     private void handleDraft(Product draft) {
+        getNavigator().navigateTo(AboutView.VIEW_NAME);
         logger.info("Draft found");
         var dialog = new ConfirmDialog(getTranslation(I18n.CONFIRM),
                 getTranslation(I18n.DRAFT_FOUND), ConfirmDialog.Type.ALERT);

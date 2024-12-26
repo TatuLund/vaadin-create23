@@ -109,15 +109,7 @@ $fake-grid-background-color: white;
   span#logout-2:hover {
     color: white;
     outline: none;
-  }
-
-  div[aria-label="Top of dialog"] {
-  	display: none;
-  }
-
-  div[aria-label="Bottom of Dialog"] {
-  	display: none;
-  }
+  } 
 
   .valo-menu-toggle:focus-visible {
     color: white;

@@ -520,10 +520,10 @@ public class BooksView extends CssLayout implements VaadinCreateView {
      * @return The created ConfirmDialog instance.
      */
     private ConfirmDialog createDiscardChangesConfirmDialog() {
-        var dialog = new ConfirmDialog(
+        var dialog = new ConfirmDialog(getTranslation(I18n.CONFIRM),
                 getTranslation(I18n.Books.UNSAVED_CHANGES),
                 ConfirmDialog.Type.ALERT);
-        dialog.setConfirmText(getTranslation(I18n.Books.CONFIRM));
+        dialog.setConfirmText(getTranslation(I18n.CONFIRM));
         dialog.setCancelText(getTranslation(I18n.CANCEL));
         return dialog;
     }

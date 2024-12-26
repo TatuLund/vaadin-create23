@@ -9,7 +9,7 @@ public class ConfirmDialogView extends VerticalLayout implements View {
     public static final String NAME = "confirm-dialog";
 
     public ConfirmDialogView() {
-        var dialog = new ConfirmDialog("Are you sure?",
+        var dialog = new ConfirmDialog("Confirm", "Are you sure?",
                 ConfirmDialog.Type.ALERT);
         dialog.addConfirmedListener(e -> {
             Notification.show("Confirmed");

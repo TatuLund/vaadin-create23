@@ -33,11 +33,11 @@ public final class I18n {
     public static final String EXCEPTION = "exception";
     public static final String CURRENT_PAGE = "current-page";
     public static final String OPENED = "opened";
+    public static final String CONFIRM = "confirm";
 
     public static final class Books {
         public static final String UPDATED = "updated";
         public static final String REMOVED = "removed";
-        public static final String CONFIRM = "confirm";
         public static final String NEW_PRODUCT = "new-product";
         public static final String FILTER = "filter";
         public static final String NOT_VALID_PID = "not-valid-pid";

@@ -58,9 +58,9 @@ public class CharacterCountExtensionConnector extends AbstractExtensionConnector
             countElement.getStyle().setDisplay(Style.Display.NONE);
         } else {
             countElement.getStyle().clearDisplay();
-            wrapper.getStyle().setProperty(WIDTH,
-                    textField.getElement().getStyle().getProperty(WIDTH));
         }
+        wrapper.getStyle().setProperty(WIDTH,
+                textField.getElement().getStyle().getProperty(WIDTH));
     }
 
     @Override

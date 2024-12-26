@@ -146,7 +146,7 @@ public class UserManagementView extends VerticalLayout implements TabView {
 
     private void handleDelete() {
         // Show a confirmation dialog before deleting the user
-        var dialog = new ConfirmDialog(
+        var dialog = new ConfirmDialog(getTranslation(I18n.CONFIRM),
                 getTranslation(I18n.WILL_DELETE, user.getName()),
                 ConfirmDialog.Type.ALERT);
         dialog.setConfirmText(getTranslation(I18n.DELETE));

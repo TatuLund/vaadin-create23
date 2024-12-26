@@ -24,4 +24,8 @@
     box-shadow: $admin-content-shadow;
     background: white;
   }
+
+  .v-button#admin-edit:hover {
+    color: $v-focus-color;
+  }
 }

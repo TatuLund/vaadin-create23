@@ -15,7 +15,7 @@ public class ConfirmDialogTest {
 
     @Test
     public void dialogComposition() {
-        var dialog = new ConfirmDialog("Are you sure?", Type.ALERT);
+        var dialog = new ConfirmDialog("Confirm", "Are you sure?", Type.ALERT);
         Assert.assertFalse(dialog.window.isDraggable());
         Assert.assertTrue(dialog.window.isModal());
         Assert.assertFalse(dialog.window.isResizable());
@@ -26,7 +26,7 @@ public class ConfirmDialogTest {
 
     @Test
     public void confirmEvent() {
-        var dialog = new ConfirmDialog("Are you sure?", Type.ALERT);
+        var dialog = new ConfirmDialog("Confirm", "Are you sure?", Type.ALERT);
 
         var content = (VerticalLayout) dialog.window.getContent();
         var buttons = (HorizontalLayout) content.getComponent(1);
@@ -41,7 +41,7 @@ public class ConfirmDialogTest {
 
     @Test
     public void cancelEvent() {
-        var dialog = new ConfirmDialog("Are you sure?", Type.ALERT);
+        var dialog = new ConfirmDialog("Confirm", "Are you sure?", Type.ALERT);
 
         var content = (VerticalLayout) dialog.window.getContent();
         var buttons = (HorizontalLayout) content.getComponent(1);
@@ -56,7 +56,7 @@ public class ConfirmDialogTest {
 
     @Test
     public void testButtonTexts() {
-        var dialog = new ConfirmDialog("Are you sure?", Type.ALERT);
+        var dialog = new ConfirmDialog("Confirm", "Are you sure?", Type.ALERT);
 
         dialog.setConfirmText("Yes");
         dialog.setCancelText("No");

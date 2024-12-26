@@ -1,3 +1,23 @@
 div#confirm-dialog {
   min-width: 300px !important;
+
+  .v-window-wrap {
+    div[aria-label="Top of dialog"] {
+      display: none;
+    }
+
+    div[aria-label="Bottom of Dialog"] {
+      display: none;
+    }
+  }
+
+  .v-window-header {
+    .v-icon {
+      margin-right: 5px;
+    }
+
+    .v-assistive-device-only {
+      display: none;
+    }
+  }
 }

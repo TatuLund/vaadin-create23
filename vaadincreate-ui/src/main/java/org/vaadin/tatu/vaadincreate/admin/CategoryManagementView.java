@@ -242,7 +242,7 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
 
         // Handle the delete button click event with a confirmation dialog.
         private void handleConfirmDelete() {
-            var dialog = new ConfirmDialog(
+            var dialog = new ConfirmDialog(getTranslation(I18n.CONFIRM),
                     getTranslation(I18n.WILL_DELETE, category.getName()),
                     ConfirmDialog.Type.ALERT);
             dialog.setConfirmText(getTranslation(I18n.DELETE));

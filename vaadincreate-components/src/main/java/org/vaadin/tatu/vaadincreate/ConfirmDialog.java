@@ -6,6 +6,7 @@ import com.vaadin.event.ConnectorEventListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.Registration;
+import com.vaadin.shared.ui.window.WindowRole;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -55,7 +56,7 @@ public class ConfirmDialog extends Composite {
      * @param type
      *            Type of the Dialog
      */
-    public ConfirmDialog(String text, Type type) {
+    public ConfirmDialog(String caption, String text, Type type) {
         window.setId("confirm-dialog");
         window.setModal(true);
         window.setClosable(false);
@@ -64,13 +65,17 @@ public class ConfirmDialog extends Composite {
         window.setHeight("50%");
         window.setDraggable(false);
         window.setIcon(VaadinIcons.EXCLAMATION_CIRCLE);
+        window.setCaption(caption);
         var message = new Label(text);
         message.setSizeFull();
         if (type == Type.SUCCESS) {
             message.addStyleName(ValoTheme.LABEL_SUCCESS);
+            window.setAssistiveRole(WindowRole.DIALOG);
         } else if (type == Type.ALERT) {
             message.addStyleName(ValoTheme.LABEL_FAILURE);
+            window.setAssistiveRole(WindowRole.ALERTDIALOG);
         }
+        window.setAssistiveDescription(message);
         var content = new VerticalLayout();
         content.setSizeFull();
         cancelButton = new Button("Cancel");

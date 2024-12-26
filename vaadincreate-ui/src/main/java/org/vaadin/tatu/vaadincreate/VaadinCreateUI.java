@@ -140,8 +140,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     // it.
     private void handleDraft(Product draft) {
         logger.info("Draft found");
-        var dialog = new ConfirmDialog(getTranslation(I18n.DRAFT_FOUND),
-                ConfirmDialog.Type.ALERT);
+        var dialog = new ConfirmDialog(getTranslation(I18n.CONFIRM),
+                getTranslation(I18n.DRAFT_FOUND), ConfirmDialog.Type.ALERT);
         dialog.setCancelText(getTranslation(I18n.DISCARD));
         dialog.setConfirmText(getTranslation(I18n.YES));
         var id = draft.getId() == null ? "new" : String.valueOf(draft.getId());

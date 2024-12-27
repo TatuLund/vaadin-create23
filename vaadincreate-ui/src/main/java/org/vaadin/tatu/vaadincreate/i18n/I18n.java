@@ -34,6 +34,7 @@ public final class I18n {
     public static final String CURRENT_PAGE = "current-page";
     public static final String OPENED = "opened";
     public static final String CONFIRM = "confirm";
+    public static final String CLOSED = "closed";
 
     public static final class Books {
         public static final String UPDATED = "updated";

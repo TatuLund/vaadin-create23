@@ -282,6 +282,9 @@ public class BookForm extends Composite implements HasI18N {
             clearDirtyIndicators();
         }
         sidePanel.show(visible);
+        if (!visible) {
+            VaadinCreateUI.get().announce(getTranslation(I18n.CLOSED));
+        }
     }
 
     public Product getProduct() {
@@ -407,12 +410,10 @@ public class BookForm extends Composite implements HasI18N {
         presenter.requestUpdateCategories();
         if (product == null) {
             product = new Product();
+            readProduct(product);
+            return;
         }
-        deleteButton.setEnabled(product.getId() != null);
-        currentProduct = product;
-        binder.readBean(product);
-        saveButton.setEnabled(false);
-        discardButton.setEnabled(false);
+        readProduct(product);
 
         // Scroll to the top
         // As this is not a Panel, using JavaScript
@@ -424,6 +425,14 @@ public class BookForm extends Composite implements HasI18N {
         }
 
         announceProductOpened(product);
+    }
+
+    private void readProduct(Product product) {
+        deleteButton.setEnabled(product.getId() != null);
+        currentProduct = product;
+        binder.readBean(product);
+        saveButton.setEnabled(false);
+        discardButton.setEnabled(false);
     }
 
     // This is horrible, but required to workaround a bug in NVDA

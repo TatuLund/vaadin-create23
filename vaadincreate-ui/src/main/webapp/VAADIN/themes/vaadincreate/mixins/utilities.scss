@@ -26,7 +26,7 @@
   // Experimental style for the grid with no visible cell focus.
   // This is not part of the Valo theme, but could be added to it.
   .no-cell-focus {
-    .v-grid-cell-focused:before {
+    td.v-grid-cell-focused:before {
       border: unset;
     }  
   }

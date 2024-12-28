@@ -74,6 +74,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     @Override
     protected void init(VaadinRequest request) {
+        setOverlayContainerLabel("");
         getPage().setTitle("Vaadin Create 23'");
         if (!getAccessControl().isUserSignedIn()) {
             MDC.clear();
@@ -244,12 +245,10 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     @Override
     public void attach() {
         super.attach();
-        // Workaround: https://github.com/vaadin/framework/issues/5772
         getPage().getJavaScript().execute(
                 """
                         setTimeout(() => {
                             document.getElementsByClassName('v-tooltip')[0].style.zIndex=30001;
-                            document.getElementsByClassName('v-overlay-container')[0].removeAttribute('aria-label');
                         }, 200);
                         """);
     }

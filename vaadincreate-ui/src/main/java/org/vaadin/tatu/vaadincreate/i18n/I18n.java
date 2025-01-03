@@ -80,6 +80,8 @@ public final class I18n {
         public static final String LOGOUT = "logout";
         public static final String MENU = "menu";
         public static final String LOGOUT_TOOLTIP = "logout-tooltip";
+        public static final String MENU_OPEN = "menu-open";
+        public static final String MENU_CLOSE = "menu-close";
 
         private App() {
             // private constructor to hide the implicit public one

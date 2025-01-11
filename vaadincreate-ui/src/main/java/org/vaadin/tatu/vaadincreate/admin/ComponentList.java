@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.admin;
 
 import java.util.Collection;
 
+import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 
 import com.vaadin.data.ValueProvider;
@@ -101,6 +102,7 @@ public class ComponentList<T, V extends Component> extends Composite {
                 VaadinCreateTheme.GRID_NO_BORDERS,
                 VaadinCreateTheme.GRID_NO_CELL_FOCUS);
         grid.setHeightMode(HeightMode.ROW);
+        AttributeExtension.of(grid).setAttribute("tabindex", "-1");
     }
 
 }

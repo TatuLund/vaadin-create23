@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate.crud;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
@@ -13,6 +14,8 @@ import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
+import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.server.SerializablePredicate;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Grid;
@@ -116,6 +119,117 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                 .setStyleName(VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT);
         getHeaderRow(0).getCell(countCol)
                 .setStyleName(VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT);
+    }
+
+    /**
+     * Checks if the data provider associated with the data communicator has no
+     * items.
+     *
+     * @return {@code true} if the data provider size is zero, {@code false}
+     *         otherwise.
+     */
+    public boolean isEmpty() {
+        return getDataCommunicator().getDataProviderSize() == 0;
+    }
+
+    /**
+     * Finds a product by its ID from the data provider.
+     *
+     * @param id
+     *            the ID of the product to find
+     * @return the product with the specified ID, or {@code null} if no such
+     *         product is found
+     */
+    @SuppressWarnings("unchecked")
+    public Product findProductById(Integer id) {
+        return ((ListDataProvider<Product>) getDataProvider()).getItems()
+                .stream().filter(book -> book.getId().equals(id)).findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Adds a new product to the data provider and refreshes the grid.
+     *
+     * @param book
+     *            the product to be added
+     */
+    @SuppressWarnings("unchecked")
+    public void addProduct(Product book) {
+        ((ListDataProvider<Product>) getDataProvider()).getItems().add(book);
+        getDataProvider().refreshAll();
+    }
+
+    /**
+     * Removes the specified product from the data provider and refreshes the
+     * grid.
+     *
+     * @param book
+     *            the product to be removed from the data provider
+     */
+    @SuppressWarnings("unchecked")
+    public void removeProduct(Product book) {
+        ((ListDataProvider<Product>) getDataProvider()).getItems().remove(book);
+        getDataProvider().refreshAll();
+    }
+
+    /**
+     * Refreshes the data provider to update the specified book item.
+     *
+     * @param book
+     *            the book item to be refreshed
+     */
+    public void refresh(Product book) {
+        getDataProvider().refreshItem(book);
+    }
+
+    /**
+     * Replaces an existing product in the data provider with an updated
+     * product.
+     *
+     * @param product
+     *            the original product to be replaced
+     * @param updatedProduct
+     *            the new product to replace the original product
+     * @throws ClassCastException
+     *             if the data provider is not of type ListDataProvider<Product>
+     * @throws IndexOutOfBoundsException
+     *             if the original product is not found in the list
+     */
+    @SuppressWarnings("unchecked")
+    public void replaceProduct(Product product, Product updatedProduct) {
+        var list = ((List<Product>) ((ListDataProvider<Product>) getDataProvider())
+                .getItems());
+        list.set(list.indexOf(product), updatedProduct);
+        refresh(updatedProduct);
+    }
+
+    /**
+     * Checks if the current data provider is an instance of ListDataProvider.
+     *
+     * @return true if the data provider is an instance of ListDataProvider,
+     *         false otherwise.
+     */
+    public boolean hasDataProdiver() {
+        return getDataProvider() instanceof ListDataProvider;
+    }
+
+    /**
+     * Sets a filter for the data provider of the grid.
+     * 
+     * @param filter the filter to be applied to the data provider
+     *               which determines which items are displayed in the grid.
+     *               The filter is a {@link SerializablePredicate} that takes a 
+     *               {@link Product} as input and returns a boolean indicating 
+     *               whether the product should be included.
+     * 
+     * @throws ClassCastException if the data provider is not an instance of 
+     *                            {@link ListDataProvider}.
+     */
+    @SuppressWarnings("unchecked")
+    public void setFilter(SerializablePredicate<Product> filter) {
+        if (getDataProvider() instanceof ListDataProvider) {
+            ((ListDataProvider<Product>) getDataProvider()).setFilter(filter);
+        }
     }
 
     @Override

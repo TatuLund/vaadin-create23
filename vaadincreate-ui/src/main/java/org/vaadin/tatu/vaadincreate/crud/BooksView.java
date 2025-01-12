@@ -1,7 +1,6 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
-import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.ViewBeforeLeaveEvent;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -54,7 +52,6 @@ public class BooksView extends CssLayout implements VaadinCreateView {
 
     private Button newProduct;
 
-    private ListDataProvider<Product> dataProvider;
     private FakeGrid fakeGrid;
     private NoMatches noMatches = new NoMatches();
     private String params;
@@ -159,8 +156,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         // Apply the filter to grid's data provider. TextField value is never
         // null
         filterField.addValueChangeListener(event -> {
-            dataProvider
-                    .setFilter(book -> passesFilter(book, event.getValue()));
+            grid.setFilter(book -> passesFilter(book, event.getValue()));
             updateNoMatchesVisibility();
         });
 
@@ -181,8 +177,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
     }
 
     private void updateNoMatchesVisibility() {
-        noMatches.setVisible(
-                grid.getDataCommunicator().getDataProviderSize() == 0);
+        noMatches.setVisible(grid.isEmpty());
     }
 
     @Override
@@ -255,8 +250,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
                 newProduct.setEnabled(true);
             }
             logger.info("Updating products");
-            dataProvider = new ListDataProvider<>(products);
-            grid.setDataProvider(dataProvider);
+            grid.setItems(products);
             grid.setVisible(true);
             fakeGrid.setVisible(false);
             // Open form with url parameter based book
@@ -388,7 +382,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
     public void updateProduct(Product product) {
         logger.info("Refresh item");
         grid.setEdited(product);
-        dataProvider.refreshItem(product);
+        grid.refresh(product);
         form.showForm(false);
         grid.focus();
         updateNoMatchesVisibility();
@@ -404,8 +398,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
      */
     public void updateGrid(Product product) {
         logger.info("Refresh grid");
-        dataProvider.getItems().add(product);
-        dataProvider.refreshAll();
+        grid.addProduct(product);
         form.showForm(false);
         grid.focus();
         updateNoMatchesVisibility();
@@ -419,8 +412,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
      *            the product to be removed
      */
     public void removeProduct(Product product) {
-        dataProvider.getItems().remove(product);
-        dataProvider.refreshAll();
+        grid.removeProduct(product);
         updateNoMatchesVisibility();
     }
 
@@ -443,7 +435,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         if (product != null) {
             // Ensure the product is up-to-date
             if (product.getId() != null) {
-                product = updateProductInDataProvider(product);
+                product = updateProductnGrid(product);
                 if (product == null) {
                     showError(getTranslation(I18n.Books.PRODUCT_DELETED));
                     return;
@@ -540,7 +532,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
                 logger.debug("Refreshing item ({}) {}", product.getId(),
                         product.getProductName());
                 grid.setEdited(product);
-                dataProvider.refreshItem(product);
+                grid.refresh(product);
             }
         });
     }
@@ -558,30 +550,31 @@ public class BooksView extends CssLayout implements VaadinCreateView {
     public void refreshProductAsync(Integer id) {
         Utils.access(ui, () -> {
             if (canPush()) {
-                dataProvider.getItems().stream()
-                        .filter(book -> book.getId().equals(id)).findFirst()
-                        .ifPresent(dataProvider::refreshItem);
+                refreshProductById(id);
             }
         });
     }
 
-    private boolean canPush() {
-        return isAttached()
-                && grid.getDataProvider() instanceof ListDataProvider;
+    private void refreshProductById(Integer id) {
+        var item = grid.findProductById(id);
+        if (item != null) {
+            grid.refresh(item);
+        }
     }
 
-    private Product updateProductInDataProvider(Product product) {
+    private boolean canPush() {
+        return isAttached() && grid.hasDataProdiver();
+    }
+
+    private Product updateProductnGrid(Product product) {
         assert product != null : "Product cannot be null";
 
-        var list = ((List<Product>) dataProvider.getItems());
         var updatedProduct = presenter.findProduct(product.getId());
         if (updatedProduct != null) {
-            list.set(list.indexOf(product), updatedProduct);
+            grid.replaceProduct(product, updatedProduct);
             logger.debug("Refreshed {}", product.getId());
-            dataProvider.refreshItem(updatedProduct);
         } else {
-            dataProvider.getItems().remove(product);
-            dataProvider.refreshAll();
+            grid.removeProduct(product);
         }
         return updatedProduct;
     }

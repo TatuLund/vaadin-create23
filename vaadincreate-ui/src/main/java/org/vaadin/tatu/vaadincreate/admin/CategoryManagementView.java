@@ -190,6 +190,7 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
                     getTranslation(I18n.DELETE), category.getName()));
             deleteButton.setEnabled(category.getId() != null);
             deleteButton.setDisableOnClick(true);
+            deleteButton.setWidth("45px");
 
             binder = new BeanValidationBinder<>(Category.class);
             // Check for duplicate category names
@@ -208,11 +209,11 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
 
         private void configureNameField() {
             nameField = new TextField();
-            var nameFieldExt = AttributeExtension.of(nameField);
-            nameFieldExt.setAttribute("autocomplete", "off");
-            nameFieldExt.setAttribute("aria-label",
+            var nameFieldAttributes = AttributeExtension.of(nameField);
+            nameFieldAttributes.setAttribute("autocomplete", "off");
+            nameFieldAttributes.setAttribute("aria-label",
                     getTranslation(I18n.Category.CATEGORY_BAME));
-            nameFieldExt.removeAttribute("aria-labelledby");
+            nameFieldAttributes.removeAttribute("aria-labelledby");
             nameField.setId(String.format("name-%s", category.getId()));
             nameField.setValueChangeMode(ValueChangeMode.LAZY);
             nameField.setValueChangeTimeout(2000);

@@ -435,7 +435,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         if (product != null) {
             // Ensure the product is up-to-date
             if (product.getId() != null) {
-                product = updateProductnGrid(product);
+                product = updateProductInGrid(product);
                 if (product == null) {
                     showError(getTranslation(I18n.Books.PRODUCT_DELETED));
                     return;
@@ -566,7 +566,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         return isAttached() && grid.hasDataProdiver();
     }
 
-    private Product updateProductnGrid(Product product) {
+    private Product updateProductInGrid(Product product) {
         assert product != null : "Product cannot be null";
 
         var updatedProduct = presenter.findProduct(product.getId());

@@ -110,6 +110,13 @@ public abstract class AbstractComponentTest extends TestBenchTestCase {
     public void setup() throws Exception {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
+        if (Boolean.getBoolean("ghActions")) {
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--disable-gpu");
+            options.addArguments("--disable-extensions");
+        }
+
         setDriver(TestBench.createDriver(new ChromeDriver(options)));
         getDriver().get(getURL(urlFragment));
 

@@ -128,10 +128,16 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
     }
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
         options.addArguments("--window-size=1280,900");
+        if (Boolean.getBoolean("ghActions")) {
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--disable-gpu");
+            options.addArguments("--disable-extensions");
+        }
         setDriver(TestBench.createDriver(new ChromeDriver(options)));
         getDriver().get(getURL(urlFragment));
 
@@ -155,6 +161,9 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
     // error-screenshots folder. Check if they are ok and move to
     // reference-screenshots folder. Rerun the tests to verify,
     protected boolean visualTests() {
+        if (Boolean.getBoolean("ghActions")) {
+            return false;
+        }
         return true;
     }
 

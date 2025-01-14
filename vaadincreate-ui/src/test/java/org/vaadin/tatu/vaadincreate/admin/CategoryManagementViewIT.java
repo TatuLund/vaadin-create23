@@ -21,7 +21,7 @@ import com.vaadin.testbench.elements.WindowElement;
 public class CategoryManagementViewIT extends AbstractViewTest {
 
     @Override
-    public void setup() throws Exception {
+    public void setup() {
         super.setup();
         open("#!" + AdminView.VIEW_NAME + "/"
                 + CategoryManagementView.VIEW_NAME);

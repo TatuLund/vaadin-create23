@@ -32,7 +32,7 @@ public class BooksViewIT extends AbstractViewTest {
     private static final String PRICE_FI = "10,00 €";
 
     @Override
-    public void setup() throws Exception {
+    public void setup() {
         super.setup();
         open("#!" + BooksView.VIEW_NAME);
         login("Admin", "admin");

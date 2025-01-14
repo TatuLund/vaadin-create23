@@ -13,7 +13,7 @@ import com.vaadin.testbench.elements.TextAreaElement;
 public class AboutViewIT extends AbstractViewTest {
 
     @Override
-    public void setup() throws Exception {
+    public void setup() {
         super.setup();
         open("#!" + AboutView.VIEW_NAME);
         login("Admin", "admin");

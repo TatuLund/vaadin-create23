@@ -16,7 +16,7 @@ import com.vaadin.testbench.elements.UIElement;
 public class StatsViewIT extends AbstractViewTest {
 
     @Override
-    public void setup() throws Exception {
+    public void setup() {
         super.setup();
         open("#!" + StatsView.VIEW_NAME);
         login("Admin", "admin");

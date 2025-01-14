@@ -23,7 +23,7 @@ import com.vaadin.testbench.elements.WindowElement;
 public class UserManagementViewIT extends AbstractViewTest {
 
     @Override
-    public void setup() throws Exception {
+    public void setup() {
         super.setup();
         open("#!" + AdminView.VIEW_NAME + "/" + UserManagementView.VIEW_NAME);
         login("Admin", "admin");
@@ -35,6 +35,7 @@ public class UserManagementViewIT extends AbstractViewTest {
     }
 
     @Test
+    @SuppressWarnings("java:S5961")
     public void createSaveAndDeleteUser() {
         waitForElementPresent(By.id("new-button"));
 

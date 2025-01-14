@@ -17,7 +17,7 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
       - name: Install Chrome
-      - uses: browser-actions/setup-chrome@latest
+        uses: browser-actions/setup-chrome@latest
         with:
           chrome-version: stable
       - name: Build with Maven

@@ -24,3 +24,13 @@ jobs:
         run: mvn --batch-mode --update-snapshots install -DskipTests
       - name: Run tests
         run: mvn --batch-mode verify -Pit -DghActions=true
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            vaadincreate-backend/target/surefire-reports/*.xml
+            vaadincreate-components/target/surefire-reports/*.xml
+            vaadincreate-components/target/failsafe-reports/*.xml
+            vaadincreate-ui/target/surefire-reports/*.xml
+            vaadincreate-ui/target/failsafe-reports/*.xml

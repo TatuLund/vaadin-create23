@@ -31,10 +31,7 @@ jobs:
           files: |
             vaadincreate-backend/target/surefire-reports/*.xml
             vaadincreate-components/target/surefire-reports/*.xml
-            vaadincreate-components/target/failsafe-reports/*.xml
+            vaadincreate-components/target/failsafe-reports/TEST-*.xml
             vaadincreate-ui/target/surefire-reports/*.xml
-            vaadincreate-ui/target/failsafe-reports/*.xml
-          exclude: |
-            vaadincreate-components/target/failsafe-reports/failsafe-summary.xml
-            vaadincreate-ui/target/failsafe-reports/failsafe-summary.xml
+            vaadincreate-ui/target/failsafe-reports/TEST-*.xml
           

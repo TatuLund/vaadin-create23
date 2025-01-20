@@ -30,18 +30,17 @@ public class ArchitectureTest {
 
     @ArchTest
     public static final ArchRule servicesAreCalledOnlyByPresetersUIandAuth = classes()
-            .that().resideInAPackage("..service..").should().onlyBeAccessed()
-            .byClassesThat().haveSimpleNameEndingWith("Preseter").orShould()
-            .haveSimpleNameEndingWith("UI").orShould()
-            .resideInAPackage("..auth..").orShould()
-            .resideInAPackage("..service..").orShould()
-            .resideInAPackage("..mock..");
+            .that().resideInAPackage("..backend..").and()
+            .haveSimpleNameEndingWith("Service").should().onlyBeAccessed()
+            .byClassesThat().haveSimpleNameEndingWith("Presenter").orShould()
+            .haveSimpleName("VaadinCreateUI").orShould()
+            .haveSimpleName("AboutView").orShould().resideInAPackage("..auth..")
+            .orShould().resideInAPackage("..backend..");
 
     @ArchTest
     public static final ArchRule eventBusIsOnlyUsedByPresentersAndUI = classes()
-            .that().haveSimpleNameEndingWith("EventBus").should()
-            .onlyBeAccessed().byClassesThat()
-            .haveSimpleNameEndingWith("Preseter").orShould()
+            .that().haveSimpleName("EventBus").should().onlyBeAccessed()
+            .byClassesThat().haveSimpleNameEndingWith("Presenter").orShould()
             .haveSimpleNameEndingWith("UI").orShould()
             .haveSimpleNameEndingWith("AboutView").orShould()
             .resideInAPackage("..eventbus..");

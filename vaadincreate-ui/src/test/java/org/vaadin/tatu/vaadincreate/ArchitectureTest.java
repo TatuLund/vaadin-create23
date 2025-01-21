@@ -6,6 +6,8 @@ import com.tngtech.archunit.lang.ArchRule;
 
 import org.junit.runner.RunWith;
 
+import com.tngtech.archunit.base.DescribedPredicate;
+import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.junit.ArchUnitRunner;
@@ -30,20 +32,45 @@ public class ArchitectureTest {
 
     @ArchTest
     public static final ArchRule servicesAreCalledOnlyByPresetersUIandAuth = classes()
-            .that().resideInAPackage("..backend..").and()
-            .haveSimpleNameEndingWith("Service").should().onlyBeAccessed()
-            .byClassesThat().haveSimpleNameEndingWith("Presenter").orShould()
-            .haveSimpleName("VaadinCreateUI").orShould()
-            .haveSimpleName("AboutView").orShould().resideInAPackage("..auth..")
-            .orShould().resideInAPackage("..backend..");
+            .that().resideInAPackage("org.vaadin.tatu.vaadincreate.backend")
+            .and().haveSimpleNameEndingWith("Service").should().onlyBeAccessed()
+            .byClassesThat(new DescribedPredicate<JavaClass>(
+                    "by Presenters, UI, AboutView and auth classes") {
+                @Override
+                public boolean test(JavaClass javaClass) {
+                    boolean isValidPackageOrClass = isPresenterOrUIClass(
+                            javaClass);
+                    return javaClass.getPackageName()
+                            .startsWith("org.vaadin.tatu.vaadincreate.auth")
+                            || javaClass.getPackageName().startsWith(
+                                    "org.vaadin.tatu.vaadincreate.backend")
+                            || isValidPackageOrClass;
+                }
+            });
+
+    private static boolean isPresenterOrUIClass(JavaClass javaClass) {
+        return javaClass.getSimpleName().endsWith("Presenter")
+                || javaClass.getSimpleName().endsWith("Test")
+                || javaClass.getSimpleName().equals("VaadinCreateUI")
+                || javaClass.getSimpleName().equals("AboutView");
+    }
 
     @ArchTest
     public static final ArchRule eventBusIsOnlyUsedByPresentersAndUI = classes()
-            .that().haveSimpleName("EventBus").should().onlyBeAccessed()
-            .byClassesThat().haveSimpleNameEndingWith("Presenter").orShould()
-            .haveSimpleNameEndingWith("UI").orShould()
-            .haveSimpleNameEndingWith("AboutView").orShould()
-            .resideInAPackage("..eventbus..");
+            .that().resideInAPackage("..vaadincreate.eventbus..").should()
+            .onlyBeAccessed().byClassesThat(new DescribedPredicate<JavaClass>(
+                    "by Presenters, UI, AboutView classes") {
+                @Override
+                public boolean test(JavaClass javaClass) {
+                    boolean isValidPackageOrClass = isPresenterOrUIClass(
+                            javaClass);
+                    return javaClass.getPackageName()
+                            .startsWith("org.vaadin.tatu.vaadincreate.eventbus")
+                            || javaClass.getPackageName().startsWith(
+                                    "org.vaadin.tatu.vaadincreate.locking")
+                            || isValidPackageOrClass;
+                }
+            });
 
     @ArchTest
     public static final ArchRule daosAreOnlyUsedByServices = classes().that()

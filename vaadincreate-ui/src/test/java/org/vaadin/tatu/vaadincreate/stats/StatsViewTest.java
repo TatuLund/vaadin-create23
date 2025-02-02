@@ -13,12 +13,15 @@ import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.admin.CategoryManagementPresenter.CategoriesUpdatedEvent;
+import org.vaadin.tatu.vaadincreate.admin.CategoryManagementPresenter.CategoriesUpdatedEvent.CategoryChange;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.crud.BooksPresenter;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
 import org.vaadin.tatu.vaadincreate.crud.FakeGrid;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.stats.StatsView.CustomChart;
 
 import com.vaadin.addon.charts.model.DataSeries;
@@ -54,6 +57,44 @@ public class StatsViewTest extends AbstractUITest {
     }
 
     @Test
+    public void chars_will_be_updated_when_category_is_being_updated() {
+        // Setup reference stats
+        prices = referencePrices();
+        availabilities = referenceAvailabilities();
+        stockTitles = referenceStockTitles();
+        stockCounts = referenceStockCounts();
+
+        // Assert that initial stats are the same
+        then_statistics_match_given_reference(prices, availabilities,
+                stockTitles, stockCounts);
+
+        // WHEN: other user renames the category "Sci-Fi" to "Science-Fiction"
+        var sciFiCategory = ui.getProductService().getAllCategories().stream()
+                .filter(cat -> cat.getName().equals("Sci-fi")).findFirst()
+                .get();
+        sciFiCategory.setName("Science-Fiction");
+        sciFiCategory = ui.getProductService().updateCategory(sciFiCategory);
+        // Fire event to update the stats
+        EventBus.get().post(
+                new CategoriesUpdatedEvent(sciFiCategory, CategoryChange.SAVE));
+        waitForCharts(dashboard);
+
+        // Update reference stats to reflect category change
+        stockTitles.put("Science-Fiction", 26);
+        stockTitles.remove("Sci-fi");
+        stockCounts.put("Science-Fiction", 2321);
+        stockCounts.remove("Sci-fi");
+
+        // Assert that actual stats have been updated
+        then_statistics_match_given_reference(prices, availabilities,
+                stockTitles, stockCounts);
+
+        // Clean-up, revert the category name
+        sciFiCategory.setName("Sci-fi");
+        ui.getProductService().updateCategory(sciFiCategory);
+    }
+
+    @Test
     public void chart_series_will_be_automatically_updated_when_book_update_and_delete_events_are_observed() {
         // Setup reference stats
         prices = referencePrices();
@@ -62,7 +103,8 @@ public class StatsViewTest extends AbstractUITest {
         stockCounts = referenceStockCounts();
 
         // Assert that initial stats are the same
-        then_statistics_match_given_reference(prices, availabilities, stockTitles, stockCounts);
+        then_statistics_match_given_reference(prices, availabilities,
+                stockTitles, stockCounts);
 
         var presenter = createBooksPresenter();
 
@@ -84,7 +126,8 @@ public class StatsViewTest extends AbstractUITest {
         });
 
         // Assert that actual stats have been updated
-        then_statistics_match_given_reference(prices, availabilities, stockTitles, stockCounts);
+        then_statistics_match_given_reference(prices, availabilities,
+                stockTitles, stockCounts);
 
         // WHEN: other user is deleting the book
         presenter.deleteProduct(savedBook);
@@ -97,7 +140,8 @@ public class StatsViewTest extends AbstractUITest {
         stockCounts = referenceStockCounts();
 
         // Assert that actual stats are back to original
-        then_statistics_match_given_reference(prices, availabilities, stockTitles, stockCounts);
+        then_statistics_match_given_reference(prices, availabilities,
+                stockTitles, stockCounts);
 
     }
 
@@ -112,23 +156,26 @@ public class StatsViewTest extends AbstractUITest {
         return presenter;
     }
 
-    private void then_statistics_match_given_reference(Map<String, Number> prices,
-            Map<String, Number> availabilities, Map<String, Number> stockTitles,
-            Map<String, Number> stockCounts) {
+    private void then_statistics_match_given_reference(
+            Map<String, Number> prices, Map<String, Number> availabilities,
+            Map<String, Number> stockTitles, Map<String, Number> stockCounts) {
         var chart = $(CustomChart.class).id("price-chart");
         var series = (DataSeries) chart.getConfiguration().getSeries().get(0);
         then_data_series_values_matches_given_reference_values(prices, series);
 
         chart = $(CustomChart.class).id("availability-chart");
         series = (DataSeries) chart.getConfiguration().getSeries().get(0);
-        then_data_series_values_matches_given_reference_values(availabilities, series);
+        then_data_series_values_matches_given_reference_values(availabilities,
+                series);
 
         chart = $(CustomChart.class).id("category-chart");
         series = (DataSeries) chart.getConfiguration().getSeries().get(0);
-        then_data_series_values_matches_given_reference_values(stockTitles, series);
+        then_data_series_values_matches_given_reference_values(stockTitles,
+                series);
 
         series = (DataSeries) chart.getConfiguration().getSeries().get(1);
-        then_data_series_values_matches_given_reference_values(stockCounts, series);
+        then_data_series_values_matches_given_reference_values(stockCounts,
+                series);
     }
 
     private static Product createBook() {
@@ -143,8 +190,8 @@ public class StatsViewTest extends AbstractUITest {
         return book;
     }
 
-    private static void then_data_series_values_matches_given_reference_values(Map<String, Number> values,
-            DataSeries series) {
+    private static void then_data_series_values_matches_given_reference_values(
+            Map<String, Number> values, DataSeries series) {
         // Asserting size to verify that items with zero count are not included
         assertEquals(values.values().size(), series.size());
         series.getData().forEach(item -> {

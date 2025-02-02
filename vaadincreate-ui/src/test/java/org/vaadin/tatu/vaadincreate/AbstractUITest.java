@@ -80,7 +80,6 @@ public abstract class AbstractUITest extends UIUnitTest {
      *            The dashboard
      */
     protected void waitForCharts(CssLayout dashboard) {
-        assertFalse(dashboard.getStyleName().contains("loaded"));
         waitWhile(dashboard, d -> !d.getStyleName().contains("loaded"), 15);
     }
 

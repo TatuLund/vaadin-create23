@@ -67,6 +67,7 @@ public class AboutView extends VerticalLayout
         if (accessControl.isUserInRole(Role.ADMIN)) {
             createEditButton();
             editButton.addClickListener(e -> {
+                accessControl.assertAdmin();
                 adminsNoteField.setVisible(true);
                 adminsNote.setVisible(false);
                 editButton.setVisible(false);
@@ -79,7 +80,7 @@ public class AboutView extends VerticalLayout
 
         adminsNoteField.addValueChangeListener(this::handleValueChange);
         adminsNoteField.setValueChangeMode(ValueChangeMode.BLUR);
-        adminsNoteField.addBlurListener(e -> closeEditor());
+        adminsNoteField.addBlurListener(blurEvent -> closeEditor());
         setSizeFull();
         setMargin(false);
         setStyleName(VaadinCreateTheme.ABOUT_VIEW);
@@ -98,9 +99,9 @@ public class AboutView extends VerticalLayout
         }
     }
 
-    private void handleValueChange(ValueChangeEvent<String> e) {
-        if (e.isUserOriginated()) {
-            var unsanitized = e.getValue();
+    private void handleValueChange(ValueChangeEvent<String> valueChange) {
+        if (valueChange.isUserOriginated()) {
+            var unsanitized = valueChange.getValue();
             // Sanitize user input with Jsoup to avoid JavaScript injection
             // vulnerabilities
             var text = Utils.sanitize(unsanitized);
@@ -140,7 +141,7 @@ public class AboutView extends VerticalLayout
         textArea.setIcon(VaadinIcons.FILE_TEXT_O);
         textArea.setCaption("HTML");
         textArea.setPlaceholder("max 250 chars");
-        textArea.addFocusListener(e -> saveRegistration = textArea
+        textArea.addFocusListener(focusEvent -> saveRegistration = textArea
                 .addShortcutListener(new ShortcutListener("Save", KeyCode.S,
                         new int[] { ModifierKey.CTRL }) {
                     @Override

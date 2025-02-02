@@ -131,6 +131,9 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
     public void setup() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
+        // Dynamic sizing seems not work when @Viewport used in UI
+        // Thus using ChromeOptions argument instead
+        // of "testBench().resizeViewPortTo(1280, 900);" here.
         options.addArguments("--window-size=1280,900");
         if (Boolean.getBoolean("ghActions")) {
             options.addArguments("--no-sandbox");
@@ -146,10 +149,6 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
         Parameters.setScreenshotComparisonCursorDetection(true);
         Parameters.setMaxScreenshotRetries(3);
         Parameters.setScreenshotRetryDelay(1000);
-
-        // Dynamic sizing seems not work when @Viewport used in UI
-        // Thus using ChromeOptions argument instead
-        // testBench().resizeViewPortTo(1280, 900);
 
         // Wait for widgetset loaded before testing
         waitForAppLoaded();

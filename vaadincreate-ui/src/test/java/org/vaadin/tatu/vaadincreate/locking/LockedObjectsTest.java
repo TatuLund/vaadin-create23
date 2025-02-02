@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -22,6 +23,7 @@ public class LockedObjectsTest {
     UserService userService = UserService.get();
 
     List<MockObject> objects;
+    static CountDownLatch latch = new CountDownLatch(1);
 
     @Before
     public void init() {
@@ -34,6 +36,11 @@ public class LockedObjectsTest {
         var user = userService.getAllUsers().get(0);
 
         lockedObjects.lock(objects.get(0), user);
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            // Ignore
+        }
 
         assertEquals(user, lockedObjects.isLocked(objects.get(0)));
         var event = listener.getLastEvent();
@@ -43,7 +50,13 @@ public class LockedObjectsTest {
         assertEquals(MockObject.class, event.type());
         assertTrue(event.locked());
 
+        latch = new CountDownLatch(1);
         lockedObjects.unlock(objects.get(0));
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            // Ignore
+        }
 
         assertEquals(null, lockedObjects.isLocked(objects.get(0)));
         event = listener.getLastEvent();
@@ -86,6 +99,7 @@ public class LockedObjectsTest {
         @Override
         public void eventFired(Object event) {
             count.incrementAndGet();
+            latch.countDown();
             this.event = (LockingEvent) event;
         }
 

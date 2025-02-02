@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.eventbus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
@@ -18,6 +19,7 @@ public class EventBusTest {
     private final ByteArrayOutputStream err = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
     private final PrintStream originalErr = System.err;
+    private static CountDownLatch latch = new CountDownLatch(1);
 
     @Before
     public void setStreams() {
@@ -39,6 +41,13 @@ public class EventBusTest {
         var listener3 = new TestListener();
         var event = new Event("Hello");
         eventBus.post(event);
+        // Wait for latch
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            // Ignore
+        }
+
         Assert.assertTrue(
                 out.toString().contains("event fired for 3 recipients."));
         Assert.assertEquals(1, listener1.getEventCount());
@@ -57,7 +66,16 @@ public class EventBusTest {
         }
 
         event = new Event("World");
+        latch = new CountDownLatch(1);
+
         eventBus.post(event);
+        // Wait for latch
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            // Ignore
+        }
+
         Assert.assertEquals(1, listener1.getEventCount());
         Assert.assertEquals("Hello", listener1.getLastEvent().toString());
         Assert.assertEquals(2, listener2.getEventCount());
@@ -88,6 +106,7 @@ public class EventBusTest {
         @Override
         public void eventFired(Object event) {
             count.incrementAndGet();
+            latch.countDown();
             this.event = event;
         }
 

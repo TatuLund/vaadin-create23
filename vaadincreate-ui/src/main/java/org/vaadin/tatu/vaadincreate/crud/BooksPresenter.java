@@ -378,6 +378,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
      *            the product draft to be saved
      */
     public void saveDraft(Product draft) {
+        accessControl.assertAdmin();
         getService().saveDraft(CurrentUser.get().get(), draft);
         this.draft = draft;
     }
@@ -386,6 +387,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
      * Removes the current draft.
      */
     public void removeDraft() {
+        accessControl.assertAdmin();
         draft = null;
         getService().saveDraft(CurrentUser.get().get(), null);
     }

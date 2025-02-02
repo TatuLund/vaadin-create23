@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -33,6 +34,7 @@ public class UserForm extends Composite implements HasI18N {
     private PasswordField password2;
     private TextField username;
     private User user;
+    private ComboBox<Role> role;
 
     public UserForm() {
         form.addStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM);
@@ -45,7 +47,7 @@ public class UserForm extends Composite implements HasI18N {
         password.setId("password-field");
         password2 = new PasswordField(getTranslation(I18n.User.PASSWD_REPEAT));
         password2.setId("password-repeat");
-        var role = new ComboBox<Role>(getTranslation(I18n.User.ROLE));
+        role = new ComboBox<>(getTranslation(I18n.User.ROLE));
         role.setItems(Role.values());
         role.setEmptySelectionAllowed(false);
         role.setTextInputAllowed(false);
@@ -85,6 +87,8 @@ public class UserForm extends Composite implements HasI18N {
         password2.setValue(user.getPasswd());
         setEnabled(true);
         username.focus();
+        // Cannot change own role
+        role.setEnabled(!CurrentUser.get().get().equals(user));
     }
 
     /**

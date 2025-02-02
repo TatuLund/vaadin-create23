@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.vaadin.tatu.vaadincreate.AboutView.MessageEvent;
 import org.vaadin.tatu.vaadincreate.admin.AdminView;
+import org.vaadin.tatu.vaadincreate.admin.UserManagementPresenter.UserUpdatedEvent;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.BasicAccessControl;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
@@ -80,6 +81,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             MDC.clear();
             showLoginView();
         } else {
+            var user = CurrentUser.get().get();
+            user = getUserService().getUserById(user.getId());
+            CurrentUser.set(user);
             target = getInitialTarget();
             showAppLayout();
         }
@@ -129,7 +133,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 VaadinIcons.USERS, AdminView.VIEW_NAME);
 
         Product draft = getProductService().findDraft(CurrentUser.get().get());
-        if (draft != null) {
+        if (draft != null && getAccessControl().isUserInRole(User.Role.ADMIN)) {
             handleDraft(draft);
         }
         if (target.isEmpty()) {
@@ -232,6 +236,16 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                         message.message(), Type.TRAY_NOTIFICATION, true);
                 note.show(getPage());
             });
+        }
+        if (event instanceof UserUpdatedEvent userUpdated) {
+            var user = getSession().getSession().getAttribute(
+                    CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY);
+            if (user.equals(userUpdated.user())) {
+                logger.debug("User was updated, updating CurrentUser");
+                access(() -> getSession().getSession().setAttribute(
+                        CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY,
+                        userUpdated.user()));
+            }
         }
     }
 

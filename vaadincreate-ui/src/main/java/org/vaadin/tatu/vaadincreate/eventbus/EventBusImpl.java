@@ -1,6 +1,8 @@
 package org.vaadin.tatu.vaadincreate.eventbus;
 
 import java.util.WeakHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,8 @@ public class EventBusImpl implements EventBus {
      */
     private final WeakHashMap<EventBusListener, Object> eventListeners = new WeakHashMap<>();
 
+    private final ExecutorService executor = Executors.newFixedThreadPool(5);
+
     public static synchronized EventBus getInstance() {
         if (instance == null) {
             instance = new EventBusImpl();
@@ -36,7 +40,8 @@ public class EventBusImpl implements EventBus {
         synchronized (eventListeners) {
             logger.debug("EventBus event fired for {} recipients.",
                     eventListeners.size());
-            eventListeners.forEach((listener, o) -> listener.eventFired(event));
+            eventListeners.forEach((listener, o) -> executor
+                    .execute(() -> listener.eventFired(event)));
         }
     }
 

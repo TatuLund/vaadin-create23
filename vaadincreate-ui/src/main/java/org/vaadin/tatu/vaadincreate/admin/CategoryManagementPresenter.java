@@ -10,6 +10,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
 @SuppressWarnings("serial")
 public class CategoryManagementPresenter implements Serializable {
@@ -40,6 +41,8 @@ public class CategoryManagementPresenter implements Serializable {
         accessControl.assertAdmin();
         try {
             getService().deleteCategory(category.getId());
+            getEventBus().post(new CategoriesUpdatedEvent(category,
+                    CategoriesUpdatedEvent.CategoryChange.DELETE));
             view.showDeleted(category.getName());
         } catch (IllegalArgumentException e) {
             view.showDeleteError();
@@ -60,6 +63,9 @@ public class CategoryManagementPresenter implements Serializable {
         try {
             newCat = getService().updateCategory(category);
             logger.info("Category '{}' updated.", category.getName());
+            getEventBus().post(new CategoriesUpdatedEvent(newCat,
+                    CategoriesUpdatedEvent.CategoryChange.SAVE));
+
         } catch (OptimisticLockException | IllegalStateException
                 | IllegalArgumentException e) {
             requestUpdateCategories();
@@ -68,8 +74,19 @@ public class CategoryManagementPresenter implements Serializable {
         return newCat;
     }
 
+    private EventBus getEventBus() {
+        return EventBus.get();
+    }
+
     private ProductDataService getService() {
         return VaadinCreateUI.get().getProductService();
+    }
+
+    public record CategoriesUpdatedEvent(Category category,
+            CategoryChange change) {
+        public enum CategoryChange {
+            SAVE, DELETE
+        }
     }
 
     private static Logger logger = LoggerFactory

@@ -10,6 +10,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
 @SuppressWarnings("serial")
 public class UserManagementPresenter implements Serializable {
@@ -39,7 +40,8 @@ public class UserManagementPresenter implements Serializable {
     public void updateUser(User user) {
         accessControl.assertAdmin();
         try {
-            getService().updateUser(user);
+            var updatedUser = getService().updateUser(user);
+            getEventBus().post(new UserUpdatedEvent(updatedUser));
             view.showUserUpdated();
             requestUpdateUsers();
             logger.info("User {}/'{}' updated.", user.getId(), user.getName());
@@ -51,8 +53,15 @@ public class UserManagementPresenter implements Serializable {
         }
     }
 
+    private EventBus getEventBus() {
+        return EventBus.get();
+    }
+
     private UserService getService() {
         return VaadinCreateUI.get().getUserService();
+    }
+
+    public record UserUpdatedEvent(User user) {
     }
 
     private static Logger logger = LoggerFactory

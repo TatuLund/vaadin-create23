@@ -168,6 +168,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         updatePriceChartAccessibilityAttributes(priceSeries);
     }
 
+    @SuppressWarnings("java:S1192")
     private void updatePriceChartAccessibilityAttributes(
             DataSeries priceSeries) {
         priceChart.setAttribute("role", "figure");
@@ -351,9 +352,11 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         presenter.cancelUpdateStats();
     }
 
-    public void setLoading() {
-        dashboard.removeStyleName("loaded");
-        categoryChart.getConfiguration().removeyAxes();
+    public void setLoadingAsync() {
+        Utils.access(ui, () -> {
+            dashboard.removeStyleName("loaded");
+            categoryChart.getConfiguration().removeyAxes();
+        });
     }
 
     /**
@@ -372,8 +375,10 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         /**
          * Sets an attribute with the specified key and value.
          *
-         * @param key the attribute key
-         * @param value the attribute value
+         * @param key
+         *            the attribute key
+         * @param value
+         *            the attribute value
          */
         public void setAttribute(String key, String value) {
             attributes.setAttribute(key, value);

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.admin.CategoryManagementPresenter.CategoriesUpdatedEvent;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
@@ -30,6 +31,10 @@ public class StatsPresenter implements EventBusListener, Serializable {
     private StatsView view;
     private transient CompletableFuture<Void> future;
     private static final String PRODUCTS_NOT_NULL = "Products must not be null";
+    private transient ProductDataService service = VaadinCreateUI.get()
+            .getProductService();
+    private transient ExecutorService executor = VaadinCreateUI.get()
+            .getExecutor();
 
     public StatsPresenter(StatsView view) {
         this.view = view;
@@ -37,8 +42,8 @@ public class StatsPresenter implements EventBusListener, Serializable {
     }
 
     private CompletableFuture<Collection<Product>> loadProductsAsync() {
-        var service = getService();
-        return CompletableFuture.supplyAsync(service::getAllProducts,
+        var productService = getService();
+        return CompletableFuture.supplyAsync(productService::getAllProducts,
                 getExecutor());
     }
 
@@ -48,15 +53,14 @@ public class StatsPresenter implements EventBusListener, Serializable {
      */
     public void requestUpdateStats() {
         logger.info("Fetching products for statistics");
-        var service = getService();
         future = loadProductsAsync().thenAccept(products -> {
             logger.info("Calculating statistics");
 
             Map<Availability, Long> availabilityStats = calculateAvailabilityStats(
                     products);
 
-            Map<String, Long[]> categoryStats = calculateCategoryStats(service,
-                    products);
+            Map<String, Long[]> categoryStats = calculateCategoryStats(
+                    getService(), products);
             // filter out empty categories
             categoryStats.entrySet()
                     .removeIf(entry -> entry.getValue()[0] == 0);
@@ -136,11 +140,17 @@ public class StatsPresenter implements EventBusListener, Serializable {
     }
 
     private ProductDataService getService() {
-        return VaadinCreateUI.get().getProductService();
+        if (service == null) {
+            service = VaadinCreateUI.get().getProductService();
+        }
+        return service;
     }
 
     private ExecutorService getExecutor() {
-        return VaadinCreateUI.get().getExecutor();
+        if (executor == null) {
+            executor = VaadinCreateUI.get().getExecutor();
+        }
+        return executor;
     }
 
     private EventBus getEventBus() {
@@ -150,9 +160,11 @@ public class StatsPresenter implements EventBusListener, Serializable {
     @Override
     public void eventFired(Object event) {
         // Update statistics when new product is added
-        if (event instanceof BooksChanged) {
-            logger.info("Book saved or deleted, refreshing statistics.");
-            view.setLoading();
+        if (event instanceof BooksChanged
+                || event instanceof CategoriesUpdatedEvent) {
+            logger.info(
+                    "Book or Category saved or deleted, refreshing statistics.");
+            view.setLoadingAsync();
             requestUpdateStats();
         }
     }

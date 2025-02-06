@@ -19,7 +19,6 @@ import org.vaadin.tatu.vaadincreate.backend.dao.HibernateUtil;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
-import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.junit.ArchUnitRunner;
@@ -39,8 +38,7 @@ import com.tngtech.archunit.junit.ArchUnitRunner;
  * of the lockedobjects package.
  */
 @RunWith(ArchUnitRunner.class)
-@AnalyzeClasses(packages = { "org.vaadin.tatu.vaadincreate",
-        "com.vaadin" }, importOptions = ImportOption.DoNotIncludeTests.class)
+@AnalyzeClasses(packages = { "org.vaadin.tatu.vaadincreate", "com.vaadin" })
 public class ArchitectureTest {
 
     @ArchTest
@@ -48,6 +46,7 @@ public class ArchitectureTest {
             .that().resideInAPackage("..backend..").and()
             .haveSimpleNameEndingWith("Service").should().onlyBeAccessed()
             .byClassesThat(have(simpleNameEndingWith("Presenter"))
+                    .or(have(simpleNameEndingWith("Test")))
                     .or(have(simpleName("VaadinCreateUI")))
                     .or(have(simpleName("AboutView")))
                     .or(resideInAPackage("..auth.."))
@@ -59,6 +58,7 @@ public class ArchitectureTest {
             .that().resideInAPackage("..vaadincreate.eventbus..").should()
             .onlyBeAccessed()
             .byClassesThat(have(simpleNameEndingWith("Presenter"))
+                    .or(have(simpleNameEndingWith("Test")))
                     .or(have(simpleName("VaadinCreateUI")))
                     .or(have(simpleName("AboutView")))
                     .or(resideInAPackage("..eventbus.."))
@@ -109,14 +109,16 @@ public class ArchitectureTest {
     @ArchTest
     public static final ArchRule AppLayout_should_be_used_only_by_VaadinCreateUI = classes()
             .that().haveSimpleName("AppLayout").should().onlyBeAccessed()
-            .byClassesThat(have(simpleName("VaadinCreateUI"))
+            .byClassesThat(have(simpleNameEndingWith("Test"))
+                    .or(have(simpleName("VaadinCreateUI")))
                     .or(have(simpleName("AppLayout"))
                             .or(belongTo(simpleName("AppLayout")))));
 
     @ArchTest
     public static final ArchRule LoginView_should_be_used_only_by_VaadinCreateUI = classes()
             .that().haveSimpleName("LoginView").should().onlyBeAccessed()
-            .byClassesThat(have(simpleName("VaadinCreateUI"))
+            .byClassesThat(have(simpleNameEndingWith("Test"))
+                    .or(have(simpleName("VaadinCreateUI")))
                     .or(have(simpleName("LoginView"))));
 
     @ArchTest

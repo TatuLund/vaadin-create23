@@ -9,6 +9,8 @@ import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.auth.MockAccessControl;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+
 import com.vaadin.testbench.uiunittest.UIUnitTest;
 
 import com.vaadin.icons.VaadinIcons;
@@ -83,7 +85,8 @@ public class AppLayoutTest extends UIUnitTest {
 
     @SuppressWarnings("serial")
     @RolesPermitted({ Role.ADMIN })
-    public static class MockView extends VerticalLayout implements View {
+    public static class MockView extends VerticalLayout
+            implements View, HasI18N {
 
         Label label = null;
 

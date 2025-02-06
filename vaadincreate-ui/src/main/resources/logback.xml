@@ -21,4 +21,7 @@
     <logger name="org.hibernate.type.descriptor.sql" level="info" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
+    <logger name="com.tngtech.archunit" level="info" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
 </configuration>

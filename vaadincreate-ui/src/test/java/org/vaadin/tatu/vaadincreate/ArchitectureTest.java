@@ -16,8 +16,10 @@ import org.junit.runner.RunWith;
 import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.dao.HibernateUtil;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
+import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.junit.ArchUnitRunner;
@@ -37,7 +39,8 @@ import com.tngtech.archunit.junit.ArchUnitRunner;
  * of the lockedobjects package.
  */
 @RunWith(ArchUnitRunner.class)
-@AnalyzeClasses(packages = { "org.vaadin.tatu.vaadincreate", "com.vaadin" })
+@AnalyzeClasses(packages = { "org.vaadin.tatu.vaadincreate",
+        "com.vaadin" }, importOptions = ImportOption.DoNotIncludeTests.class)
 public class ArchitectureTest {
 
     @ArchTest
@@ -45,7 +48,6 @@ public class ArchitectureTest {
             .that().resideInAPackage("..backend..").and()
             .haveSimpleNameEndingWith("Service").should().onlyBeAccessed()
             .byClassesThat(have(simpleNameEndingWith("Presenter"))
-                    .or(have(simpleNameEndingWith("Test")))
                     .or(have(simpleName("VaadinCreateUI")))
                     .or(have(simpleName("AboutView")))
                     .or(resideInAPackage("..auth.."))
@@ -57,7 +59,6 @@ public class ArchitectureTest {
             .that().resideInAPackage("..vaadincreate.eventbus..").should()
             .onlyBeAccessed()
             .byClassesThat(have(simpleNameEndingWith("Presenter"))
-                    .or(have(simpleNameEndingWith("Test")))
                     .or(have(simpleName("VaadinCreateUI")))
                     .or(have(simpleName("AboutView")))
                     .or(resideInAPackage("..eventbus.."))
@@ -108,16 +109,14 @@ public class ArchitectureTest {
     @ArchTest
     public static final ArchRule AppLayout_should_be_used_only_by_VaadinCreateUI = classes()
             .that().haveSimpleName("AppLayout").should().onlyBeAccessed()
-            .byClassesThat(have(simpleNameEndingWith("Test"))
-                    .or(have(simpleName("VaadinCreateUI")))
+            .byClassesThat(have(simpleName("VaadinCreateUI"))
                     .or(have(simpleName("AppLayout"))
                             .or(belongTo(simpleName("AppLayout")))));
 
     @ArchTest
     public static final ArchRule LoginView_should_be_used_only_by_VaadinCreateUI = classes()
             .that().haveSimpleName("LoginView").should().onlyBeAccessed()
-            .byClassesThat(have(simpleNameEndingWith("Test"))
-                    .or(have(simpleName("VaadinCreateUI")))
+            .byClassesThat(have(simpleName("VaadinCreateUI"))
                     .or(have(simpleName("LoginView"))));
 
     @ArchTest
@@ -129,8 +128,7 @@ public class ArchitectureTest {
     public static final ArchRule BasicAccessControl_should_be_used_only_by_auth = classes()
             .that().haveSimpleName("BasicAccessControl").should()
             .onlyBeAccessed()
-            .byClassesThat(simpleNameEndingWith("Test")
-                    .or(have(simpleName("AccessControl")))
+            .byClassesThat(have(simpleName("AccessControl"))
                     .or(have(simpleName("VaadinCreateUI")))
                     .or(have(simpleName("BasicAccessControl"))));
 
@@ -174,5 +172,18 @@ public class ArchitectureTest {
             .areDeclaredInClassesThat(
                     resideInAPackage("org.vaadin.tatu.vaadincreate.util"))
             .should().beStatic();
+
+    @ArchTest
+    public static final ArchRule views_should_implement_View_or_Tabview = classes()
+            .that().areNotInterfaces().and()
+            .resideInAPackage("org.vaadin.tatu.vaadincreate").and()
+            .haveSimpleNameEndingWith("View").should()
+            .implement(simpleName("View").or(simpleName("TabView")));
+
+    @ArchTest
+    public static final ArchRule views_should_implement_HasI18n = classes()
+            .that().areNotInterfaces().and()
+            .resideInAPackage("org.vaadin.tatu.vaadincreate").and()
+            .haveSimpleNameEndingWith("View").should().implement(HasI18N.class);
 
 }

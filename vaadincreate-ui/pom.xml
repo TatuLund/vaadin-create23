@@ -106,6 +106,18 @@
             <artifactId>vaadin-testbench</artifactId>
             <version>${testbench.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-testbench-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-testbench-core</artifactId>
+            <version>${testbench.version}</version>
+            <scope>test</scope>            
         </dependency>
         <dependency>
             <groupId>com.vaadin.testbench</groupId>

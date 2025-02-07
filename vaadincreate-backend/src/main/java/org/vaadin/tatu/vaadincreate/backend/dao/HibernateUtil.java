@@ -6,11 +6,15 @@ import java.util.function.Function;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for managing Hibernate sessions and transactions.
  */
 public class HibernateUtil {
+
+    private static final int DATABASE_CALL_WARN_LIMIT = 50;
 
     // Private constructor to prevent instantiation
     private HibernateUtil() {
@@ -52,6 +56,7 @@ public class HibernateUtil {
      *             if the transaction fails and is rolled back.
      */
     public static <T> T inTransaction(Function<Session, T> transaction) {
+        var start = System.currentTimeMillis();
         var session = getSessionFactory().openSession();
         var tx = session.beginTransaction();
         T result;
@@ -64,8 +69,13 @@ public class HibernateUtil {
         } finally {
             session.close();
         }
+        var time = System.currentTimeMillis() - start;
+        if (time > DATABASE_CALL_WARN_LIMIT) {
+            logWarning(time);
+        }
         return result;
     }
+
 
     /**
      * Executes a given transaction within a Hibernate session.
@@ -84,6 +94,7 @@ public class HibernateUtil {
      *             after rolling back the transaction
      */
     public static void inTransaction(Consumer<Session> transaction) {
+        var start = System.currentTimeMillis();
         var session = getSessionFactory().openSession();
         var tx = session.beginTransaction();
         try {
@@ -94,6 +105,10 @@ public class HibernateUtil {
             throw e;
         } finally {
             session.close();
+        }
+        var time = System.currentTimeMillis() - start;
+        if (time > DATABASE_CALL_WARN_LIMIT) {
+            logWarning(time);
         }
     }
 
@@ -109,12 +124,17 @@ public class HibernateUtil {
      * @return The result of the task.
      */
     public static <T> T inSession(Function<Session, T> task) {
+        var start = System.currentTimeMillis();
         T result;
         var session = getSessionFactory().openSession();
         try {
             result = task.apply(session);
         } finally {
             session.close();
+        }
+        var time = System.currentTimeMillis() - start;
+        if (time > DATABASE_CALL_WARN_LIMIT) {
+            logWarning(time);
         }
         return result;
     }
@@ -129,11 +149,24 @@ public class HibernateUtil {
      *            operations within that session.
      */
     public static void inSession(Consumer<Session> task) {
+        var start = System.currentTimeMillis();
         var session = getSessionFactory().openSession();
         try {
             task.accept(session);
         } finally {
             session.close();
         }
+        var time = System.currentTimeMillis() - start;
+        if (time > DATABASE_CALL_WARN_LIMIT) {
+            logWarning(time);
+        }
     }
+
+    private static void logWarning(long time) {
+        logger.warn("Database call duration exceeded {}ms, {}ms.",
+                DATABASE_CALL_WARN_LIMIT, time);
+    }
+
+    private static Logger logger = LoggerFactory.getLogger(HibernateUtil.class);
+
 }

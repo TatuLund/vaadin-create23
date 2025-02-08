@@ -119,7 +119,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         assert filterText != null : "Filter text cannot be null";
         assert value != null : "Value cannot be null";
 
-        return value != null && value.toString().toLowerCase()
+        return value.toString().toLowerCase()
                 .contains(filterText.toLowerCase());
     }
 
@@ -568,11 +568,13 @@ public class BooksView extends CssLayout implements VaadinCreateView {
 
     private Product updateProductInGrid(Product product) {
         assert product != null : "Product cannot be null";
+        var id = product.getId();
+        assert id != null : "Product ID cannot be null";
 
-        var updatedProduct = presenter.findProduct(product.getId());
+        var updatedProduct = presenter.findProduct(id);
         if (updatedProduct != null) {
             grid.replaceProduct(product, updatedProduct);
-            logger.debug("Refreshed {}", product.getId());
+            logger.debug("Refreshed {}", id);
         } else {
             grid.removeProduct(product);
         }

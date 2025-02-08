@@ -5,6 +5,9 @@ import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 @Entity
 public class Category extends AbstractEntity {

@@ -11,7 +11,9 @@ import org.jsoup.safety.Safelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
+import org.vaadin.tatu.vaadincreate.backend.data.User;
 
 import com.vaadin.data.Converter;
 import com.vaadin.data.HasValue;
@@ -170,6 +172,18 @@ public class Utils {
         } else {
             logger.warn("No UI available for pushing updates.");
         }
+    }
+
+    /**
+     * Retrieves the current user from the context.
+     * 
+     * @return the current {@link User} if present
+     * @throws IllegalStateException
+     *             if no user is present in the context
+     */
+    public static User getCurrentUserOrThrow() {
+        return CurrentUser.get().orElseThrow(
+                () -> new IllegalStateException("No user present"));
     }
 
     private static Logger logger = LoggerFactory.getLogger(Utils.class);

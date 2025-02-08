@@ -2,12 +2,14 @@ package org.vaadin.tatu.vaadincreate.auth;
 
 import java.io.Serializable;
 
+import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
 /**
  * Simple interface for authentication and authorization checks.
  */
+@NullMarked
 public interface AccessControl extends Serializable {
 
     /**
@@ -40,6 +42,8 @@ public interface AccessControl extends Serializable {
      * Get the name of currently signed in user in the session.
      *
      * @return String value
+     * @throws IllegalStateException
+     *             if no user is signed in
      */
     public String getPrincipalName();
 

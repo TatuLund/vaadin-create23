@@ -17,6 +17,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 @Entity
 public class Product extends AbstractEntity {
@@ -30,7 +33,9 @@ public class Product extends AbstractEntity {
     @Column(name = "price")
     private BigDecimal price = BigDecimal.ZERO;
 
-    // Using Eager as the category is shown in the Grid, Lazy would not help performance.
+    // Using Eager as the category is shown in the Grid, Lazy would not help
+    // performance.
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST,
             CascadeType.MERGE, CascadeType.DETACH })
     @JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
@@ -49,6 +54,15 @@ public class Product extends AbstractEntity {
     public Product() {
     }
 
+    /**
+     * Copy constructor for creating a new Product instance by copying the
+     * properties of another Product instance.
+     *
+     * @param other
+     *            the Product instance to copy from
+     * @throws NullPointerException
+     *             if the provided Product instance is null
+     */
     public Product(Product other) {
         setId(other.getId());
         setProductName(other.getProductName());

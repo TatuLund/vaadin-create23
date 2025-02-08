@@ -2,12 +2,16 @@ package org.vaadin.tatu.vaadincreate.locking;
 
 import java.io.Serializable;
 
+import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.backend.data.AbstractEntity;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 
 /**
  * This is a ledger for locked objects used for pessimistic locking.
  */
+@NullMarked
 public interface LockedObjects {
 
     /**
@@ -18,13 +22,14 @@ public interface LockedObjects {
      * @return The user who has locked the object, null if the object is not
      *         locked.
      */
+    @Nullable
     public User isLocked(AbstractEntity object);
 
     /**
      * Lock object for the given user
      *
      * @param object
-     *            AnstractEntity
+     *            AbstractEntity
      * @param user
      *            User holding the lock
      */
@@ -34,7 +39,7 @@ public interface LockedObjects {
      * Unlock the object
      *
      * @param object
-     *            AnstractEntity
+     *            AbstractEntity
      * @param id
      *            The id of the object
      */

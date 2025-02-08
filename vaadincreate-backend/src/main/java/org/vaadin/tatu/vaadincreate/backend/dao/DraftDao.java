@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate.backend.dao;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +12,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.User;
  * Data access object for managing drafts.
  */
 @SuppressWarnings("java:S1602")
+@NullMarked
 public class DraftDao {
 
     /**
@@ -61,6 +64,7 @@ public class DraftDao {
      * @return the Draft associated with the given User, or null if no such
      *         Draft exists
      */
+    @Nullable
     public Draft findDraft(User user) {
         logger.info("Fetching Draft for User: ({})", user.getId());
         return HibernateUtil.inSession(session -> {

@@ -10,6 +10,10 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Version;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 @MappedSuperclass
 @SuppressWarnings("serial")
 public abstract class AbstractEntity implements Serializable {
@@ -17,16 +21,18 @@ public abstract class AbstractEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgenerator")
     @SequenceGenerator(name = "idgenerator", initialValue = 1)
+    @Nullable
     Integer id;
 
     @Version
     Integer version;
 
+    @Nullable
     public Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(@Nullable Integer id) {
         this.id = id;
     }
 

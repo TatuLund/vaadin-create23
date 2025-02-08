@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
+@NullMarked
 @SuppressWarnings("serial")
 public class MockDataGenerator implements Serializable {
     private static final Random random = new Random(1);
@@ -59,6 +61,7 @@ public class MockDataGenerator implements Serializable {
         return products;
     }
 
+    @SuppressWarnings("java:S3400")
     public static String createMessage() {
         return "System update complete";
     }
@@ -95,7 +98,7 @@ public class MockDataGenerator implements Serializable {
         Product p = new Product();
         p.setProductName(generateName());
 
-        p.setPrice(new BigDecimal((random.nextInt(250) + 50) / 10.0));
+        p.setPrice(BigDecimal.valueOf((random.nextInt(250) + 50) / 10.0));
         p.setAvailability(Availability.values()[random
                 .nextInt(Availability.values().length)]);
         if (p.getAvailability() == Availability.AVAILABLE) {

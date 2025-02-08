@@ -4,11 +4,11 @@ import java.lang.reflect.Method;
 
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
-import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.ValidationException;
@@ -88,7 +88,7 @@ public class UserForm extends Composite implements HasI18N {
         setEnabled(true);
         username.focus();
         // Cannot change own role
-        role.setEnabled(!CurrentUser.get().get().equals(user));
+        role.setEnabled(!Utils.getCurrentUserOrThrow().equals(user));
     }
 
     /**

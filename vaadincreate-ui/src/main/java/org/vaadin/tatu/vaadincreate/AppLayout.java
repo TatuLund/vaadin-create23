@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
@@ -30,6 +32,7 @@ import com.vaadin.ui.themes.ValoTheme;
 /**
  * This is a responsive application shell with Navigator build with ValoMenu
  */
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class AppLayout extends Composite implements HasI18N {
 
@@ -78,7 +81,7 @@ public class AppLayout extends Composite implements HasI18N {
         menuLayout.addComponent(title);
 
         // Add a button to toggle the visibility of the menu when on mobile
-        var toggleButton = new Button(getTranslation(I18n.App.MENU), event -> {
+        var toggleButton = new Button(getTranslation(I18n.App.MENU), click -> {
             if (menuLayout.getStyleName().contains(ValoTheme.MENU_VISIBLE)) {
                 menuLayout.removeStyleName(ValoTheme.MENU_VISIBLE);
                 announce(getTranslation(I18n.App.MENU_CLOSE));
@@ -124,8 +127,8 @@ public class AppLayout extends Composite implements HasI18N {
         // annotation, if not reject navigation to path.
         nav.addViewChangeListener(new ViewChangeListener() {
             @Override
-            public void afterViewChange(ViewChangeEvent event) {
-                String viewName = event.getViewName();
+            public void afterViewChange(ViewChangeEvent afterChange) {
+                String viewName = afterChange.getViewName();
                 if (viewName.isEmpty()) {
                     viewName = "about";
                 }
@@ -137,8 +140,8 @@ public class AppLayout extends Composite implements HasI18N {
             }
 
             @Override
-            public boolean beforeViewChange(ViewChangeEvent event) {
-                var view = event.getNewView();
+            public boolean beforeViewChange(ViewChangeEvent beforeChange) {
+                var view = beforeChange.getNewView();
                 return hasAccessToView(view.getClass());
             }
 
@@ -160,7 +163,7 @@ public class AppLayout extends Composite implements HasI18N {
      * @param announcement
      *            the message to be announced
      */
-    public void announce(String announcement) {
+    public void announce(@Nullable String announcement) {
         if (isAttached()) {
             announcer.setValue("");
             getUI().push();
@@ -247,8 +250,8 @@ public class AppLayout extends Composite implements HasI18N {
     }
 
     private static String getUserName() {
-        return CurrentUser.get().isPresent() ? CurrentUser.get().get().getName()
-                : "";
+        var user = CurrentUser.get();
+        return user.isPresent() ? user.get().getName() : "";
     }
 
     public class MenuButton extends Button {
@@ -263,7 +266,7 @@ public class AppLayout extends Composite implements HasI18N {
             this.caption = caption;
             setId(path);
             setData(path);
-            addClickListener(e -> ui.getNavigator().navigateTo(path));
+            addClickListener(click -> ui.getNavigator().navigateTo(path));
             setPrimaryStyleName(ValoTheme.MENU_ITEM);
             if (path.equals("")) {
                 addStyleName(ValoTheme.MENU_SELECTED);

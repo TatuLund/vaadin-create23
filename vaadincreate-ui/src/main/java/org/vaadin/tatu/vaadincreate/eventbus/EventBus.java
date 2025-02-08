@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate.eventbus;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The EventBus interface provides a mechanism for posting events and
  * registering listeners that will be notified when events are fired. It follows
@@ -30,6 +32,7 @@ package org.vaadin.tatu.vaadincreate.eventbus;
  * Note: The event object passed to the {@code post} method should not be null.
  * </p>
  */
+@NullMarked
 public interface EventBus {
 
     /**

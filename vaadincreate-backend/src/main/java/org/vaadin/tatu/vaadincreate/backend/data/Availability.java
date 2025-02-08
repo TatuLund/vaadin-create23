@@ -1,5 +1,8 @@
 package org.vaadin.tatu.vaadincreate.backend.data;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public enum Availability {
     COMING("Coming"), AVAILABLE("Available"), DISCONTINUED("Discontinued");
 

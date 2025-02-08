@@ -18,17 +18,17 @@ public class UserServiceTest {
     private UserService service;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         service = UserServiceImpl.getInstance();
     }
 
     @Test
-    public void canFetchUsers() throws Exception {
+    public void canFetchUsers() {
         assertFalse(service.getAllUsers().isEmpty());
     }
 
     @Test
-    public void updateTheUser() throws Exception {
+    public void updateTheUser() {
         var oldSize = service.getAllUsers().size();
         var user = service.getAllUsers().iterator().next();
         var version = user.getVersion();
@@ -40,7 +40,7 @@ public class UserServiceTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void updateTheUserByDuplicateName() throws Exception {
+    public void updateTheUserByDuplicateName() {
         var user = service.getAllUsers().iterator().next();
         user.setName("Admin");
         service.updateUser(user);
@@ -55,7 +55,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void addNewUser() throws Exception {
+    public void addNewUser() {
         var oldSize = service.getAllUsers().size();
         User user = new User();
         user.setName("Test2");
@@ -70,7 +70,7 @@ public class UserServiceTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void addNewUserByDuplicateName() throws Exception {
+    public void addNewUserByDuplicateName() {
         User user = new User();
         user.setName("Admin");
         user.setPasswd("admin");
@@ -79,7 +79,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void removeUser() throws Exception {
+    public void removeUser() {
         var oldSize = service.getAllUsers().size();
         var u = service.getAllUsers().iterator().next();
         var uid = u.getId();

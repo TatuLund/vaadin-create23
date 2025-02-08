@@ -5,6 +5,8 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
@@ -16,6 +18,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 
+@NullMarked
 @SuppressWarnings("java:S6548")
 public class ProductDataServiceImpl implements ProductDataService {
     private static final String ID_CANT_BE_NULL = "id can't be null";
@@ -66,6 +69,7 @@ public class ProductDataServiceImpl implements ProductDataService {
         productDao.deleteProduct(id);
     }
 
+    @Nullable
     @Override
     public synchronized Product getProductById(Integer id) {
         Objects.requireNonNull(id, ID_CANT_BE_NULL);
@@ -117,7 +121,7 @@ public class ProductDataServiceImpl implements ProductDataService {
     }
 
     @Override
-    public void saveDraft(User user, Product draftProduct) {
+    public void saveDraft(User user, @Nullable Product draftProduct) {
         Objects.requireNonNull(user, "user can't be null");
         randomWait(1);
         logger.info("Saving draft for user '{}'", user.getName());
@@ -129,6 +133,7 @@ public class ProductDataServiceImpl implements ProductDataService {
         }
     }
 
+    @Nullable
     @Override
     public Product findDraft(User user) {
         Objects.requireNonNull(user, "user can't be null");

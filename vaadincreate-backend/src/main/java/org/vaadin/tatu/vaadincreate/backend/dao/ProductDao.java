@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
@@ -13,6 +15,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Product;
 /**
  * Data access object for managing products and categories.
  */
+@NullMarked
 @SuppressWarnings("java:S1602")
 public class ProductDao {
 
@@ -117,6 +120,7 @@ public class ProductDao {
      *            the Category to be updated or created
      * @return the updated or newly created Category
      */
+
     public Category updateCategory(Category category) {
         logger.info("Persisting Category: ({}) '{}'", category.getId(),
                 category.getName());
@@ -143,6 +147,7 @@ public class ProductDao {
      * @return the Category object corresponding to the provided ID, or null if
      *         not found
      */
+    @Nullable
     public Category getCategory(Integer id) {
         logger.info("Fetching Category: ({})", id);
         return HibernateUtil.inSession(session -> {
@@ -155,6 +160,7 @@ public class ProductDao {
      *
      * @return a collection of all categories.
      */
+
     public Collection<Category> getAllCategories() {
         logger.info("Fetching all Categories");
         return HibernateUtil.inSession(session -> {
@@ -169,6 +175,7 @@ public class ProductDao {
      *            a set of integer IDs representing the categories to be fetched
      * @return a set of Category objects corresponding to the provided IDs
      */
+
     public Set<Category> getCategoriesByIds(Set<Integer> ids) {
         logger.info("Fetching Categories: {}", ids);
         return HibernateUtil.inSession(session -> {
@@ -239,6 +246,7 @@ public class ProductDao {
      * @return the Category entity with the specified name, or null if no such
      *         entity exists
      */
+    @Nullable
     public Category getCategoryByName(String name) {
         logger.info("Fetching Category by name: '{}'", name);
         return HibernateUtil.inSession(session -> {

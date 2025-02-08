@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.backend.dao;
 
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
@@ -9,6 +11,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.User;
 /**
  * Data access object class for managing User entities.
  */
+@NullMarked
 @SuppressWarnings("java:S1602")
 public class UserDao {
 
@@ -19,6 +22,7 @@ public class UserDao {
      *            the name of the user to find
      * @return the user with the specified name, or null if no such user exists
      */
+    @Nullable
     public User findByName(String name) {
         logger.info("Finding user {}", name);
         return HibernateUtil.inSession(session -> {
@@ -37,6 +41,7 @@ public class UserDao {
      *            the User object to be updated or saved
      * @return the updated User object retrieved from the database
      */
+
     public User updateUser(User user) {
         logger.info("Persisting User: ({}) '{}'", user.getId(), user.getName());
         var identifier = HibernateUtil.inTransaction(session -> {
@@ -62,6 +67,7 @@ public class UserDao {
      * @return the User entity corresponding to the given user ID, or null if no
      *         such user exists
      */
+    @Nullable
     public User getUserById(Integer userId) {
         logger.info("Fetching User: ({})", userId);
         return HibernateUtil.inSession(session -> {
@@ -88,6 +94,7 @@ public class UserDao {
      *
      * @return a List of User objects representing all users in the database.
      */
+
     public List<User> getAllUsers() {
         logger.info("Fetching all Users");
         return HibernateUtil.inSession(session -> {

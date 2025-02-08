@@ -84,6 +84,12 @@
 			<version>4.0.0</version>
 			<scope>provided</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <version>${jspecify.version}</version>
+			<scope>provided</scope>
+        </dependency>
 
 		<dependency>
 			<groupId>com.vaadin</groupId>

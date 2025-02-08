@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate;
 
 import java.time.LocalDateTime;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
@@ -34,6 +36,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+@NullMarked
 @AllPermitted
 @SuppressWarnings({ "serial", "java:S2160" })
 public class AboutView extends VerticalLayout
@@ -44,12 +47,15 @@ public class AboutView extends VerticalLayout
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
 
+    @Nullable
     private Button editButton;
     private Label adminsNote;
     private TextArea adminsNoteField;
 
+    @Nullable
     private UI ui;
 
+    @Nullable
     private Registration saveRegistration;
 
     public AboutView() {
@@ -66,7 +72,7 @@ public class AboutView extends VerticalLayout
         adminsContent.addComponents(adminsNote, adminsNoteField);
         if (accessControl.isUserInRole(Role.ADMIN)) {
             createEditButton();
-            editButton.addClickListener(e -> {
+            editButton.addClickListener(click -> {
                 accessControl.assertAdmin();
                 adminsNoteField.setVisible(true);
                 adminsNote.setVisible(false);
@@ -141,7 +147,7 @@ public class AboutView extends VerticalLayout
         textArea.setIcon(VaadinIcons.FILE_TEXT_O);
         textArea.setCaption("HTML");
         textArea.setPlaceholder("max 250 chars");
-        textArea.addFocusListener(focusEvent -> saveRegistration = textArea
+        textArea.addFocusListener(focused -> saveRegistration = textArea
                 .addShortcutListener(new ShortcutListener("Save", KeyCode.S,
                         new int[] { ModifierKey.CTRL }) {
                     @Override
@@ -174,9 +180,13 @@ public class AboutView extends VerticalLayout
         openingView(VIEW_NAME);
 
         Message message = getService().getMessage();
-        adminsNote.setCaption(
-                Utils.formatDate(message.getDateStamp(), getLocale()));
-        adminsNote.setValue(message.getMessage());
+        if (message != null) {
+            adminsNote.setCaption(
+                    Utils.formatDate(message.getDateStamp(), getLocale()));
+            adminsNote.setValue(message.getMessage());
+        } else {
+            adminsNote.setValue(getTranslation(I18n.About.NO_MESSAGE));
+        }
     }
 
     @Override

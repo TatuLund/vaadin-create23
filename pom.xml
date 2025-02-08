@@ -21,6 +21,7 @@
 		<testbench.version>5.3.2</testbench.version>
 		<webdrivermanager.version>5.7.0</webdrivermanager.version>
 		<jetty.plugin.version>10.0.20</jetty.plugin.version>
+		<jspecify.version>1.0.0</jspecify.version>
 	</properties>
 
 	<modules>

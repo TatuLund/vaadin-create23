@@ -13,6 +13,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
@@ -25,10 +27,12 @@ import org.vaadin.tatu.vaadincreate.crud.BooksPresenter.BooksChanged;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 
+@NullMarked
 @SuppressWarnings("serial")
 public class StatsPresenter implements EventBusListener, Serializable {
 
     private StatsView view;
+    @Nullable
     private transient CompletableFuture<Void> future;
     private static final String PRODUCTS_NOT_NULL = "Products must not be null";
     private transient ProductDataService service = VaadinCreateUI.get()
@@ -54,6 +58,7 @@ public class StatsPresenter implements EventBusListener, Serializable {
     public void requestUpdateStats() {
         logger.info("Fetching products for statistics");
         future = loadProductsAsync().thenAccept(products -> {
+            var start = System.currentTimeMillis();
             logger.info("Calculating statistics");
 
             Map<Availability, Long> availabilityStats = calculateAvailabilityStats(
@@ -71,6 +76,8 @@ public class StatsPresenter implements EventBusListener, Serializable {
 
             view.updateStatsAsync(availabilityStats, categoryStats, priceStats);
             future = null;
+            logger.info("Statistics updated in {}ms",
+                    System.currentTimeMillis() - start);
         });
     }
 
@@ -125,10 +132,17 @@ public class StatsPresenter implements EventBusListener, Serializable {
         }
     }
 
+    // SonarLint is not able to deduct from isEmpty() check that stream cannot
+    // be empty and hence get() is safe
+    @SuppressWarnings("java:S3655")
     private List<PriceBracket> getPriceBrackets(Collection<Product> products) {
         assert products != null : PRODUCTS_NOT_NULL;
 
         var brackets = new ArrayList<PriceBracket>();
+        if (products.isEmpty()) {
+            return brackets;
+        }
+
         var max = products.stream()
                 .max((p1, p2) -> p1.getPrice().compareTo(p2.getPrice())).get()
                 .getPrice();

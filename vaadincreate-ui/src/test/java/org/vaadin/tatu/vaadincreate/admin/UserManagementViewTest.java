@@ -204,4 +204,14 @@ public class UserManagementViewTest extends AbstractUITest {
 
         then_form_is_empty_and_buttons_are_disabled();
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void admin_cannot_change_his_own_role() {
+        // WHEN: Selecting the admin user
+        test($(ComboBox.class).id("user-select")).setInput("Admin");
+
+        // THEN: Role field is disabled
+        assertFalse($(ComboBox.class).id("role-field").isEnabled());
+    }
 }

@@ -37,6 +37,7 @@ import com.tngtech.archunit.junit.ArchUnitRunner;
  * eventbus package. LockedObjects should be used only via its interface outside
  * of the lockedobjects package.
  */
+@SuppressWarnings("java:S1192")
 @RunWith(ArchUnitRunner.class)
 @AnalyzeClasses(packages = { "org.vaadin.tatu.vaadincreate", "com.vaadin" })
 public class ArchitectureTest {

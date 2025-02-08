@@ -68,8 +68,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
             return "";
         });
 
-        addColumn(Product::getId, new NumberRenderer()).setCaption("Id")
-                .setResizable(false);
+        addColumn(product -> product.getId() != null ? product.getId() : -1,
+                new NumberRenderer()).setCaption("Id").setResizable(false);
         addColumn(Product::getProductName).setId(NAME_ID)
                 .setCaption(getTranslation(I18n.PRODUCT_NAME))
                 .setResizable(false)
@@ -216,14 +216,16 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     /**
      * Sets a filter for the data provider of the grid.
      * 
-     * @param filter the filter to be applied to the data provider
-     *               which determines which items are displayed in the grid.
-     *               The filter is a {@link SerializablePredicate} that takes a 
-     *               {@link Product} as input and returns a boolean indicating 
-     *               whether the product should be included.
+     * @param filter
+     *            the filter to be applied to the data provider which determines
+     *            which items are displayed in the grid. The filter is a
+     *            {@link SerializablePredicate} that takes a {@link Product} as
+     *            input and returns a boolean indicating whether the product
+     *            should be included.
      * 
-     * @throws ClassCastException if the data provider is not an instance of 
-     *                            {@link ListDataProvider}.
+     * @throws ClassCastException
+     *             if the data provider is not an instance of
+     *             {@link ListDataProvider}.
      */
     @SuppressWarnings("unchecked")
     public void setFilter(SerializablePredicate<Product> filter) {
@@ -263,7 +265,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     private String formatCategories(Product product) {
         assert product != null : "Product must not be null";
 
-        if (product.getCategory() == null || product.getCategory().isEmpty()) {
+        if (product.getCategory().isEmpty()) {
             return "";
         }
         return product.getCategory().stream()

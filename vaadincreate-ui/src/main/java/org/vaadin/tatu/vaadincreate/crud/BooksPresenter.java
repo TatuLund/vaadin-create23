@@ -9,11 +9,12 @@ import java.util.concurrent.ExecutorService;
 
 import javax.persistence.OptimisticLockException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
-import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -23,6 +24,7 @@ import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects.LockingEvent;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 /**
  * This class provides an interface for the logical operations between the CRUD
@@ -33,14 +35,18 @@ import org.vaadin.tatu.vaadincreate.locking.LockedObjects.LockingEvent;
  * the system separately, and to e.g. provide alternative views for the same
  * data.
  */
+@NullMarked
 @SuppressWarnings("serial")
 public class BooksPresenter implements Serializable, EventBusListener {
 
     private BooksView view;
+    @Nullable
     private transient CompletableFuture<Void> future;
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
+    @Nullable
     private Product editing;
+    @Nullable
     private Product draft;
 
     /**
@@ -166,11 +172,11 @@ public class BooksPresenter implements Serializable, EventBusListener {
      */
     private void lockBook(Product book) {
         assert book != null : "Book must not be null";
-
+        var user = Utils.getCurrentUserOrThrow();
         if (editing != null) {
             unlockBook();
         }
-        getLockedBooks().lock(book, CurrentUser.get().get());
+        getLockedBooks().lock(book, user);
         editing = book;
     }
 
@@ -184,7 +190,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
      * @param productId
      *            the ID of the product to navigate to
      */
-    public void enter(String productId) {
+    public void enter(@Nullable String productId) {
         if (!accessControl.isUserInRole(Role.ADMIN)) {
             view.setFragmentParameter("");
             return;
@@ -241,6 +247,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
      *            the ID of the product to find
      * @return the product with the specified ID, or null if not found
      */
+    @Nullable
     public Product findProduct(int productId) {
         logger.info("Fetching product {}", productId);
         return getService().getProductById(productId);
@@ -252,6 +259,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
      * @param product
      *            The product to be saved, not null.
      */
+    @Nullable
     public Product saveProduct(Product product) {
         Objects.requireNonNull(product, "Product must not be null");
 
@@ -298,10 +306,12 @@ public class BooksPresenter implements Serializable, EventBusListener {
      */
     public void deleteProduct(Product product) {
         accessControl.assertAdmin();
+        var id = product.getId();
+        Objects.requireNonNull(id, "Product must have an ID to be deleted");
         view.showDeleteNotification(product.getProductName());
         view.clearSelection();
         logger.info("Deleting product: {}", product.getId());
-        getService().deleteProduct(product.getId());
+        getService().deleteProduct(id);
         view.removeProduct(product);
         unlockBook();
         view.setFragmentParameter("");
@@ -318,7 +328,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
      * @param product
      *            the product to be edited
      */
-    public void editProduct(Product product) {
+    public void editProduct(@Nullable Product product) {
         if (product == null) {
             view.setFragmentParameter("");
             unlockBook();
@@ -357,7 +367,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
      * @param product
      *            the selected product
      */
-    public void rowSelected(Product product) {
+    public void rowSelected(@Nullable Product product) {
         if (accessControl.isUserInRole(Role.ADMIN)) {
             if (product != null && getLockedBooks().isLocked(product) != null) {
                 view.clearSelection();
@@ -367,6 +377,12 @@ public class BooksPresenter implements Serializable, EventBusListener {
         }
     }
 
+    /**
+     * Selects a product and notifies the view of the selection change.
+     *
+     * @param product
+     *            the product to be selected
+     */
     public void selectProduct(Product product) {
         view.handleSelectionChange(product);
     }
@@ -376,20 +392,31 @@ public class BooksPresenter implements Serializable, EventBusListener {
      *
      * @param draft
      *            the product draft to be saved
+     * @throws IllegalStateException
+     *             if the current user is not an admin
+     * @throws IllegalStateException
+     *             if the current user is not present in the context
      */
     public void saveDraft(Product draft) {
         accessControl.assertAdmin();
-        getService().saveDraft(CurrentUser.get().get(), draft);
+        var user = Utils.getCurrentUserOrThrow();
+        getService().saveDraft(user, draft);
         this.draft = draft;
     }
 
     /**
      * Removes the current draft.
+     *
+     * @throws IllegalStateException
+     *             if the current user is not an admin
+     * @throws IllegalStateException
+     *             if the current user is not present in the context
      */
     public void removeDraft() {
         accessControl.assertAdmin();
+        var user = Utils.getCurrentUserOrThrow();
         draft = null;
-        getService().saveDraft(CurrentUser.get().get(), null);
+        getService().saveDraft(user, null);
     }
 
     /**
@@ -399,9 +426,11 @@ public class BooksPresenter implements Serializable, EventBusListener {
      * @return the draft product associated with the current user's principal
      *         name.
      */
+    @Nullable
     public Product getDraft() {
+        var user = Utils.getCurrentUserOrThrow();
         if (draft == null) {
-            draft = getService().findDraft(CurrentUser.get().get());
+            draft = getService().findDraft(user);
         }
         return draft;
     }

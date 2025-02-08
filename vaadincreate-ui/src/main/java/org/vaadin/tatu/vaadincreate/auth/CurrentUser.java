@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.auth;
 
 import java.util.Optional;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 
 import com.vaadin.server.VaadinRequest;
@@ -15,6 +17,7 @@ import com.vaadin.server.VaadinSession;
  *
  * @see com.vaadin.server.VaadinService#getCurrentRequest()
  */
+@NullMarked
 public final class CurrentUser {
 
     /**
@@ -50,13 +53,8 @@ public final class CurrentUser {
      * @throws IllegalStateException
      *             if the current session cannot be accessed.
      */
-    public static void set(User currentUser) {
-        if (currentUser == null) {
-            VaadinSession.getCurrent().getSession()
-                    .setAttribute(CURRENT_USER_SESSION_ATTRIBUTE_KEY, null);
-        } else {
-            VaadinSession.getCurrent().getSession().setAttribute(
-                    CURRENT_USER_SESSION_ATTRIBUTE_KEY, currentUser);
-        }
+    public static void set(@Nullable User currentUser) {
+        VaadinSession.getCurrent().getSession()
+                .setAttribute(CURRENT_USER_SESSION_ATTRIBUTE_KEY, currentUser);
     }
 }

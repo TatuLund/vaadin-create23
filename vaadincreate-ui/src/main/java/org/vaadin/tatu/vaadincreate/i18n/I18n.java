@@ -136,6 +136,7 @@ public final class I18n {
     public static final class About {
         public static final String EDIT_NOTE = "edit-note";
         public static final String VAADIN = "vaadin";
+        public static final String NO_MESSAGE = "no-message";
 
         private About() {
             // private constructor to hide the implicit public one

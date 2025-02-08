@@ -3,6 +3,8 @@ package org.vaadin.tatu.vaadincreate.backend;
 import java.util.Collection;
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
@@ -11,6 +13,7 @@ import org.vaadin.tatu.vaadincreate.backend.service.ProductDataServiceImpl;
 /**
  * Back-end service interface for retrieving and updating product data.
  */
+@NullMarked
 public interface ProductDataService {
 
     /**
@@ -56,6 +59,7 @@ public interface ProductDataService {
      *            id of the Product
      * @return Product if it was found, otherwise null
      */
+    @Nullable
     public abstract Product getProductById(Integer productId);
 
     /**
@@ -92,7 +96,7 @@ public interface ProductDataService {
      * @param draft
      *            Product
      */
-    public abstract void saveDraft(User user, Product draft);
+    public abstract void saveDraft(User user, @Nullable Product draft);
 
     /**
      * Find the last draft of the user.
@@ -101,6 +105,7 @@ public interface ProductDataService {
      *            The user
      * @return Product or null if user does not have draft
      */
+    @Nullable
     public abstract Product findDraft(User user);
 
     public static ProductDataService get() {

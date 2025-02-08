@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.backend.service;
 
 import java.time.LocalDateTime;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.AppDataService;
@@ -9,6 +11,7 @@ import org.vaadin.tatu.vaadincreate.backend.dao.MessageDao;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 
+@NullMarked
 @SuppressWarnings("java:S6548")
 public class AppDataServiceImpl implements AppDataService {
     private static AppDataServiceImpl instance;
@@ -38,6 +41,7 @@ public class AppDataServiceImpl implements AppDataService {
         return messageDao.updateMessage(messageEntity);
     }
 
+    @Nullable
     @Override
     public synchronized Message getMessage() {
         return messageDao.getLastMessage();

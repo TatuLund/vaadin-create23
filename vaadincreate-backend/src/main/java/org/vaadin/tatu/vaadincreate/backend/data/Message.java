@@ -6,9 +6,14 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 @Entity
 public class Message extends AbstractEntity {
+
+    @SuppressWarnings("java:S1700")
 
     @Column(name = "message")
     @NotNull

@@ -14,11 +14,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 @Entity
 public class Draft extends AbstractEntity {
 
+    @Nullable
     @Column(name = "product_id")
     private Integer productId;
 
@@ -61,7 +67,7 @@ public class Draft extends AbstractEntity {
         setCategory(product.getCategory());
         setStockCount(product.getStockCount());
         setAvailability(product.getAvailability());
-        setUser(user);
+        this.user = user;
     }
 
     /**
@@ -70,6 +76,7 @@ public class Draft extends AbstractEntity {
      * @return a Product instance with properties copied from the current Draft
      *         instance.
      */
+
     public Product toProduct() {
         Product product = new Product();
         product.setId(getProductId());
@@ -81,11 +88,12 @@ public class Draft extends AbstractEntity {
         return product;
     }
 
+    @Nullable
     private Integer getProductId() {
         return productId;
     }
 
-    private void setProductId(Integer productId) {
+    private void setProductId(@Nullable Integer productId) {
         this.productId = productId;
     }
 
@@ -117,7 +125,7 @@ public class Draft extends AbstractEntity {
         return category;
     }
 
-    public void setCategory(Set<Category> category) {
+    public void setCategory(@NotNull Set<Category> category) {
         this.category = category;
     }
 

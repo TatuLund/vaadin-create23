@@ -3,12 +3,15 @@ package org.vaadin.tatu.vaadincreate.locking;
 import java.util.Objects;
 import java.util.WeakHashMap;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.data.AbstractEntity;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
+@NullMarked
 @SuppressWarnings("java:S6548")
 public class LockedObjectsImpl implements LockedObjects {
 
@@ -28,6 +31,7 @@ public class LockedObjectsImpl implements LockedObjects {
     private LockedObjectsImpl() {
     }
 
+    @Nullable
     @Override
     public User isLocked(AbstractEntity object) {
         Objects.requireNonNull(object, NOT_NULL_ERROR);
@@ -39,6 +43,8 @@ public class LockedObjectsImpl implements LockedObjects {
     @Override
     public void lock(AbstractEntity object, User user) {
         Objects.requireNonNull(object, NOT_NULL_ERROR);
+        var id = object.getId();
+        Objects.requireNonNull(id, "Can't unlock object with null id");
         Objects.requireNonNull(user, "user can't be null");
         synchronized (lockedObjects) {
             if (lockedObjects.containsKey(object)) {
@@ -47,8 +53,7 @@ public class LockedObjectsImpl implements LockedObjects {
                                 object.getId()));
             }
             lockedObjects.put(object, user);
-            eventBus.post(new LockingEvent(object.getClass(), object.getId(),
-                    user, true));
+            eventBus.post(new LockingEvent(object.getClass(), id, user, true));
             logger.debug("{} locked {} ({})", user.getName(),
                     object.getClass().getSimpleName(), object.getId());
         }
@@ -57,11 +62,13 @@ public class LockedObjectsImpl implements LockedObjects {
     @Override
     public void unlock(AbstractEntity object) {
         Objects.requireNonNull(object, NOT_NULL_ERROR);
+        var id = object.getId();
+        Objects.requireNonNull(id, "Can't unlock object with null id");
         synchronized (lockedObjects) {
             User user = lockedObjects.remove(object);
             if (user != null) {
-                eventBus.post(new LockingEvent(object.getClass(),
-                        object.getId(), user, false));
+                eventBus.post(
+                        new LockingEvent(object.getClass(), id, user, false));
                 logger.debug("{} unlocked {} ({})", user.getName(),
                         object.getClass().getSimpleName(), object.getId());
             }

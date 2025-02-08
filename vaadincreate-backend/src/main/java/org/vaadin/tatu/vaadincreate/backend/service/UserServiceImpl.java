@@ -4,6 +4,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
@@ -11,6 +13,7 @@ import org.vaadin.tatu.vaadincreate.backend.dao.UserDao;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 
+@NullMarked
 @SuppressWarnings("java:S6548")
 public class UserServiceImpl implements UserService {
 
@@ -45,8 +48,7 @@ public class UserServiceImpl implements UserService {
         Objects.requireNonNull(user, "User must not be null");
         randomWait(2);
         var existingUser = userDao.findByName(user.getName());
-        if (existingUser != null
-                && !existingUser.getId().equals(user.getId())) {
+        if (existingUser != null && !existingUser.equals(user)) {
             throw new IllegalArgumentException(
                     "User with the same name already exists");
         }
@@ -60,6 +62,7 @@ public class UserServiceImpl implements UserService {
         return Optional.ofNullable(userDao.findByName(name));
     }
 
+    @Nullable
     @Override
     public synchronized User getUserById(Integer userId) {
         Objects.requireNonNull(userId, "User ID must not be null");

@@ -4,6 +4,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
  * Super simple event bus to be used with CDI, e.g. as application scoped
  * broadcaster.
  */
+@NullMarked
 @SuppressWarnings("java:S6548")
 public class EventBusImpl implements EventBus {
 

@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.backend.dao;
 
 import java.util.Collection;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
@@ -9,6 +11,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Message;
 /**
  * Data access object for managing messages.
  */
+@NullMarked
 @SuppressWarnings("java:S1602")
 public class MessageDao {
 
@@ -20,6 +23,7 @@ public class MessageDao {
      *            the message to be updated or saved
      * @return the updated or newly saved message
      */
+
     public Message updateMessage(Message message) {
         logger.info("Persisting Message: ({}) '{}'", message.getId(),
                 message.getMessage());
@@ -47,6 +51,7 @@ public class MessageDao {
      * @return the last {@link Message} from the database, or {@code null} if no
      *         messages are found.
      */
+    @Nullable
     public Message getLastMessage() {
         logger.info("Fetching Message");
         return HibernateUtil.inSession(session -> {
@@ -61,6 +66,7 @@ public class MessageDao {
      *
      * @return a collection of all messages.
      */
+
     public Collection<Message> getMessages() {
         logger.info("Fetching all Messages");
         return HibernateUtil.inSession(session -> {

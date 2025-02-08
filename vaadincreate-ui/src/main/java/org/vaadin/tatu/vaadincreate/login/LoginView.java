@@ -3,6 +3,8 @@ package org.vaadin.tatu.vaadincreate.login;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.CapsLockWarning;
@@ -36,31 +38,40 @@ import com.vaadin.util.ReflectTools;
  * UI content when the user is not logged in yet.
  */
 @SuppressWarnings({ "serial", "java:S2160" })
+@NullMarked
 public class LoginView extends Composite implements HasI18N {
 
-    TextField usernameField;
-    PasswordField passwordField;
-    Button login;
-    private Button forgotPassword;
-    private AccessControl accessControl;
+    final TextField usernameField = new TextField(getTranslation(I18n.USERNAME),
+            "Admin");
+    final PasswordField passwordField = new PasswordField(
+            getTranslation(I18n.PASSWORD));
+    final Button login = new Button(getTranslation(I18n.Login.LOGIN_BUTTON));
+
+    private final Button forgotPassword = new Button(
+            getTranslation(I18n.Login.FORGOT_PASSWORD));
+    private final CssLayout loginInformation;
+    private final ComboBox<Locale> lang = new LanguageSelect();
+    private final Label loginInfoText = new Label(getLoginInfoText(),
+            ContentMode.HTML);
+    private final CapsLockWarning capsLockWarning = CapsLockWarning
+            .warnFor(passwordField);
+
+    private final CssLayout layout = new CssLayout();
+    private final AccessControl accessControl;
+
+    @Nullable
     private Registration resizeReg;
-    private CssLayout loginInformation;
-    private ComboBox<Locale> lang;
-    private Label loginInfoText;
-    private CapsLockWarning capsLockWarning;
-    private CssLayout layout = new CssLayout();
 
     public LoginView(AccessControl accessControl, LoginListener loginListener) {
         this.accessControl = accessControl;
+        // information text about logging in
+        loginInformation = buildLoginInformation();
         addLoginListener(loginListener);
         setCompositionRoot(layout);
     }
 
     void buildUI() {
         layout.addStyleName(VaadinCreateTheme.LOGINVIEW);
-
-        // information text about logging in
-        loginInformation = buildLoginInformation();
 
         // login form, centered in the available part of the screen
         var loginForm = buildLoginForm();
@@ -83,7 +94,7 @@ public class LoginView extends Composite implements HasI18N {
     public void attach() {
         super.attach();
         resizeReg = getUI().getPage().addBrowserWindowResizeListener(
-                e -> showLoginInformation(e.getWidth()));
+                windowResize -> showLoginInformation(windowResize.getWidth()));
         buildUI();
         showLoginInformation(getUI().getPage().getBrowserWindowWidth());
         usernameField.focus();
@@ -145,14 +156,11 @@ public class LoginView extends Composite implements HasI18N {
         loginForm.setSizeUndefined();
         loginForm.setMargin(false);
 
-        usernameField = new TextField(getTranslation(I18n.USERNAME), "Admin");
         loginForm.addComponent(usernameField);
         usernameField.setWidth(18, Unit.EM);
         usernameField.setId("login-username-field");
 
-        passwordField = new PasswordField(getTranslation(I18n.PASSWORD));
         loginForm.addComponent(passwordField);
-        capsLockWarning = CapsLockWarning.warnFor(passwordField);
         capsLockWarning.setMessage(getTranslation(I18n.Login.CAPSLOCK));
         passwordField.setWidth(18, Unit.EM);
         passwordField.setId("login-password-field");
@@ -160,11 +168,10 @@ public class LoginView extends Composite implements HasI18N {
         buttons.setStyleName("buttons");
         loginForm.addComponent(buttons);
 
-        login = new Button(getTranslation(I18n.Login.LOGIN_BUTTON));
         buttons.addComponent(login);
         login.setDisableOnClick(true);
         login.setId("login-button");
-        login.addClickListener(event -> {
+        login.addClickListener(click -> {
             try {
                 login();
             } finally {
@@ -174,24 +181,24 @@ public class LoginView extends Composite implements HasI18N {
         login.setClickShortcut(ShortcutAction.KeyCode.ENTER);
         login.addStyleName(ValoTheme.BUTTON_FRIENDLY);
 
-        forgotPassword = new Button(getTranslation(I18n.Login.FORGOT_PASSWORD));
-        buttons.addComponent(forgotPassword);
-        forgotPassword.addClickListener(event -> showHintNotification());
         forgotPassword.addStyleNames(ValoTheme.BUTTON_LINK,
                 VaadinCreateTheme.LOGINVIEW_FORGOTBUTTON);
+        buttons.addComponent(forgotPassword);
+        forgotPassword.addClickListener(click -> showHintNotification());
 
-        lang = new LanguageSelect();
         lang.setWidth(18, Unit.EM);
         loginForm.addComponent(lang);
-        lang.addValueChangeListener(e -> {
+        lang.addValueChangeListener(valueChange -> {
             var ui = getUI();
             // Set the locale to session attribute, request handler will persist
             // it to the cookie from there.
-            ui.getSession().setAttribute("locale", e.getValue().getLanguage());
-            Locale.setDefault(e.getValue());
-            ui.getSession().setLocale(e.getValue());
+            ui.getSession().setAttribute("locale",
+                    valueChange.getValue().getLanguage());
+            Locale.setDefault(valueChange.getValue());
+            ui.getSession().setLocale(valueChange.getValue());
             updateTranslations();
-            logger.info("Changing locale to {}", e.getValue().getLanguage());
+            logger.info("Changing locale to {}",
+                    valueChange.getValue().getLanguage());
         });
         var locale = I18NProvider.fetchLocaleFromCookie();
         lang.setValue(locale);
@@ -202,7 +209,6 @@ public class LoginView extends Composite implements HasI18N {
     private CssLayout buildLoginInformation() {
         var infoLayout = new CssLayout();
         infoLayout.setStyleName(VaadinCreateTheme.LOGINVIEW_INFORMATION);
-        loginInfoText = new Label(getLoginInfoText(), ContentMode.HTML);
         loginInfoText.setSizeFull();
         infoLayout.addComponent(loginInfoText);
         return infoLayout;

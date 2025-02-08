@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -53,6 +54,7 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+@NullMarked
 @Theme("vaadincreate")
 @StyleSheet("vaadin://styles/additional-styles.css")
 @SuppressWarnings({ "serial", "java:S2160" })
@@ -81,8 +83,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             MDC.clear();
             showLoginView();
         } else {
-            var user = CurrentUser.get().get();
-            user = getUserService().getUserById(user.getId());
+            var id = Utils.getCurrentUserOrThrow().getId();
+            assert id != null : "User id must not be null";
+            var user = getUserService().getUserById(id);
             CurrentUser.set(user);
             target = getInitialTarget();
             showAppLayout();
@@ -90,7 +93,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     }
 
     private void showLoginView() {
-        setContent(new LoginView(getAccessControl(), e -> onLogin()));
+        setContent(new LoginView(getAccessControl(), login -> onLogin()));
     }
 
     private void onLogin() {
@@ -132,7 +135,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         appLayout.addView(AdminView.class, getTranslation(AdminView.VIEW_NAME),
                 VaadinIcons.USERS, AdminView.VIEW_NAME);
 
-        Product draft = getProductService().findDraft(CurrentUser.get().get());
+        Product draft = getProductService()
+                .findDraft(Utils.getCurrentUserOrThrow());
         if (draft != null && getAccessControl().isUserInRole(User.Role.ADMIN)) {
             handleDraft(draft);
         }
@@ -151,9 +155,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         dialog.setCancelText(getTranslation(I18n.DISCARD));
         dialog.setConfirmText(getTranslation(I18n.YES));
         var id = draft.getId() == null ? "new" : String.valueOf(draft.getId());
-        dialog.addConfirmedListener(e -> getNavigator()
+        dialog.addConfirmedListener(confirmed -> getNavigator()
                 .navigateTo(String.format("%s/%s", BooksView.VIEW_NAME, id)));
-        dialog.addCancelListener(e -> {
+        dialog.addCancelListener(cancelled -> {
             logger.info("Draft discarded");
             getProductService().saveDraft(CurrentUser.get().get(), null);
             getNavigator().navigateTo(target);

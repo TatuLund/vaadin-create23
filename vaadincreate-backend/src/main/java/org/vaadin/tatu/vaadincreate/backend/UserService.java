@@ -3,9 +3,12 @@ package org.vaadin.tatu.vaadincreate.backend;
 import java.util.List;
 import java.util.Optional;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.service.UserServiceImpl;
 
+@NullMarked
 public interface UserService {
 
     public abstract Optional<User> findByName(String name);
@@ -14,6 +17,7 @@ public interface UserService {
 
     public abstract List<User> getAllUsers();
 
+    @Nullable
     public User getUserById(Integer userId);
 
     void removeUser(Integer userId);

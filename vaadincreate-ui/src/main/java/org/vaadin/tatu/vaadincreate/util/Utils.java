@@ -8,6 +8,8 @@ import java.util.Locale;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
@@ -26,6 +28,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.UIDetachedException;
 
+@NullMarked
 public class Utils {
 
     private Utils() {
@@ -101,7 +104,7 @@ public class Utils {
      *            the converter to use for the conversion
      * @return the converted presentation value
      */
-    public static <T, U> U convertToPresentation(T value,
+    public static <T, U> U convertToPresentation(@Nullable T value,
             Converter<U, T> converter) {
         return converter.convertToPresentation(value, createValueContext());
     }
@@ -162,7 +165,7 @@ public class Utils {
      * @param command
      *            the command to be executed
      */
-    public static void access(UI ui, Runnable command) {
+    public static void access(@Nullable UI ui, Runnable command) {
         if (ui != null) {
             try {
                 ui.access(command);

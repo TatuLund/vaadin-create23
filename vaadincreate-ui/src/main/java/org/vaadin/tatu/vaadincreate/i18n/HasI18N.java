@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate.i18n;
 
+import org.jspecify.annotations.NullMarked;
+
 import com.vaadin.ui.Component;
 
 /**
@@ -20,16 +22,18 @@ import com.vaadin.ui.Component;
  * @see I18NProvider
  * @see I18n
  */
+@NullMarked
 public interface HasI18N extends Component {
 
     /**
      * Get translation with given key and parameter from I18NProvider. Locale is
-     * fetched from a "language" Cookie and using system Locale as fallback.
+     * fetched from a "language" Cookie and using system Locale as fallback.If
+     * Locale is not supported, English is used.
      *
      * @see DefaultI18NProvider
      *
      * @param key
-     *            Key for the translation
+     *            Key for the translation, not null
      * @param params
      *            Optional parameters
      * @return String composed with Locale.

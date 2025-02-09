@@ -9,12 +9,14 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.MDC;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 
 import java.io.IOException;
 
+@NullMarked
 @WebFilter("/*")
 public class LoggingFilter implements Filter {
 

@@ -1,11 +1,13 @@
 package org.vaadin.tatu.vaadincreate.admin;
 
+import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.ui.UI;
 
+@NullMarked
 public interface TabView extends HasI18N {
 
     /**

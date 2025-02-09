@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate.admin;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
@@ -17,6 +19,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 // This is an example of a possible sub-navigation pattern in Vaadin 8
 // using url parameters.
+@NullMarked
 @SuppressWarnings("serial")
 @RolesPermitted({ Role.ADMIN })
 public class AdminView extends VerticalLayout implements View, HasI18N {
@@ -66,7 +69,7 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
      * @param tabName
      *            The name of the tab to show
      */
-    public void setFragmentParameter(String tabName) {
+    public void setFragmentParameter(@Nullable String tabName) {
         String fragmentParameter;
         if (tabName == null || tabName.isEmpty()) {
             fragmentParameter = "";

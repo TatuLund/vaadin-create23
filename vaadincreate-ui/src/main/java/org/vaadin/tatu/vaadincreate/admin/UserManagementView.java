@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.admin;
 
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
@@ -22,11 +24,13 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class UserManagementView extends VerticalLayout implements TabView {
 
     public static final String VIEW_NAME = "users";
 
+    @Nullable
     private User user;
     private ComboBox<User> userSelect = new ComboBox<>();
 
@@ -35,9 +39,9 @@ public class UserManagementView extends VerticalLayout implements TabView {
 
     private UserForm form;
 
-    private Button save;
-    private Button delete;
-    private Button cancel;
+    private Button save = new Button(getTranslation(I18n.SAVE));
+    private Button delete = new Button(getTranslation(I18n.DELETE));
+    private Button cancel = new Button(getTranslation(I18n.CANCEL));
 
     public UserManagementView() {
         var attributes = AttributeExtension.of(this);
@@ -50,13 +54,13 @@ public class UserManagementView extends VerticalLayout implements TabView {
 
         form = new UserForm();
         form.setEnabled(false);
-        form.addFormChangedListener(event -> {
-            save.setEnabled(event.isValid());
+        form.addFormChangedListener(changed -> {
+            save.setEnabled(changed.isValid());
             cancel.setEnabled(true);
         });
 
         var header = createHeader();
-        var buttons = createButtons();
+        var buttons = createButtonsLayout();
 
         addComponents(title, header, form, buttons);
         setComponentAlignment(buttons, Alignment.BOTTOM_LEFT);
@@ -85,29 +89,26 @@ public class UserManagementView extends VerticalLayout implements TabView {
         return header;
     }
 
-    private HorizontalLayout createButtons() {
+    private HorizontalLayout createButtonsLayout() {
         var buttons = new HorizontalLayout();
 
         // Save button is enabled when the form is valid
-        save = new Button(getTranslation(I18n.SAVE));
         save.addStyleName(ValoTheme.BUTTON_PRIMARY);
         save.setClickShortcut(KeyCode.S, ModifierKey.CTRL);
         save.setId("save-button");
-        save.addClickListener(event -> handleSave());
+        save.addClickListener(click -> handleSave());
 
         // Delete button is enabled when a user is selected
-        delete = new Button(getTranslation(I18n.DELETE));
         delete.addStyleName(ValoTheme.BUTTON_DANGER);
         delete.setId("delete-button");
-        delete.addClickListener(event -> handleDelete());
+        delete.addClickListener(click -> handleDelete());
 
         // Cancel button is enabled when a user is being edited or a new user is
         // being created
-        cancel = new Button(getTranslation(I18n.CANCEL));
         cancel.setId("cancel-button");
         cancel.setClickShortcut(KeyCode.ESCAPE);
         cancel.addStyleName(VaadinCreateTheme.BUTTON_CANCEL);
-        cancel.addClickListener(e -> handleCancel());
+        cancel.addClickListener(click -> handleCancel());
 
         // Initially all buttons are disabled
         disableButtons();

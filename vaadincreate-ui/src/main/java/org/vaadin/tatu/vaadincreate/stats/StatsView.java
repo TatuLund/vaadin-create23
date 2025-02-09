@@ -3,6 +3,8 @@ package org.vaadin.tatu.vaadincreate.stats;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
@@ -31,6 +33,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 @RolesPermitted({ Role.USER, Role.ADMIN })
 public class StatsView extends VerticalLayout implements VaadinCreateView {
@@ -41,14 +44,16 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
 
     private CssLayout dashboard;
 
-    private CustomChart availabilityChart;
-    private CustomChart categoryChart;
-    private CustomChart priceChart;
+    private CustomChart availabilityChart = new CustomChart(ChartType.COLUMN);
+    private CustomChart categoryChart = new CustomChart(ChartType.COLUMN);
+    private CustomChart priceChart = new CustomChart(ChartType.PIE);
 
     private Lang lang;
 
+    @Nullable
     private Registration resizeListener;
 
+    @Nullable
     private UI ui;
 
     public StatsView() {
@@ -61,11 +66,11 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         // asynchronously
         lang.setNoData(getTranslation(I18n.Stats.NO_DATA));
 
-        var availabilityChartWrapper = createAvailabilityChart();
+        var availabilityChartWrapper = configureAvailabilityChart();
 
-        var categoryChartWrapper = createCategoryChart();
+        var categoryChartWrapper = configureCategoryChart();
 
-        var priceChartWrapper = createPriceChart();
+        var priceChartWrapper = configurePriceChart();
 
         dashboard.addComponents(availabilityChartWrapper, priceChartWrapper,
                 categoryChartWrapper);
@@ -75,9 +80,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         setComponentAlignment(dashboard, Alignment.MIDDLE_CENTER);
     }
 
-    private CssLayout createPriceChart() {
+    private CssLayout configurePriceChart() {
         var priceChartWrapper = new CssLayout();
-        priceChart = new CustomChart(ChartType.PIE);
         priceChart.setId("price-chart");
         priceChart.addStyleName(VaadinCreateTheme.DASHBOARD_CHART_FOCUSRING);
         priceChartWrapper.addStyleName(VaadinCreateTheme.DASHBOARD_CHART);
@@ -89,11 +93,10 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         return priceChartWrapper;
     }
 
-    private CssLayout createCategoryChart() {
+    private CssLayout configureCategoryChart() {
         var categoryChartWrapper = new CssLayout();
         categoryChartWrapper
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_WIDE);
-        categoryChart = new CustomChart(ChartType.COLUMN);
         categoryChart.setId("category-chart");
         categoryChart.addStyleName(VaadinCreateTheme.DASHBOARD_CHART_FOCUSRING);
         var conf = categoryChart.getConfiguration();
@@ -104,9 +107,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         return categoryChartWrapper;
     }
 
-    private CssLayout createAvailabilityChart() {
+    private CssLayout configureAvailabilityChart() {
         var availabilityChartWrapper = new CssLayout();
-        availabilityChart = new CustomChart(ChartType.COLUMN);
         availabilityChart
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_FOCUSRING);
         availabilityChart.setId("availability-chart");

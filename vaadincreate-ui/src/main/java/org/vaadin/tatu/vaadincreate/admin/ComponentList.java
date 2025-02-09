@@ -1,7 +1,10 @@
 package org.vaadin.tatu.vaadincreate.admin;
 
 import java.util.Collection;
+import java.util.Objects;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 
@@ -19,9 +22,12 @@ import com.vaadin.ui.themes.ValoTheme;
  * A list of components generated from a collection of items. Components are
  * shown as scrollable list.
  */
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class ComponentList<T, V extends Component> extends Composite {
+
     private Grid<T> grid;
+    @Nullable
     private ListDataProvider<T> dataProvider;
     private Panel panel = new Panel();
 
@@ -29,10 +35,11 @@ public class ComponentList<T, V extends Component> extends Composite {
      * Creates a new instance of ComponentList.
      *
      * @param provider
-     *            ValueProvider to create components from items.
+     *            ValueProvider to create components from items, not null
      */
     public ComponentList(ValueProvider<T, V> provider) {
-        createCategoryListing(provider);
+        Objects.requireNonNull(provider, "ValueProvider cannot be null");
+        grid = createCategoryListing(provider);
         panel.setSizeFull();
         panel.setContent(grid);
         panel.addStyleName(ValoTheme.PANEL_BORDERLESS);
@@ -54,6 +61,14 @@ public class ComponentList<T, V extends Component> extends Composite {
         dataProvider.refreshAll();
     }
 
+    /**
+     * Removes the specified item from the data provider, refreshes the data
+     * provider, and adjusts the grid height based on the number of remaining
+     * items.
+     *
+     * @param item
+     *            the item to be removed from the data provider
+     */
     public void removeItem(T item) {
         dataProvider.getItems().remove(item);
         dataProvider.refreshAll();
@@ -65,7 +80,7 @@ public class ComponentList<T, V extends Component> extends Composite {
      * items.
      *
      * @param items
-     *            Collection of items
+     *            Collection of items, not null
      */
     public void setItems(Collection<T> items) {
         dataProvider = new ListDataProvider<>(items);
@@ -81,7 +96,7 @@ public class ComponentList<T, V extends Component> extends Composite {
      * Adds an item to the list and generates a component from the item.
      *
      * @param item
-     *            item to be added
+     *            item to be added, not null
      */
     public void addItem(T item) {
         dataProvider.getItems().add(item);
@@ -90,7 +105,7 @@ public class ComponentList<T, V extends Component> extends Composite {
         grid.scrollToEnd();
     }
 
-    private void createCategoryListing(ValueProvider<T, V> provider) {
+    private Grid<T> createCategoryListing(ValueProvider<T, V> provider) {
         grid = new Grid<>();
         grid.setRowHeight(40);
         grid.addComponentColumn(provider);
@@ -103,6 +118,7 @@ public class ComponentList<T, V extends Component> extends Composite {
                 VaadinCreateTheme.GRID_NO_CELL_FOCUS);
         grid.setHeightMode(HeightMode.ROW);
         AttributeExtension.of(grid).setAttribute("tabindex", "-1");
+        return grid;
     }
 
 }

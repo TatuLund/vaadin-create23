@@ -8,9 +8,11 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 @SuppressWarnings("serial")
 public class DefaultI18NProvider implements I18NProvider {
 
@@ -39,11 +41,6 @@ public class DefaultI18NProvider implements I18NProvider {
 
     @Override
     public String getTranslation(String key, Locale locale, Object... params) {
-        if (key == null) {
-            logger.warn("Got lang request for key with null value!");
-            return "";
-        }
-
         ResourceBundle bundle;
         if (getLocales().contains(locale)) {
             bundle = ResourceBundle.getBundle(BUNDLE_PREFIX, locale);

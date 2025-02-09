@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.admin;
 
 import java.lang.reflect.Method;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
@@ -26,6 +28,7 @@ import com.vaadin.util.ReflectTools;
 /**
  * The form for editing users.
  */
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class UserForm extends Composite implements HasI18N {
     private FormLayout form = new FormLayout();
@@ -33,6 +36,7 @@ public class UserForm extends Composite implements HasI18N {
             User.class);
     private PasswordField password2;
     private TextField username;
+    @Nullable
     private User user;
     private ComboBox<Role> role;
 
@@ -79,7 +83,7 @@ public class UserForm extends Composite implements HasI18N {
      * Populates the form with the user's data.
      *
      * @param user
-     *            the user to be populated
+     *            the user to be populated, not null
      */
     public void populate(User user) {
         this.user = user;

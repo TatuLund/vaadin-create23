@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate.i18n;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class represents the internationalization (i18n) keys used in the
  * application. It provides static final String constants for various keys used
@@ -8,6 +10,7 @@ package org.vaadin.tatu.vaadincreate.i18n;
  * feature of the application. The keys are used to retrieve localized strings
  * from resource bundles or translation files.
  */
+@NullMarked
 @SuppressWarnings("serial")
 public final class I18n {
 

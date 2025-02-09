@@ -3,6 +3,8 @@ package org.vaadin.tatu.vaadincreate.admin;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
@@ -25,6 +27,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class CategoryManagementView extends VerticalLayout implements TabView {
 
@@ -34,6 +37,7 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
             this);
     private Button newCategoryButton;
 
+    @Nullable
     private Collection<Category> categories;
 
     private ComponentList<Category, CategoryForm> list;

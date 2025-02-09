@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The VaadinCreateTheme class defines the CSS class names used in the Vaadin
  * Create application's theme. These class names are used to style various
@@ -8,6 +10,7 @@ package org.vaadin.tatu.vaadincreate;
  *
  * See: vaadincreate.scss for the implementations.
  */
+@NullMarked
 public final class VaadinCreateTheme {
 
     private VaadinCreateTheme() {

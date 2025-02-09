@@ -1,11 +1,13 @@
 package org.vaadin.tatu.vaadincreate;
 
+import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.navigator.View;
 import com.vaadin.ui.UI;
 
+@NullMarked
 public interface VaadinCreateView extends HasI18N, View {
 
     /**

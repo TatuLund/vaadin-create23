@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.crud.form;
 
+import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 
 import com.vaadin.icons.VaadinIcons;
@@ -19,6 +20,7 @@ import com.vaadin.ui.ComboBox;
  *         "Availability");
  * </pre>
  */
+@NullMarked
 @SuppressWarnings("serial")
 public class AvailabilitySelector extends ComboBox<Availability> {
 
@@ -32,11 +34,12 @@ public class AvailabilitySelector extends ComboBox<Availability> {
         setTextInputAllowed(false);
         setItemIconGenerator(item -> VaadinIcons.CIRCLE);
         setStyleGenerator(this::getAvailabilityStyle);
-        addValueChangeListener(e -> {
-            if (e.getOldValue() != null) {
-                removeStyleName(getAvailabilityStyle(e.getOldValue()));
+        addValueChangeListener(valueChange -> {
+            if (valueChange.getOldValue() != null) {
+                removeStyleName(
+                        getAvailabilityStyle(valueChange.getOldValue()));
             }
-            addStyleName(getAvailabilityStyle(e.getValue()));
+            addStyleName(getAvailabilityStyle(valueChange.getValue()));
         });
     }
 

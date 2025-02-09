@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
+import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -35,6 +36,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * spinner wrapper expanding to fill available space.</li>
  * </ul>
  */
+@NullMarked
 @SuppressWarnings("serial")
 public class FakeGrid extends Composite implements HasI18N {
 

@@ -4,6 +4,9 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import com.vaadin.data.Result;
 import com.vaadin.data.ValueContext;
 import com.vaadin.data.converter.StringToIntegerConverter;
@@ -13,6 +16,7 @@ import com.vaadin.data.converter.StringToIntegerConverter;
  * count conversions. This converter ensures that the number format does not use
  * a thousands separator and always parses the input as an integer.
  */
+@NullMarked
 @SuppressWarnings("serial")
 public class StockCountConverter extends StringToIntegerConverter {
 
@@ -35,7 +39,8 @@ public class StockCountConverter extends StringToIntegerConverter {
     }
 
     @Override
-    public Result<Integer> convertToModel(String value, ValueContext context) {
+    public Result<Integer> convertToModel(@Nullable String value,
+            ValueContext context) {
         Result<Integer> result = super.convertToModel(value, context);
         return result.map(stock -> stock == null ? 0 : stock);
     }

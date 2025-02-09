@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.crud.form;
 
+import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 
@@ -11,6 +12,7 @@ import com.vaadin.ui.JavaScript;
 /**
  * Side panel layout with CSS animation sliding in / out.
  */
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class SidePanel extends Composite {
     private CssLayout layout = new CssLayout();

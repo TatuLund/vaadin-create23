@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
@@ -102,6 +104,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * logic for saving, editing, and deleting products.
  * </p>
  */
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class BookForm extends Composite implements HasI18N {
 
@@ -126,6 +129,8 @@ public class BookForm extends Composite implements HasI18N {
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
     private Binder<Product> binder;
+
+    @Nullable
     private Product currentProduct;
     private SidePanel sidePanel = new SidePanel();
     private BooksPresenter presenter;
@@ -287,6 +292,7 @@ public class BookForm extends Composite implements HasI18N {
         }
     }
 
+    @Nullable
     public Product getProduct() {
         return currentProduct;
     }
@@ -320,7 +326,7 @@ public class BookForm extends Composite implements HasI18N {
         });
     }
 
-    private static <T> String convertValue(T value) {
+    private static <T> String convertValue(@Nullable T value) {
         if (value == null) {
             return "";
         }
@@ -400,12 +406,13 @@ public class BookForm extends Composite implements HasI18N {
                 .getDataProvider();
         dataProvider.setSortComparator(
                 (a, b) -> category.getValue().contains(a) ? -1 : 1);
-        if (getProduct() != null) {
-            category.setValue(getProduct().getCategory());
+        var product = getProduct();
+        if (product != null) {
+            category.setValue(product.getCategory());
         }
     }
 
-    public void editProduct(Product product) {
+    public void editProduct(@Nullable Product product) {
         accessControl.assertAdmin();
         presenter.requestUpdateCategories();
         if (product == null) {
@@ -453,7 +460,9 @@ public class BookForm extends Composite implements HasI18N {
         if (isShown() && binder.hasChanges()) {
             logger.info(
                     "Browser closed before saving changes, draft product autosaved.");
-            var draft = new Product(getProduct());
+            var product = getProduct();
+            assert product != null;
+            var draft = new Product(product);
             binder.writeBeanAsDraft(draft, true);
             presenter.saveDraft(draft);
         }
@@ -493,7 +502,8 @@ public class BookForm extends Composite implements HasI18N {
 
     private void selectPreviousProduct(BooksPresenter presenter,
             BookGrid grid) {
-        if (getProduct().getId() == null) {
+        var product = getProduct();
+        if (product == null || product.getId() == null) {
             return;
         }
         var items = getVisibleItems(grid);
@@ -504,7 +514,8 @@ public class BookForm extends Composite implements HasI18N {
     }
 
     private void selectNextProduct(BooksPresenter presenter, BookGrid grid) {
-        if (getProduct().getId() == null) {
+        var product = getProduct();
+        if (product == null || product.getId() == null) {
             return;
         }
         var items = getVisibleItems(grid);

@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.crud;
 
 import java.util.Collection;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
@@ -37,6 +39,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * See also {@link BookPresenter} for fetching the data, the actual CRUD
  * operations and controlling the view based on events from outside.
  */
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 @RolesPermitted({ Role.USER, Role.ADMIN })
 public class BooksView extends CssLayout implements VaadinCreateView {
@@ -50,14 +53,19 @@ public class BooksView extends CssLayout implements VaadinCreateView {
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
 
-    private Button newProduct;
+    private Button newProduct = new Button(
+            getTranslation(I18n.Books.NEW_PRODUCT));
 
     private FakeGrid fakeGrid;
     private NoMatches noMatches = new NoMatches();
+
+    @Nullable
     private String params;
 
+    @Nullable
     private Product draft;
 
+    @Nullable
     private UI ui;
 
     public BooksView() {
@@ -68,9 +76,9 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         noMatches.setVisible(false);
 
         grid = new BookGrid();
-        grid.asSingleSelect().addValueChangeListener(event -> {
-            if (event.isUserOriginated()) {
-                handleSelectionChange(event.getValue());
+        grid.asSingleSelect().addValueChangeListener(selected -> {
+            if (selected.isUserOriginated()) {
+                handleSelectionChange(selected.getValue());
             }
         });
         grid.setVisible(false);
@@ -96,16 +104,17 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         presenter.init();
     }
 
-    public void handleSelectionChange(Product product) {
+    public void handleSelectionChange(@Nullable Product product) {
         if (form.hasChanges()) {
             var dialog = createDiscardChangesConfirmDialog();
             dialog.open();
-            dialog.addConfirmedListener(e -> {
+            dialog.addConfirmedListener(confirmed -> {
                 presenter.unlockBook();
                 form.showForm(false);
                 setFragmentParameter("");
             });
-            dialog.addCancelListener(e -> grid.select(form.getProduct()));
+            dialog.addCancelListener(
+                    cancelled -> grid.select(form.getProduct()));
         } else {
             presenter.rowSelected(product);
             if (product != null) {
@@ -160,7 +169,6 @@ public class BooksView extends CssLayout implements VaadinCreateView {
             updateNoMatchesVisibility();
         });
 
-        newProduct = new Button(getTranslation(I18n.Books.NEW_PRODUCT));
         newProduct.setId("new-product");
         newProduct.setEnabled(false);
         newProduct.addStyleName(ValoTheme.BUTTON_PRIMARY);
@@ -323,7 +331,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
      * @param book
      *            the name of the book that has been deleted
      */
-    public void showDeleteNotification(String book) {
+    public void showDeleteNotification(@Nullable String book) {
         String message = "";
         if (book != null) {
             message = getTranslation(I18n.Books.REMOVED, book);
@@ -368,6 +376,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
      * @return the selected row as a {@link Product} object, or null if no row
      *         is selected
      */
+    @Nullable
     public Product getSelectedRow() {
         return grid.getSelectedRow();
     }
@@ -427,7 +436,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
      * @param product
      *            the product to be edited
      */
-    public void editProduct(Product product) {
+    public void editProduct(@Nullable Product product) {
         if (!accessControl.isUserInRole(Role.ADMIN)) {
             return;
         }
@@ -469,7 +478,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
      * @param productId
      *            The parameter
      */
-    public void setFragmentParameter(String productId) {
+    public void setFragmentParameter(@Nullable String productId) {
         String fragmentParameter;
         if (productId == null || productId.isEmpty()) {
             fragmentParameter = "";
@@ -566,6 +575,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         return isAttached() && grid.hasDataProdiver();
     }
 
+    @Nullable
     private Product updateProductInGrid(Product product) {
         assert product != null : "Product cannot be null";
         var id = product.getId();

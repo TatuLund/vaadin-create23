@@ -5,6 +5,9 @@ import com.vaadin.server.UserError;
 import com.vaadin.shared.ui.ErrorLevel;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.TextField;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
@@ -29,12 +32,14 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
  * NumberField numberField = new NumberField("Enter number");
  * </pre>
  */
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class NumberField extends CustomField<Integer> implements HasI18N {
 
     protected TextField textField = new TextField();
     private StockCountConverter stockCountConverter = new StockCountConverter(
             "");
+    @Nullable
     private Integer intValue;
 
     /**
@@ -80,7 +85,7 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
     }
 
     @Override
-    public void setValue(Integer value) {
+    public void setValue(@Nullable Integer value) {
         if (value == null) {
             value = 0;
         }
@@ -88,7 +93,7 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
     }
 
     @Override
-    protected void doSetValue(Integer value) {
+    protected void doSetValue(@Nullable Integer value) {
         textField.setValue(stockCountConverter.convertToPresentation(value,
                 Utils.createValueContext()));
     }

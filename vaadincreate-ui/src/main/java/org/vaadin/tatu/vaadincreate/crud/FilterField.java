@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.ResetButtonForTextField;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
@@ -14,9 +16,11 @@ import com.vaadin.shared.Registration;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class FilterField extends TextField implements HasI18N {
 
+    @Nullable
     private Registration shortcutRegistration;
 
     /**

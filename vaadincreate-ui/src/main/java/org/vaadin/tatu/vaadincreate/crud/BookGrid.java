@@ -4,8 +4,11 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -29,6 +32,7 @@ import com.vaadin.ui.renderers.NumberRenderer;
  * items. This version uses an in-memory data source that is suitable for small
  * data sets.
  */
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class BookGrid extends Grid<Product> implements HasI18N {
 
@@ -38,9 +42,11 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     private static final String AVAILABILITY_ID = "availability";
     private static final String PRICE_ID = "price";
 
+    @Nullable
     private Registration resizeReg;
     private Label availabilityCaption;
 
+    @Nullable
     private Product editedProduct;
     private int edited;
 
@@ -140,6 +146,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
      * @return the product with the specified ID, or {@code null} if no such
      *         product is found
      */
+    @Nullable
     @SuppressWarnings("unchecked")
     public Product findProductById(Integer id) {
         return ((ListDataProvider<Product>) getDataProvider()).getItems()
@@ -402,7 +409,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
      * @param product
      *            the product to be highlighted as last edited
      */
-    public void setEdited(Product product) {
+    public void setEdited(@Nullable Product product) {
         if (edited != -1) {
             edited = -1;
             if (editedProduct != null) {
@@ -410,8 +417,13 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                 getDataProvider().refreshItem(editedProduct);
             }
         }
-        edited = product != null ? product.getId() : -1;
+        edited = product != null ? getIdOrThrow(product) : -1;
         editedProduct = product;
+    }
+
+    private static int getIdOrThrow(Product product) {
+        return Objects.requireNonNull(product.getId(),
+                "Product must have an ID to be edited");
     }
 
     /**

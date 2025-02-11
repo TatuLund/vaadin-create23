@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate;
 
+import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.shared.ResetButtonForTextFieldState;
 
 import com.vaadin.server.AbstractExtension;
@@ -12,6 +13,7 @@ import com.vaadin.ui.TextField;
  * @see <a href="https://vaadin.com/blog/-/blogs/2656782">Extending components
  *      in Vaadin 7</a>
  */
+@NullMarked
 @SuppressWarnings("serial")
 public class ResetButtonForTextField extends AbstractExtension {
 

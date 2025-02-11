@@ -113,7 +113,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
                 form.showForm(false);
                 setFragmentParameter("");
             });
-            dialog.addCancelListener(
+            dialog.addCancelledListener(
                     cancelled -> grid.select(form.getProduct()));
         } else {
             presenter.rowSelected(product);

@@ -2,6 +2,9 @@ package org.vaadin.tatu.vaadincreate;
 
 import java.lang.reflect.Method;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import com.vaadin.event.ConnectorEventListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.icons.VaadinIcons;
@@ -19,6 +22,7 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.ReflectTools;
 
+@NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class ConfirmDialog extends Composite {
 
@@ -56,7 +60,7 @@ public class ConfirmDialog extends Composite {
      * @param type
      *            Type of the Dialog
      */
-    public ConfirmDialog(String caption, String text, Type type) {
+    public ConfirmDialog(String caption, @Nullable String text, Type type) {
         window.setId("confirm-dialog");
         window.setModal(true);
         window.setClosable(false);
@@ -79,14 +83,14 @@ public class ConfirmDialog extends Composite {
         var content = new VerticalLayout();
         content.setSizeFull();
         cancelButton = new Button("Cancel");
-        cancelButton.addClickListener(e -> {
+        cancelButton.addClickListener(click -> {
             cancelButton.removeClickShortcut();
-            fireEvent(new CancelEvent(this));
+            fireEvent(new CancelledEvent(this));
             window.close();
         });
         cancelButton.setId("cancel-button");
         confirmButton = new Button("Confirm");
-        confirmButton.addClickListener(e -> {
+        confirmButton.addClickListener(click -> {
             confirmButton.removeClickShortcut();
             fireEvent(new ConfirmedEvent(this));
             window.close();
@@ -111,7 +115,7 @@ public class ConfirmDialog extends Composite {
      * @param cancelText
      *            The caption string
      */
-    public void setCancelText(String cancelText) {
+    public void setCancelText(@Nullable String cancelText) {
         cancelButton.setCaption(cancelText);
     }
 
@@ -121,7 +125,7 @@ public class ConfirmDialog extends Composite {
      * @param confirmText
      *            The caption string
      */
-    public void setConfirmText(String confirmText) {
+    public void setConfirmText(@Nullable String confirmText) {
         confirmButton.setCaption(confirmText);
     }
 
@@ -177,28 +181,28 @@ public class ConfirmDialog extends Composite {
      *            The listener, can be Lambda expression.
      * @return Registration Use Registration#remove() for listener removal.
      */
-    public Registration addCancelListener(CancelListener listener) {
-        return addListener(CancelEvent.class, listener,
-                CancelListener.CANCELLED_METHOD);
+    public Registration addCancelledListener(CancelledListener listener) {
+        return addListener(CancelledEvent.class, listener,
+                CancelledListener.CANCELLED_METHOD);
     }
 
     /**
      * Cancel listener interface, can be implemented with Lambda or anonymous
      * inner class.
      */
-    public interface CancelListener extends ConnectorEventListener {
-        Method CANCELLED_METHOD = ReflectTools.findMethod(CancelListener.class,
-                "cancelled", CancelEvent.class);
+    public interface CancelledListener extends ConnectorEventListener {
+        Method CANCELLED_METHOD = ReflectTools.findMethod(
+                CancelledListener.class, "cancelled", CancelledEvent.class);
 
-        public void cancelled(CancelEvent event);
+        public void cancelled(CancelledEvent event);
     }
 
     /**
      * CancelEvent is fired when user clicks cancel button of the ConfirmDialog.
      */
-    public static class CancelEvent extends Component.Event {
+    public static class CancelledEvent extends Component.Event {
 
-        public CancelEvent(Component source) {
+        public CancelledEvent(Component source) {
             super(source);
         }
     }

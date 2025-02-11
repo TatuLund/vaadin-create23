@@ -157,7 +157,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         var id = draft.getId() == null ? "new" : String.valueOf(draft.getId());
         dialog.addConfirmedListener(confirmed -> getNavigator()
                 .navigateTo(String.format("%s/%s", BooksView.VIEW_NAME, id)));
-        dialog.addCancelListener(cancelled -> {
+        dialog.addCancelledListener(cancelled -> {
             logger.info("Draft discarded");
             getProductService().saveDraft(CurrentUser.get().get(), null);
             getNavigator().navigateTo(target);

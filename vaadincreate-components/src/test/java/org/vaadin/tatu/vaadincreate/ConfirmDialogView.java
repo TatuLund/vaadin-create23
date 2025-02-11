@@ -14,7 +14,7 @@ public class ConfirmDialogView extends VerticalLayout implements View {
         dialog.addConfirmedListener(e -> {
             Notification.show("Confirmed");
         });
-        dialog.addCancelListener(e -> {
+        dialog.addCancelledListener(e -> {
             Notification.show("Cancelled");
         });
         var button = new Button("Open dialog", e -> dialog.open());

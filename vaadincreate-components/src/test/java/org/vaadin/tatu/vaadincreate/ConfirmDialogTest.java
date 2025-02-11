@@ -47,7 +47,7 @@ public class ConfirmDialogTest {
         var buttons = (HorizontalLayout) content.getComponent(1);
         var cancelButton = (Button) buttons.getComponent(0);
         var count = new AtomicInteger(0);
-        dialog.addCancelListener(e -> {
+        dialog.addCancelledListener(e -> {
             count.addAndGet(1);
         });
         cancelButton.click();

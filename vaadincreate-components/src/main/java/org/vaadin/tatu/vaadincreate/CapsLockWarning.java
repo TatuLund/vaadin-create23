@@ -3,11 +3,13 @@ package org.vaadin.tatu.vaadincreate;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
+import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.shared.CapsLockWarningState;
 
 import com.vaadin.server.AbstractExtension;
 import com.vaadin.ui.PasswordField;
 
+@NullMarked
 @SuppressWarnings("serial")
 public class CapsLockWarning extends AbstractExtension {
 

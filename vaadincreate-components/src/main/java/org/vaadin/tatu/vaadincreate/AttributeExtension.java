@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate;
 
+import org.jspecify.annotations.NullMarked;
+
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.ui.AbstractComponent;
@@ -8,6 +10,7 @@ import com.vaadin.ui.AbstractComponent;
  * A JavaScript extension for adding arbitrary HTML attributes for component's
  * top level element.
  */
+@NullMarked
 @SuppressWarnings("serial")
 @JavaScript("attributeextension/attribute_extension_connector.js")
 public class AttributeExtension extends AbstractJavaScriptExtension {

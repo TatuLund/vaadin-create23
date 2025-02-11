@@ -1,11 +1,14 @@
 package org.vaadin.tatu.vaadincreate;
 
+import org.jspecify.annotations.NullMarked;
+
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.AbstractExtension;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
+@NullMarked
 @SuppressWarnings("serial")
 public class CharacterCountExtension extends AbstractExtension {
 

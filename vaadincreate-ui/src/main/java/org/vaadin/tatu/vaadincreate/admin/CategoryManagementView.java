@@ -259,7 +259,7 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
                 list.removeItem(category);
                 categories.remove(category);
             });
-            dialog.addCancelListener(
+            dialog.addCancelledListener(
                     cancelled -> deleteButton.setEnabled(true));
         }
     }

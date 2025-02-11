@@ -19,11 +19,11 @@ public class NoMatches extends Composite implements HasI18N {
         label.addStyleNames(VaadinCreateTheme.BOOKVIEW_NOMATCHES,
                 ValoTheme.LABEL_FAILURE);
 
-        var extension = AttributeExtension.of(label);
+        var attributes = AttributeExtension.of(label);
         // With this attribute screen reader will announce the content of the
         // label when it becomes visible.
-        extension.setAttribute("aria-live", "assertive");
-        extension.setAttribute("role", "alert");
+        attributes.setAttribute("aria-live", "assertive");
+        attributes.setAttribute("role", "alert");
 
         setCompositionRoot(label);
     }

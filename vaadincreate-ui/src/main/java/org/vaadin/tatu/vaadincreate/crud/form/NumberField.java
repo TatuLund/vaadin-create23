@@ -52,10 +52,10 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
         super();
         setCaption(string);
         setTypeNumber();
-        textField.addValueChangeListener(event -> {
+        textField.addValueChangeListener(valueChange -> {
             var result = stockCountConverter.convertToModel(
                     textField.getValue(), Utils.createValueContext());
-            result.ifError(e -> {
+            result.ifError(errorMessage -> {
                 // Return null so that Binder will trigger validation error on
                 // missing value.
                 intValue = null;
@@ -68,7 +68,7 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
                 intValue = value;
                 textField.setComponentError(null);
             });
-            fireEvent(event);
+            fireEvent(valueChange);
         });
     }
 

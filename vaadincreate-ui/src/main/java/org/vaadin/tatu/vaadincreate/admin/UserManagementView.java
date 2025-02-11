@@ -75,9 +75,9 @@ public class UserManagementView extends VerticalLayout implements TabView {
         userSelect.setItemCaptionGenerator(User::getName);
         userSelect.setPlaceholder(getTranslation(I18n.User.SEARCH));
         userSelect.setId("user-select");
-        userSelect.addValueChangeListener(event -> {
-            if (event.isUserOriginated()) {
-                userSelected(event.getValue());
+        userSelect.addValueChangeListener(valueChange -> {
+            if (valueChange.isUserOriginated()) {
+                userSelected(valueChange.getValue());
             }
         });
         var newUser = new Button(getTranslation(I18n.User.NEW_USER));
@@ -153,7 +153,7 @@ public class UserManagementView extends VerticalLayout implements TabView {
         dialog.setConfirmText(getTranslation(I18n.DELETE));
         dialog.setCancelText(getTranslation(I18n.CANCEL));
         dialog.open();
-        dialog.addConfirmedListener(e -> {
+        dialog.addConfirmedListener(confirmed -> {
             // If the user confirms the deletion, remove the user
             presenter.removeUser(user.getId());
             form.clear();

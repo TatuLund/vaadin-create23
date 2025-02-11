@@ -65,15 +65,15 @@ public class UserForm extends Composite implements HasI18N {
                         getTranslation(I18n.User.NOT_MATCHING))
                 .bind("passwd");
 
-        password2.addValueChangeListener(event -> {
-            if (event.isUserOriginated()) {
+        password2.addValueChangeListener(valueChange -> {
+            if (valueChange.isUserOriginated()) {
                 binder.validate();
             }
         });
         password2.setRequiredIndicatorVisible(true);
 
         binder.bind(role, "role");
-        binder.addValueChangeListener(event -> fireEvent(
+        binder.addValueChangeListener(valueChange -> fireEvent(
                 new FormChangedEvent(this, binder.isValid())));
 
         setCompositionRoot(form);

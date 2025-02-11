@@ -319,7 +319,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
     }
 
     @Override
-    public void enter(ViewChangeEvent event) {
+    public void enter(ViewChangeEvent viewChange) {
         openingView(VIEW_NAME);
         // There is no need to fetch data before navigation is complete, thus we
         // trigger it in enter, not in constructor

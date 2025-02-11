@@ -170,8 +170,8 @@ public class BookForm extends Composite implements HasI18N {
         binder.setChangeDetectionEnabled(true);
 
         // enable/disable save button while editing
-        binder.addStatusChangeListener(event -> {
-            isValid = !event.hasValidationErrors();
+        binder.addStatusChangeListener(statusChange -> {
+            isValid = !statusChange.hasValidationErrors();
             if (isValid) {
                 setStockCountAndAvailabilityInvalid(false);
             }
@@ -180,24 +180,24 @@ public class BookForm extends Composite implements HasI18N {
             }
         });
 
-        binder.addValueChangeListener(event -> {
+        binder.addValueChangeListener(valueChange -> {
             var hasChanges = binder.hasChanges();
             saveButton.setEnabled(hasChanges && isValid);
             discardButton.setEnabled(hasChanges);
         });
 
-        saveButton.addClickListener(event -> handleSave());
+        saveButton.addClickListener(clicked -> handleSave());
         saveButton.setClickShortcut(KeyCode.S, ModifierKey.CTRL);
 
-        discardButton.addClickListener(event -> {
+        discardButton.addClickListener(clicked -> {
             presenter.editProduct(currentProduct);
             updateDirtyIndicators();
         });
 
-        cancelButton.addClickListener(event -> presenter.cancelProduct());
+        cancelButton.addClickListener(clicked -> presenter.cancelProduct());
         cancelButton.setClickShortcut(KeyCode.ESCAPE);
 
-        deleteButton.addClickListener(event -> handleDelete());
+        deleteButton.addClickListener(clicked -> handleDelete());
 
         pageDownRegistration = addShortcutListener(
                 new ShortcutListener("Next", KeyCode.PAGE_DOWN, null) {

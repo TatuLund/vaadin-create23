@@ -44,7 +44,7 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
         tabSheet.setSizeFull();
         tabSheet.addStyleNames(ValoTheme.TABSHEET_PADDED_TABBAR,
                 ValoTheme.TABSHEET_CENTERED_TABS);
-        tabSheet.addSelectedTabChangeListener(e -> {
+        tabSheet.addSelectedTabChangeListener(tabChange -> {
             var tabName = ((TabView) tabSheet.getSelectedTab()).getTabName();
             setFragmentParameter(tabName);
             ((TabView) tabSheet.getSelectedTab()).enter();

@@ -44,6 +44,7 @@ public class EventBusTest {
         // Wait for latch
         try {
             latch.await();
+            wait10ms(); // Wait loggers to print
         } catch (InterruptedException e) {
             // Ignore
         }
@@ -59,11 +60,7 @@ public class EventBusTest {
         listener3 = null;
 
         System.gc();
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            // Ignore
-        }
+        wait100ms(); // Wait for GC to run
 
         event = new Event("World");
         latch = new CountDownLatch(1);
@@ -72,6 +69,7 @@ public class EventBusTest {
         // Wait for latch
         try {
             latch.await();
+            wait10ms(); // Wait loggers to print
         } catch (InterruptedException e) {
             // Ignore
         }
@@ -84,6 +82,22 @@ public class EventBusTest {
                 out.toString().contains("event fired for 1 recipients."));
 
         listener2.remove();
+    }
+
+    private void wait100ms() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            // Ignore
+        }
+    }
+
+    private void wait10ms() {
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            // Ignore
+        }
     }
 
     record Event(String message) {

@@ -164,8 +164,8 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         var filterField = new FilterField();
         // Apply the filter to grid's data provider. TextField value is never
         // null
-        filterField.addValueChangeListener(event -> {
-            grid.setFilter(book -> passesFilter(book, event.getValue()));
+        filterField.addValueChangeListener(valueChange -> {
+            grid.setFilter(book -> passesFilter(book, valueChange.getValue()));
             updateNoMatchesVisibility();
         });
 
@@ -195,10 +195,10 @@ public class BooksView extends CssLayout implements VaadinCreateView {
     }
 
     @Override
-    public void enter(ViewChangeEvent event) {
+    public void enter(ViewChangeEvent viewChange) {
         openingView(VIEW_NAME);
         draft = presenter.getDraft();
-        params = event.getParameters();
+        params = viewChange.getParameters();
         if (!accessControl.isUserInRole(Role.ADMIN)) {
             grid.setSelectionMode(SelectionMode.NONE);
             grid.setReadOnly(true);
@@ -224,7 +224,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         if (form.hasChanges()) {
             var dialog = createDiscardChangesConfirmDialog();
             dialog.open();
-            dialog.addConfirmedListener(e -> {
+            dialog.addConfirmedListener(confirmed -> {
                 form.showForm(false);
                 clearSelection();
                 setFragmentParameter("");
@@ -497,7 +497,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         if (form.hasChanges()) {
             var dialog = createDiscardChangesConfirmDialog();
             dialog.open();
-            dialog.addConfirmedListener(e -> {
+            dialog.addConfirmedListener(confirmed -> {
                 form.showForm(false);
                 event.navigate();
             });

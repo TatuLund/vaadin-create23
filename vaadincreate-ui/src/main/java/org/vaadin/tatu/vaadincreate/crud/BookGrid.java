@@ -79,16 +79,16 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         addColumn(Product::getProductName).setId(NAME_ID)
                 .setCaption(getTranslation(I18n.PRODUCT_NAME))
                 .setResizable(false)
-                .setComparator((p1, p2) -> p1.getProductName()
-                        .compareToIgnoreCase(p2.getProductName()));
+                .setComparator((product1, product2) -> product1.getProductName()
+                        .compareToIgnoreCase(product2.getProductName()));
 
         // Format and add " €" to price
         var priceCol = addColumn(
                 product -> String.format("%.2f €", product.getPrice()))
                         .setCaption(getTranslation(I18n.PRICE))
                         .setResizable(true)
-                        .setComparator((p1, p2) -> p1.getPrice()
-                                .compareTo(p2.getPrice()))
+                        .setComparator((product1, product2) -> product1
+                                .getPrice().compareTo(product2.getPrice()))
                         .setStyleGenerator(
                                 product -> VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT)
                         .setId(PRICE_ID);
@@ -96,8 +96,9 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         // Add an traffic light icon in front of availability
         addColumn(this::htmlFormatAvailability, new HtmlRenderer())
                 .setResizable(false)
-                .setComparator((p1, p2) -> p1.getAvailability().toString()
-                        .compareTo(p2.getAvailability().toString()))
+                .setComparator((product1, product2) -> product1
+                        .getAvailability().toString()
+                        .compareTo(product2.getAvailability().toString()))
                 .setId(AVAILABILITY_ID);
         availabilityCaption = new Label(getTranslation(I18n.AVAILABILITY));
         availabilityCaption
@@ -110,8 +111,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
             }
             return Integer.toString(product.getStockCount());
         }).setCaption(getTranslation(I18n.IN_STOCK)).setResizable(false)
-                .setComparator((p1, p2) -> Integer.compare(p1.getStockCount(),
-                        p2.getStockCount()))
+                .setComparator((product1, product2) -> Integer.compare(
+                        product1.getStockCount(), product2.getStockCount()))
                 .setStyleGenerator(
                         product -> VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT)
                 .setId(STOCK_ID);
@@ -292,7 +293,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         adjustColumns(width);
         // Add resize listener to update visible columns based on width
         resizeReg = getUI().getPage().addBrowserWindowResizeListener(
-                e -> adjustColumns(e.getWidth()));
+                windowResize -> adjustColumns(windowResize.getWidth()));
 
         // Ensure that we use the same format as the Converter
         var decimalFormat = (DecimalFormat) NumberFormat
@@ -325,7 +326,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
             }
             return null;
         });
-        getColumns().forEach(c -> c.setHidden(true));
+        getColumns().forEach(column -> column.setHidden(true));
         if (width < 650) {
             getColumn(NAME_ID).setHidden(false).setWidth(300);
             getColumn(PRICE_ID).setHidden(false);

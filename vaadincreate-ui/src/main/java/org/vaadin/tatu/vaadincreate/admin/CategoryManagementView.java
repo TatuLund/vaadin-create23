@@ -67,7 +67,7 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
 
         newCategoryButton = new Button(
                 getTranslation(I18n.Category.ADD_NEW_CATEGORY),
-                event -> addCategory());
+                click -> addCategory());
         newCategoryButton.setIcon(VaadinIcons.PLUS_CIRCLE);
         newCategoryButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         newCategoryButton.setDisableOnClick(true);
@@ -188,7 +188,7 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
             }
 
             deleteButton = new Button(VaadinIcons.TRASH,
-                    e -> handleConfirmDelete());
+                    click -> handleConfirmDelete());
             deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
             deleteButton.setDescription(String.format("%s: %s",
                     getTranslation(I18n.DELETE), category.getName()));
@@ -203,7 +203,7 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
                             getTranslation(I18n.Category.DUPLICATE)))
                     .bind("name");
             binder.setBean(category);
-            binder.addValueChangeListener(event -> handleSave());
+            binder.addValueChangeListener(valueChange -> handleSave());
 
             var layout = new HorizontalLayout(nameField, deleteButton);
             layout.setExpandRatio(nameField, 1);
@@ -223,9 +223,10 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
             nameField.setValueChangeTimeout(2000);
             nameField.setWidthFull();
             nameField.setPlaceholder(getTranslation(I18n.Category.INSTRUCTION));
-            nameField
-                    .addFocusListener(e -> newCategoryButton.setEnabled(false));
-            nameField.addBlurListener(e -> newCategoryButton.setEnabled(true));
+            nameField.addFocusListener(
+                    focus -> newCategoryButton.setEnabled(false));
+            nameField.addBlurListener(
+                    blur -> newCategoryButton.setEnabled(true));
         }
 
         private void handleSave() {
@@ -253,12 +254,13 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
             dialog.setConfirmText(getTranslation(I18n.DELETE));
             dialog.setCancelText(getTranslation(I18n.CANCEL));
             dialog.open();
-            dialog.addConfirmedListener(e -> {
+            dialog.addConfirmedListener(confirmed -> {
                 presenter.removeCategory(category);
                 list.removeItem(category);
                 categories.remove(category);
             });
-            dialog.addCancelListener(e -> deleteButton.setEnabled(true));
+            dialog.addCancelListener(
+                    cancelled -> deleteButton.setEnabled(true));
         }
     }
 }

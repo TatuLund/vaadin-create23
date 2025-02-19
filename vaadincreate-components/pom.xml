@@ -186,6 +186,9 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<failOnError>false</failOnError>
+				</configuration>
 			</plugin>
 
 			<plugin>
@@ -201,22 +204,6 @@
 					</execution>
 				</executions>
 			</plugin>
-            <plugin>
-                <groupId>net.alchim31.maven</groupId>
-            	<artifactId>yuicompressor-maven-plugin</artifactId>
-        	    <version>1.5.1</version>
-            	<executions>
-                	<execution>
-                    	<phase>process-resources</phase>
-    	                <goals>
-        	                <goal>compress</goal>
-            	        </goals>
-                	    <configuration>
-           	                <nosuffix>true</nosuffix>
-                    	</configuration>
-                	</execution>
-            	</executions>
-        	</plugin>
 		</plugins>
 
 		<!-- This is needed for the sources required by the client-side compiler to be

@@ -345,6 +345,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 VaadinSession session = event.getSession();
                 session.getSession().setMaxInactiveInterval(300);
                 session.addRequestHandler(this::handleRequest);
+                // Workaround of: https://github.com/vaadin/flow/issues/6959
                 session.setAttribute(WrappedSession.class,
                         session.getSession());
                 // Set error handler for the session to login all exceptions

@@ -12,7 +12,7 @@ import com.vaadin.ui.AbstractComponent;
  */
 @NullMarked
 @SuppressWarnings("serial")
-@JavaScript("attributeextension/attribute_extension_connector.js")
+@JavaScript("attributeextension/attribute_extension_connector.min.js")
 public class AttributeExtension extends AbstractJavaScriptExtension {
 
     protected AttributeExtension() {

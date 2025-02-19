@@ -1,20 +1,18 @@
 window.org_vaadin_tatu_vaadincreate_AttributeExtension = function () {
-  this.onStateChange = function () {
+  this.onStateChange = () => {
     const element = this.getElement(this.getParentId());
-    if (element) {
-      const attributes = this.getState().attributes;
-      for (var attr in attributes) {
-        if (attributes.hasOwnProperty(attr)) {
-          try {
-            element.setAttribute(attr, attributes[attr]);
-          } catch (e) {
-            console.error('Failed to set attribute ' + attr + ' to ' + attributes[attr], e);
-          }
-        }
+    if (!element) return;
+
+    const { attributes, removals } = this.getState();
+
+    Object.keys(attributes).forEach(attr => {
+      try {
+        element.setAttribute(attr, attributes[attr]);
+      } catch (error) {
+        console.error(`Failed to set attribute ${attr} to ${attributes[attr]}`, error);
       }
-      this.getState().removals.forEach(function(attr) {
-        element.removeAttribute(attr);
-      });
-    }
+    });
+
+    removals.forEach(attr => element.removeAttribute(attr));
   };
 };

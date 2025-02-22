@@ -355,7 +355,8 @@ public class BooksView extends CssLayout implements VaadinCreateView {
      * Clears the selection in the grid.
      */
     public void clearSelection() {
-        grid.getSelectionModel().deselectAll();
+        // IMHO: UI#access should not be necessary here
+        ui.access(() -> grid.deselectAll());
     }
 
     /**

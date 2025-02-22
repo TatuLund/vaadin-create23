@@ -23,7 +23,7 @@ public class HibernateUtil {
         throw new UnsupportedOperationException("Utility class");
     }
 
-    private static SessionFactory sessionFactory;
+    static SessionFactory sessionFactory;
 
     static {
         try {

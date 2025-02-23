@@ -13,6 +13,11 @@ import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.backend.service.UserServiceImpl;
 
+/**
+ * Test class for {@link UserService}.
+ *
+ * These integration tests run against the in-memory H2 database.
+ */
 public class UserServiceTest {
 
     private UserService service;

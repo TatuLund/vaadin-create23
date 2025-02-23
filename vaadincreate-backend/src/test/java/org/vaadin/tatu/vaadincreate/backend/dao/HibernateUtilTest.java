@@ -15,6 +15,12 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+/**
+ * Test class for {@link HibernateUtil}.
+ * 
+ * These unit tests use Mockito to mock the Hibernate Session and Transaction
+ * objects.
+ */
 public class HibernateUtilTest {
 
     @Mock

@@ -22,7 +22,9 @@ import java.util.Set;
 import javax.persistence.OptimisticLockException;
 
 /**
- * Simple unit test for the back-end data service.
+ * Test class for {@link ProductDataService}.
+ *
+ * These integration tests run against the in-memory H2 database.
  */
 public class ProductDataServiceTest {
 
@@ -212,5 +214,5 @@ public class ProductDataServiceTest {
         service.deleteCategory(newCategory.getId());
         draft = service.findDraft(user);
         assertTrue(draft.getCategory().isEmpty());
-    }   
+    }
 }

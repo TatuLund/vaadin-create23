@@ -7,6 +7,11 @@ import org.junit.Test;
 
 import org.vaadin.tatu.vaadincreate.backend.service.AppDataServiceImpl;
 
+/**
+ * Test class for {@link AppDataService}.
+ *
+ * These integration tests run against the in-memory H2 database.
+ */
 public class AppDataServiceTest {
 
     private AppDataService service;

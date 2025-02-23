@@ -2,6 +2,8 @@
 
 This is show case application for advanced Vaadin 8 topics. The application focuses on UI design and architecture of the UI code. These techniques help to keep old Vaadin 8 applications upto date. The application is built with Vaadin 8.27, which is fully compatible with Java 11 and 17.
 
+This project is my dogfooding test application for legacy Vaadin 8 as we are still maintaining it under our commercial extended maintenance program. Thus, even it is a bit fabricated, I have added there many detail that you would find in real production application.
+
 ## Covered topics
 
 Despites being somewhat artificial this demo app covers various use cases you may encounter in real life application. Source of the demonstrated cases has been actual customer questions I have seen during my career as a software consultant.
@@ -18,7 +20,7 @@ Despites being somewhat artificial this demo app covers various use cases you ma
 	- Responsive dashboard layout of Charts using Vaadin responsive CSS.
 	- Async loading and showing no data label during loading.
 	- Multi-axis Chart example.
-	- Automatically update the charts when someone saves or deletes book
+	- Automatically update the charts when someone saves or deletes book, as well as adds, removes or updates a category.
 - BooksView
 	- Responsive Grid using BrowserResizeListener, 
 	- Responsive CSS in Grid column
@@ -56,7 +58,12 @@ Despites being somewhat artificial this demo app covers various use cases you ma
 	- This EventBus is used in many ways in the application
 - The custom theme is using BEM (Block Element Modifier) naming scheme to avoid class name conflicts in CSS
 - Example of how to localize / provide translations for texts used in UI
-- Comprehensive set of unit, compomnent, integration and end to end tests
+
+### Automated testing
+
+The test suite of the application follows the principles that I think are the best practise for a Vaadin application. 
+
+- Comprehensive set of unit, component, integration and end to end tests
     - The project demonstrates testing approach I would recommend for typical Vaadin application:
     - Test custom components in isolation
     - Test as much as possible with unit tests
@@ -64,6 +71,11 @@ Despites being somewhat artificial this demo app covers various use cases you ma
     - Use UI Unit Testing for verifying various concurrent user actions scenarios
     - Verify the most important parts with end to end tests using TestBench
     - Include few Screenshot tests to verify visuals
+
+### Accessibility
+
+Vaadin 8 is not fully upto date with modern accessibility, but with some relatively simple workarounds acceptable accessibility can be still achieved and those are being demonstrated in this application.
+
 - Accessiblility
     - In most of the views some additional attributes are set for better accessibility
     - In StatsView Charts are having role "figure" and "aria-label" set for audible version of data
@@ -77,6 +89,10 @@ Despites being somewhat artificial this demo app covers various use cases you ma
     - Tabindex and visual focus ring is used to improve situational awateness
     - Using focus color in focused fields labels
 
+### General use components
+
+The general use components have been isolated in their own module. This is to emphasize separation of concern, and also making it possible to have end-to-end tests of the components in isolation agains test UIs.
+
 - Components module has examples of GWT and JavaScript extensions
 	- Reset button for text field extension with client side GWT,
 	- Character counter for TextArea and TextField showing remaining characters extension with GWT,
@@ -85,17 +101,18 @@ Despites being somewhat artificial this demo app covers various use cases you ma
 	- ConfirmDialog server side composition component,
 	- Suite of unit and integration tests for the components and standalone test UI for them
 
-Notes
+### Notes
 
 - Backend module has in memory data service built with H2 database and Hibernate and has simulated latency on service layer.
 - Dependency injection framework such as CDI or Spring is not being used, the demo has neutral stance on purpose and demonstrates that especially small applications can be built without them.
 
 ## This project uses commercial Vaadin products
 
-This is intentional to demonstrate the current state of Vaadin 8 extended maintenance
+This is intentional to demonstrate the current state of Vaadin 8 extended maintenance.
+
 The following commercial products are used.
 
-- Vaadin 8.27.2. The application uses some features it provides. (The latest free version 8.14.3)
+- Vaadin 8.27.6. The application uses some features it provides. (The latest free version 8.14.3)
   - Eager UI cleanup
   - Binder: change tracking
   - Binder: draft saving

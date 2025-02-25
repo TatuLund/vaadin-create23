@@ -99,8 +99,8 @@ public class LockedObjectsTest {
         @Override
         public void eventFired(Object event) {
             count.incrementAndGet();
-            latch.countDown();
             this.event = (LockingEvent) event;
+            latch.countDown();
         }
 
         public int getEventCount() {

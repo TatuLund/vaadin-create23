@@ -1,0 +1,9 @@
+# Dockerfile.db
+FROM postgres:13
+
+# Set environment variables for the database
+ENV POSTGRES_DB=vaadincreate
+ENV POSTGRES_USER=creator
+ENV POSTGRES_PASSWORD=creator
+
+EXPOSE 5432

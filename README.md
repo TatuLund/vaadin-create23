@@ -185,7 +185,35 @@ Debugging client side code in the vaadincreate-ui project:
   - run "mvn vaadin:run-codeserver" on a separate console while the application is running
   - activate Super Dev Mode in the debug window of the application or by adding ?superdevmode to the URL
   - You can access Java-sources and set breakpoints inside Chrome if you enable source maps from inspector settings.
- 
+
+### Build simulated production setup with Docker
+
+The project root folder has Dockerfile, Dockerfile.db and docker-compose.yaml files for setting up two container demonstrator "production" environment. 
+
+Check Dockerfile first, add your license key there into VAADIN_PRO_KEY environment variable, the license checker needs this during build time as it is using commercial assets.
+
+Then use command
+
+docker-compose build
+
+The building of the application container can take 5-10 minutes depending on how fast the dependencies are loaded. This build does not run the tests in order to speed up the process. The setenv.sh file in the repository is injected to the application container and has the system properties set for the production mode app.
+
+The other container is just Postgres database.
+
+Then you need to load initial data from the script in this repository, start the database container e.g. from Docker Desktop and use commands:
+
+docker cp vaadincreate.sql vaadin-create23-db-1:/backup/vaadincreate.sql
+docker exec -it vaadin-create23-db-1 psql -U creator -d vaadincreate -f /backup/vaadincreate.sql
+
+Then stop the container.
+
+If it works thus far, you can start the cluster using:
+
+docker-compose up
+
+If you change the application build it separately using, as the database container should not be usually rebuild unless you need to start from the scratch again.
+
+docker-compose build app
 
 ## License & Author
 

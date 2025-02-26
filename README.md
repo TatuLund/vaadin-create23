@@ -124,19 +124,25 @@ The following commercial products are used.
 
 ## Building and running the application
 
+```
 git clone <url of the repository>
 
 mvn clean install
+```
 
     (or use "mvn clean install -Pit" to run also the TestBench tests)
 
+```
 cd vaadincreate-ui
+```
 
 mvn jetty:run
 
 Alternatively run application with AppSecKit
 
+```
 mvn jetty:run -Pappsec
+```
 
 To see the demo, navigate to http://localhost:8080/
 
@@ -144,15 +150,19 @@ To see the demo, navigate to http://localhost:8080/
 
 The components module has test UI of its own for running the integration tests of the components.
 
+```
 git clone <url of the repository>
 
 mvn clean install
+```
 
     (or use "mvn clean install -Pit" to run also the TestBench tests)
 
+```
 cd vaadincreate-components
 
 mvn jetty:run
+```
 
 To see the demo, navigate to http://localhost:8080/
 
@@ -194,26 +204,36 @@ Check Dockerfile first, add your license key there into VAADIN_PRO_KEY environme
 
 Then use command
 
+```
 docker-compose build
+```
 
 The building of the application container can take 5-10 minutes depending on how fast the dependencies are loaded. This build does not run the tests in order to speed up the process. The setenv.sh file in the repository is injected to the application container and has the system properties set for the production mode app.
 
 The other container is just Postgres database.
 
-Then you need to load initial data from the script in this repository, start the database container e.g. from Docker Desktop and use commands:
+Then you need to load initial data from the script in this repository, start the database container and use commands:
 
-docker cp vaadincreate.sql vaadin-create23-db-1:/backup/vaadincreate.sql
-docker exec -it vaadin-create23-db-1 psql -U creator -d vaadincreate -f /backup/vaadincreate.sql
+```
+docker-compose up db
+docker exec -it vaadincreate23-db-1 mkdir /backup
+docker cp vaadincreate.sql vaadincreate23-db-1:/backup/vaadincreate.sql
+docker exec -it vaadincreate23-db-1 psql -U creator -d vaadincreate -f /backup/vaadincreate.sql
+```
 
 Then stop the container.
 
 If it works thus far, you can start the cluster using:
 
+```
 docker-compose up
+```
 
 If you change the application build it separately using, as the database container should not be usually rebuild unless you need to start from the scratch again.
 
+```
 docker-compose build app
+```
 
 ## License & Author
 

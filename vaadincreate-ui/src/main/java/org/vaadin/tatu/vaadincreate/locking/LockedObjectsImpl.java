@@ -46,6 +46,8 @@ public class LockedObjectsImpl implements LockedObjects {
         var id = object.getId();
         Objects.requireNonNull(id, "Can't unlock object with null id");
         Objects.requireNonNull(user, "user can't be null");
+        var userId = user.getId();
+        Objects.requireNonNull(userId, "user id can't be null");
         synchronized (lockedObjects) {
             if (lockedObjects.containsKey(object)) {
                 throw new IllegalStateException(
@@ -53,7 +55,8 @@ public class LockedObjectsImpl implements LockedObjects {
                                 object.getId()));
             }
             lockedObjects.put(object, user);
-            eventBus.post(new LockingEvent(object.getClass(), id, user, true));
+            eventBus.post(
+                    new LockingEvent(object.getClass(), id, userId, true));
             logger.debug("{} locked {} ({})", user.getName(),
                     object.getClass().getSimpleName(), object.getId());
         }
@@ -65,10 +68,12 @@ public class LockedObjectsImpl implements LockedObjects {
         var id = object.getId();
         Objects.requireNonNull(id, "Can't unlock object with null id");
         synchronized (lockedObjects) {
-            User user = lockedObjects.remove(object);
+            var user = lockedObjects.remove(object);
             if (user != null) {
+                var userId = user.getId();
+                assert userId != null : "user id can't be null";
                 eventBus.post(
-                        new LockingEvent(object.getClass(), id, user, false));
+                        new LockingEvent(object.getClass(), id, userId, false));
                 logger.debug("{} unlocked {} ({})", user.getName(),
                         object.getClass().getSimpleName(), object.getId());
             }

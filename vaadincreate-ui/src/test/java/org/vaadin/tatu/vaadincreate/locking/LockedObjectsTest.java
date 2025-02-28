@@ -42,10 +42,10 @@ public class LockedObjectsTest {
             // Ignore
         }
 
-        assertEquals(user, lockedObjects.isLocked(objects.get(0)));
+        assertEquals(user.getId(), lockedObjects.isLocked(objects.get(0)).getId());
         var event = listener.getLastEvent();
         assertEquals(1, listener.getEventCount());
-        assertEquals(user, event.user());
+        assertEquals(user.getId(), event.userId());
         assertEquals(objects.get(0).getId(), event.id());
         assertEquals(MockObject.class, event.type());
         assertTrue(event.locked());
@@ -61,7 +61,7 @@ public class LockedObjectsTest {
         assertEquals(null, lockedObjects.isLocked(objects.get(0)));
         event = listener.getLastEvent();
         assertEquals(2, listener.getEventCount());
-        assertEquals(user, event.user());
+        assertEquals(user.getId(), event.userId());
         assertEquals(objects.get(0).getId(), event.id());
         assertEquals(MockObject.class, event.type());
         assertFalse(event.locked());

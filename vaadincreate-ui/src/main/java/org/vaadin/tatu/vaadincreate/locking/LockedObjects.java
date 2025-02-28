@@ -52,6 +52,6 @@ public interface LockedObjects {
     /**
      * Locking event, which will be fired when object is locked or unlocked.
      */
-    public record LockingEvent(Class<?> type, Integer id, User user, boolean locked) implements Serializable {
+    public record LockingEvent(Class<?> type, Integer id, Integer userId, boolean locked) implements Serializable {
     }
 }

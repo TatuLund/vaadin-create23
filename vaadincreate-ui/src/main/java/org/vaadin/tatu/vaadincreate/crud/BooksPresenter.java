@@ -19,7 +19,7 @@ import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
-import org.vaadin.tatu.vaadincreate.crud.BooksPresenter.BooksChanged.BookChange;
+import org.vaadin.tatu.vaadincreate.crud.BooksPresenter.BooksChangedEvent.BookChange;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
@@ -293,8 +293,10 @@ public class BooksPresenter implements Serializable, EventBusListener {
         }
         view.setFragmentParameter("");
         // Post SaveEvent to EventBus
-        getEventBus()
-                .post(new BooksChanged(product, BooksChanged.BookChange.SAVE));
+        var id = product.getId();
+        assert id != null : "Product ID should not be null";
+        getEventBus().post(
+                new BooksChangedEvent(id, BooksChangedEvent.BookChange.SAVE));
         return product;
     }
 
@@ -316,7 +318,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
         unlockBook();
         view.setFragmentParameter("");
         getEventBus().post(
-                new BooksChanged(product, BooksChanged.BookChange.DELETE));
+                new BooksChangedEvent(id, BooksChangedEvent.BookChange.DELETE));
     }
 
     /**
@@ -441,12 +443,12 @@ public class BooksPresenter implements Serializable, EventBusListener {
             var id = lockingEvent.id();
             view.refreshProductAsync(id);
         }
-        if (event instanceof BooksChanged booksChanged) {
-            var product = booksChanged.product();
-            if (((BooksChanged) event).change() != BookChange.SAVE) {
+        if (event instanceof BooksChangedEvent booksChanged) {
+            var id = booksChanged.productId();
+            if (booksChanged.change() != BookChange.SAVE) {
                 return;
             }
-            view.refreshProductAsync(product);
+            view.refreshProductAsync(id);
         }
     }
 
@@ -467,7 +469,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
      * of a change made to a book, including the product affected and the type
      * of change.
      */
-    public record BooksChanged(Product product, BookChange change) {
+    public record BooksChangedEvent(Integer productId, BookChange change) {
         public enum BookChange {
             SAVE, DELETE
         }

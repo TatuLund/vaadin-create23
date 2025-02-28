@@ -242,13 +242,17 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             });
         }
         if (event instanceof UserUpdatedEvent userUpdated) {
-            var user = getSession().getSession().getAttribute(
+            var user = (User) getSession().getSession().getAttribute(
                     CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY);
-            if (user.equals(userUpdated.user())) {
+            assert user != null : "User must not be null";
+            var userId = user.getId();
+            assert userId != null : "User id must not be null";
+            if (userId.equals(userUpdated.userId())) {
                 logger.debug("User was updated, updating CurrentUser");
+                var updatedUser = getUserService().getUserById(userId);
                 access(() -> getSession().getSession().setAttribute(
                         CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY,
-                        userUpdated.user()));
+                        updatedUser));
             }
         }
     }

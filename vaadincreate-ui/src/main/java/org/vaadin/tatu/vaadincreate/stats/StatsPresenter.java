@@ -23,7 +23,7 @@ import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
-import org.vaadin.tatu.vaadincreate.crud.BooksPresenter.BooksChanged;
+import org.vaadin.tatu.vaadincreate.crud.BooksPresenter.BooksChangedEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 
@@ -174,7 +174,7 @@ public class StatsPresenter implements EventBusListener, Serializable {
     @Override
     public void eventFired(Object event) {
         // Update statistics when new product is added
-        if (event instanceof BooksChanged
+        if (event instanceof BooksChangedEvent
                 || event instanceof CategoriesUpdatedEvent) {
             logger.info(
                     "Book or Category saved or deleted, refreshing statistics.");

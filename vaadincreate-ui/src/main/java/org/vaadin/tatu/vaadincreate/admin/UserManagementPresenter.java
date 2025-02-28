@@ -85,7 +85,9 @@ public class UserManagementPresenter implements Serializable {
         accessControl.assertAdmin();
         try {
             var updatedUser = getService().updateUser(user);
-            getEventBus().post(new UserUpdatedEvent(updatedUser));
+            var id = updatedUser.getId();
+            assert id != null : "User ID should not be null";
+            getEventBus().post(new UserUpdatedEvent(id));
             view.showUserUpdated();
             requestUpdateUsers();
             logger.info("User {}/'{}' updated.", user.getId(), user.getName());
@@ -105,7 +107,7 @@ public class UserManagementPresenter implements Serializable {
         return VaadinCreateUI.get().getUserService();
     }
 
-    public record UserUpdatedEvent(User user) {
+    public record UserUpdatedEvent(Integer userId) {
     }
 
     private static Logger logger = LoggerFactory

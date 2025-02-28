@@ -3,7 +3,6 @@ package org.vaadin.tatu.vaadincreate;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 
 import org.junit.After;
 import org.junit.Before;
@@ -55,7 +54,7 @@ public class VaadinCreateUITest extends AbstractUITest {
 
         // WHEN: User is updated
         var newUser = ui.getUserService().updateUser(user);
-        EventBus.get().post(new UserUpdatedEvent(newUser));
+        EventBus.get().post(new UserUpdatedEvent(newUser.getId()));
 
         test($(MenuButton.class).id("inventory")).click();
         var view = $(BooksView.class).first();
@@ -63,7 +62,6 @@ public class VaadinCreateUITest extends AbstractUITest {
         waitForGrid(view, grid);
 
         // THEN: Current user is updated
-        assertSame(newUser, CurrentUser.get().get());
         assertEquals(newName, CurrentUser.get().get().getName());
         assertEquals(Role.USER, CurrentUser.get().get().getRole());
 

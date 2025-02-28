@@ -52,7 +52,7 @@ public class CategoryManagementPresenter implements Serializable {
         Objects.requireNonNull(id, "Category must have an ID to be removed");
         try {
             getService().deleteCategory(id);
-            getEventBus().post(new CategoriesUpdatedEvent(category,
+            getEventBus().post(new CategoriesUpdatedEvent(id,
                     CategoriesUpdatedEvent.CategoryChange.DELETE));
             view.showDeleted(category.getName());
         } catch (IllegalArgumentException e) {
@@ -77,7 +77,9 @@ public class CategoryManagementPresenter implements Serializable {
         try {
             newCat = getService().updateCategory(category);
             logger.info("Category '{}' updated.", category.getName());
-            getEventBus().post(new CategoriesUpdatedEvent(newCat,
+            var id = newCat.getId();
+            assert id != null : "Category ID should not be null";
+            getEventBus().post(new CategoriesUpdatedEvent(id,
                     CategoriesUpdatedEvent.CategoryChange.SAVE));
 
         } catch (OptimisticLockException | IllegalStateException
@@ -96,7 +98,7 @@ public class CategoryManagementPresenter implements Serializable {
         return VaadinCreateUI.get().getProductService();
     }
 
-    public record CategoriesUpdatedEvent(Category category,
+    public record CategoriesUpdatedEvent(Integer categoryId,
             CategoryChange change) {
         public enum CategoryChange {
             SAVE, DELETE

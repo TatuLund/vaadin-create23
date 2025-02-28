@@ -75,8 +75,8 @@ public class StatsViewTest extends AbstractUITest {
         sciFiCategory.setName("Science-Fiction");
         sciFiCategory = ui.getProductService().updateCategory(sciFiCategory);
         // Fire event to update the stats
-        EventBus.get().post(
-                new CategoriesUpdatedEvent(sciFiCategory, CategoryChange.SAVE));
+        EventBus.get().post(new CategoriesUpdatedEvent(sciFiCategory.getId(),
+                CategoryChange.SAVE));
         waitForCharts(dashboard);
 
         // Update reference stats to reflect category change

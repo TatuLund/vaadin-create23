@@ -1,11 +1,10 @@
-package org.vaadin.tatu.vaadincreate.backend;
+package org.vaadin.tatu.vaadincreate.backend.service;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import org.vaadin.tatu.vaadincreate.backend.service.AppDataServiceImpl;
+import org.vaadin.tatu.vaadincreate.backend.AppDataService;
 
 /**
  * Test class for {@link AppDataService}.

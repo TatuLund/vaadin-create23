@@ -262,6 +262,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         super.detach();
         // Unregister this UI instance from the event bus when it is detached
         getEventBus().unregisterEventBusListener(this);
+        getExecutor().shutdown();
     }
 
     @Override
@@ -294,6 +295,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         if (executor == null) {
             executor = Executors.newSingleThreadExecutor();
             executor.execute(() -> {
+                if (getSession() == null) {
+                    return;
+                }
                 // Add user id to MDC for logging
                 var user = (User) getSession().getSession().getAttribute(
                         CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY);
@@ -381,6 +385,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                     wrappedSession.invalidate();
                 }
                 logger.debug("Session ended");
+            });
+            getService().addServiceDestroyListener(event -> {
+                EventBus.get().shutdown();
             });
         }
 

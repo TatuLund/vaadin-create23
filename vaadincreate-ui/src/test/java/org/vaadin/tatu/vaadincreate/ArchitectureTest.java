@@ -50,6 +50,7 @@ public class ArchitectureTest {
                     .or(have(simpleNameEndingWith("Test")))
                     .or(have(simpleName("VaadinCreateUI")))
                     .or(have(simpleName("AboutView")))
+                    .or(have(simpleName("EventBusImpl")))
                     .or(resideInAPackage("..auth.."))
                     .or(resideInAPackage("..backend..")))
             .as("UI implementing code should not depend on backend");
@@ -62,6 +63,7 @@ public class ArchitectureTest {
                     .or(have(simpleNameEndingWith("Test")))
                     .or(have(simpleName("VaadinCreateUI")))
                     .or(have(simpleName("AboutView")))
+                    .or(have(simpleName("Servlet")))
                     .or(resideInAPackage("..eventbus.."))
                     .or(resideInAPackage("..locking.."))
                     .or(resideInAPackage("..auth.."))

@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 @NullMarked
 public class HibernateUtil {
 
-    private static final int DATABASE_CALL_WARN_LIMIT = 50;
+    private static final int DATABASE_CALL_WARN_LIMIT = 100;
 
     // Private constructor to prevent instantiation
     private HibernateUtil() {

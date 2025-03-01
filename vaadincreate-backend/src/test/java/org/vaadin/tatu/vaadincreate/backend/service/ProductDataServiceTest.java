@@ -1,11 +1,10 @@
-package org.vaadin.tatu.vaadincreate.backend;
+package org.vaadin.tatu.vaadincreate.backend.service;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
-import org.vaadin.tatu.vaadincreate.backend.service.ProductDataServiceImpl;
-import org.vaadin.tatu.vaadincreate.backend.service.UserServiceImpl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

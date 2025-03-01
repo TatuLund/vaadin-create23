@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.eventbus;
 
+import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -7,6 +8,7 @@ import java.util.concurrent.Executors;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.backend.RedisPubSubService;
 
 /**
  * Super simple event bus to be used with CDI, e.g. as application scoped
@@ -17,6 +19,11 @@ import org.slf4j.LoggerFactory;
 public class EventBusImpl implements EventBus {
 
     private static EventBusImpl instance;
+    private final String nodeId = UUID.randomUUID().toString();
+
+    // Initialize the Redis pub-sub service. Host, port, and channel names may
+    // be adjusted.
+    private final RedisPubSubService redisService = RedisPubSubService.get();
 
     /**
      * It is <em>VERY IMPORTANT</em> we use a weak hash map when registering
@@ -35,10 +42,27 @@ public class EventBusImpl implements EventBus {
     }
 
     private EventBusImpl() {
+        // Start the subscriber and handle incoming envelopes.
+        redisService.startSubscriber(envelope -> {
+            // Ignore events from the same node.
+            if (!nodeId.equals(envelope.nodeId())) {
+                // Dispatch the unwrapped event locally.
+                logger.debug("EventBus event received from {}: {}",
+                        envelope.nodeId(), envelope.event());
+                postLocal(envelope.event());
+            }
+        });
     }
 
     @Override
     public void post(Object event) {
+        // Publish the event using the Redis service.
+        redisService.publishEvent(nodeId, event);
+        // Immediately dispatch locally.
+        postLocal(event);
+    }
+
+    private void postLocal(Object event) {
         synchronized (eventListeners) {
             logger.debug("EventBus event fired for {} recipients.",
                     eventListeners.size());
@@ -67,6 +91,13 @@ public class EventBusImpl implements EventBus {
                         listener.hashCode());
             }
         }
+    }
+
+    @Override
+    public void shutdown() {
+        redisService.stopSubscriber();
+        redisService.closePublisher();
+        executor.shutdown();
     }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());

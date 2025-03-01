@@ -75,6 +75,8 @@ public interface EventBus {
      */
     public void unregisterEventBusListener(EventBusListener listener);
 
+    public void shutdown();
+
     /**
      * Retrieves the singleton instance of the EventBus.
      *

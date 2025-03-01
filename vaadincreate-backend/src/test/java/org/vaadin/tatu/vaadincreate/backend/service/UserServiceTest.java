@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate.backend;
+package org.vaadin.tatu.vaadincreate.backend.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,9 +9,9 @@ import javax.persistence.OptimisticLockException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
-import org.vaadin.tatu.vaadincreate.backend.service.UserServiceImpl;
 
 /**
  * Test class for {@link UserService}.

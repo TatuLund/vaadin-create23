@@ -8,10 +8,13 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.RedisPubSubService;
 
+@NullMarked
 public class RedisPubSubServiceImpl implements RedisPubSubService {
 
     private final Jedis publisherJedis;
@@ -43,14 +46,6 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
         mapper.findAndRegisterModules();
     }
 
-    /**
-     * Publishes an event wrapped in an envelope with metadata.
-     *
-     * @param nodeId
-     *            the identifier for the node sending the event.
-     * @param event
-     *            the event object to publish.
-     */
     @Override
     public void publishEvent(String nodeId, Object event) {
         if (localMode) {
@@ -59,8 +54,8 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
             return;
         }
         try {
-            EventEnvelope envelope = new EventEnvelope(nodeId, event);
-            String message = mapper.writeValueAsString(envelope);
+            var envelope = new EventEnvelope(nodeId, event);
+            var message = mapper.writeValueAsString(envelope);
             publisherJedis.publish(channel, message);
             logger.debug("Published event: {}", message);
         } catch (JedisConnectionException e) {
@@ -73,13 +68,6 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
         }
     }
 
-    /**
-     * Starts the subscriber which will deliver a deserialized EventEnvelope via
-     * the provided callback.
-     *
-     * @param envelopeHandler
-     *            a callback to handle each incoming envelope.
-     */
     @Override
     public void startSubscriber(Consumer<EventEnvelope> envelopeHandler) {
         executor.submit(() -> {
@@ -88,7 +76,7 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
                     @Override
                     public void onMessage(String channel, String message) {
                         try {
-                            EventEnvelope envelope = mapper.readValue(message,
+                            var envelope = mapper.readValue(message,
                                     EventEnvelope.class);
                             envelopeHandler.accept(envelope);
                         } catch (Exception e) {

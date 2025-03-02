@@ -262,6 +262,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         super.detach();
         // Unregister this UI instance from the event bus when it is detached
         getEventBus().unregisterEventBusListener(this);
+        logger.info("Shutting down executor");
         getExecutor().shutdown();
     }
 
@@ -293,18 +294,19 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
      */
     public ExecutorService getExecutor() {
         if (executor == null) {
+            logger.info("Creating executor");
             executor = Executors.newSingleThreadExecutor();
             executor.execute(() -> {
-                if (getSession() == null) {
-                    return;
-                }
-                // Add user id to MDC for logging
-                var user = (User) getSession().getSession().getAttribute(
-                        CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY);
-                if (user != null) {
-                    var userId = String.format("[%s/%s]",
-                            user.getRole().toString(), user.getName());
-                    MDC.put("userId", userId);
+                if (!executor.isShutdown()) {
+                    // Add user id to MDC for logging
+                    logger.debug("Adding user id to MDC");
+                    var user = (User) getSession().getSession().getAttribute(
+                            CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY);
+                    if (user != null) {
+                        var userId = String.format("[%s/%s]",
+                                user.getRole().toString(), user.getName());
+                        MDC.put("userId", userId);
+                    }
                 }
             });
         }
@@ -386,9 +388,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 }
                 logger.debug("Session ended");
             });
-            getService().addServiceDestroyListener(event -> {
-                EventBus.get().shutdown();
-            });
+            getService().addServiceDestroyListener(
+                    event -> EventBus.get().shutdown());
         }
 
         private String formatId() {

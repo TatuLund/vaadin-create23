@@ -42,13 +42,16 @@ public class EventBusImpl implements EventBus {
     }
 
     private EventBusImpl() {
+        logger.info("Starting EventBus");
         // Start the subscriber and handle incoming envelopes.
         redisService.startSubscriber(envelope -> {
+            logger.debug("EventBus event received from {}: {}",
+                    envelope.nodeId(), envelope.event());
             // Ignore events from the same node.
             if (!nodeId.equals(envelope.nodeId())) {
                 // Dispatch the unwrapped event locally.
-                logger.debug("EventBus event received from {}: {}",
-                        envelope.nodeId(), envelope.event());
+                logger.info("Relaying event to local listeners: {}",
+                        envelope.event());
                 postLocal(envelope.event());
             }
         });
@@ -95,6 +98,7 @@ public class EventBusImpl implements EventBus {
 
     @Override
     public void shutdown() {
+        logger.info("Shutting down EventBus");
         redisService.stopSubscriber();
         redisService.closePublisher();
         executor.shutdown();

@@ -384,7 +384,11 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                         .getAttribute(WrappedSession.class);
                 if (wrappedSession != null) {
                     logger.info("Invalidating session");
-                    wrappedSession.invalidate();
+                    try {
+                        wrappedSession.invalidate();
+                    } catch (IllegalStateException e) {
+                        logger.warn("Session already invalidated");
+                    }
                 }
                 logger.debug("Session ended");
             });

@@ -10,6 +10,12 @@
         <property name="hibernate.connection.username">creator</property>
         <property name="hibernate.connection.password">creator</property>
 
+        <!-- Use HikariCP for connection pooling -->
+        <property name="hibernate.connection.provider_class">org.hibernate.hikaricp.internal.HikariCPConnectionProvider</property>
+        <property name="hibernate.hikari.minimumIdle">5</property>
+        <property name="hibernate.hikari.maximumPoolSize">20</property>
+        <property name="hibernate.hikari.idleTimeout">300000</property>
+
         <!-- Usually you want to manage schema differently in production (e.g. 'validate', 'update') -->
         <property name="hibernate.hbm2ddl.auto">validate</property>
 

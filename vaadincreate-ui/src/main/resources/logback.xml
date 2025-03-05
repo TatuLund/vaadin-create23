@@ -24,4 +24,7 @@
     <logger name="com.tngtech.archunit" level="info" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
+    <logger name="com.zaxxer.hikari" level="info" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
 </configuration>

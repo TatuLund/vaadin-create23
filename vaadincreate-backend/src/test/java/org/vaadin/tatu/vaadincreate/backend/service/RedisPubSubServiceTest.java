@@ -24,7 +24,8 @@ public class RedisPubSubServiceTest {
 
     @Before
     public void setUp() {
-        service = new RedisPubSubServiceImpl("localhost", 6379, "test_channel");
+        service = new RedisPubSubServiceImpl("localhost", 6379, "test_channel",
+                null);
     }
 
     @After
@@ -37,10 +38,7 @@ public class RedisPubSubServiceTest {
     public void testPublishEventSuccessful() throws Exception {
         // Arrange: Replace the publisherJedis with a mock.
         var publisherMock = mock(Jedis.class);
-        var publisherField = RedisPubSubServiceImpl.class
-                .getDeclaredField("publisherJedis");
-        publisherField.setAccessible(true);
-        publisherField.set(service, publisherMock);
+        service.publisherJedis = publisherMock;
 
         // Act: Call publishEvent.
         service.publishEvent("node1", "testEvent");
@@ -57,14 +55,11 @@ public class RedisPubSubServiceTest {
     }
 
     @Test
-    public void testPublishEventSetsLocalModeOnException() throws Exception {
+    public void testPublishEventSetsLocalModeOnException() {
         // Arrange: Replace the publisherJedis with a mock that throws
         // exception.
         var publisherMock = mock(Jedis.class);
-        var publisherField = RedisPubSubServiceImpl.class
-                .getDeclaredField("publisherJedis");
-        publisherField.setAccessible(true);
-        publisherField.set(service, publisherMock);
+        service.publishEvent("node1", "testEvent");
 
         doThrow(new JedisConnectionException("Test exception"))
                 .when(publisherMock).publish(anyString(), anyString());
@@ -86,10 +81,7 @@ public class RedisPubSubServiceTest {
         // Arrange: Replace subscriberJedis with a mock.
         var latch = new CountDownLatch(1);
         var subscriberMock = mock(Jedis.class);
-        var subscriberField = RedisPubSubServiceImpl.class
-                .getDeclaredField("subscriberJedis");
-        subscriberField.setAccessible(true);
-        subscriberField.set(service, subscriberMock);
+        service.subscriberJedis = subscriberMock;
 
         @SuppressWarnings("unchecked")
         Consumer<EventEnvelope> envelopeConsumer = mock(Consumer.class);

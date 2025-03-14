@@ -18,7 +18,6 @@ import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
-import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.crud.BooksPresenter.BooksChangedEvent.BookChange;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
@@ -45,8 +44,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
     private transient CompletableFuture<Void> future;
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
-    private User userForDraft = Utils.getCurrentUserOrThrow();
-        
+
     @Nullable
     private Product editing;
     @Nullable
@@ -403,8 +401,9 @@ public class BooksPresenter implements Serializable, EventBusListener {
      *             if the current user is not present in the context
      */
     public void saveDraft(Product draft) {
-        // The CurrentUser may be null at time of detach
-        getService().saveDraft(userForDraft, draft);
+        accessControl.assertAdmin();
+        var user = Utils.getCurrentUserOrThrow();
+        getService().saveDraft(user, draft);
         this.draft = draft;
     }
 

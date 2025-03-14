@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -47,7 +48,6 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.server.WrappedSession;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -67,12 +67,20 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     // in the unit tests included. Supposed these were the real production
     // services this UI can be extended and getters for the services overriden
     // for creating test UI for unit tests.
+    @Nullable
     private transient ProductDataService productService = ProductDataService
             .get();
+
+    @Nullable
     private transient UserService userService = UserService.get();
+
+    @Nullable
     private transient AppDataService appService = AppDataService.get();
+
+    @Nullable
     private transient ExecutorService executor;
 
+    @Nullable
     private String target;
 
     @Override
@@ -262,8 +270,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         super.detach();
         // Unregister this UI instance from the event bus when it is detached
         getEventBus().unregisterEventBusListener(this);
-        logger.info("Shutting down executor");
-        getExecutor().shutdown();
+        shutdownExecutor();
     }
 
     @Override
@@ -313,6 +320,14 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         return executor;
     }
 
+    private void shutdownExecutor() {
+        if (executor != null) {
+            logger.info("Shutting down executor");
+            executor.shutdown();
+            executor = null;
+        }
+    }
+
     private static Logger logger = LoggerFactory
             .getLogger(VaadinCreateUI.class);
 
@@ -355,9 +370,6 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 VaadinSession session = event.getSession();
                 session.getSession().setMaxInactiveInterval(300);
                 session.addRequestHandler(this::handleRequest);
-                // Workaround of: https://github.com/vaadin/flow/issues/6959
-                session.setAttribute(WrappedSession.class,
-                        session.getSession());
                 // Set error handler for the session to login all exceptions
                 // happening in the session and show them to the user in the UI
                 session.setErrorHandler(errorHandler -> {
@@ -380,8 +392,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 // The servlet container typically does not immediately
                 // invalidate timed out sessions, so we need to do ourselves if
                 // we want an eager cleanup.
-                var wrappedSession = event.getSession()
-                        .getAttribute(WrappedSession.class);
+                var wrappedSession = event.getSession().getSession();
                 if (wrappedSession != null) {
                     logger.info("Invalidating session");
                     try {

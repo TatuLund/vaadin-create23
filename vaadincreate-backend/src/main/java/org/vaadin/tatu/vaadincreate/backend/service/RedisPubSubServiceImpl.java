@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.backend.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
@@ -10,6 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.RedisPubSubService;
@@ -17,8 +19,8 @@ import org.vaadin.tatu.vaadincreate.backend.RedisPubSubService;
 @NullMarked
 public class RedisPubSubServiceImpl implements RedisPubSubService {
 
-    private final Jedis publisherJedis;
-    private final Jedis subscriberJedis;
+    protected Jedis publisherJedis;
+    protected Jedis subscriberJedis;
     private final String channel;
     private final ExecutorService executor;
     private final ObjectMapper mapper;
@@ -29,16 +31,33 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
     public static synchronized RedisPubSubService getInstance() {
         if (instance == null) {
             instance = new RedisPubSubServiceImpl("redis", 6379,
-                    "eventbus_channel");
+                    "eventbus_channel", "creator");
         }
         return instance;
     }
 
-    protected RedisPubSubServiceImpl(String host, int port, String channel) {
+    protected RedisPubSubServiceImpl(String host, int port, String channel,
+            @Nullable String password) {
         this.channel = channel;
-        this.publisherJedis = new Jedis(host, port);
-        this.subscriberJedis = new Jedis(host, port);
-        this.executor = Executors.newSingleThreadExecutor();
+        publisherJedis = new Jedis(host, port);
+        if (password != null) {
+            try {
+                publisherJedis.auth(password);
+            } catch (JedisConnectionException e) {
+                logger.error("Authentication failed for publisher. Error: {}",
+                        e.getMessage());
+            }
+        }
+        subscriberJedis = new Jedis(host, port);
+        if (password != null) {
+            try {
+                subscriberJedis.auth(password);
+            } catch (JedisConnectionException e) {
+                logger.error("Authentication failed for subscriber. Error: {}",
+                        e.getMessage());
+            }
+        }
+        executor = Executors.newSingleThreadExecutor();
 
         // Configure ObjectMapper with support for Java records and polymorphic
         // types.
@@ -63,7 +82,7 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
                     "Redis is unavailable; falling back to local mode. Error: {}",
                     e.getMessage());
             localMode = true;
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             logger.error("Error serializing/publishing event", e);
         }
     }
@@ -79,9 +98,11 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
                             var envelope = mapper.readValue(message,
                                     EventEnvelope.class);
                             envelopeHandler.accept(envelope);
-                        } catch (Exception e) {
+                        } catch (JsonProcessingException e) {
                             logger.error("Error deserializing event message",
                                     e);
+                        } catch (Exception e) {
+                            logger.error("Unexpected error in onMessage", e);
                         }
                     }
                 }, channel);

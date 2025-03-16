@@ -18,12 +18,13 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
-import org.vaadin.tatu.vaadincreate.admin.CategoryManagementPresenter.CategoriesUpdatedEvent;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
-import org.vaadin.tatu.vaadincreate.crud.BooksPresenter.BooksChangedEvent;
+import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
+import org.vaadin.tatu.vaadincreate.backend.events.BooksChangedEvent;
+import org.vaadin.tatu.vaadincreate.backend.events.CategoriesUpdatedEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 
@@ -172,8 +173,8 @@ public class StatsPresenter implements EventBusListener, Serializable {
     }
 
     @Override
-    public void eventFired(Object event) {
-        // Update statistics when new product is added
+    public void eventFired(AbstractEvent event) {
+        // Update statistics when any relevant event occurs
         if (event instanceof BooksChangedEvent
                 || event instanceof CategoriesUpdatedEvent) {
             logger.info(

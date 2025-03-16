@@ -1,7 +1,5 @@
 package org.vaadin.tatu.vaadincreate.locking;
 
-import java.io.Serializable;
-
 import javax.annotation.Nullable;
 
 import org.jspecify.annotations.NullMarked;
@@ -49,9 +47,4 @@ public interface LockedObjects {
         return LockedObjectsImpl.getInstance();
     }
 
-    /**
-     * Locking event, which will be fired when object is locked or unlocked.
-     */
-    public record LockingEvent(Class<?> type, Integer id, Integer userId, boolean locked) implements Serializable {
-    }
 }

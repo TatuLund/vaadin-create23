@@ -1,7 +1,5 @@
 package org.vaadin.tatu.vaadincreate;
 
-import java.time.LocalDateTime;
-
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -11,6 +9,8 @@ import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
 import org.vaadin.tatu.vaadincreate.backend.AppDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
+import org.vaadin.tatu.vaadincreate.backend.events.MessageEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
@@ -190,7 +190,7 @@ public class AboutView extends VerticalLayout
     }
 
     @Override
-    public void eventFired(Object event) {
+    public void eventFired(AbstractEvent event) {
         if (event instanceof MessageEvent message) {
             Utils.access(ui, () -> {
                 if (adminsNoteField.isVisible()) {
@@ -223,9 +223,6 @@ public class AboutView extends VerticalLayout
 
     private AppDataService getService() {
         return VaadinCreateUI.get().getAppService();
-    }
-
-    public record MessageEvent(String message, LocalDateTime timeStamp) {
     }
 
     private static Logger logger = LoggerFactory.getLogger(AboutView.class);

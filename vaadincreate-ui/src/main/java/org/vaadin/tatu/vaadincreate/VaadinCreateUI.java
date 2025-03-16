@@ -14,9 +14,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.vaadin.tatu.vaadincreate.AboutView.MessageEvent;
 import org.vaadin.tatu.vaadincreate.admin.AdminView;
-import org.vaadin.tatu.vaadincreate.admin.UserManagementPresenter.UserUpdatedEvent;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.BasicAccessControl;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
@@ -25,6 +23,9 @@ import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
+import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
+import org.vaadin.tatu.vaadincreate.backend.events.MessageEvent;
+import org.vaadin.tatu.vaadincreate.backend.events.UserUpdatedEvent;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
@@ -48,6 +49,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -107,7 +109,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     private void onLogin() {
         target = getInitialTarget();
         logger.info("Initial target '{}'", target);
-        Utils.sessionFixation();
+        // Session fixation is not working with nginx
+        // Thus not using: "Utils.sessionFixation();"
+        getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
         getPage().reload();
         showAppLayout();
     }
@@ -240,7 +244,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     }
 
     @Override
-    public void eventFired(Object event) {
+    public void eventFired(AbstractEvent event) {
         if (event instanceof MessageEvent message) {
             access(() -> {
                 var note = new Notification(

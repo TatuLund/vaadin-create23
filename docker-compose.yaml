@@ -5,19 +5,40 @@ services:
     command: redis-server --requirepass "creator"
     ports:
       - "6379:6379"
+    networks:
+      - app-network
 
-  app:
+  app-1:
+    restart: 'unless-stopped'
+    hostname: app-1
     build:
       context: .
       dockerfile: Dockerfile
     environment:
       CATALINA_OPTS: "-Dvaadin.productionMode=true"
     ports:
-      - "8080:8080"
+      - 8081:8080
     depends_on:
       - db
       - redis
+    networks:
+      - app-network
 
+  app-2:
+    restart: 'unless-stopped'
+    hostname: app-2
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      CATALINA_OPTS: "-Dvaadin.productionMode=true"
+    ports:
+      - 8082:8080
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app-network
   db:
     build:
       context: .
@@ -26,6 +47,25 @@ services:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+    networks:
+      - app-network  
+
+  load_balancer:
+    hostname: load_balancer
+    restart: 'unless-stopped'
+    image: nginx:latest
+    ports:
+      - 8080:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app-1
+      - app-2
+    networks:
+      - app-network
 
 volumes:
   db-data:
+networks:
+  app-network:
+    driver: bridge

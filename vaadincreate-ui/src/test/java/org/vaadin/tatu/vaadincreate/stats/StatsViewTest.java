@@ -13,11 +13,11 @@ import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
-import org.vaadin.tatu.vaadincreate.admin.CategoryManagementPresenter.CategoriesUpdatedEvent;
-import org.vaadin.tatu.vaadincreate.admin.CategoryManagementPresenter.CategoriesUpdatedEvent.CategoryChange;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.backend.events.CategoriesUpdatedEvent;
+import org.vaadin.tatu.vaadincreate.backend.events.CategoriesUpdatedEvent.CategoryChange;
 import org.vaadin.tatu.vaadincreate.crud.BooksPresenter;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
 import org.vaadin.tatu.vaadincreate.crud.FakeGrid;
@@ -57,7 +57,7 @@ public class StatsViewTest extends AbstractUITest {
     }
 
     @Test
-    public void chars_will_be_updated_when_category_is_being_updated() {
+    public void charts_will_be_updated_when_category_is_being_updated() {
         // Setup reference stats
         prices = referencePrices();
         availabilities = referenceAvailabilities();

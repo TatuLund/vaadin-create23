@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.locking;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -13,9 +14,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.AbstractEntity;
+import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
+import org.vaadin.tatu.vaadincreate.backend.events.LockingEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
-import org.vaadin.tatu.vaadincreate.locking.LockedObjects.LockingEvent;
 
 public class LockedObjectsTest {
 
@@ -42,7 +44,8 @@ public class LockedObjectsTest {
             // Ignore
         }
 
-        assertEquals(user.getId(), lockedObjects.isLocked(objects.get(0)).getId());
+        assertEquals(user.getId(),
+                lockedObjects.isLocked(objects.get(0)).getId());
         var event = listener.getLastEvent();
         assertEquals(1, listener.getEventCount());
         assertEquals(user.getId(), event.userId());
@@ -58,7 +61,7 @@ public class LockedObjectsTest {
             // Ignore
         }
 
-        assertEquals(null, lockedObjects.isLocked(objects.get(0)));
+        assertNull(lockedObjects.isLocked(objects.get(0)));
         event = listener.getLastEvent();
         assertEquals(2, listener.getEventCount());
         assertEquals(user.getId(), event.userId());
@@ -86,6 +89,34 @@ public class LockedObjectsTest {
         lockedObjects.unlock(objects.get(0));
     }
 
+    @Test
+    public void remoteLockingAndUnlocking() {
+        var listener = new TestListener();
+        var user = userService.getAllUsers().get(0);
+        var eventBus = EventBus.get();
+        var lockingEvent = new LockingEvent(MockObject.class,
+                objects.get(0).getId(), user.getId(), true);
+        eventBus.post(lockingEvent);
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            // Ignore
+        }
+        assertEquals(1, listener.getEventCount());
+
+        assertEquals(user, lockedObjects.isLocked(objects.get(0)));
+
+        lockingEvent = new LockingEvent(MockObject.class,
+                objects.get(0).getId(), user.getId(), false);
+        eventBus.post(lockingEvent);
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            // Ignore
+        }
+        assertNull(lockedObjects.isLocked(objects.get(0)));
+    }
+
     public static class TestListener implements EventBusListener {
 
         private AtomicInteger count = new AtomicInteger(0);
@@ -97,9 +128,11 @@ public class LockedObjectsTest {
         }
 
         @Override
-        public void eventFired(Object event) {
+        public void eventFired(AbstractEvent event) {
             count.incrementAndGet();
-            this.event = (LockingEvent) event;
+            if (event instanceof LockingEvent) {
+                this.event = (LockingEvent) event;
+            }
             latch.countDown();
         }
 

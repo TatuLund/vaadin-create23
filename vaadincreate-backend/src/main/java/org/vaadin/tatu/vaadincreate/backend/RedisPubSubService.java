@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate.backend;
 import java.util.function.Consumer;
 
 import org.jspecify.annotations.NullMarked;
+import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
 import org.vaadin.tatu.vaadincreate.backend.service.RedisPubSubServiceImpl;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -18,7 +19,7 @@ public interface RedisPubSubService {
      * @param event
      *            the event object to publish, not null.
      */
-    public void publishEvent(String nodeId, Object event);
+    public void publishEvent(String nodeId, AbstractEvent event);
 
     /**
      * Starts the subscriber which will deliver a deserialized EventEnvelope via
@@ -49,8 +50,8 @@ public interface RedisPubSubService {
     }
 
     /**
-     * Represents an envelope for events, containing metadata such as the node ID
-     * and the event object itself.
+     * Represents an envelope for events, containing metadata such as the node
+     * ID and the event object itself.
      *
      * @param nodeId
      *            the identifier for the node sending the event, not null.
@@ -58,6 +59,6 @@ public interface RedisPubSubService {
      *            the event object, not null.
      */
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-    public record EventEnvelope(String nodeId, Object event) {
+    public record EventEnvelope(String nodeId, AbstractEvent event) {
     }
 }

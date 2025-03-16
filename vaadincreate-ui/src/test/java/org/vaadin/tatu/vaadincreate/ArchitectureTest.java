@@ -50,6 +50,7 @@ public class ArchitectureTest {
                     .or(have(simpleNameEndingWith("Test")))
                     .or(have(simpleName("VaadinCreateUI")))
                     .or(have(simpleName("AboutView")))
+                    .or(have(simpleName("LockedObjectsImpl")))
                     .or(have(simpleName("EventBusImpl")))
                     .or(resideInAPackage("..auth.."))
                     .or(resideInAPackage("..backend..")))

@@ -17,7 +17,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.User;
 import java.io.IOException;
 
 @NullMarked
-@WebFilter("/*")
+@WebFilter(urlPatterns = "/*", asyncSupported = true)
 public class LoggingFilter implements Filter {
 
     @Override

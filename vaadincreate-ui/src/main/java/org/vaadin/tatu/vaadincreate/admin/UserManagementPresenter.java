@@ -11,6 +11,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
+import org.vaadin.tatu.vaadincreate.backend.events.UserUpdatedEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
 @NullMarked
@@ -105,9 +106,6 @@ public class UserManagementPresenter implements Serializable {
 
     private UserService getService() {
         return VaadinCreateUI.get().getUserService();
-    }
-
-    public record UserUpdatedEvent(Integer userId) {
     }
 
     private static Logger logger = LoggerFactory

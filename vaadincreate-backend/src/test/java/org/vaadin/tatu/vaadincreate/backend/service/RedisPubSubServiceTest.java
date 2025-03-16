@@ -10,11 +10,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.backend.RedisPubSubService.EventEnvelope;
+import org.vaadin.tatu.vaadincreate.backend.events.MessageEvent;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
@@ -41,17 +43,18 @@ public class RedisPubSubServiceTest {
         service.publisherJedis = publisherMock;
 
         // Act: Call publishEvent.
-        service.publishEvent("node1", "testEvent");
+        service.publishEvent("node1",
+                new MessageEvent("testEvent", LocalDateTime.now()));
 
         // Assert: Verify publish was called with a proper JSON message.
         verify(publisherMock).publish(eq("test_channel"), anyString());
         // Capture and verify the published message.
-        var publishedMessage = getPublishedMessage(publisherMock);
+        String publishedMessage = getPublishedMessage(publisherMock);
         var mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
         var envelope = mapper.readValue(publishedMessage, EventEnvelope.class);
         assertEquals("node1", envelope.nodeId());
-        assertEquals("testEvent", envelope.event());
+        assertEquals("testEvent", ((MessageEvent) envelope.event()).message());
     }
 
     @Test
@@ -59,18 +62,21 @@ public class RedisPubSubServiceTest {
         // Arrange: Replace the publisherJedis with a mock that throws
         // exception.
         var publisherMock = mock(Jedis.class);
-        service.publishEvent("node1", "testEvent");
+        service.publishEvent("node1",
+                new MessageEvent("testEvent", LocalDateTime.now()));
 
         doThrow(new JedisConnectionException("Test exception"))
                 .when(publisherMock).publish(anyString(), anyString());
 
         // Act: Call publishEvent which should catch exception and set
         // localMode.
-        service.publishEvent("node1", "testEvent");
+        service.publishEvent("node1",
+                new MessageEvent("testEvent", LocalDateTime.now()));
 
         // Reset the mock to verify that subsequent calls do nothing.
         reset(publisherMock);
-        service.publishEvent("node1", "testEvent");
+        service.publishEvent("node1",
+                new MessageEvent("testEvent", LocalDateTime.now()));
 
         // Assert: publish should not be called after localMode is set.
         verify(publisherMock, never()).publish(anyString(), anyString());
@@ -90,7 +96,8 @@ public class RedisPubSubServiceTest {
         doAnswer(invocation -> {
             JedisPubSub pubSub = invocation.getArgument(0);
             // Simulate a received message.
-            var envelope = new EventEnvelope("node1", "testEvent");
+            var envelope = new EventEnvelope("node1",
+                    new MessageEvent("testEvent", LocalDateTime.now()));
             var mapper = new ObjectMapper();
             mapper.findAndRegisterModules();
             var json = mapper.writeValueAsString(envelope);
@@ -120,7 +127,8 @@ public class RedisPubSubServiceTest {
             return 1L;
         }).when(publisherMock).publish(anyString(), anyString());
         // Re-call publishEvent to capture the message.
-        service.publishEvent("node1", "testEvent");
+        service.publishEvent("node1",
+                new MessageEvent("testEvent", LocalDateTime.now()));
         return capturedMessage[0];
     }
 }

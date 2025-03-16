@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.eventbus;
 
 import org.jspecify.annotations.NullMarked;
+import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
 
 /**
  * The EventBus interface provides a mechanism for posting events and
@@ -47,7 +48,7 @@ public interface EventBus {
          * @param event
          *            the event object that was fired
          */
-        public void eventFired(Object event);
+        public void eventFired(AbstractEvent event);
     }
 
     /**
@@ -57,7 +58,7 @@ public interface EventBus {
      * @param event
      *            the event object to be posted. It should not be null.
      */
-    public void post(Object event);
+    public void post(AbstractEvent event);
 
     /**
      * Registers an event bus listener to receive events.

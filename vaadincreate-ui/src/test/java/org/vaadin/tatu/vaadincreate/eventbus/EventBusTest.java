@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.eventbus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.time.LocalDateTime;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -9,6 +10,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
+import org.vaadin.tatu.vaadincreate.backend.events.MessageEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 
 public class EventBusTest {
@@ -29,8 +32,11 @@ public class EventBusTest {
 
     @After
     public void restoreInitialStreams() {
+        var log = out.toString();
         System.setOut(originalOut);
         System.setErr(originalErr);
+
+        System.out.println(log);
     }
 
     @Test
@@ -39,7 +45,7 @@ public class EventBusTest {
         var listener1 = new TestListener();
         var listener2 = new TestListener();
         var listener3 = new TestListener();
-        var event = new Event("Hello");
+        var event = new MessageEvent("Hello", LocalDateTime.now());
         eventBus.post(event);
         // Wait for latch
         try {
@@ -49,12 +55,12 @@ public class EventBusTest {
             // Ignore
         }
 
-        Assert.assertTrue(
-                out.toString().contains("event fired for 3 recipients."));
         Assert.assertEquals(1, listener1.getEventCount());
-        Assert.assertEquals("Hello", listener1.getLastEvent().toString());
+        Assert.assertEquals("Hello", listener1.getLastEvent().message());
         Assert.assertEquals(1, listener2.getEventCount());
-        Assert.assertEquals("Hello", listener2.getLastEvent().toString());
+        Assert.assertEquals("Hello", listener2.getLastEvent().message());
+        Assert.assertEquals(1, listener3.getEventCount());
+        Assert.assertEquals("Hello", listener3.getLastEvent().message());
 
         listener1.remove();
         listener3 = null;
@@ -62,7 +68,7 @@ public class EventBusTest {
         System.gc();
         wait100ms(); // Wait for GC to run
 
-        event = new Event("World");
+        event = new MessageEvent("World", LocalDateTime.now());
         latch = new CountDownLatch(1);
 
         eventBus.post(event);
@@ -75,11 +81,11 @@ public class EventBusTest {
         }
 
         Assert.assertEquals(1, listener1.getEventCount());
-        Assert.assertEquals("Hello", listener1.getLastEvent().toString());
+        Assert.assertEquals("Hello", listener1.getLastEvent().message());
         Assert.assertEquals(2, listener2.getEventCount());
-        Assert.assertEquals("World", listener2.getLastEvent().toString());
+        Assert.assertEquals("World", listener2.getLastEvent().message());
         Assert.assertTrue(
-                out.toString().contains("event fired for 1 recipients."));
+                out.toString().contains("event fired for 2 recipients."));
 
         listener2.remove();
     }
@@ -100,17 +106,10 @@ public class EventBusTest {
         }
     }
 
-    record Event(String message) {
-        @Override
-        public final String toString() {
-            return message;
-        }
-    }
-
     public static class TestListener implements EventBusListener {
 
         private AtomicInteger count = new AtomicInteger(0);
-        private Object event;
+        private MessageEvent event;
         private EventBus eventBus = EventBus.get();
 
         public TestListener() {
@@ -118,17 +117,19 @@ public class EventBusTest {
         }
 
         @Override
-        public void eventFired(Object event) {
+        public void eventFired(AbstractEvent event) {
             count.incrementAndGet();
             latch.countDown();
-            this.event = event;
+            if (event instanceof MessageEvent) {
+                this.event = (MessageEvent) event;
+            }
         }
 
         public int getEventCount() {
             return count.get();
         }
 
-        public Object getLastEvent() {
+        public MessageEvent getLastEvent() {
             return event;
         }
 

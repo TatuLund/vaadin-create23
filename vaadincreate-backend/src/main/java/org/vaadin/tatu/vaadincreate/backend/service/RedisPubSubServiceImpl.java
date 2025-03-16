@@ -15,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.RedisPubSubService;
+import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
 
 @NullMarked
 public class RedisPubSubServiceImpl implements RedisPubSubService {
@@ -66,7 +67,7 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
     }
 
     @Override
-    public void publishEvent(String nodeId, Object event) {
+    public void publishEvent(String nodeId, AbstractEvent event) {
         if (localMode) {
             logger.trace("Local mode is enabled; event not published: {}",
                     event);

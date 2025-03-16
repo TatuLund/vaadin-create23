@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.vaadin.tatu.vaadincreate.AboutView.MessageEvent;
 import org.vaadin.tatu.vaadincreate.AppLayout.MenuButton;
+import org.vaadin.tatu.vaadincreate.backend.events.MessageEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
 import com.vaadin.server.ServiceException;

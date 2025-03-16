@@ -13,6 +13,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
+import org.vaadin.tatu.vaadincreate.backend.events.CategoriesUpdatedEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
 @NullMarked
@@ -96,13 +97,6 @@ public class CategoryManagementPresenter implements Serializable {
 
     private ProductDataService getService() {
         return VaadinCreateUI.get().getProductService();
-    }
-
-    public record CategoriesUpdatedEvent(Integer categoryId,
-            CategoryChange change) {
-        public enum CategoryChange {
-            SAVE, DELETE
-        }
     }
 
     private static Logger logger = LoggerFactory

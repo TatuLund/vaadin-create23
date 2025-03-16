@@ -19,11 +19,13 @@ import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
-import org.vaadin.tatu.vaadincreate.crud.BooksPresenter.BooksChangedEvent.BookChange;
+import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
+import org.vaadin.tatu.vaadincreate.backend.events.BooksChangedEvent;
+import org.vaadin.tatu.vaadincreate.backend.events.BooksChangedEvent.BookChange;
+import org.vaadin.tatu.vaadincreate.backend.events.LockingEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
-import org.vaadin.tatu.vaadincreate.locking.LockedObjects.LockingEvent;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 /**
@@ -439,7 +441,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
     }
 
     @Override
-    public void eventFired(Object event) {
+    public void eventFired(AbstractEvent event) {
         if (event instanceof LockingEvent lockingEvent) {
             var id = lockingEvent.id();
             view.refreshProductAsync(id);
@@ -463,17 +465,6 @@ public class BooksPresenter implements Serializable, EventBusListener {
 
     private ExecutorService getExecutor() {
         return VaadinCreateUI.get().getExecutor();
-    }
-
-    /**
-     * Represents a change event for books. This record encapsulates the details
-     * of a change made to a book, including the product affected and the type
-     * of change.
-     */
-    public record BooksChangedEvent(Integer productId, BookChange change) {
-        public enum BookChange {
-            SAVE, DELETE
-        }
     }
 
     private EventBus getEventBus() {

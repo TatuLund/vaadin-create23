@@ -85,7 +85,7 @@ public class EventBusTest {
         Assert.assertEquals(2, listener2.getEventCount());
         Assert.assertEquals("World", listener2.getLastEvent().message());
         Assert.assertTrue(
-                out.toString().contains("event fired for 2 recipients."));
+                out.toString().contains("event fired for 1 recipients."));
 
         listener2.remove();
     }

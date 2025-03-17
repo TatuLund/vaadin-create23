@@ -44,11 +44,10 @@ public class LockedObjectsTest {
             // Ignore
         }
 
-        assertEquals(user.getId(),
-                lockedObjects.isLocked(objects.get(0)).getId());
+        assertEquals(user.getName(), lockedObjects.isLocked(objects.get(0)));
         var event = listener.getLastEvent();
         assertEquals(1, listener.getEventCount());
-        assertEquals(user.getId(), event.userId());
+        assertEquals(user.getName(), event.userName());
         assertEquals(objects.get(0).getId(), event.id());
         assertEquals(MockObject.class, event.type());
         assertTrue(event.locked());
@@ -65,10 +64,10 @@ public class LockedObjectsTest {
         event = listener.getLastEvent();
         assertEquals(2, listener.getEventCount());
         assertEquals(user.getId(), event.userId());
+        assertEquals(user.getName(), event.userName());
         assertEquals(objects.get(0).getId(), event.id());
         assertEquals(MockObject.class, event.type());
         assertFalse(event.locked());
-
         listener.remove();
     }
 
@@ -77,7 +76,7 @@ public class LockedObjectsTest {
         boolean thrown = false;
         var user = userService.getAllUsers().get(0);
         lockedObjects.lock(objects.get(0), user);
-        assertEquals(user, lockedObjects.isLocked(objects.get(0)));
+        assertEquals(user.getName(), lockedObjects.isLocked(objects.get(0)));
         try {
             lockedObjects.lock(objects.get(0),
                     userService.getAllUsers().get(1));
@@ -85,7 +84,7 @@ public class LockedObjectsTest {
             thrown = true;
         }
         assertTrue(thrown);
-        assertEquals(user, lockedObjects.isLocked(objects.get(0)));
+        assertEquals(user.getName(), lockedObjects.isLocked(objects.get(0)));
         lockedObjects.unlock(objects.get(0));
     }
 
@@ -95,7 +94,7 @@ public class LockedObjectsTest {
         var user = userService.getAllUsers().get(0);
         var eventBus = EventBus.get();
         var lockingEvent = new LockingEvent(MockObject.class,
-                objects.get(0).getId(), user.getId(), true);
+                objects.get(0).getId(), user.getId(), user.getName(), true);
         eventBus.post(lockingEvent);
         try {
             Thread.sleep(50);
@@ -104,10 +103,10 @@ public class LockedObjectsTest {
         }
         assertEquals(1, listener.getEventCount());
 
-        assertEquals(user, lockedObjects.isLocked(objects.get(0)));
+        assertEquals(user.getName(), lockedObjects.isLocked(objects.get(0)));
 
         lockingEvent = new LockingEvent(MockObject.class,
-                objects.get(0).getId(), user.getId(), false);
+                objects.get(0).getId(), user.getId(), user.getName(), false);
         eventBus.post(lockingEvent);
         try {
             Thread.sleep(50);

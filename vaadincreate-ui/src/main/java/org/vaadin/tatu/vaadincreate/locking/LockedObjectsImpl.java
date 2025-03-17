@@ -1,14 +1,13 @@
 package org.vaadin.tatu.vaadincreate.locking;
 
-import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Objects;
-import java.util.WeakHashMap;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.AbstractEntity;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
@@ -24,7 +23,7 @@ public class LockedObjectsImpl implements LockedObjects, EventBusListener {
     private EventBus eventBus = EventBus.get();
     private static final String NOT_NULL_ERROR = "object can't be null";
 
-    private final WeakHashMap<Integer, Integer> lockedObjects = new WeakHashMap<>();
+    private final HashMap<Integer, UserData> lockedObjects = new LinkedHashMap<>();
 
     public static synchronized LockedObjects getInstance() {
         if (instance == null) {
@@ -39,19 +38,17 @@ public class LockedObjectsImpl implements LockedObjects, EventBusListener {
 
     @Nullable
     @Override
-    public User isLocked(AbstractEntity object) {
+    public String isLocked(AbstractEntity object) {
         Objects.requireNonNull(object, NOT_NULL_ERROR);
         Integer id = object.getId();
         Objects.requireNonNull(id, NOT_NULL_ERROR);
-        Integer userId;
+        String userName = null;
         synchronized (lockedObjects) {
-            userId = lockedObjects.get(id);
+            userName = lockedObjects.get(id) != null
+                    ? lockedObjects.get(id).name()
+                    : null;
         }
-        if (userId == null) {
-            return null;
-        }
-        UserService userService = UserService.get();
-        return userService.getUserById(userId);
+        return userName;
     }
 
     @Override
@@ -60,6 +57,7 @@ public class LockedObjectsImpl implements LockedObjects, EventBusListener {
         var id = object.getId();
         Objects.requireNonNull(id, "Can't unlock object with null id");
         Objects.requireNonNull(user, "user can't be null");
+        var userName = user.getName();
         var userId = user.getId();
         Objects.requireNonNull(userId, "user id can't be null");
         synchronized (lockedObjects) {
@@ -68,9 +66,9 @@ public class LockedObjectsImpl implements LockedObjects, EventBusListener {
                         String.format("Can't lock object already locked: %s",
                                 object.getId()));
             }
-            lockedObjects.put(id, userId);
-            eventBus.post(
-                    new LockingEvent(object.getClass(), id, userId, true));
+            lockedObjects.put(id, new UserData(userName, userId));
+            eventBus.post(new LockingEvent(object.getClass(), id, userId,
+                    userName, true));
             logger.debug("{} locked {} ({})", user.getName(),
                     object.getClass().getSimpleName(), object.getId());
         }
@@ -82,10 +80,12 @@ public class LockedObjectsImpl implements LockedObjects, EventBusListener {
         var id = object.getId();
         Objects.requireNonNull(id, "Can't unlock object with null id");
         synchronized (lockedObjects) {
-            var userId = lockedObjects.remove(id);
-            if (userId != null) {
-                eventBus.post(
-                        new LockingEvent(object.getClass(), id, userId, false));
+            var userData = lockedObjects.remove(id);
+            if (userData != null) {
+                var userId = userData.id();
+                var userName = userData.name();
+                eventBus.post(new LockingEvent(object.getClass(), id, userId,
+                        userName, false));
                 logger.debug("Unlocked {} ({})",
                         object.getClass().getSimpleName(), object.getId());
             }
@@ -101,7 +101,8 @@ public class LockedObjectsImpl implements LockedObjects, EventBusListener {
                     logger.debug("Remote locked {} ({}) by user {}",
                             lockingEvent.type().getSimpleName(),
                             lockingEvent.id(), lockingEvent.userId());
-                    lockedObjects.put(lockingEvent.id(), lockingEvent.userId());
+                    lockedObjects.put(lockingEvent.id(), new UserData(
+                            lockingEvent.userName(), lockingEvent.userId()));
                 } else if (!lockingEvent.locked()
                         && lockedObjects.containsKey(lockingEvent.id())) {
                     logger.debug("Remote unlocked {} ({}) by user {}",
@@ -111,6 +112,9 @@ public class LockedObjectsImpl implements LockedObjects, EventBusListener {
                 }
             }
         }
+    }
+
+    private record UserData(String name, Integer id) {
     }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());

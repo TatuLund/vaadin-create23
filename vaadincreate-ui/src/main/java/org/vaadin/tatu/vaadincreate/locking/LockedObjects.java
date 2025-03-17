@@ -21,7 +21,7 @@ public interface LockedObjects {
      *         locked.
      */
     @Nullable
-    public User isLocked(AbstractEntity object);
+    public String isLocked(AbstractEntity object);
 
     /**
      * Lock object for the given user

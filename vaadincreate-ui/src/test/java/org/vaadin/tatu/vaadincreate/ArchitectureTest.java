@@ -142,8 +142,9 @@ public class ArchitectureTest {
     public static final ArchRule EventBusImpl_should_be_used_only_by_EventBus = classes()
             .that().haveSimpleName("EventBusImpl").should().onlyBeAccessed()
             .byClassesThat(have(simpleName("EventBus"))
-                    .or(have(simpleName("EventBusImpl"))))
-            .as("EventBus should be used only view interface");
+                    .or(have(simpleName("EventBusImpl")))
+                    .or(have(simpleName("EventBusTest"))))
+            .as("EventBus should be used only by interface");
 
     @ArchTest
     public static final ArchRule LockedObjectsImpl_should_be_used_only_by_LockedObjects = classes()

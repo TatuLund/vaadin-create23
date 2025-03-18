@@ -24,7 +24,6 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
-import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.crud.form.AvailabilitySelector;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
 import org.vaadin.tatu.vaadincreate.crud.form.NumberField;

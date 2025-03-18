@@ -31,7 +31,7 @@ public class EventBusImpl implements EventBus {
      * Vaadin components. Without it, this class would keep references to the UI
      * objects forever, causing a massive memory leak.
      */
-    private final WeakHashMap<EventBusListener, Object> eventListeners = new WeakHashMap<>();
+    protected WeakHashMap<EventBusListener, Object> eventListeners = new WeakHashMap<>();
 
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
 

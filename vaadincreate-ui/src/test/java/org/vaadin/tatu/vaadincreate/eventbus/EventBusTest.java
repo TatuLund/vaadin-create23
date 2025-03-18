@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate.eventbus;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.time.LocalDateTime;
+import java.util.WeakHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -16,16 +17,20 @@ import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 
 public class EventBusTest {
 
-    EventBus eventBus = EventBus.get();
+    EventBusImpl eventBus = (EventBusImpl) EventBusImpl.getInstance();
 
     private final ByteArrayOutputStream out = new ByteArrayOutputStream();
     private final ByteArrayOutputStream err = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
     private final PrintStream originalErr = System.err;
+
+    private WeakHashMap<EventBusListener, Object> listenersBackup;
     private static CountDownLatch latch = new CountDownLatch(1);
 
     @Before
     public void setStreams() {
+        listenersBackup = eventBus.eventListeners;
+        eventBus.eventListeners = new WeakHashMap<>();
         System.setOut(new PrintStream(out));
         System.setErr(new PrintStream(err));
     }
@@ -37,6 +42,7 @@ public class EventBusTest {
         System.setErr(originalErr);
 
         System.out.println(log);
+        eventBus.eventListeners = listenersBackup;
     }
 
     @Test

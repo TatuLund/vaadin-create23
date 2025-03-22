@@ -49,6 +49,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -108,7 +109,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     private void onLogin() {
         target = getInitialTarget();
         logger.info("Initial target '{}'", target);
-        Utils.sessionFixation();
+        // Normally we should do session fixation here, but this is not
+        // working with Nginx community edition.
+        getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
         getPage().reload();
         showAppLayout();
     }

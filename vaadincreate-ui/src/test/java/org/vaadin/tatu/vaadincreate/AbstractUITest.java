@@ -1,7 +1,6 @@
 package org.vaadin.tatu.vaadincreate;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.vaadin.tatu.vaadincreate.crud.BookGrid;
@@ -9,7 +8,6 @@ import org.vaadin.tatu.vaadincreate.crud.FakeGrid;
 import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
 import org.vaadin.tatu.vaadincreate.login.LanguageSelect;
 
-import com.vaadin.server.VaadinSession;
 import com.vaadin.testbench.uiunittest.UIUnitTest;
 
 import com.vaadin.ui.Button;
@@ -37,16 +35,12 @@ public abstract class AbstractUITest extends UIUnitTest {
      *            The password
      */
     protected void login(String username, String password) {
-        var sessionId = VaadinSession.getCurrent().getSession().getId();
         test($(TextField.class).id("login-username-field")).setValue(username);
         test($(PasswordField.class).id("login-password-field"))
                 .setValue(password);
         test($(LanguageSelect.class).first())
                 .clickItem(DefaultI18NProvider.LOCALE_EN);
         test($(Button.class).id("login-button")).click();
-        // Session fixation is not working with nginx proxy
-        assertNotEquals(sessionId,
-                VaadinSession.getCurrent().getSession().getId());
     }
 
     /**

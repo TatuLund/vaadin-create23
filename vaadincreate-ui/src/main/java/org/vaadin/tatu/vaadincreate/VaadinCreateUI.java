@@ -49,7 +49,6 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -109,9 +108,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     private void onLogin() {
         target = getInitialTarget();
         logger.info("Initial target '{}'", target);
-        // Session fixation is not working with nginx
-        // Thus not using: "Utils.sessionFixation();"
-        getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
+        Utils.sessionFixation();
         getPage().reload();
         showAppLayout();
     }

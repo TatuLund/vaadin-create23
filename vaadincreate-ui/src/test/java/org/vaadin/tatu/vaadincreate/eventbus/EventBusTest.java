@@ -1,23 +1,31 @@
 package org.vaadin.tatu.vaadincreate.eventbus;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.tatu.vaadincreate.backend.RedisPubSubService;
+import org.vaadin.tatu.vaadincreate.backend.RedisPubSubService.EventEnvelope;
 import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
 import org.vaadin.tatu.vaadincreate.backend.events.MessageEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 
 public class EventBusTest {
 
-    EventBusImpl eventBus = (EventBusImpl) EventBusImpl.getInstance();
+    private static RedisPubSubService redisService = new MockPubSubService();
+    private static EventBusImpl eventBus = new EventBusImpl(redisService);
+    private static Consumer<EventEnvelope> envelopeHandler;
 
     private final ByteArrayOutputStream out = new ByteArrayOutputStream();
     private final ByteArrayOutputStream err = new ByteArrayOutputStream();
@@ -61,12 +69,12 @@ public class EventBusTest {
             // Ignore
         }
 
-        Assert.assertEquals(1, listener1.getEventCount());
-        Assert.assertEquals("Hello", listener1.getLastEvent().message());
-        Assert.assertEquals(1, listener2.getEventCount());
-        Assert.assertEquals("Hello", listener2.getLastEvent().message());
-        Assert.assertEquals(1, listener3.getEventCount());
-        Assert.assertEquals("Hello", listener3.getLastEvent().message());
+        assertEquals(1, listener1.getEventCount());
+        assertEquals("Hello", listener1.getLastEvent().message());
+        assertEquals(1, listener2.getEventCount());
+        assertEquals("Hello", listener2.getLastEvent().message());
+        assertEquals(1, listener3.getEventCount());
+        assertEquals("Hello", listener3.getLastEvent().message());
 
         listener1.remove();
         listener3 = null;
@@ -86,14 +94,36 @@ public class EventBusTest {
             // Ignore
         }
 
-        Assert.assertEquals(1, listener1.getEventCount());
-        Assert.assertEquals("Hello", listener1.getLastEvent().message());
-        Assert.assertEquals(2, listener2.getEventCount());
-        Assert.assertEquals("World", listener2.getLastEvent().message());
-        Assert.assertTrue(
-                out.toString().contains("event fired for 1 recipients."));
+        assertEquals(1, listener1.getEventCount());
+        assertEquals(2, listener2.getEventCount());
+        assertEquals("World", listener2.getLastEvent().message());
+        assertTrue(out.toString().contains("event fired for 1 recipients."));
 
         listener2.remove();
+    }
+
+    @Test
+    public void messageReceivedFromRedisIsRelayedLocally() {
+        var listener = new TestListener();
+        triggerRedisEvent();
+
+        try {
+            latch.await();
+            wait10ms(); // Wait loggers to print
+        } catch (InterruptedException e) {
+            // Ignore
+        }
+
+        assertEquals(1, listener.getEventCount());
+        assertEquals("Redis", listener.getLastEvent().message());
+
+        listener.remove();
+    }
+
+    public void triggerRedisEvent() {
+        var event = new MessageEvent("Redis", LocalDateTime.now());
+        envelopeHandler
+                .accept(new EventEnvelope(UUID.randomUUID().toString(), event));
     }
 
     private void wait100ms() {
@@ -116,7 +146,6 @@ public class EventBusTest {
 
         private AtomicInteger count = new AtomicInteger(0);
         private MessageEvent event;
-        private EventBus eventBus = EventBus.get();
 
         public TestListener() {
             eventBus.registerEventBusListener(this);
@@ -125,10 +154,10 @@ public class EventBusTest {
         @Override
         public void eventFired(AbstractEvent event) {
             count.incrementAndGet();
-            latch.countDown();
             if (event instanceof MessageEvent) {
                 this.event = (MessageEvent) event;
             }
+            latch.countDown();
         }
 
         public int getEventCount() {
@@ -142,5 +171,29 @@ public class EventBusTest {
         public void remove() {
             eventBus.unregisterEventBusListener(this);
         }
+    }
+
+    public static class MockPubSubService implements RedisPubSubService {
+
+        @Override
+        public void publishEvent(String nodeId, AbstractEvent event) {
+            // No-op
+        }
+
+        @Override
+        public void startSubscriber(Consumer<EventEnvelope> handler) {
+            envelopeHandler = handler;
+        }
+
+        @Override
+        public void stopSubscriber() {
+            // No-op
+        }
+
+        @Override
+        public void closePublisher() {
+            // No-op
+        }
+
     }
 }

@@ -52,6 +52,7 @@ public class ArchitectureTest {
                     .or(have(simpleName("AboutView")))
                     .or(have(simpleName("LockedObjectsImpl")))
                     .or(have(simpleName("EventBusImpl")))
+                    .or(have(simpleName("EventBus")))
                     .or(resideInAPackage("..auth.."))
                     .or(resideInAPackage("..backend..")))
             .as("UI implementing code should not depend on backend");
@@ -143,7 +144,8 @@ public class ArchitectureTest {
             .that().haveSimpleName("EventBusImpl").should().onlyBeAccessed()
             .byClassesThat(have(simpleName("EventBus"))
                     .or(have(simpleName("EventBusImpl")))
-                    .or(have(simpleName("EventBusTest"))))
+                    .or(have(simpleName("EventBusTest")))
+                    .or(belongTo(simpleName("EventBusTest"))))
             .as("EventBus should be used only by interface");
 
     @ArchTest

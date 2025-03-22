@@ -4,6 +4,8 @@ This is show case application for advanced Vaadin 8 topics. The application focu
 
 This project is my dogfooding test application for legacy Vaadin 8 as we are still maintaining it under our commercial extended maintenance program. Thus, even it is a bit fabricated, I have added there many detail that you would find in real production application.
 
+Despite the application is using the old Vaadin 8, many of the examples featured by this application are applicable for more current Vaadin versions.
+
 ## Covered topics
 
 Despites being somewhat artificial this demo app covers various use cases you may encounter in real life application. Source of the demonstrated cases has been actual customer questions I have seen during my career as a software consultant.
@@ -56,8 +58,13 @@ Despites being somewhat artificial this demo app covers various use cases you ma
 - How to create and use application scoped EventBus
 	- Implementation shows how to avoid common caveats of memory leaks, see unit test for proof
 	- This EventBus is used in many ways in the application
+	- The EventBus uses RedisPubSubService to share the events within the cluster
 - The custom theme is using BEM (Block Element Modifier) naming scheme to avoid class name conflicts in CSS
 - Example of how to localize / provide translations for texts used in UI
+
+### Backend
+
+The backend module features data access layer using Hibernate with a concise utility class for running queries in session and transaction, which is used by DAOs. There are couple of Service classes that are using by the presenters in the UI module. The backend also has RedisPubSubService, which is used by EventBus.  There is set of unit tests verifying the main functionalities.
 
 ### Automated testing
 
@@ -112,7 +119,7 @@ This is intentional to demonstrate the current state of Vaadin 8 extended mainte
 
 The following commercial products are used.
 
-- Vaadin 8.27.6. The application uses some features it provides. (The latest free version 8.14.3)
+- Vaadin 8.27.7. The application uses some features it provides. (The latest free version 8.14.3)
   - Eager UI cleanup
   - Binder: change tracking
   - Binder: draft saving
@@ -198,7 +205,7 @@ Debugging client side code in the vaadincreate-ui project:
 
 ### Build simulated production setup with Docker
 
-The project root folder has Dockerfile, Dockerfile.db and docker-compose.yaml files for setting up two container demonstrator "production" environment. 
+The project root folder has Dockerfile, Dockerfile.db and docker-compose.yaml files for setting up five container demonstrator "production" environment. 
 
 Check Dockerfile first, add your license key there into VAADIN_PRO_KEY environment variable, the license checker needs this during build time as it is using commercial assets.
 
@@ -210,7 +217,7 @@ docker-compose build
 
 The building of the application container can take 5-10 minutes depending on how fast the dependencies are loaded. This build does not run the tests in order to speed up the process. The setenv.sh file in the repository is injected to the application container and has the system properties set for the production mode app.
 
-The other container is just Postgres database.
+The other Dockerfile.db file is just for Postgres database.
 
 Then you need to load initial data from the script in this repository, start the database container and use commands:
 
@@ -232,8 +239,11 @@ docker-compose up
 If you change the application build it separately using, as the database container should not be usually rebuild unless you need to start from the scratch again.
 
 ```
-docker-compose build app
+docker-compose build app-1
+docker-compose build app-2
 ```
+
+The compose file builds also Redis and Nginx containers. Redis is used by EventBus for sharing events within the cluster and Nginx is used as load balancer. As the free edition of Nginx does not support real sticky sessions the nginx.conf demonstrates one potential workaroiund for this problem, which works also with session fixation.
 
 ## License & Author
 

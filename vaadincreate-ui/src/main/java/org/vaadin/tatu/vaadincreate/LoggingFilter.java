@@ -26,17 +26,21 @@ public class LoggingFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpSession session = httpRequest.getSession(false);
         if (session != null) {
-            // Add user id to log messages if the user is logged in
-            var user = (User) session.getAttribute(
-                    CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY);
-            if (user != null) {
-                var userId = String.format("[%s/%s]", user.getRole().toString(),
-                        user.getName());
-                MDC.put("userId", userId);
-            }
+            populateUserDetails(session);
         }
+
         // Pass the request along the filter chain
         chain.doFilter(request, response);
     }
 
+    private static void populateUserDetails(HttpSession session) {
+        // Add user id to log messages if the user is logged in
+        var user = (User) session
+                .getAttribute(CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY);
+        if (user != null) {
+            var userId = String.format("[%s/%s]", user.getRole().toString(),
+                    user.getName());
+            MDC.put("userId", userId);
+        }
+    }
 }

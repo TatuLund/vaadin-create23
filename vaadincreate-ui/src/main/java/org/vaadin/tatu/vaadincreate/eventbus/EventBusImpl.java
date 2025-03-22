@@ -22,9 +22,7 @@ public class EventBusImpl implements EventBus {
     private static EventBusImpl instance;
     private final String nodeId = UUID.randomUUID().toString();
 
-    // Initialize the Redis pub-sub service. Host, port, and channel names may
-    // be adjusted.
-    private final RedisPubSubService redisService = RedisPubSubService.get();
+    private RedisPubSubService redisService;
 
     /**
      * It is <em>VERY IMPORTANT</em> we use a weak hash map when registering
@@ -37,12 +35,13 @@ public class EventBusImpl implements EventBus {
 
     public static synchronized EventBus getInstance() {
         if (instance == null) {
-            instance = new EventBusImpl();
+            instance = new EventBusImpl(RedisPubSubService.get());
         }
         return instance;
     }
 
-    private EventBusImpl() {
+    protected EventBusImpl(RedisPubSubService redisService) {
+        this.redisService = redisService;
         logger.info("Starting EventBus");
         // Start the subscriber and handle incoming envelopes.
         redisService.startSubscriber(envelope -> {

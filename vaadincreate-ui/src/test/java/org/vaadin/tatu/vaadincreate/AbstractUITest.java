@@ -1,7 +1,7 @@
 package org.vaadin.tatu.vaadincreate;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.vaadin.tatu.vaadincreate.crud.BookGrid;
@@ -45,7 +45,7 @@ public abstract class AbstractUITest extends UIUnitTest {
                 .clickItem(DefaultI18NProvider.LOCALE_EN);
         test($(Button.class).id("login-button")).click();
         // Session fixation is not working with nginx proxy
-        assertEquals(sessionId,
+        assertNotEquals(sessionId,
                 VaadinSession.getCurrent().getSession().getId());
     }
 

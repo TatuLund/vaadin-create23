@@ -125,6 +125,15 @@ $fake-grid-background-color: white;
     }
   }
 
+  .valo-menu-title {
+    .v-caption {
+      display: none;
+    }
+    .valo-menu-logo {
+      padding: 3px;
+    }
+  }
+
   .v-tabsheet-tabitemcell:focus {
     text-shadow: $v-focus-color 1px 0 1px;
   }

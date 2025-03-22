@@ -18,11 +18,13 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Responsive;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.UI;
@@ -72,10 +74,11 @@ public class AppLayout extends Composite implements HasI18N {
         menuLayout.setHeight("100%");
 
         title = new CssLayout();
-        var logo = new Label(VaadinIcons.BOOK.getHtml(), ContentMode.HTML);
-        logo.setSizeUndefined();
-        logo.setPrimaryStyleName(ValoTheme.MENU_LOGO);
-        title.addComponents(logo);
+        var resource = new ThemeResource("images/bookstore.png");
+        var image = new Image("", resource);
+        image.setPrimaryStyleName(ValoTheme.MENU_LOGO);
+        image.setWidthUndefined();
+        title.addComponents(image);
         title.addStyleNames(ValoTheme.MENU_TITLE);
 
         menuLayout.addComponent(title);

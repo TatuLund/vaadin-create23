@@ -337,14 +337,30 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
                 e -> JavaScript.eval("vaadin.forceLayout()"));
 
         // Remove Highcharts desc-banners, they are announced by NVDA
+        // And add keyboard accessibility to legend items
         JavaScript
                 .eval("""
-                        setTimeout(() => Array.from(document.getElementsByTagName('svg'))
-                            .forEach(el => {
-                                const desc = el.getElementsByTagName('desc')[0];
-                                el.removeChild(desc);
-                            }), 1000);
-                        """);
+                        setTimeout(() => {
+                            Array.from(document.getElementsByTagName('svg'))
+                                .forEach(el => {
+                                    const desc = el.getElementsByTagName('desc')[0];
+                                    el.removeChild(desc);
+                                });
+                            Array.from(document.getElementsByClassName('highcharts-legend-item'))
+                                .forEach(el => {
+                                    el.setAttribute('tabindex', '0');
+                                    el.setAttribute('role', 'button');
+                                    el.setAttribute('aria-label', '%s ' + el.textContent);
+                                    el.addEventListener('keyup', (e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            el.dispatchEvent(new CustomEvent('click'));
+                                        }
+                                    });
+                                });
+                        }, 1000);
+                        """
+                        .formatted(
+                                getTranslation(I18n.Stats.LEGEND_CLICKABLE)));
     }
 
     @Override

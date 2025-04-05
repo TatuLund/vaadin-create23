@@ -21,4 +21,10 @@
       border-radius: 2px;
     }
   }
+
+  g.highcharts-legend-item:focus {
+    outline: 2px solid $v-focus-color;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 }

@@ -104,6 +104,16 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         conf.setLang(lang);
         configureTooltip(conf);
         categoryChartWrapper.addComponent(categoryChart);
+        categoryChart.addLegendItemClickListener(legendItemClicked -> {
+            var series = (DataSeries) legendItemClicked.getSeries();
+            series.setVisible(!series.isVisible(), true);
+            var titles = (DataSeries) categoryChart.getConfiguration()
+                    .getSeries().get(0);
+            var stockCounts = (DataSeries) categoryChart.getConfiguration()
+                    .getSeries().get(1);
+            updateCategoryChartAccessibilityAttributes(titles, stockCounts);
+
+        });
         return categoryChartWrapper;
     }
 
@@ -210,23 +220,32 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         updateCategoryChartAccessibilityAttributes(titles, stockCounts);
     }
 
+    @SuppressWarnings("java:S5411")
     private void updateCategoryChartAccessibilityAttributes(DataSeries titles,
             DataSeries stockCounts) {
         categoryChart.setAttribute("role", "figure");
         categoryChart.setAttribute("tabindex", "0");
-        var alt1 = String.format("%s %s:%s",
+        categoryChart.setAttribute("aria-live", "polite");
+
+        var alt1 = titles.isVisible() ? String.format("%s %s:%s",
                 getTranslation(I18n.Stats.CATEGORIES),
                 getTranslation(I18n.Stats.COUNT),
-                titles.getData().stream().map(data -> String.format("%s %s",
-                        data.getName(), data.getY()))
-                        .collect(Collectors.joining(",")));
-        var alt2 = String.format("%s %s:%s",
+                titles.getData().stream()
+                        .map(data -> String.format("%s %s", data.getName(),
+                                data.getY()))
+                        .collect(Collectors.joining(",")))
+                : "";
+        var alt2 = stockCounts.isVisible() ? String.format("%s %s:%s",
                 getTranslation(I18n.Stats.CATEGORIES),
                 getTranslation(I18n.IN_STOCK),
-                stockCounts
-                        .getData().stream().map(data -> String.format("%s %s",
-                                data.getName(), data.getY()))
-                        .collect(Collectors.joining(",")));
+                stockCounts.getData().stream()
+                        .map(data -> String.format("%s %s", data.getName(),
+                                data.getY()))
+                        .collect(Collectors.joining(",")))
+                : "";
+        if (alt1.isEmpty() && alt2.isEmpty()) {
+            alt1 = getTranslation(I18n.Stats.EMPTY);
+        }
         categoryChart.setAttribute("aria-label", alt1 + " " + alt2);
     }
 

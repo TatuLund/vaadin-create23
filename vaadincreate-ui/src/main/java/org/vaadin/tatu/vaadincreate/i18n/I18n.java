@@ -131,6 +131,7 @@ public final class I18n {
         public static final String PRICES = "prices";
         public static final String COUNT = "count";
         public static final String LEGEND_CLICKABLE = "legend-clickable";
+        public static final String EMPTY = "empty";
 
         private Stats() {
             // private constructor to hide the implicit public one

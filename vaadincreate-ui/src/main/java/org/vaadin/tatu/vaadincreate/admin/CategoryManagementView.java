@@ -6,24 +6,15 @@ import java.util.Collection;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
-import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
-import com.vaadin.data.BeanValidationBinder;
-import com.vaadin.data.ValidationResult;
-import com.vaadin.data.Validator;
-import com.vaadin.data.ValueContext;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.Registration;
-import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Composite;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -63,7 +54,7 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
         attributes.setAttribute("role", "region");
         attributes.setAttribute("aria-labelledby", "view-name");
 
-        list = new ComponentList<>(CategoryForm::new);
+        list = new ComponentList<>(this::createCategoryForm);
 
         newCategoryButton = new Button(
                 getTranslation(I18n.Category.ADD_NEW_CATEGORY),
@@ -82,6 +73,45 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
 
         addComponents(viewName, newCategoryButton, list);
         setExpandRatio(list, 1);
+    }
+
+    private CategoryForm createCategoryForm(Category category) {
+        CategoryForm form = new CategoryForm(category)
+                .withCategories(categories);
+        form.addFormSaveListener(event -> handleSave(event.getCategory()));
+        form.addFormDeleteListener(event -> handleDelete(event.getCategory()));
+        form.addFormFocusListener(
+                event -> newCategoryButton.setEnabled(!event.isFocused()));
+        return form;
+    }
+
+    private void handleSave(Category category) {
+        var saved = presenter.updateCategory(category);
+        if (saved != null) {
+            list.replaceItem(category, saved);
+
+            if (category.getId() == null) {
+                // If this was a new category, focus the form for easier data
+                // entry
+                var form = list.getComponentFor(saved);
+                if (form != null) {
+                    form.focus();
+                }
+            }
+
+            presenter.requestUpdateCategories();
+            newCategoryButton.setEnabled(true);
+            Notification.show(getTranslation(I18n.Category.CATEGORY_SAVED,
+                    saved.getName()));
+        }
+    }
+
+    private void handleDelete(Category category) {
+        presenter.removeCategory(category);
+        list.removeItem(category);
+        if (categories != null) {
+            categories.remove(category);
+        }
     }
 
     private void addCategory() {
@@ -131,136 +161,5 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
 
     public void showDeleted(String name) {
         Notification.show(getTranslation(I18n.Category.CATEGORY_DELETED, name));
-    }
-
-    /**
-     * Validator to ensure that a category is not duplicated.
-     */
-    class CategoryNotDuplicateValidator implements Validator<String> {
-
-        private Category category;
-        private String errorMessage;
-
-        /**
-         * Validator to ensure that a category is not duplicated.
-         *
-         * @param category
-         *            the category to be validated
-         * @param errorMessage
-         *            the error message to be displayed if the category is
-         *            duplicated
-         */
-        public CategoryNotDuplicateValidator(Category category,
-                String errorMessage) {
-            this.category = category;
-            this.errorMessage = errorMessage;
-        }
-
-        @Override
-        public ValidationResult apply(String value, ValueContext context) {
-            var valid = categories.stream()
-                    .filter(item -> !item.equals(category)
-                            && item.getName().equals(value))
-                    .count() == 0;
-            if (valid) {
-                return ValidationResult.ok();
-            }
-            return ValidationResult.error(errorMessage);
-        }
-    }
-
-    /**
-     * A form for editing a category.
-     */
-    class CategoryForm extends Composite {
-
-        private Category category;
-        private TextField nameField;
-        private BeanValidationBinder<Category> binder;
-        private Button deleteButton;
-
-        CategoryForm(Category category) {
-            this.category = category;
-            configureNameField();
-            // Focus the name field if the category is new
-            if (category.getId() == null) {
-                nameField.focus();
-            }
-
-            deleteButton = new Button(VaadinIcons.TRASH,
-                    click -> handleConfirmDelete());
-            deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
-            deleteButton.setDescription(String.format("%s: %s",
-                    getTranslation(I18n.DELETE), category.getName()));
-            deleteButton.setEnabled(category.getId() != null);
-            deleteButton.setDisableOnClick(true);
-            deleteButton.setWidth("45px");
-
-            binder = new BeanValidationBinder<>(Category.class);
-            // Check for duplicate category names
-            binder.forField(nameField)
-                    .withValidator(new CategoryNotDuplicateValidator(category,
-                            getTranslation(I18n.Category.DUPLICATE)))
-                    .bind("name");
-            binder.setBean(category);
-            binder.addValueChangeListener(valueChange -> handleSave());
-
-            var layout = new HorizontalLayout(nameField, deleteButton);
-            layout.setExpandRatio(nameField, 1);
-            layout.setWidthFull();
-            setCompositionRoot(layout);
-        }
-
-        private void configureNameField() {
-            nameField = new TextField();
-            var nameFieldAttributes = AttributeExtension.of(nameField);
-            nameFieldAttributes.setAttribute("autocomplete", "off");
-            nameFieldAttributes.setAttribute("aria-label",
-                    getTranslation(I18n.Category.CATEGORY_BAME));
-            nameFieldAttributes.removeAttribute("aria-labelledby");
-            nameField.setId(String.format("name-%s", category.getId()));
-            nameField.setValueChangeMode(ValueChangeMode.LAZY);
-            nameField.setValueChangeTimeout(2000);
-            nameField.setWidthFull();
-            nameField.setPlaceholder(getTranslation(I18n.Category.INSTRUCTION));
-            nameField.addFocusListener(
-                    focus -> newCategoryButton.setEnabled(false));
-            nameField.addBlurListener(
-                    blur -> newCategoryButton.setEnabled(true));
-        }
-
-        private void handleSave() {
-            if (binder.isValid()) {
-                var saved = presenter.updateCategory(category);
-                if (saved != null) {
-                    list.replaceItem(category, saved);
-                    if (category.getId() == null) {
-                        nameField.focus();
-                    }
-                    presenter.requestUpdateCategories();
-                    deleteButton.setEnabled(true);
-                    newCategoryButton.setEnabled(true);
-                    Notification.show(getTranslation(
-                            I18n.Category.CATEGORY_SAVED, saved.getName()));
-                }
-            }
-        }
-
-        // Handle the delete button click event with a confirmation dialog.
-        private void handleConfirmDelete() {
-            var dialog = new ConfirmDialog(getTranslation(I18n.CONFIRM),
-                    getTranslation(I18n.WILL_DELETE, category.getName()),
-                    ConfirmDialog.Type.ALERT);
-            dialog.setConfirmText(getTranslation(I18n.DELETE));
-            dialog.setCancelText(getTranslation(I18n.CANCEL));
-            dialog.open();
-            dialog.addConfirmedListener(confirmed -> {
-                presenter.removeCategory(category);
-                list.removeItem(category);
-                categories.remove(category);
-            });
-            dialog.addCancelledListener(
-                    cancelled -> deleteButton.setEnabled(true));
-        }
     }
 }

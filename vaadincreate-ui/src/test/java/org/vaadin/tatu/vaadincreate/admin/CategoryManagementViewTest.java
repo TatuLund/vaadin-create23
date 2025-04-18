@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
-import org.vaadin.tatu.vaadincreate.admin.CategoryManagementView.CategoryForm;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 
 import com.vaadin.server.ServiceException;

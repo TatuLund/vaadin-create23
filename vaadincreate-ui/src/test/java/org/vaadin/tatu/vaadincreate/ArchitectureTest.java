@@ -8,7 +8,10 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.lang.conditions.ArchPredicates.*;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.*;
 
+import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
+import com.tngtech.archunit.lang.ConditionEvents;
+import com.tngtech.archunit.lang.SimpleConditionEvent;
 import com.vaadin.navigator.View;
 
 import org.hibernate.SessionFactory;
@@ -19,6 +22,7 @@ import org.vaadin.tatu.vaadincreate.backend.dao.HibernateUtil;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
+import com.tngtech.archunit.core.domain.JavaMethod;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.junit.ArchUnitRunner;
@@ -194,5 +198,49 @@ public class ArchitectureTest {
             .that().areNotInterfaces().and()
             .resideInAPackage("org.vaadin.tatu.vaadincreate").and()
             .haveSimpleNameEndingWith("View").should().implement(HasI18N.class);
+
+    @ArchTest
+    public static final ArchRule detach_methods_should_call_super_detach = methods()
+            .that().haveName("detach").and().areDeclaredInClassesThat()
+            .resideInAPackage("org.vaadin.tatu.vaadincreate")
+            .should(new ArchCondition<JavaMethod>("call super.detach()") {
+                @Override
+                public void check(JavaMethod method, ConditionEvents events) {
+                    // Check if any method call in this method calls a method
+                    // named "detach"
+                    boolean callsSuperDetach = method.getMethodCallsFromSelf()
+                            .stream().anyMatch(call -> call.getTarget()
+                                    .getName().equals("detach"));
+                    if (!callsSuperDetach) {
+                        String message = String.format(
+                                "Method %s does not call super.detach()",
+                                method.getFullName());
+                        events.add(
+                                SimpleConditionEvent.violated(method, message));
+                    }
+                }
+            });
+
+    @ArchTest
+    public static final ArchRule attach_methods_should_call_super_attach = methods()
+            .that().haveName("attach").and().areDeclaredInClassesThat()
+            .resideInAPackage("org.vaadin.tatu.vaadincreate")
+            .should(new ArchCondition<JavaMethod>("call super.attach()") {
+                @Override
+                public void check(JavaMethod method, ConditionEvents events) {
+                    // Check if any method call in this method calls a method
+                    // named "atach"
+                    boolean callsSuperAttach = method.getMethodCallsFromSelf()
+                            .stream().anyMatch(call -> call.getTarget()
+                                    .getName().equals("attach"));
+                    if (!callsSuperAttach) {
+                        String message = String.format(
+                                "Method %s does not call super.attach()",
+                                method.getFullName());
+                        events.add(
+                                SimpleConditionEvent.violated(method, message));
+                    }
+                }
+            });
 
 }

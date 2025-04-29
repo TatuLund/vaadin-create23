@@ -71,9 +71,8 @@ public class BooksViewIT extends AbstractViewTest {
                 form.$(ButtonElement.class).id("delete-button").isEnabled());
 
         form.$(ButtonElement.class).id("save-button").click();
-        var notification = $(NotificationElement.class)
-                .caption("\"Test book\" päivitetty").first();
-        notification.close();
+        $(NotificationElement.class).caption("\"Test book\" päivitetty")
+                .first();
 
         // Book form should close
         assertFalse(form.getClassNames()
@@ -110,8 +109,7 @@ public class BooksViewIT extends AbstractViewTest {
                 .contains("Test book"));
         dialog.$(ButtonElement.class).id("confirm-button").click();
 
-        $(NotificationElement.class)
-                .caption("\"Test book\" poistettu").first();
+        $(NotificationElement.class).caption("\"Test book\" poistettu").first();
 
         assertEquals(0, $(GridElement.class).first().getRowCount());
 
@@ -188,8 +186,8 @@ public class BooksViewIT extends AbstractViewTest {
 
         // Save the book and assert the name was changed in notification
         form.$(ButtonElement.class).id("save-button").click();
-        $(NotificationElement.class)
-                .caption("\"A changed book\" päivitetty").first();
+        $(NotificationElement.class).caption("\"A changed book\" päivitetty")
+                .first();
 
         // Book form should close
         assertFalse(form.getClassNames()
@@ -206,9 +204,8 @@ public class BooksViewIT extends AbstractViewTest {
         nameField = form.$(TextFieldElement.class).id("product-name");
         nameField.setValue(oldName);
         form.$(ButtonElement.class).id("save-button").click();
-        var notification = $(NotificationElement.class).last();
-        assertTrue(notification.getText().contains(oldName));
-        notification.close();
+        $(NotificationElement.class)
+                .caption(String.format("\"%s\" päivitetty", oldName)).first();
     }
 
     @Test

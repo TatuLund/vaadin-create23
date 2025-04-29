@@ -1,10 +1,10 @@
 package org.vaadin.tatu.vaadincreate.admin;
 
 import org.jspecify.annotations.NullMarked;
-import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 
 @NullMarked
@@ -24,8 +24,10 @@ public interface TabView extends HasI18N {
 
     public default void openingView(String viewName) {
         UI.getCurrent().getPage().setTitle(getTranslation(viewName));
-        VaadinCreateUI.get().announce(
-                getTranslation(viewName) + " " + getTranslation(I18n.OPENED));
+        Notification.show(
+                String.format("%s %s", getTranslation(viewName),
+                        getTranslation(I18n.OPENED)),
+                Notification.Type.ASSISTIVE_NOTIFICATION);
     }
 
 }

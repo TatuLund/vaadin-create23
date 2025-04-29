@@ -244,8 +244,7 @@ public class BooksViewTest extends AbstractUITest {
         // grid is focused
         assertFalse(form.isShown());
         assertTrue(test(grid).isFocused());
-        assertTrue($(Notification.class).last().getCaption()
-                .contains("Filter book"));
+        assertNotification("\"Filter book\" updated");
 
         // THEN: The book is added to the backend
         assertTrue(ui.getProductService().getAllProducts().stream()
@@ -341,8 +340,9 @@ public class BooksViewTest extends AbstractUITest {
 
         // THEN: Notification is shown with the book name, form is closed, book
         // is deleted and grid is empty
-        assertTrue($(Notification.class).last().getCaption()
-                .contains(book.getProductName()));
+        assertNotification(
+                String.format("\"%s\" removed", book.getProductName()));
+
         assertFalse(form.isShown());
         assertEquals(null, ui.getProductService().getProductById(id));
         assertEquals(0, test(grid).size());
@@ -712,8 +712,7 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, Button.class).id("save-button")).click();
 
         // THEN: Notification is shown with the book name, form is closed
-        assertEquals("\"Different book\" updated",
-                $(Notification.class).last().getCaption());
+        assertNotification("\"Different book\" updated");
         assertFalse(form.isShown());
 
         // THEN: The edited row is highlighted and has the new name
@@ -1148,4 +1147,11 @@ public class BooksViewTest extends AbstractUITest {
         ObjectInputStream in = new ObjectInputStream(bis);
         var v = (VaadinSession) in.readObject();
     }
+
+    private void assertNotification(String message) {
+        assertTrue($(Notification.class).stream()
+                .filter(n -> n.getCaption().equals(message)).findAny()
+                .isPresent());
+    }
+
 }

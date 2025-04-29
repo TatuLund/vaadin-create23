@@ -1,7 +1,6 @@
 package org.vaadin.tatu.vaadincreate;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
@@ -27,8 +26,10 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.themes.ValoTheme;
 
 /**
@@ -87,10 +88,12 @@ public class AppLayout extends Composite implements HasI18N {
         var toggleButton = new Button(getTranslation(I18n.App.MENU), click -> {
             if (menuLayout.getStyleName().contains(ValoTheme.MENU_VISIBLE)) {
                 menuLayout.removeStyleName(ValoTheme.MENU_VISIBLE);
-                announce(getTranslation(I18n.App.MENU_CLOSE));
+                Notification.show(getTranslation(I18n.App.MENU_CLOSE,
+                        Type.ASSISTIVE_NOTIFICATION));
             } else {
                 menuLayout.addStyleName(ValoTheme.MENU_VISIBLE);
-                announce(getTranslation(I18n.App.MENU_OPEN));
+                Notification.show(getTranslation(I18n.App.MENU_OPEN,
+                        Type.ASSISTIVE_NOTIFICATION));
             }
         });
         toggleButton.setDescription(getTranslation(I18n.App.MENU));
@@ -156,26 +159,6 @@ public class AppLayout extends Composite implements HasI18N {
         layout.addComponent(announcer);
 
         setCompositionRoot(layout);
-    }
-
-    /**
-     * Announces a message using ARIA live regions to make it accessible to
-     * screen readers. This method sets the ARIA attributes for the form to
-     * ensure the announcement is conveyed to users with assistive technologies.
-     *
-     * @param announcement
-     *            the message to be announced
-     */
-    public void announce(@Nullable String announcement) {
-        if (isAttached()) {
-            announcer.setValue("");
-            getUI().push();
-            getUI().runAfterRoundTrip(() ->
-            // Set ARIA attributes for the form to make it accessible
-            announcer.setValue(String.format(
-                    "<div role='alert' aria-live='assertive' aria-atomic='true' aria-label='%s'></div>",
-                    announcement)));
-        }
     }
 
     private void handleConfirmLogoutWhenChanges(UI ui, Navigator nav) {

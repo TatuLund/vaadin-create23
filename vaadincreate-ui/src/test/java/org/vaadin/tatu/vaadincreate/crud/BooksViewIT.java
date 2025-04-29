@@ -71,8 +71,8 @@ public class BooksViewIT extends AbstractViewTest {
                 form.$(ButtonElement.class).id("delete-button").isEnabled());
 
         form.$(ButtonElement.class).id("save-button").click();
-        var notification = $(NotificationElement.class).last();
-        assertTrue(notification.getText().contains("Test book"));
+        var notification = $(NotificationElement.class)
+                .caption("\"Test book\" päivitetty").first();
         notification.close();
 
         // Book form should close
@@ -110,8 +110,8 @@ public class BooksViewIT extends AbstractViewTest {
                 .contains("Test book"));
         dialog.$(ButtonElement.class).id("confirm-button").click();
 
-        assertTrue($(NotificationElement.class).last().getText()
-                .contains("Test book"));
+        $(NotificationElement.class)
+                .caption("\"Test book\" poistettu").first();
 
         assertEquals(0, $(GridElement.class).first().getRowCount());
 
@@ -188,9 +188,8 @@ public class BooksViewIT extends AbstractViewTest {
 
         // Save the book and assert the name was changed in notification
         form.$(ButtonElement.class).id("save-button").click();
-        var notification = $(NotificationElement.class).first();
-        assertTrue(notification.getText().contains("A changed book"));
-        notification.close();
+        $(NotificationElement.class)
+                .caption("\"A changed book\" päivitetty").first();
 
         // Book form should close
         assertFalse(form.getClassNames()
@@ -207,7 +206,7 @@ public class BooksViewIT extends AbstractViewTest {
         nameField = form.$(TextFieldElement.class).id("product-name");
         nameField.setValue(oldName);
         form.$(ButtonElement.class).id("save-button").click();
-        notification = $(NotificationElement.class).last();
+        var notification = $(NotificationElement.class).last();
         assertTrue(notification.getText().contains(oldName));
         notification.close();
     }
@@ -263,8 +262,8 @@ public class BooksViewIT extends AbstractViewTest {
         if (visualTests()) {
             waitForElementPresent(By.id("book-grid"));
             $(ButtonElement.class).id("new-product").click();
-            // The opening CSS animation is 200ms
-            driver.manage().timeouts().implicitlyWait(300,
+            // The opening CSS animation is 300ms
+            driver.manage().timeouts().implicitlyWait(350,
                     TimeUnit.MILLISECONDS);
             var form = $(CssLayoutElement.class).id("book-form");
             form.$(ComboBoxElement.class).id("availability").openPopup();
@@ -281,4 +280,5 @@ public class BooksViewIT extends AbstractViewTest {
             return "0";
         return count;
     }
+
 }

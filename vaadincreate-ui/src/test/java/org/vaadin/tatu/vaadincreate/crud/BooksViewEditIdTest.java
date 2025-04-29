@@ -107,12 +107,18 @@ public class BooksViewEditIdTest extends AbstractUITest {
 
         // THEN: The form is hidden, a notification is shown, the product is
         // saved with the new data
-        assertTrue($(Notification.class).last().getCaption()
-                .contains("Modified book"));
+        assertNotificationForUpdatedBook();
+
         assertFalse(form.isShown());
 
         var savedProduct = ui.getProductService().getProductById(id);
         assertEquals("Modified book", savedProduct.getProductName());
+    }
+
+    private void assertNotificationForUpdatedBook() {
+        assertTrue($(Notification.class).stream()
+                .filter(n -> n.getCaption().equals("\"Modified book\" updated"))
+                .findAny().isPresent());
     }
 
     private static Product createBook() {

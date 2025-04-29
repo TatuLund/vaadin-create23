@@ -87,6 +87,10 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     @Override
     protected void init(VaadinRequest request) {
         setOverlayContainerLabel("");
+        getNotificationConfiguration()
+                .setAssistivePostfix(Type.ASSISTIVE_NOTIFICATION, "");
+        getNotificationConfiguration()
+                .setAssistivePrefix(Type.ASSISTIVE_NOTIFICATION, "");
         getPage().setTitle("Vaadin Create 23'");
         if (!getAccessControl().isUserSignedIn()) {
             MDC.clear();
@@ -177,18 +181,6 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     public static VaadinCreateUI get() {
         return (VaadinCreateUI) UI.getCurrent();
-    }
-
-    /**
-     * Announces a message using ARIA live regions to make it accessible to
-     * screen readers. This method sets the ARIA attributes for the form to
-     * ensure the announcement is conveyed to users with assistive technologies.
-     *
-     * @param announcement
-     *            the message to be announced
-     */
-    public void announce(String announcement) {
-        ((AppLayout) getContent()).announce(announcement);
     }
 
     /**

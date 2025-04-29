@@ -43,6 +43,7 @@ import com.vaadin.ui.CheckBoxGroup;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -266,8 +267,8 @@ public class BookForm extends Composite implements HasI18N {
             availability.setComponentError(new UserError(
                     getTranslation(I18n.Form.AVAILABILITY_MISMATCH),
                     AbstractErrorMessage.ContentMode.TEXT, ErrorLevel.ERROR));
-            VaadinCreateUI.get()
-                    .announce(getTranslation(I18n.Form.AVAILABILITY_MISMATCH));
+            Notification.show(getTranslation(I18n.Form.AVAILABILITY_MISMATCH,
+                    Notification.Type.ASSISTIVE_NOTIFICATION));
         } else {
             stockCount.setComponentError(null);
             availability.setComponentError(null);
@@ -288,7 +289,8 @@ public class BookForm extends Composite implements HasI18N {
         }
         sidePanel.show(visible);
         if (!visible) {
-            VaadinCreateUI.get().announce(getTranslation(I18n.CLOSED));
+            Notification.show(getTranslation(I18n.CLOSED),
+                    Notification.Type.ASSISTIVE_NOTIFICATION);
         }
     }
 
@@ -445,8 +447,10 @@ public class BookForm extends Composite implements HasI18N {
     // This is horrible, but required to workaround a bug in NVDA
     private void announceProductOpened(Product product) {
         if (isAttached()) {
-            VaadinCreateUI.get().announce(product.getProductName() + " "
-                    + getTranslation(I18n.OPENED));
+            Notification.show(
+                    String.format("%s %s", product.getProductName(),
+                            getTranslation(I18n.OPENED)),
+                    Notification.Type.ASSISTIVE_NOTIFICATION);
         }
     }
 

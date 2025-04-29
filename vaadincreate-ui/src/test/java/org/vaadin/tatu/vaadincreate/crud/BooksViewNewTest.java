@@ -72,8 +72,7 @@ public class BooksViewNewTest extends AbstractUITest {
 
         // THEN: The form is hidden, a notification is shown, the grid is
         // focused
-        assertTrue($(Notification.class).last().getCaption()
-                .contains("A new product"));
+        assertNotificationForUpdatedBook();
         assertFalse(form.isShown());
 
         assertTrue(test(grid).isFocused());
@@ -93,4 +92,9 @@ public class BooksViewNewTest extends AbstractUITest {
         ui.getProductService().deleteProduct(test(grid).item(row).getId());
     }
 
+    private void assertNotificationForUpdatedBook() {
+        assertTrue($(Notification.class).stream()
+                .filter(n -> n.getCaption().equals("\"A new product\" updated"))
+                .findAny().isPresent());
+    }
 }

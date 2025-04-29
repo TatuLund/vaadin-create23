@@ -5,6 +5,8 @@ import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.navigator.View;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 
 @NullMarked
@@ -18,7 +20,9 @@ public interface VaadinCreateView extends HasI18N, View {
      */
     public default void openingView(String viewName) {
         UI.getCurrent().getPage().setTitle(getTranslation(viewName));
-        VaadinCreateUI.get().announce(
-                getTranslation(viewName) + " " + getTranslation(I18n.OPENED));
+        Notification.show(
+                String.format("%s %s", getTranslation(viewName),
+                        getTranslation(I18n.OPENED)),
+                Type.ASSISTIVE_NOTIFICATION);
     }
 }

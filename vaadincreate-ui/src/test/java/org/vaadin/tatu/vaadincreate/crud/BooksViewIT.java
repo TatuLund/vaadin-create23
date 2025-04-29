@@ -71,8 +71,8 @@ public class BooksViewIT extends AbstractViewTest {
                 form.$(ButtonElement.class).id("delete-button").isEnabled());
 
         form.$(ButtonElement.class).id("save-button").click();
-        $(NotificationElement.class).caption("\"Test book\" päivitetty")
-                .first();
+
+        assertAndCloseSaveNotification("Test book");
 
         // Book form should close
         assertFalse(form.getClassNames()
@@ -109,11 +109,28 @@ public class BooksViewIT extends AbstractViewTest {
                 .contains("Test book"));
         dialog.$(ButtonElement.class).id("confirm-button").click();
 
-        $(NotificationElement.class).caption("\"Test book\" poistettu").first();
+        assertAndCloseDeletionNotification();
 
         assertEquals(0, $(GridElement.class).first().getRowCount());
 
         $(TextFieldElement.class).id("filter-field").clear();
+    }
+
+    private void assertAndCloseSaveNotification(String bookName) {
+        var notification = $(NotificationElement.class).all().stream()
+                .filter(n -> n.getCaption()
+                        .equals(String.format("\"%s\" päivitetty", bookName)))
+                .findFirst().orElseThrow(() -> new AssertionError(
+                        "Save notification not found"));
+        notification.close();
+    }
+
+    private void assertAndCloseDeletionNotification() {
+        var notification = $(NotificationElement.class).all().stream()
+                .filter(n -> n.getCaption().equals("\"Test book\" poistettu"))
+                .findFirst().orElseThrow(() -> new AssertionError(
+                        "Deletion notification not found"));
+        notification.close();
     }
 
     @Test
@@ -186,8 +203,7 @@ public class BooksViewIT extends AbstractViewTest {
 
         // Save the book and assert the name was changed in notification
         form.$(ButtonElement.class).id("save-button").click();
-        $(NotificationElement.class).caption("\"A changed book\" päivitetty")
-                .first();
+        assertAndCloseSaveNotification("A changed book");
 
         // Book form should close
         assertFalse(form.getClassNames()
@@ -204,8 +220,7 @@ public class BooksViewIT extends AbstractViewTest {
         nameField = form.$(TextFieldElement.class).id("product-name");
         nameField.setValue(oldName);
         form.$(ButtonElement.class).id("save-button").click();
-        $(NotificationElement.class)
-                .caption(String.format("\"%s\" päivitetty", oldName)).first();
+        assertAndCloseSaveNotification(oldName);
     }
 
     @Test

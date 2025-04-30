@@ -88,12 +88,12 @@ public class AppLayout extends Composite implements HasI18N {
         var toggleButton = new Button(getTranslation(I18n.App.MENU), click -> {
             if (menuLayout.getStyleName().contains(ValoTheme.MENU_VISIBLE)) {
                 menuLayout.removeStyleName(ValoTheme.MENU_VISIBLE);
-                Notification.show(getTranslation(I18n.App.MENU_CLOSE,
-                        Type.ASSISTIVE_NOTIFICATION));
+                Notification.show(getTranslation(I18n.App.MENU_CLOSE),
+                        Type.ASSISTIVE_NOTIFICATION);
             } else {
                 menuLayout.addStyleName(ValoTheme.MENU_VISIBLE);
-                Notification.show(getTranslation(I18n.App.MENU_OPEN,
-                        Type.ASSISTIVE_NOTIFICATION));
+                Notification.show(getTranslation(I18n.App.MENU_OPEN),
+                        Type.ASSISTIVE_NOTIFICATION);
             }
         });
         toggleButton.setDescription(getTranslation(I18n.App.MENU));

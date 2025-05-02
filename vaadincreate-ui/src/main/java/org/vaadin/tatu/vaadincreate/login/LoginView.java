@@ -17,6 +17,7 @@ import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import com.vaadin.event.ConnectorEventListener;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.Page;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -26,6 +27,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
@@ -101,7 +103,7 @@ public class LoginView extends Composite implements HasI18N {
     }
 
     private void updateTranslations() {
-        if (getUI().getPage().getBrowserWindowWidth() < 700) {
+        if (getUI().getPage().getBrowserWindowWidth() < 800) {
             usernameField.setPlaceholder(getTranslation(I18n.USERNAME));
             passwordField.setPlaceholder(getTranslation(I18n.PASSWORD));
         } else {
@@ -132,21 +134,32 @@ public class LoginView extends Composite implements HasI18N {
     }
 
     private void showLoginInformation(int width) {
-        if (width < 700) {
+        if (width < 1000 && width >= 800) {
             layout.removeComponent(loginInformation);
-            usernameField.setPlaceholder(getTranslation(I18n.USERNAME));
-            passwordField.setPlaceholder(getTranslation(I18n.PASSWORD));
-            usernameField.setCaption("");
-            passwordField.setCaption("");
-            lang.setCaption("");
+            wideLogin();
+        } else if (width < 800) {
+            layout.removeComponent(loginInformation);
+            narrowLogin();
         } else {
             layout.addComponent(loginInformation);
-            usernameField.setPlaceholder("");
-            passwordField.setPlaceholder("");
-            usernameField.setCaption(getTranslation(I18n.USERNAME));
-            passwordField.setCaption(getTranslation(I18n.PASSWORD));
-            lang.setCaption(getTranslation(I18n.Login.LANGUAGE));
+            wideLogin();
         }
+    }
+
+    private void narrowLogin() {
+        usernameField.setPlaceholder(getTranslation(I18n.USERNAME));
+        passwordField.setPlaceholder(getTranslation(I18n.PASSWORD));
+        usernameField.setCaption("");
+        passwordField.setCaption("");
+        lang.setCaption("");
+    }
+
+    private void wideLogin() {
+        usernameField.setPlaceholder("");
+        passwordField.setPlaceholder("");
+        usernameField.setCaption(getTranslation(I18n.USERNAME));
+        passwordField.setCaption(getTranslation(I18n.PASSWORD));
+        lang.setCaption(getTranslation(I18n.Login.LANGUAGE));
     }
 
     private Component buildLoginForm() {
@@ -208,9 +221,13 @@ public class LoginView extends Composite implements HasI18N {
 
     private CssLayout buildLoginInformation() {
         var infoLayout = new CssLayout();
+        infoLayout.setId("info-layout");
+        var resource = new ThemeResource("images/bookstore.png");
+        var image = new Image("", resource);
+        image.setWidthFull();
         infoLayout.setStyleName(VaadinCreateTheme.LOGINVIEW_INFORMATION);
-        loginInfoText.setSizeFull();
-        infoLayout.addComponent(loginInfoText);
+        loginInfoText.setWidthFull();
+        infoLayout.addComponents(image, loginInfoText);
         return infoLayout;
     }
 

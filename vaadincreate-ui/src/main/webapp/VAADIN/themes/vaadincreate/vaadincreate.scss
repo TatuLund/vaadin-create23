@@ -23,9 +23,10 @@ $v-layout-spacing-horizontal: round($v-unit-size / 1.8) !default;
 // Custom variable definitions for application theme
 
 $login-info-width: 300px !default;
-$login-info-opacity: 0.7 !default;
+$login-info-opacity: 0.8 !default;
+$login-form-opacity: 0.9 !default;
 $login-background-color: $editor-background-color !default;
-$login-background-image: "../images/login-bg.jpg" !default;
+$login-background-image: "../images/login-background.jpg" !default;
 
 $editor-background-color: #fafafa !default;
 $editor-shadow: 0 0 10px 10px rgba(0,0,0,.1) !default;

@@ -163,4 +163,13 @@
       border: $v-grid-border;
     }
   }
+
+  // IMHO: This is a bug in the grid, but this is a workaround for now.
+  .v-grid {
+    thead {
+      th.v-grid-cell-focused:last-child::before {
+        right: 2px;        
+      }
+    }
+  }
 }

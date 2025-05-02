@@ -18,7 +18,6 @@ import org.vaadin.tatu.vaadincreate.auth.MockAccessControl;
 import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
 
 import com.vaadin.testbench.uiunittest.UIUnitTest;
-
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
@@ -93,10 +92,17 @@ public class LoginViewTest extends UIUnitTest {
     @Test
     public void when_browser_is_small_placeholders_are_used_and_when_browser_is_large_captions_are_used() {
         var login = createLogin();
+        assertTrue($(CssLayout.class).id("info-layout").isVisible());
         then_caption_are_set_and_placeholders_are_not_and_information_text_is_shown(
                 login);
 
         // WHEN: resizing the browser window to be smaller
+        ui.getPage().updateBrowserWindowSize(900, 800, true);
+
+        // THEN: info text is hidden
+        assertNull($(CssLayout.class).id("info-layout"));
+
+        // WHEN: resizing the browser window to be even smalle smaller
         ui.getPage().updateBrowserWindowSize(600, 800, true);
 
         // THEN: placeholders should be shown and captions should be
@@ -115,6 +121,8 @@ public class LoginViewTest extends UIUnitTest {
 
         then_caption_are_set_and_placeholders_are_not_and_information_text_is_shown(
                 login);
+        // THEN: info text is shown
+        assertTrue($(CssLayout.class).id("info-layout").isVisible());
     }
 
     private void then_caption_are_set_and_placeholders_are_not_and_information_text_is_shown(

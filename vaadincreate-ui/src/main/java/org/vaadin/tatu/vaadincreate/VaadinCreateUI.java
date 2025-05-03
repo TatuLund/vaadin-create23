@@ -42,6 +42,9 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.server.BootstrapFragmentResponse;
+import com.vaadin.server.BootstrapListener;
+import com.vaadin.server.BootstrapPageResponse;
 import com.vaadin.server.CustomizedSystemMessages;
 import com.vaadin.server.DefaultDeploymentConfiguration;
 import com.vaadin.server.DeploymentConfiguration;
@@ -60,7 +63,7 @@ import com.vaadin.ui.themes.ValoTheme;
 @StyleSheet("vaadin://styles/additional-styles.css")
 @SuppressWarnings({ "serial", "java:S2160" })
 @Push(transport = Transport.WEBSOCKET_XHR)
-@Viewport("width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no")
+@Viewport("width=device-width, initial-scale=1, maximum-scale=5.0, user-scalable=yes")
 public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     // Inject the default services. This demo application does not include real
@@ -379,6 +382,25 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                                         .showInternalError(message, id)));
                         logger.error("Exception happened {}", id,
                                 errorHandler.getThrowable());
+                    }
+                });
+                session.addBootstrapListener(new BootstrapListener() {
+                    @Override
+                    public void modifyBootstrapPage(
+                            BootstrapPageResponse response) {
+                        Cookie localeCookie = CookieUtil.getCookieByName(
+                                "language", response.getRequest());
+                        response.getDocument().getElementsByTag("html").get(0)
+                                .attributes().add("lang",
+                                        localeCookie != null
+                                                ? localeCookie.getValue()
+                                                : "en");
+                    }
+
+                    @Override
+                    public void modifyBootstrapFragment(
+                            BootstrapFragmentResponse response) {
+                        // No-op: not needed in this case
                     }
                 });
             });

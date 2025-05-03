@@ -398,6 +398,7 @@ public class BookForm extends Composite implements HasI18N {
         formLayout.setExpandRatio(spacer, 1);
 
         sidePanel.setContent(formLayout);
+        sidePanel.setAriaLabel(getTranslation(I18n.Books.PRODUCT_FORM));
     }
 
     @SuppressWarnings("unchecked")
@@ -546,8 +547,6 @@ public class BookForm extends Composite implements HasI18N {
             // Set ARIA attributes for the form to make it accessible
             var attributes = AttributeExtension.of(this);
             attributes.setAttribute("tabindex", "0");
-            attributes.setAttribute("aria-label",
-                    getTranslation(I18n.Books.PRODUCT_FORM));
             attributes.setAttribute("role", "form");
             attributes.setAttribute("aria-keyshortcuts",
                     "Escape PageDown PageUp");

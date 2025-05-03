@@ -5,9 +5,9 @@ $v-luminance-threshold: 180 !default;
 
 $valo-menu-background-color: rgb(59, 63, 66) !default;
 
-$v-focus-color: rgb(76, 150, 214) !default;
+$v-focus-color: rgb(33, 101, 161) !default;
 $v-error-indicator-color: #eb1937 !default;
-$v-friendly-color: rgb(54, 185, 85);
+$v-friendly-color: rgb(45, 166, 73);
 
 $v-font-size: 15px !default;
 $v-font-weight: 400 !default;
@@ -32,7 +32,7 @@ $editor-background-color: #fafafa !default;
 $editor-shadow: 0 0 10px 10px rgba(0,0,0,.1) !default;
 $editor-embed-background-color: darken($editor-background-color, 5%) !default;
 $editor-raised-background-color: lighten($editor-background-color, 10%) !default;
-$editor-caption-font-color: valo-font-color($editor-background-color, 0.5) !default;
+$editor-caption-font-color: valo-font-color($editor-background-color, 0.8) !default;
 
 $color-available: var(--color-available) !default;
 $color-coming: var(--color-coming) !default;
@@ -95,6 +95,14 @@ $fake-grid-background-color: white;
     padding: 4px 32px 4px 16px;	  
   }
 
+  .valo-menu {
+    color: valo-font-color($valo-menu-background-color, 0.8);
+
+    .valo-menu-item.selected .v-icon {
+      color: lighten($v-focus-color, 25%);
+    }
+  }
+
   // It sounds like a bug in CustomField the need to tweak this
   .v-customcomponent {
     input {
@@ -155,6 +163,10 @@ $fake-grid-background-color: white;
     }
   }
 
+  .v-button-danger {
+    color: white;
+  }
+ 
   // Hide spinner buttons from number input
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button {

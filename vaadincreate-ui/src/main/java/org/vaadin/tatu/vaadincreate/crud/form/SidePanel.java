@@ -15,7 +15,9 @@ import com.vaadin.ui.JavaScript;
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class SidePanel extends Composite {
+    private static final String ARIA_HIDDEN = "aria-hidden";
     private CssLayout layout = new CssLayout();
+    private AttributeExtension attributes;
 
     /**
      * Constructs a new SidePanel instance.
@@ -28,7 +30,10 @@ public class SidePanel extends Composite {
         layout.setId("book-form");
         layout.addStyleNames(VaadinCreateTheme.BOOKFORM,
                 VaadinCreateTheme.BOOKFORM_WRAPPER);
-        AttributeExtension.of(layout).setAttribute("role", "dialog");
+        attributes = AttributeExtension.of(layout);
+        attributes.setAttribute("role", "dialog");
+        attributes.setAttribute("aria-label", "side panel");
+        attributes.setAttribute(ARIA_HIDDEN, "true");
 
         setCompositionRoot(layout);
     }
@@ -42,6 +47,21 @@ public class SidePanel extends Composite {
     public void setContent(Component content) {
         layout.removeAllComponents();
         layout.addComponent(content);
+    }
+
+    /**
+     * Sets the ARIA label attribute of the component.
+     *
+     * <p>
+     * This method allows you to specify a descriptive label for the component,
+     * enhancing accessibility by providing assistive technologies with a text
+     * description of the element.
+     *
+     * @param label
+     *            the ARIA label to be set on the component.
+     */
+    public void setAriaLabel(String label) {
+        attributes.setAttribute("aria-label", label);
     }
 
     /**
@@ -59,11 +79,15 @@ public class SidePanel extends Composite {
             JavaScript.eval(
                     "document.getElementById('book-form').style.display='block';");
             if (getUI() != null) {
-                getUI().runAfterRoundTrip(() -> layout.addStyleName(
-                        VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
+                getUI().runAfterRoundTrip(() -> {
+                    layout.addStyleName(
+                            VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
+                    attributes.setAttribute(ARIA_HIDDEN, "true");
+                });
             }
         } else {
             layout.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
+            attributes.setAttribute(ARIA_HIDDEN, "false");
             if (isAttached()) {
                 getUI().runAfterRoundTrip(() -> JavaScript.eval(
                         "setTimeout(() => document.getElementById('book-form').style.display='none', 200);"));

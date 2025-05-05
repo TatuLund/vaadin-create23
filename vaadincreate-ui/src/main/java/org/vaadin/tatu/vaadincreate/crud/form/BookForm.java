@@ -267,8 +267,8 @@ public class BookForm extends Composite implements HasI18N {
             availability.setComponentError(new UserError(
                     getTranslation(I18n.Form.AVAILABILITY_MISMATCH),
                     AbstractErrorMessage.ContentMode.TEXT, ErrorLevel.ERROR));
-            Notification.show(getTranslation(I18n.Form.AVAILABILITY_MISMATCH,
-                    Notification.Type.ASSISTIVE_NOTIFICATION));
+            Notification.show(getTranslation(I18n.Form.AVAILABILITY_MISMATCH),
+                    Notification.Type.ASSISTIVE_NOTIFICATION);
         } else {
             stockCount.setComponentError(null);
             availability.setComponentError(null);

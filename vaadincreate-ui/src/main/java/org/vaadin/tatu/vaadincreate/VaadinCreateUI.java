@@ -420,7 +420,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 logger.debug("Session ended");
             });
             getService().addServiceDestroyListener(
-                    event -> EventBus.get().shutdown());
+                    serviceDestroy -> EventBus.get().shutdown());
         }
 
         private String formatId() {

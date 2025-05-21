@@ -161,4 +161,18 @@ public class HibernateUtilTest {
 
         verify(hibernateSession).close();
     }
+
+    @Test
+    public void shutdown() {
+        HibernateUtil.shutdown();
+        verify(mockFactory).close();
+        assertNull(HibernateUtil.sessionFactory);
+        // Verify that getSessionFactory() throws an exception
+        try {
+            HibernateUtil.getSessionFactory();
+            fail("Expected IllegalStateException was not thrown");
+        } catch (IllegalStateException e) {
+            assertEquals("SessionFactory was shut down", e.getMessage());
+        }
+    }
 }

@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ public class HibernateUtil {
         throw new UnsupportedOperationException("Utility class");
     }
 
+    @Nullable
     static SessionFactory sessionFactory;
 
     static {
@@ -42,6 +44,9 @@ public class HibernateUtil {
      * @return the SessionFactory instance used for creating Hibernate sessions.
      */
     public static SessionFactory getSessionFactory() {
+        if (sessionFactory == null) {
+            throw new IllegalStateException("SessionFactory was shut down");
+        }
         return sessionFactory;
     }
 
@@ -166,6 +171,17 @@ public class HibernateUtil {
     private static void logWarning(long time) {
         logger.warn("Database call duration exceeded {}ms, {}ms.",
                 DATABASE_CALL_WARN_LIMIT, time);
+    }
+
+    /**
+     * Closes the SessionFactory and releases all resources.
+     */
+    public static void shutdown() {
+        if (sessionFactory == null) {
+            return;
+        }
+        sessionFactory.close();
+        sessionFactory = null;
     }
 
     private static Logger logger = LoggerFactory.getLogger(HibernateUtil.class);

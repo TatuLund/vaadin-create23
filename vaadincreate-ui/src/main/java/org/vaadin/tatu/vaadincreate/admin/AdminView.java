@@ -9,10 +9,14 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.AbstractErrorMessage.ContentMode;
+import com.vaadin.server.UserError;
+import com.vaadin.shared.ui.ErrorLevel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -48,6 +52,15 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
             var tabName = ((TabView) tabSheet.getSelectedTab()).getTabName();
             setFragmentParameter(tabName);
             ((TabView) tabSheet.getSelectedTab()).enter();
+            if (tabSheet.getTab(1).getComponent().getStyleName()
+                    .contains(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES)) {
+                var errorMessage = new UserError(
+                        getTranslation(I18n.User.CHANGES), ContentMode.TEXT,
+                        ErrorLevel.WARNING);
+                tabSheet.getTab(1).setComponentError(errorMessage);
+            } else {
+                tabSheet.getTab(1).setComponentError(null);
+            }
             logger.info("Tab '{}' selected.", tabName);
         });
         if (params.equals(UserManagementView.VIEW_NAME)) {

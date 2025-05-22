@@ -159,6 +159,7 @@ public final class I18n {
         public static final String USER_IS_DUPLICATE = "user-is-duplicate";
         public static final String NEW_USER = "new-user";
         public static final String EDIT_USERS = "edit-users";
+        public static final String CHANGES = "user-changes";
 
         private User() {
             // private constructor to hide the implicit public one

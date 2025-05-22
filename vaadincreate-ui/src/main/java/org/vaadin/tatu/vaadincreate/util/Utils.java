@@ -189,6 +189,30 @@ public class Utils {
                 () -> new IllegalStateException("No user present"));
     }
 
+    /**
+     * Start one minute polling for the current UI. This will disable session to
+     * expire.
+     */
+    public static void startPolling() {
+        assert UI.getCurrent() != null : "UI should not be null";
+        if (UI.getCurrent().getPollInterval() > -1) {
+            return;
+        }
+        UI.getCurrent().setPollInterval(60000);
+        logger.debug("Enabled polling");
+    }
+
+    /**
+     * Stop polling for the current UI. This will enable session to expire.
+     */
+    public static void stopPolling() {
+        assert UI.getCurrent() != null : "UI should not be null";
+        if (UI.getCurrent().getPollInterval() > -1) {
+            UI.getCurrent().setPollInterval(-1);
+            logger.debug("Disabled polling");
+        }
+    }
+
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
 
 }

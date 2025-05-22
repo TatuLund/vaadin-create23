@@ -9,6 +9,7 @@ import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.ValidationException;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -57,6 +58,8 @@ public class UserManagementView extends VerticalLayout implements TabView {
         form.addFormChangedListener(changed -> {
             save.setEnabled(changed.isValid());
             cancel.setEnabled(true);
+            Utils.startPolling();
+            addStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES);
         });
 
         var header = createHeader();
@@ -128,6 +131,8 @@ public class UserManagementView extends VerticalLayout implements TabView {
         delete.setEnabled(false);
         save.setEnabled(false);
         cancel.setEnabled(true);
+        Utils.startPolling();
+        addStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES);
     }
 
     private void userSelected(User user) {
@@ -136,6 +141,8 @@ public class UserManagementView extends VerticalLayout implements TabView {
         delete.setEnabled(true);
         save.setEnabled(false);
         cancel.setEnabled(false);
+        Utils.stopPolling();
+        removeStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES);
     }
 
     private void handleCancel() {
@@ -143,6 +150,7 @@ public class UserManagementView extends VerticalLayout implements TabView {
         form.setEnabled(false);
         disableButtons();
         userSelect.setValue(null);
+        removeStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES);
     }
 
     private void handleDelete() {
@@ -159,6 +167,7 @@ public class UserManagementView extends VerticalLayout implements TabView {
             form.clear();
             disableButtons();
             userSelect.setValue(null);
+            removeStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES);
         });
     }
 
@@ -166,6 +175,10 @@ public class UserManagementView extends VerticalLayout implements TabView {
         delete.setEnabled(false);
         save.setEnabled(false);
         cancel.setEnabled(false);
+        if (getUI() != null) {
+            Utils.stopPolling();
+        }
+        removeStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES);
     }
 
     private void handleSave() {
@@ -185,6 +198,7 @@ public class UserManagementView extends VerticalLayout implements TabView {
     @Override
     public void detach() {
         super.detach();
+        Utils.stopPolling();
         cancel.removeClickShortcut();
         save.removeClickShortcut();
     }

@@ -2,3 +2,14 @@
 .vaadincreate .v-filterselect [class$="button"]:before {
   margin-top: -0.47em;
 }
+
+/* SASS does not like :has(..) selector */
+.vaadincreate .v-tabsheet-tabitem {
+  .v-caption:has(.v-errorindicator) {
+    color: #d88600;
+  }
+
+  .v-caption:has(.v-errorindicator):hover {
+    color: #dd8900;
+  }
+}

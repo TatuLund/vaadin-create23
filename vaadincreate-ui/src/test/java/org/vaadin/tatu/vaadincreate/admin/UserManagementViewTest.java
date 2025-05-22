@@ -19,6 +19,7 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
@@ -84,7 +85,8 @@ public class UserManagementViewTest extends AbstractUITest {
         // WHEN: Filling password
         test($(PasswordField.class).id("password-field")).setValue("tester");
 
-        // THEN: Password field is invalid, validation message is shown and save
+        // THEN: Password field is invalid, validation message is shown
+        // and save
         // button is disabled
         assertTrue(
                 test($(PasswordField.class).id("password-field")).isInvalid());
@@ -96,7 +98,8 @@ public class UserManagementViewTest extends AbstractUITest {
         // WHEN: Filling password repeat
         test($(PasswordField.class).id("password-repeat")).setValue("tester");
 
-        // THEN: Password field is valid, save button is disabled and role is
+        // THEN: Password field is valid, save button is disabled and
+        // role is
         // invalid and validation message is shown
         assertFalse(
                 test($(PasswordField.class).id("password-field")).isInvalid());
@@ -108,7 +111,8 @@ public class UserManagementViewTest extends AbstractUITest {
         // WHEN: Filling role
         test($(ComboBox.class).id("role-field")).clickItem(Role.USER);
 
-        // THEN: Role is valid, save button is enabled and delete button is
+        // THEN: Role is valid, save button is enabled and delete button
+        // is
         // disabled
         assertFalse(test($(ComboBox.class).id("role-field")).isInvalid());
         assertFalse($(Button.class).id("delete-button").isEnabled());
@@ -213,5 +217,38 @@ public class UserManagementViewTest extends AbstractUITest {
 
         // THEN: Role field is disabled
         assertFalse($(ComboBox.class).id("role-field").isEnabled());
+    }
+
+    @Test
+    public void componentError_is_shown_when_tab_is_changed_and_there_are_changes() {
+        // WHEN: Clicking new user button
+        test($(Button.class).id("new-button")).click();
+
+        // THEN: Form is enabled and focused on the first field
+        assertTrue(test($(TextField.class).id("user-field")).isFocused());
+
+        // WHEN: Filling user name
+        test($(TextField.class).id("user-field")).setValue("Tester");
+
+        // THEN: Poll interval is set to 60 seconds
+        assertEquals(60000, ui.getPollInterval());
+
+        // WHEN: Changing tab
+        var tabSheet = $(TabSheet.class).first();
+        tabSheet.setSelectedTab(0);
+
+        // THEN: Error message is shown
+        assertEquals("The&#32;form&#32;has&#32;unsaved&#32;changes&#46;",
+                tabSheet.getTab(1).getComponentError()
+                        .getFormattedHtmlMessage());
+
+        // WHEN: Clicking cancel button
+        tabSheet.setSelectedTab(1);
+        test($(Button.class).id("cancel-button")).click();
+
+        // THEN: Error message is not shown and poll interval is reset
+        tabSheet.setSelectedTab(0);
+        assertNull(tabSheet.getTab(1).getComponentError());
+        assertEquals(-1, ui.getPollInterval());
     }
 }

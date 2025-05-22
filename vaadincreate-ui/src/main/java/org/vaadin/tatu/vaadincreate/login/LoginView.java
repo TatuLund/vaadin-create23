@@ -13,6 +13,7 @@ import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18NProvider;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.event.ConnectorEventListener;
 import com.vaadin.event.ShortcutAction;
@@ -100,6 +101,7 @@ public class LoginView extends Composite implements HasI18N {
         buildUI();
         showLoginInformation(getUI().getPage().getBrowserWindowWidth());
         usernameField.focus();
+        Utils.startPolling();
     }
 
     private void updateTranslations() {
@@ -130,6 +132,7 @@ public class LoginView extends Composite implements HasI18N {
     @Override
     public void detach() {
         super.detach();
+        Utils.stopPolling();
         resizeReg.remove();
     }
 

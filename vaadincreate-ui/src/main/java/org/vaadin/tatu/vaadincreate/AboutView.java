@@ -75,6 +75,7 @@ public class AboutView extends VerticalLayout
             editButton.addClickListener(click -> {
                 accessControl.assertAdmin();
                 adminsNoteField.setVisible(true);
+                Utils.startPolling();
                 adminsNote.setVisible(false);
                 editButton.setVisible(false);
                 adminsNoteField.setValue(adminsNote.getValue());
@@ -195,6 +196,7 @@ public class AboutView extends VerticalLayout
             Utils.access(ui, () -> {
                 if (adminsNoteField.isVisible()) {
                     adminsNoteField.setVisible(false);
+                    Utils.stopPolling();
                     adminsNote.setVisible(true);
                     editButton.setVisible(true);
                 }
@@ -214,6 +216,7 @@ public class AboutView extends VerticalLayout
     @Override
     public void detach() {
         super.detach();
+        Utils.stopPolling();
         getEventBus().unregisterEventBusListener(this);
     }
 

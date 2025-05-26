@@ -1,8 +1,10 @@
 package org.vaadin.tatu.vaadincreate;
 
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.annotation.WebInitParam;
@@ -25,6 +27,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
 import org.vaadin.tatu.vaadincreate.backend.events.MessageEvent;
+import org.vaadin.tatu.vaadincreate.backend.events.ShutdownEvent;
 import org.vaadin.tatu.vaadincreate.backend.events.UserUpdatedEvent;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
@@ -260,6 +263,19 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                         updatedUser));
             }
         }
+        if (event instanceof ShutdownEvent) {
+            access(() -> Notification.show(getTranslation(I18n.LOGOUT_60S),
+                    Type.WARNING_MESSAGE));
+            CompletableFuture.runAsync(() -> getSession().access(() -> {
+                if (getSession().getState() == VaadinSession.State.OPEN) {
+                    logger.info("Performing scheduled logout");
+                    getSession().close();
+                    getPage().reload();
+                }
+            }), CompletableFuture.delayedExecutor(60, TimeUnit.SECONDS,
+                    getExecutor()));
+        }
+
     }
 
     @Override

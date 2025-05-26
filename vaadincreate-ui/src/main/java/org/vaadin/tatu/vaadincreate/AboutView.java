@@ -4,6 +4,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
 import org.vaadin.tatu.vaadincreate.backend.AppDataService;
@@ -11,6 +12,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
 import org.vaadin.tatu.vaadincreate.backend.events.MessageEvent;
+import org.vaadin.tatu.vaadincreate.backend.events.ShutdownEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
@@ -51,6 +53,8 @@ public class AboutView extends VerticalLayout
     private Button editButton;
     private Label adminsNote;
     private TextArea adminsNoteField;
+    @Nullable
+    private Button shutDownButton;
 
     @Nullable
     private UI ui;
@@ -94,7 +98,36 @@ public class AboutView extends VerticalLayout
         addComponents(aboutContent, adminsContent);
         setComponentAlignment(aboutContent, Alignment.MIDDLE_CENTER);
         setComponentAlignment(adminsContent, Alignment.MIDDLE_CENTER);
+        if (accessControl.isUserInRole(Role.ADMIN)) {
+            shutDownButton = new Button(getTranslation(I18n.About.SHUTDOWN));
+            shutDownButton.setId("shutdown-button");
+            shutDownButton.setDisableOnClick(true);
+            shutDownButton.setIcon(VaadinIcons.POWER_OFF);
+            shutDownButton.addStyleNames(ValoTheme.BUTTON_BORDERLESS,
+                    ValoTheme.BUTTON_SMALL);
+            shutDownButton.setDescription(
+                    getTranslation(I18n.About.SHUTDOWN_DESCRIPTION));
+            shutDownButton.addClickListener(click -> handleGloabalLogout());
+            addComponent(shutDownButton);
+            setComponentAlignment(shutDownButton, Alignment.MIDDLE_CENTER);
+        }
         getEventBus().registerEventBusListener(this);
+    }
+
+    private void handleGloabalLogout() {
+        accessControl.assertAdmin();
+        var confirmDialog = new ConfirmDialog(
+                getTranslation(I18n.About.SHUTDOWN),
+                getTranslation(I18n.About.CONFIRM_SHUTDOWN), Type.ALERT);
+        confirmDialog.setConfirmText(I18n.CONFIRM);
+        confirmDialog.setCancelText(I18n.CANCEL);
+        confirmDialog.addConfirmedListener(confirmed -> {
+            logger.info("Global logout schduled in 60 seconds");
+            getEventBus().post(new ShutdownEvent());
+        });
+        confirmDialog.addCancelledListener(
+                cancelled -> shutDownButton.setEnabled(true));
+        confirmDialog.open();
     }
 
     private void closeEditor() {
@@ -203,6 +236,12 @@ public class AboutView extends VerticalLayout
                 adminsNote.setCaption(
                         Utils.formatDate(message.timeStamp(), getLocale()));
                 adminsNote.setValue(message.message());
+            });
+        } else if (event instanceof ShutdownEvent) {
+            Utils.access(ui, () -> {
+                if (shutDownButton != null) {
+                    shutDownButton.setEnabled(false);
+                }
             });
         }
     }

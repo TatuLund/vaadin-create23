@@ -38,6 +38,7 @@ public final class I18n {
     public static final String OPENED = "opened";
     public static final String CONFIRM = "confirm";
     public static final String CLOSED = "closed";
+    public static final String LOGOUT_60S = "logout-60s";
 
     public static final class Books {
         public static final String UPDATED = "updated";
@@ -142,6 +143,9 @@ public final class I18n {
         public static final String EDIT_NOTE = "edit-note";
         public static final String VAADIN = "vaadin";
         public static final String NO_MESSAGE = "no-message";
+        public static final String SHUTDOWN = "shutdown";
+        public static final String SHUTDOWN_DESCRIPTION = "shutdown-description";
+        public static final String CONFIRM_SHUTDOWN = "confirm-shutdown";
 
         private About() {
             // private constructor to hide the implicit public one

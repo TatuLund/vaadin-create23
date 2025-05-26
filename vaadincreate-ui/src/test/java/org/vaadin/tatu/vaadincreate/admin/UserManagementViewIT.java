@@ -9,6 +9,7 @@ import java.io.IOException;
 import org.junit.After;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 
 import com.vaadin.testbench.elements.ButtonElement;
@@ -70,8 +71,9 @@ public class UserManagementViewIT extends AbstractViewTest {
         assertTrue(save.isEnabled());
         save.click();
 
-        assertTrue($(NotificationElement.class).last().getText()
-                .contains("Testuser"));
+        var notification = $(NotificationElement.class).last();
+        assertEquals("Käyttäjä \"Testuser\" tallenettu.",
+                notification.getText());
 
         assertFalse(delete.isEnabled());
         assertFalse(save.isEnabled());
@@ -83,7 +85,8 @@ public class UserManagementViewIT extends AbstractViewTest {
 
         var userSelect = $(ComboBoxElement.class).id("user-select");
         assertEquals("", userSelect.getValue());
-        userSelect.selectByText("Testuser");
+        userSelect.sendKeys("Testuser", Keys.TAB);
+        waitUntil(input -> delete.isEnabled());
 
         assertFalse(save.isEnabled());
         assertTrue(delete.isEnabled());
@@ -100,8 +103,8 @@ public class UserManagementViewIT extends AbstractViewTest {
                 .contains("Testuser"));
         dialog.$(ButtonElement.class).id("confirm-button").click();
 
-        assertTrue($(NotificationElement.class).last().getText()
-                .contains("Testuser"));
+        assertEquals("Käyttäjä \"Testuser\" poistettu.",
+                $(NotificationElement.class).last().getText());
 
         assertEquals("", userSelect.getValue());
 

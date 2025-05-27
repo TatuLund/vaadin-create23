@@ -85,10 +85,10 @@ public class UserManagementViewIT extends AbstractViewTest {
 
         var userSelect = $(ComboBoxElement.class).id("user-select");
         assertEquals("", userSelect.getValue());
+        userSelect.focus();
         userSelect.sendKeys("Testuser", Keys.TAB);
-        if (!delete.isEnabled()) {
-            waitUntil(input -> delete.isEnabled());
-        }
+        waitUntil(driver -> userSelect.getValue().equals("Testuser"));
+        waitUntil(driver -> delete.isEnabled());
 
         assertFalse(save.isEnabled());
         assertTrue(delete.isEnabled());

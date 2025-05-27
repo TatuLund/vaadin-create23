@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Test;

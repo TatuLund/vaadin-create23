@@ -119,8 +119,8 @@ public class AboutView extends VerticalLayout
         var confirmDialog = new ConfirmDialog(
                 getTranslation(I18n.About.SHUTDOWN),
                 getTranslation(I18n.About.CONFIRM_SHUTDOWN), Type.ALERT);
-        confirmDialog.setConfirmText(I18n.CONFIRM);
-        confirmDialog.setCancelText(I18n.CANCEL);
+        confirmDialog.setConfirmText(getTranslation(I18n.CONFIRM));
+        confirmDialog.setCancelText(getTranslation(I18n.CANCEL));
         confirmDialog.addConfirmedListener(confirmed -> {
             logger.info("Global logout schduled in 60 seconds");
             getEventBus().post(new ShutdownEvent());

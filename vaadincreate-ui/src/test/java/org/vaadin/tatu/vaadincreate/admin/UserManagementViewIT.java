@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Test;
@@ -86,6 +87,8 @@ public class UserManagementViewIT extends AbstractViewTest {
         var userSelect = $(ComboBoxElement.class).id("user-select");
         assertEquals("", userSelect.getValue());
         userSelect.focus();
+        driver.manage().timeouts().implicitlyWait(20, TimeUnit.MILLISECONDS);
+
         userSelect.sendKeys("Testuser", Keys.TAB);
         waitUntil(driver -> userSelect.getValue().equals("Testuser"));
         waitUntil(driver -> delete.isEnabled());

@@ -86,10 +86,8 @@ public class UserManagementViewIT extends AbstractViewTest {
 
         var userSelect = $(ComboBoxElement.class).id("user-select");
         assertEquals("", userSelect.getValue());
-        userSelect.focus();
-        driver.manage().timeouts().implicitlyWait(20, TimeUnit.MILLISECONDS);
-
-        userSelect.sendKeys("Testuser", Keys.TAB);
+        userSelect.click();
+        userSelect.sendKeys("Testuser", Keys.ENTER);
         waitUntil(driver -> userSelect.getValue().equals("Testuser"));
         waitUntil(driver -> delete.isEnabled());
 

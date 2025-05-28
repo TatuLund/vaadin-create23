@@ -58,8 +58,8 @@ public class UserManagementView extends VerticalLayout implements TabView {
         form.addFormChangedListener(changed -> {
             save.setEnabled(changed.isValid());
             cancel.setEnabled(true);
-            Utils.startPolling();
             addStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES);
+            Utils.startPolling();
         });
 
         var header = createHeader();
@@ -131,17 +131,15 @@ public class UserManagementView extends VerticalLayout implements TabView {
         delete.setEnabled(false);
         save.setEnabled(false);
         cancel.setEnabled(true);
-        Utils.startPolling();
-        addStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES);
     }
 
     private void userSelected(User user) {
+        Utils.stopPolling();
         this.user = user;
         form.populate(user);
         delete.setEnabled(true);
         save.setEnabled(false);
         cancel.setEnabled(false);
-        Utils.stopPolling();
         removeStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES);
     }
 

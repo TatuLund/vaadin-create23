@@ -19,6 +19,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 public class AboutViewTest extends AbstractUITest {
 
@@ -110,4 +111,21 @@ public class AboutViewTest extends AbstractUITest {
         assertEquals(note.getCaption(), notification.getCaption());
     }
 
+    @Test
+    public void when_clicking_shutdown_it_needs_to_be_confirmed_and_after_confirm_notification_is_shown() {
+        // WHEN: Clicking shutdown button
+        test($(Button.class).id("shutdown-button")).click();
+
+        // THEN: A confirmation dialog is shown
+        var confirmDialog = $(Window.class).id("confirm-dialog");
+        assertEquals("Shutdown", confirmDialog.getCaption());
+
+        // WHEN: Clicking confirm
+        test($(confirmDialog, Button.class).id("confirm-button")).click();
+
+        waitWhile(String.class, t -> $(Notification.class).size() == 2, 2);
+
+        // THEN: A notification is shown
+        assertNotification("You will be logged out in 60 seconds.");
+    }
 }

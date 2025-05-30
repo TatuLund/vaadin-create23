@@ -24,7 +24,6 @@ import com.vaadin.data.ValueContext;
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
@@ -116,9 +115,7 @@ public class BooksViewEditIdTest extends AbstractUITest {
     }
 
     private void assertNotificationForUpdatedBook() {
-        assertTrue($(Notification.class).stream()
-                .filter(n -> n.getCaption().equals("\"Modified book\" updated"))
-                .findAny().isPresent());
+        assertNotification("\"Modified book\" updated");
     }
 
     private static Product createBook() {

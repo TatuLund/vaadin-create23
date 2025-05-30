@@ -3,6 +3,8 @@ package org.vaadin.tatu.vaadincreate;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.stream.Collectors;
+
 import org.vaadin.tatu.vaadincreate.crud.BookGrid;
 import org.vaadin.tatu.vaadincreate.crud.FakeGrid;
 import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
@@ -14,6 +16,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 
@@ -78,4 +81,21 @@ public abstract class AbstractUITest extends UIUnitTest {
         waitWhile(dashboard, d -> !d.getStyleName().contains("loaded"), 15);
     }
 
+    /**
+     * Assert that a notification with the given message is present.
+     *
+     * @param message
+     *            The message to check
+     */
+    protected void assertNotification(String message) {
+        var notifications = $(Notification.class).stream()
+                .map(n -> n.getCaption()).collect(Collectors.joining(","));
+        var result = $(Notification.class).stream()
+                .filter(n -> n.getCaption().equals(message)).findAny()
+                .isPresent();
+
+        assertTrue(String.format(
+                "Notification with caption '%s' not found in [%s].", message,
+                notifications), result);
+    }
 }

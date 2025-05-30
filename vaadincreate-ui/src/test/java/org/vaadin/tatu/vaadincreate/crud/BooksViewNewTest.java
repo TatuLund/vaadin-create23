@@ -17,7 +17,6 @@ import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
@@ -93,8 +92,6 @@ public class BooksViewNewTest extends AbstractUITest {
     }
 
     private void assertNotificationForUpdatedBook() {
-        assertTrue($(Notification.class).stream()
-                .filter(n -> n.getCaption().equals("\"A new product\" updated"))
-                .findAny().isPresent());
+        assertNotification("\"A new product\" updated");
     }
 }

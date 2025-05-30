@@ -249,9 +249,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
     }
 
     private void assertNotificationForUpdatedBook() {
-        assertTrue($(Notification.class).stream()
-                .filter(n -> n.getCaption().equals("\"Modified book\" updated"))
-                .findAny().isPresent());
+        assertNotification("\"Modified book\" updated");
     }
 
     @Test

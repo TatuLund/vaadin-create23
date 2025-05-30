@@ -266,7 +266,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         if (event instanceof ShutdownEvent) {
             access(() -> Notification.show(getTranslation(I18n.LOGOUT_60S),
                     Type.WARNING_MESSAGE));
-            CompletableFuture.runAsync(() -> getSession().access(() -> {
+            CompletableFuture.runAsync(() -> access(() -> {
                 if (getSession().getState() == VaadinSession.State.OPEN) {
                     logger.info("Performing scheduled logout");
                     getSession().close();

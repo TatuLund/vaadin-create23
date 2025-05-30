@@ -1148,10 +1148,4 @@ public class BooksViewTest extends AbstractUITest {
         var v = (VaadinSession) in.readObject();
     }
 
-    private void assertNotification(String message) {
-        assertTrue($(Notification.class).stream()
-                .filter(n -> n.getCaption().equals(message)).findAny()
-                .isPresent());
-    }
-
 }

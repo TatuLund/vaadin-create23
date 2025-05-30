@@ -86,8 +86,7 @@ public class UserManagementViewTest extends AbstractUITest {
         test($(PasswordField.class).id("password-field")).setValue("tester");
 
         // THEN: Password field is invalid, validation message is shown
-        // and save
-        // button is disabled
+        // and save button is disabled
         assertTrue(
                 test($(PasswordField.class).id("password-field")).isInvalid());
         assertEquals("Passwords do not match",
@@ -99,8 +98,7 @@ public class UserManagementViewTest extends AbstractUITest {
         test($(PasswordField.class).id("password-repeat")).setValue("tester");
 
         // THEN: Password field is valid, save button is disabled and
-        // role is
-        // invalid and validation message is shown
+        // role is invalid and validation message is shown
         assertFalse(
                 test($(PasswordField.class).id("password-field")).isInvalid());
         assertFalse(save.isEnabled());
@@ -112,8 +110,7 @@ public class UserManagementViewTest extends AbstractUITest {
         test($(ComboBox.class).id("role-field")).clickItem(Role.USER);
 
         // THEN: Role is valid, save button is enabled and delete button
-        // is
-        // disabled
+        // is disabled
         assertFalse(test($(ComboBox.class).id("role-field")).isInvalid());
         assertFalse($(Button.class).id("delete-button").isEnabled());
         assertTrue(save.isEnabled());

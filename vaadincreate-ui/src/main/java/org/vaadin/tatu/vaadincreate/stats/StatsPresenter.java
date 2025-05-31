@@ -1,17 +1,10 @@
 package org.vaadin.tatu.vaadincreate.stats;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -20,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
-import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
 import org.vaadin.tatu.vaadincreate.backend.events.BooksChangedEvent;
@@ -35,7 +27,6 @@ public class StatsPresenter implements EventBusListener, Serializable {
     private StatsView view;
     @Nullable
     private transient CompletableFuture<Void> future;
-    private static final String PRODUCTS_NOT_NULL = "Products must not be null";
     private transient ProductDataService service = VaadinCreateUI.get()
             .getProductService();
     private transient ExecutorService executor = VaadinCreateUI.get()
@@ -62,66 +53,21 @@ public class StatsPresenter implements EventBusListener, Serializable {
             var start = System.currentTimeMillis();
             logger.info("Calculating statistics");
 
-            Map<Availability, Long> availabilityStats = calculateAvailabilityStats(
-                    products);
+            Map<Availability, Long> availabilityStats = StatsUtils
+                    .calculateAvailabilityStats(products);
 
-            Map<String, Long[]> categoryStats = calculateCategoryStats(
-                    getService(), products);
-            // filter out empty categories
-            categoryStats.entrySet()
-                    .removeIf(entry -> entry.getValue()[0] == 0);
+            var categories = service.getAllCategories();
+            Map<String, Long[]> categoryStats = StatsUtils
+                    .calculateCategoryStats(categories, products);
 
-            Map<String, Long> priceStats = calculatePriceStats(products);
-            // filter out empty price brackets
-            priceStats.entrySet().removeIf(entry -> entry.getValue() == 0);
+            Map<String, Long> priceStats = StatsUtils
+                    .calculatePriceStats(products);
 
             view.updateStatsAsync(availabilityStats, categoryStats, priceStats);
             future = null;
             logger.info("Statistics updated in {}ms",
                     System.currentTimeMillis() - start);
         });
-    }
-
-    // Calculate statistics based on product data and return as a map of price
-    // brackets and product counts
-    private Map<String, Long> calculatePriceStats(
-            Collection<Product> products) {
-        assert products != null : PRODUCTS_NOT_NULL;
-        return getPriceBrackets(products).stream()
-                .collect(Collectors.toMap(PriceBracket::toString,
-                        priceBracket -> products.stream()
-                                .filter(product -> priceBracket
-                                        .isInPriceBracket(product.getPrice()))
-                                .count()));
-    }
-
-    // Calculate statistics based on product data and return as a map of
-    // category names and product counts
-    private Map<String, Long[]> calculateCategoryStats(
-            ProductDataService service, Collection<Product> products) {
-        assert products != null : PRODUCTS_NOT_NULL;
-        return service.getAllCategories().stream()
-                .collect(Collectors.toMap(Category::getName, category -> {
-                    long titles = products.stream().filter(
-                            product -> product.getCategory().contains(category))
-                            .count();
-                    long instock = products.stream().filter(
-                            product -> product.getCategory().contains(category))
-                            .mapToLong(Product::getStockCount).sum();
-                    return new Long[] { titles, instock };
-                }));
-    }
-
-    // Calculate statistics based on product data and return as a map of
-    // availability statuses and product counts
-    private Map<Availability, Long> calculateAvailabilityStats(
-            Collection<Product> products) {
-        assert products != null : PRODUCTS_NOT_NULL;
-        return Arrays.stream(Availability.values()).map(availability -> Map
-                .entry(availability, products.stream().filter(
-                        product -> product.getAvailability() == availability)
-                        .count()))
-                .collect(toEnumMap(Availability.class));
     }
 
     public void cancelUpdateStats() {
@@ -131,27 +77,6 @@ public class StatsPresenter implements EventBusListener, Serializable {
             future = null;
             logger.info("Fetching stats cancelled: {}", cancelled);
         }
-    }
-
-    // SonarLint is not able to deduct from isEmpty() check that stream cannot
-    // be empty and hence get() is safe
-    @SuppressWarnings("java:S3655")
-    private List<PriceBracket> getPriceBrackets(Collection<Product> products) {
-        assert products != null : PRODUCTS_NOT_NULL;
-
-        var brackets = new ArrayList<PriceBracket>();
-        if (products.isEmpty()) {
-            return brackets;
-        }
-
-        var max = products.stream()
-                .max((p1, p2) -> p1.getPrice().compareTo(p2.getPrice())).get()
-                .getPrice();
-        var numBrackets = (max.intValue() / 10) + 1;
-        for (int i = 10; i <= (numBrackets * 10); i += 10) {
-            brackets.add(new PriceBracket(i));
-        }
-        return brackets;
     }
 
     private ProductDataService getService() {
@@ -184,31 +109,6 @@ public class StatsPresenter implements EventBusListener, Serializable {
         }
     }
 
-    private record PriceBracket(int max) {
-        public boolean isInPriceBracket(BigDecimal price) {
-            return price.doubleValue() < max
-                    && price.doubleValue() >= (max - 10);
-        }
-
-        @Override
-        public String toString() {
-            return (max - 10) + " - " + max + " €";
-        }
-    }
-
-    // Collectors.toMap does not support EnumMap, so we need to implement our
-    // own collector
-    private static <K extends Enum<K>, V> Collector<Map.Entry<K, V>, ?, EnumMap<K, V>> toEnumMap(
-            Class<K> keyType) {
-        return Collector.of(() -> new EnumMap<>(keyType),
-                (map, entry) -> map.put(entry.getKey(), entry.getValue()),
-                (map1, map2) -> {
-                    map1.putAll(map2);
-                    return map1;
-                });
-    }
-
     private static Logger logger = LoggerFactory
             .getLogger(StatsPresenter.class);
-
 }

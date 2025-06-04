@@ -22,7 +22,6 @@ import com.vaadin.server.SerializablePredicate;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.renderers.HtmlRenderer;
 import com.vaadin.ui.renderers.NumberRenderer;
@@ -60,8 +59,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     public BookGrid() {
         setId("book-grid");
         setSizeFull();
-        addStyleNames(VaadinCreateTheme.GRID_NO_CELL_FOCUS,
-                VaadinCreateTheme.GRID_ROW_FOCUS);
+        setAccessibleNavigation(true);
+        addStyleNames(VaadinCreateTheme.GRID_ROW_FOCUS);
 
         // Set highlight color to last edited row with style generator.
         setStyleGenerator(book -> {
@@ -246,10 +245,9 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
         if (!readOnly) {
-            addStyleNames(VaadinCreateTheme.GRID_NO_CELL_FOCUS,
+            addStyleNames(
                     VaadinCreateTheme.GRID_ROW_FOCUS);
         } else {
-            addStyleName(VaadinCreateTheme.GRID_NO_CELL_FOCUS);
             removeStyleName(VaadinCreateTheme.GRID_ROW_FOCUS);
         }
     }
@@ -300,15 +298,6 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                 .getNumberInstance(getUI().getLocale());
         decimalFormat.setMaximumFractionDigits(2);
         decimalFormat.setMinimumFractionDigits(2);
-        // Improve Grid browsing experience for screen reader users
-        JavaScript.eval("""
-                setTimeout(() => {
-                    const body = document.querySelector('tbody.v-grid-body');
-                    Array.from(body.getElementsByTagName('tr')).forEach(el => {
-                        el.setAttribute('aria-live', 'polite');
-                    });
-                }, 1000);
-                """);
     }
 
     /**

@@ -92,6 +92,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     @Override
     protected void init(VaadinRequest request) {
+        setTabIndex(0);
         setOverlayContainerLabel("");
         getNotificationConfiguration()
                 .setAssistivePostfix(Type.ASSISTIVE_NOTIFICATION, "");

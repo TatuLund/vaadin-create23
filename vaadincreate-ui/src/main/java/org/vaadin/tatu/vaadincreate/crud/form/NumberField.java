@@ -50,6 +50,8 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
      */
     public NumberField(String string) {
         super();
+        var attributes = AttributeExtension.of(this);
+        attributes.setAttribute("role", "field");
         setCaption(string);
         setTypeNumber();
         textField.addValueChangeListener(valueChange -> {
@@ -73,10 +75,10 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
     }
 
     private void setTypeNumber() {
-        var stockFieldExtension = AttributeExtension.of(textField);
+        var attributes = AttributeExtension.of(textField);
         // Mark the stock count field as numeric.
         // This affects the virtual keyboard shown on mobile devices.
-        stockFieldExtension.setAttribute("type", "number");
+        attributes.setAttribute("type", "number");
     }
 
     @Override

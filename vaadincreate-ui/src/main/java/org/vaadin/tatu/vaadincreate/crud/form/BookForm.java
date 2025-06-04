@@ -373,6 +373,7 @@ public class BookForm extends Composite implements HasI18N {
         stockCount.setWidthFull();
         fieldWrapper.addComponents(price, stockCount);
 
+        AttributeExtension.of(category).setAttribute("role", "group");
         category.setId("category");
         category.addStyleName(VaadinCreateTheme.CHECKBOXGROUP_SCROLL);
         category.setHeight("170px");

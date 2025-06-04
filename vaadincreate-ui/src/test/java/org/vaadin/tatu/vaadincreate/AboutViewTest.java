@@ -60,6 +60,7 @@ public class AboutViewTest extends AbstractUITest {
         // THEN: Text area is shown
         var area = $(TextArea.class).id("admins-text-area");
         assertTrue(area.isVisible());
+        assertTrue(test(area).isFocused());
 
         // WHEN: Changing the value that contains XSS and clicking outside
         test(area).setValue(

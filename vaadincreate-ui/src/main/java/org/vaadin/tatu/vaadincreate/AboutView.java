@@ -83,6 +83,7 @@ public class AboutView extends VerticalLayout
                 adminsNote.setVisible(false);
                 editButton.setVisible(false);
                 adminsNoteField.setValue(adminsNote.getValue());
+                adminsNoteField.focus();
             });
             adminsContent.addComponent(editButton);
             adminsContent.setComponentAlignment(editButton,

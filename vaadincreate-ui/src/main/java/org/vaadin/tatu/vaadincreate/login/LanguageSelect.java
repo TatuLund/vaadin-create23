@@ -11,7 +11,7 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.ComboBox;
 
 @NullMarked
-@SuppressWarnings({"serial", "java:S2160", "java:S110"})
+@SuppressWarnings({ "serial", "java:S2160", "java:S110" })
 public class LanguageSelect extends ComboBox<Locale> implements HasI18N {
 
     public LanguageSelect() {
@@ -19,8 +19,9 @@ public class LanguageSelect extends ComboBox<Locale> implements HasI18N {
         setItems(DefaultI18NProvider.getInstance().getLocales());
         setItemCaptionGenerator(item -> getTranslation(item.getLanguage()));
         setItemIconGenerator(locale -> new ThemeResource(
-            String.format("flags/%s.gif", locale.getLanguage())));
+                String.format("flags/%s.gif", locale.getLanguage())));
         setEmptySelectionAllowed(false);
         setTextInputAllowed(false);
+        addValueChangeListener(valueChange -> getDataProvider().refreshAll());
     }
 }

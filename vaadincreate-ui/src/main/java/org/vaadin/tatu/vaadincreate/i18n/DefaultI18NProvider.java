@@ -21,9 +21,10 @@ public class DefaultI18NProvider implements I18NProvider {
     public static final Locale LOCALE_FI = new Locale("fi", "FI");
     public static final Locale LOCALE_EN = new Locale("en", "GB");
     public static final Locale LOCALE_DE = new Locale("de", "DE");
+    public static final Locale LOCALE_SV = new Locale("sv", "SE");
 
     public static final List<Locale> locales = Collections
-            .unmodifiableList(Arrays.asList(LOCALE_FI, LOCALE_EN, LOCALE_DE));
+            .unmodifiableList(Arrays.asList(LOCALE_FI, LOCALE_EN, LOCALE_DE, LOCALE_SV));
 
     protected static I18NProvider instance;
 

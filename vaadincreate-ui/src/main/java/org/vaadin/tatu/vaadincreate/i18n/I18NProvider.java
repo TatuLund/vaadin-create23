@@ -9,7 +9,7 @@ import javax.servlet.http.Cookie;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.vaadin.tatu.vaadincreate.util.CookieUtil;
+import org.vaadin.tatu.vaadincreate.util.CookieUtils;
 
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
@@ -52,7 +52,7 @@ public interface I18NProvider extends Serializable {
         Locale locale = null;
         // First try to find locale Cookie
         if (request != null) {
-            Cookie localeCookie = CookieUtil.getCookieByName("language",
+            Cookie localeCookie = CookieUtils.getCookieByName("language",
                     request);
             if (localeCookie != null && localeCookie.getValue() != null) {
                 String lang = localeCookie.getValue();

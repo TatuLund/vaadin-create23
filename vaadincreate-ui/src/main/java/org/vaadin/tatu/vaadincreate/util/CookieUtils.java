@@ -8,9 +8,9 @@ import org.jspecify.annotations.Nullable;
 import com.vaadin.server.VaadinRequest;
 
 @NullMarked
-public class CookieUtil {
+public class CookieUtils {
 
-    private CookieUtil() {
+    private CookieUtils() {
         // private constructor to hide the implicit public one
     }
 

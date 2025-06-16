@@ -36,7 +36,7 @@ import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.login.LoginView;
 import org.vaadin.tatu.vaadincreate.stats.StatsView;
-import org.vaadin.tatu.vaadincreate.util.CookieUtil;
+import org.vaadin.tatu.vaadincreate.util.CookieUtils;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.annotations.Push;
@@ -405,7 +405,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                     @Override
                     public void modifyBootstrapPage(
                             BootstrapPageResponse response) {
-                        Cookie localeCookie = CookieUtil.getCookieByName(
+                        Cookie localeCookie = CookieUtils.getCookieByName(
                                 "language", response.getRequest());
                         response.getDocument().getElementsByTag("html").get(0)
                                 .attributes().add("lang",
@@ -451,7 +451,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         private boolean handleRequest(VaadinSession session,
                 VaadinRequest request, VaadinResponse response) {
             var locale = new StringBuilder();
-            Cookie localeCookie = CookieUtil.getCookieByName("language",
+            Cookie localeCookie = CookieUtils.getCookieByName("language",
                     request);
             session.accessSynchronously(() -> {
                 var l = (String) session.getAttribute("locale");

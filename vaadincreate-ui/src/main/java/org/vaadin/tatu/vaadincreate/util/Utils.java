@@ -12,6 +12,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.AccessTask;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
@@ -26,7 +27,6 @@ import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.UIDetachedException;
 
 @NullMarked
 public class Utils {
@@ -167,11 +167,7 @@ public class Utils {
      */
     public static void access(@Nullable UI ui, Runnable command) {
         if (ui != null) {
-            try {
-                ui.access(command);
-            } catch (UIDetachedException e) {
-                logger.warn("Browser window was closed while pushing updates.");
-            }
+            ui.access(new AccessTask(command));
         } else {
             logger.warn("No UI available for pushing updates.");
         }

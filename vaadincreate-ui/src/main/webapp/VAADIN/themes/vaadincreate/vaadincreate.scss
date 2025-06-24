@@ -65,6 +65,15 @@ $fake-grid-background-color: white;
 
 @keyframes fadeIn { from { opacity: 1; } to { opacity: 0; } }
 
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 @mixin vaadincreate {
   // IMPORT VALO THEME
   @include valo;
@@ -175,5 +184,27 @@ $fake-grid-background-color: white;
   }
   input[type=number] {
   	appearance: textfield;
+  }
+
+  // Replace loading indicator with spinner animation
+  .v-loading-indicator {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #2165a1;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: transparent;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite !important;
+    position: fixed;
+    top: 47%;
+    left: 47%;
+  }
+
+  .v-loading-indicator[style*="none"] {
+    animation: unset !important;
+    width: 48px !important;
+    transition: unset !important;
   }
 }

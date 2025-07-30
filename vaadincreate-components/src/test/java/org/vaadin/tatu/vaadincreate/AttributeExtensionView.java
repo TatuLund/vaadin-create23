@@ -10,17 +10,32 @@ public class AttributeExtensionView extends VerticalLayout implements View {
     public static final String NAME = "attribute-extension";
 
     public AttributeExtensionView() {
-        var field = new TextField("Number");
-        var extension = AttributeExtension.of(field);
-        extension.setAttribute("type", "number");
-        extension.setAttribute("custom", "custom");
-        extension.setAttribute("special", "sticky");
+        var field = new AttributeTextField("Number");
+        field.setAttribute("type", "number");
+        field.setAttribute("custom", "custom");
+        field.setAttribute("special", "sticky");
 
         var button = new Button("Remove", e -> {
-            extension.removeAttribute("type");
-            extension.removeAttribute("custom");
+            field.removeAttribute("type");
+            field.removeAttribute("custom");
         });
 
         addComponents(field, button);
+    }
+
+    public static class AttributeTextField extends TextField
+            implements AttributeExtension.HasAttributes {
+
+        private final AttributeExtension attributes;
+
+        public AttributeTextField(String caption) {
+            super(caption);
+            attributes = AttributeExtension.of(this);
+        }
+
+        @Override
+        public AttributeExtension getAttributeExtension() {
+            return attributes;
+        }
     }
 }

@@ -5,6 +5,7 @@ import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.ResetButtonForTextField;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
@@ -18,10 +19,11 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
-public class FilterField extends TextField implements HasI18N {
+public class FilterField extends TextField implements HasI18N, HasAttributes {
 
     @Nullable
     private Registration shortcutRegistration;
+    private AttributeExtension attributes;
 
     /**
      * A custom text field component for filtering book entries.
@@ -35,9 +37,9 @@ public class FilterField extends TextField implements HasI18N {
         setIcon(VaadinIcons.SEARCH);
         var resetButton = ResetButtonForTextField.of(this);
         resetButton.setButtonLabel(getTranslation(I18n.Books.CLEAR_TEXT));
-        var attributes = AttributeExtension.of(this);
-        attributes.setAttribute("autocomplete", "off");
-        attributes.setAttribute("role", "searchbox");
+        attributes = AttributeExtension.of(this);
+        setAttribute("autocomplete", "off");
+        setAttribute("role", "searchbox");
         setShortcut();
     }
 
@@ -51,5 +53,10 @@ public class FilterField extends TextField implements HasI18N {
     public void detach() {
         super.detach();
         shortcutRegistration.remove();
+    }
+
+    @Override
+    public AttributeExtension getAttributeExtension() {
+        return attributes;
     }
 }

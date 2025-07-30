@@ -9,6 +9,7 @@ import com.vaadin.ui.TextField;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
@@ -34,13 +35,15 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
  */
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
-public class NumberField extends CustomField<Integer> implements HasI18N {
+public class NumberField extends CustomField<Integer>
+        implements HasI18N, HasAttributes {
 
     protected TextField textField = new TextField();
     private StockCountConverter stockCountConverter = new StockCountConverter(
             "");
     @Nullable
     private Integer intValue;
+    private AttributeExtension attributes;
 
     /**
      * Creates a new number field with the given caption.
@@ -50,8 +53,8 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
      */
     public NumberField(String string) {
         super();
-        var attributes = AttributeExtension.of(this);
-        attributes.setAttribute("role", "field");
+        attributes = AttributeExtension.of(this);
+        setAttribute("role", "field");
         setCaption(string);
         setTypeNumber();
         textField.addValueChangeListener(valueChange -> {
@@ -75,10 +78,9 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
     }
 
     private void setTypeNumber() {
-        var attributes = AttributeExtension.of(textField);
         // Mark the stock count field as numeric.
         // This affects the virtual keyboard shown on mobile devices.
-        attributes.setAttribute("type", "number");
+        AttributeExtension.of(textField).setAttribute("type", "number");
     }
 
     @Override
@@ -103,5 +105,10 @@ public class NumberField extends CustomField<Integer> implements HasI18N {
     @Override
     public Integer getValue() {
         return intValue;
+    }
+
+    @Override
+    public AttributeExtension getAttributeExtension() {
+        return attributes;
     }
 }

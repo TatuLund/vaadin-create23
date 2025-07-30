@@ -190,7 +190,7 @@ $fake-grid-background-color: white;
   .v-loading-indicator {
     width: 48px;
     height: 48px;
-    border: 5px solid #2165a1;
+    border: 5px solid $v-focus-color;
     border-bottom-color: transparent;
     border-radius: 50%;
     display: inline-block;

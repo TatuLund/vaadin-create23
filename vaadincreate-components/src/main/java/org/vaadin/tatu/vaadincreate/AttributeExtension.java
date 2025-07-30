@@ -59,4 +59,40 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
         extension.extend(target);
         return extension;
     }
+
+    /**
+     * Interface to be implemented by components that support attributes.
+     * Provides methods to set and remove attributes.
+     */
+    public interface HasAttributes {
+
+        /**
+         * Gets the AttributeExtension associated with this component.
+         *
+         * @return the AttributeExtension instance
+         */
+        abstract AttributeExtension getAttributeExtension();
+
+        /**
+         * Sets an attribute with the specified key and value.
+         *
+         * @param key
+         *            the attribute key
+         * @param value
+         *            the attribute value
+         */
+        default void setAttribute(String key, String value) {
+            getAttributeExtension().setAttribute(key, value);
+        }
+
+        /**
+         * Removes an attribute with the specified key.
+         *
+         * @param key
+         *            the attribute key
+         */
+        default void removeAttribute(String key) {
+            getAttributeExtension().removeAttribute(key);
+        }
+    }
 }

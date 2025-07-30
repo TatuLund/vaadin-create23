@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate.crud;
 import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
@@ -60,17 +61,34 @@ public class FakeGrid extends Composite implements HasI18N {
         spinnerWrapper.setSpacing(false);
         var fakeHeader = new CssLayout();
         fakeHeader.addStyleName(VaadinCreateTheme.FAKEGRID_HEADER);
-        var spinner = new Label();
-        spinner.addStyleName(ValoTheme.LABEL_SPINNER);
-        var spinnerExtension = AttributeExtension.of(spinner);
-        // Set ARIA attributes for the spinner to make it accessible
-        spinnerExtension.setAttribute("aria-label",
-                getTranslation(I18n.Books.LOADING));
-        spinnerExtension.setAttribute("aria-live", "assertive");
-        spinnerExtension.setAttribute("role", "alert");
+        var spinner = new Spinner();
         spinnerWrapper.addComponent(spinner);
         spinnerWrapper.setComponentAlignment(spinner, Alignment.MIDDLE_CENTER);
         layout.addComponents(fakeHeader, spinnerWrapper);
         layout.setExpandRatio(spinnerWrapper, 1);
+    }
+
+    @SuppressWarnings("java:S2160")
+    static class Spinner extends Label implements HasAttributes, HasI18N {
+
+        private AttributeExtension attributes;
+
+        /**
+         * Creates a new spinner label with the loading style.
+         */
+        public Spinner() {
+            super();
+            addStyleName(ValoTheme.LABEL_SPINNER);
+            attributes = AttributeExtension.of(this);
+            // Set ARIA attributes for the spinner to make it accessible
+            setAttribute("aria-label", getTranslation(I18n.Books.LOADING));
+            setAttribute("aria-live", "assertive");
+            setAttribute("role", "alert");
+        }
+
+        @Override
+        public AttributeExtension getAttributeExtension() {
+            return attributes;
+        }
     }
 }

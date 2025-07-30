@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -66,7 +67,11 @@ public class CategoryForm extends Composite implements HasI18N {
 
     public CategoryForm(Category category) {
         this.category = category;
-        configureNameField();
+        nameField = new NameField(category);
+        nameField.addFocusListener(
+                focus -> fireEvent(new FormFocusEvent(this, true)));
+        nameField.addBlurListener(
+                blur -> fireEvent(new FormFocusEvent(this, false)));
         // Focus the name field if the category is new
         if (category.getId() == null) {
             nameField.focus();
@@ -112,24 +117,6 @@ public class CategoryForm extends Composite implements HasI18N {
     public CategoryForm withCategories(Collection<Category> categories) {
         this.categories = categories;
         return this;
-    }
-
-    private void configureNameField() {
-        nameField = new TextField();
-        var nameFieldAttributes = AttributeExtension.of(nameField);
-        nameFieldAttributes.setAttribute("autocomplete", "off");
-        nameFieldAttributes.setAttribute("aria-label",
-                getTranslation(I18n.Category.CATEGORY_BAME));
-        nameFieldAttributes.removeAttribute("aria-labelledby");
-        nameField.setId(String.format("name-%s", category.getId()));
-        nameField.setValueChangeMode(ValueChangeMode.LAZY);
-        nameField.setValueChangeTimeout(2000);
-        nameField.setWidthFull();
-        nameField.setPlaceholder(getTranslation(I18n.Category.INSTRUCTION));
-        nameField.addFocusListener(
-                focus -> fireEvent(new FormFocusEvent(this, true)));
-        nameField.addBlurListener(
-                blur -> fireEvent(new FormFocusEvent(this, false)));
     }
 
     private void handleConfirmDelete() {
@@ -286,6 +273,30 @@ public class CategoryForm extends Composite implements HasI18N {
          */
         public boolean isFocused() {
             return focused;
+        }
+    }
+
+    static class NameField extends TextField implements HasI18N, HasAttributes {
+
+        private AttributeExtension attributes;
+
+        public NameField(Category category) {
+            super();
+            attributes = AttributeExtension.of(this);
+            setAttribute("autocomplete", "off");
+            setAttribute("aria-label",
+                    getTranslation(I18n.Category.CATEGORY_BAME));
+            removeAttribute("aria-labelledby");
+            setId(String.format("name-%s", category.getId()));
+            setValueChangeMode(ValueChangeMode.LAZY);
+            setValueChangeTimeout(2000);
+            setWidthFull();
+            setPlaceholder(getTranslation(I18n.Category.INSTRUCTION));
+        }
+
+        @Override
+        public AttributeExtension getAttributeExtension() {
+            return attributes;
         }
     }
 }

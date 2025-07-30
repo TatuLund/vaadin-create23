@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
@@ -240,7 +241,7 @@ public class AppLayout extends Composite implements HasI18N {
         return user.isPresent() ? user.get().getName() : "";
     }
 
-    public class MenuButton extends Button {
+    public class MenuButton extends Button implements HasAttributes {
 
         private String path;
         private String caption;
@@ -259,7 +260,7 @@ public class AppLayout extends Composite implements HasI18N {
             }
             setIcon(icon);
             attributes = AttributeExtension.of(this);
-            attributes.setAttribute("role", "link");
+            setAttribute("role", "link");
         }
 
         public String getPath() {
@@ -269,12 +270,17 @@ public class AppLayout extends Composite implements HasI18N {
         public void setSelected(boolean selected) {
             if (selected) {
                 addStyleName(ValoTheme.MENU_SELECTED);
-                attributes.setAttribute("aria-label",
+                setAttribute("aria-label",
                         caption + " " + getTranslation(I18n.CURRENT_PAGE));
             } else {
                 removeStyleName(ValoTheme.MENU_SELECTED);
-                attributes.setAttribute("aria-label", caption);
+                setAttribute("aria-label", caption);
             }
+        }
+
+        @Override
+        public AttributeExtension getAttributeExtension() {
+            return attributes;
         }
     }
 

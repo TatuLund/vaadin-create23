@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.admin.CategoryForm.NameField;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 
 import com.vaadin.server.ServiceException;
@@ -16,7 +17,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 public class CategoryManagementViewTest extends AbstractUITest {
@@ -52,7 +52,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var grid = (Grid<Category>) $(cats, Grid.class).single();
         var gridSize = test(grid).size();
         var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
-        test($(form, TextField.class).first()).setValue("Tech horror");
+        test($(form, NameField.class).first()).setValue("Tech horror");
 
         var cat = test(grid).item(gridSize - 1);
         assertEquals("Tech horror", cat.getName());
@@ -67,7 +67,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
                 .get();
 
         form = (CategoryForm) test(grid).cell(0, gridSize - 1);
-        test($(form, TextField.class).first()).setValue("Technology");
+        test($(form, NameField.class).first()).setValue("Technology");
         assertEquals("Category \"Technology\" saved.",
                 $(Notification.class).last().getCaption());
         cat = test(grid).item(gridSize - 1);
@@ -93,7 +93,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var grid = (Grid<Category>) $(cats, Grid.class).single();
         var gridSize = test(grid).size();
         var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
-        test($(form, TextField.class).first()).setValue("Tech horror");
+        test($(form, NameField.class).first()).setValue("Tech horror");
 
         var cat = test(grid).item(gridSize - 1);
         assertEquals("Tech horror", cat.getName());
@@ -110,7 +110,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
         ui.getProductService().updateCategory(newCat);
 
         form = (CategoryForm) test(grid).cell(0, gridSize - 1);
-        test($(form, TextField.class).first()).setValue("Technology");
+        test($(form, NameField.class).first()).setValue("Technology");
         // Assert that optimistic locking is thrown and caught
         assertEquals("Save conflict, try again.",
                 $(Notification.class).last().getCaption());
@@ -134,10 +134,10 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var grid = (Grid<Category>) $(cats, Grid.class).single();
         var gridSize = test(grid).size();
         var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
-        test($(form, TextField.class).first()).setValue("Sci-fi");
-        assertTrue(test($(form, TextField.class).first()).isInvalid());
+        test($(form, NameField.class).first()).setValue("Sci-fi");
+        assertTrue(test($(form, NameField.class).first()).isInvalid());
         assertEquals("Category's name already in use.",
-                test($(form, TextField.class).first()).errorMessage());
+                test($(form, NameField.class).first()).errorMessage());
     }
 
     @Test
@@ -147,10 +147,10 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var grid = (Grid<Category>) $(cats, Grid.class).single();
         var gridSize = test(grid).size();
         var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
-        test($(form, TextField.class).first()).setValue("Sci");
-        assertTrue(test($(form, TextField.class).first()).isInvalid());
+        test($(form, NameField.class).first()).setValue("Sci");
+        assertTrue(test($(form, NameField.class).first()).isInvalid());
         assertEquals("Category length is at least 5 and max 40 characters",
-                test($(form, TextField.class).first()).errorMessage());
+                test($(form, NameField.class).first()).errorMessage());
     }
 
     @Test
@@ -160,7 +160,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var grid = (Grid<Category>) $(cats, Grid.class).single();
         var gridSize = test(grid).size();
         var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
-        test($(form, TextField.class).first()).setValue("Sci");
+        test($(form, NameField.class).first()).setValue("Sci");
 
         test(tabs).click(1);
         test(tabs).click(0);
@@ -183,13 +183,13 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var grid = (Grid<Category>) $(cats, Grid.class).single();
         var gridSize = test(grid).size();
         var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
-        assertEquals("Horrors", $(form, TextField.class).first().getValue());
+        assertEquals("Horrors", $(form, NameField.class).first().getValue());
 
         // Simulate other user deleting the category
         ui.getProductService().deleteCategory(newCat.getId());
 
         // Attempt to edit the category
-        test($(form, TextField.class).first()).setValue("Horror");
+        test($(form, NameField.class).first()).setValue("Horror");
 
         // Assert that optimistic locking is thrown and caught
         assertEquals("Save conflict, try again.",
@@ -198,12 +198,12 @@ public class CategoryManagementViewTest extends AbstractUITest {
     }
 
     @Test
-    public void focusing_textfield_will_disable_new_category_button() {
+    public void focusing_namefield_will_disable_new_category_button() {
         assertTrue($(cats, Button.class).id("new-category").isEnabled());
         @SuppressWarnings("unchecked")
         var grid = (Grid<Category>) $(cats, Grid.class).single();
         var form = (CategoryForm) test(grid).cell(0, 0);
-        test($(form, TextField.class).first()).focus();
+        test($(form, NameField.class).first()).focus();
         assertFalse($(cats, Button.class).id("new-category").isEnabled());
         test($(form, Button.class).first()).focus();
         assertTrue($(cats, Button.class).id("new-category").isEnabled());
@@ -223,7 +223,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var grid = (Grid<Category>) $(cats, Grid.class).single();
         var gridSize = test(grid).size();
         var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
-        test($(form, TextField.class).first()).setValue("Duplicate");
+        test($(form, NameField.class).first()).setValue("Duplicate");
 
         // Assert that save failed and error shown
         assertEquals("Save conflict, try again.",
@@ -241,7 +241,7 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var grid = (Grid<Category>) $(cats, Grid.class).single();
         var gridSize = test(grid).size();
         var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
-        test($(form, TextField.class).first()).setValue("Deleted");
+        test($(form, NameField.class).first()).setValue("Deleted");
 
         assertEquals("Category \"Deleted\" saved.",
                 $(Notification.class).last().getCaption());

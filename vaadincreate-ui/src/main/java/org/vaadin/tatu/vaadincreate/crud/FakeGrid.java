@@ -1,7 +1,6 @@
 package org.vaadin.tatu.vaadincreate.crud;
 
 import org.jspecify.annotations.NullMarked;
-import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -71,24 +70,16 @@ public class FakeGrid extends Composite implements HasI18N {
     @SuppressWarnings("java:S2160")
     static class Spinner extends Label implements HasAttributes, HasI18N {
 
-        private AttributeExtension attributes;
-
         /**
          * Creates a new spinner label with the loading style.
          */
         public Spinner() {
             super();
             addStyleName(ValoTheme.LABEL_SPINNER);
-            attributes = AttributeExtension.of(this);
             // Set ARIA attributes for the spinner to make it accessible
             setAttribute("aria-label", getTranslation(I18n.Books.LOADING));
             setAttribute("aria-live", "assertive");
             setAttribute("role", "alert");
-        }
-
-        @Override
-        public AttributeExtension getAttributeExtension() {
-            return attributes;
         }
     }
 }

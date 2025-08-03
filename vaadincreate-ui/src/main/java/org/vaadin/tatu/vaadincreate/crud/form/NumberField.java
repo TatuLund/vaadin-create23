@@ -43,7 +43,6 @@ public class NumberField extends CustomField<Integer>
             "");
     @Nullable
     private Integer intValue;
-    private AttributeExtension attributes;
 
     /**
      * Creates a new number field with the given caption.
@@ -53,7 +52,6 @@ public class NumberField extends CustomField<Integer>
      */
     public NumberField(String string) {
         super();
-        attributes = AttributeExtension.of(this);
         setAttribute("role", "field");
         setCaption(string);
         setTypeNumber();
@@ -105,10 +103,5 @@ public class NumberField extends CustomField<Integer>
     @Override
     public Integer getValue() {
         return intValue;
-    }
-
-    @Override
-    public AttributeExtension getAttributeExtension() {
-        return attributes;
     }
 }

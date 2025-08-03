@@ -1,7 +1,6 @@
 package org.vaadin.tatu.vaadincreate.crud.form;
 
 import org.jspecify.annotations.NullMarked;
-import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 
@@ -18,7 +17,6 @@ import com.vaadin.ui.JavaScript;
 public class SidePanel extends Composite implements HasAttributes {
     private static final String ARIA_HIDDEN = "aria-hidden";
     private CssLayout layout = new CssLayout();
-    private AttributeExtension attributes;
 
     /**
      * Constructs a new SidePanel instance.
@@ -31,7 +29,6 @@ public class SidePanel extends Composite implements HasAttributes {
         layout.setId("book-form");
         layout.addStyleNames(VaadinCreateTheme.BOOKFORM,
                 VaadinCreateTheme.BOOKFORM_WRAPPER);
-        attributes = AttributeExtension.of(layout);
         setAttribute("role", "dialog");
         setAttribute("aria-label", "side panel");
         setAttribute(ARIA_HIDDEN, "true");
@@ -94,10 +91,5 @@ public class SidePanel extends Composite implements HasAttributes {
                         "setTimeout(() => document.getElementById('book-form').style.display='none', 200);"));
             }
         }
-    }
-
-    @Override
-    public AttributeExtension getAttributeExtension() {
-        return attributes;
     }
 }

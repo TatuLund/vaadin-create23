@@ -245,7 +245,6 @@ public class AppLayout extends Composite implements HasI18N {
 
         private String path;
         private String caption;
-        private AttributeExtension attributes;
 
         public MenuButton(String caption, String path, Resource icon) {
             super(caption);
@@ -259,7 +258,6 @@ public class AppLayout extends Composite implements HasI18N {
                 addStyleName(ValoTheme.MENU_SELECTED);
             }
             setIcon(icon);
-            attributes = AttributeExtension.of(this);
             setAttribute("role", "link");
         }
 
@@ -276,11 +274,6 @@ public class AppLayout extends Composite implements HasI18N {
                 removeStyleName(ValoTheme.MENU_SELECTED);
                 setAttribute("aria-label", caption);
             }
-        }
-
-        @Override
-        public AttributeExtension getAttributeExtension() {
-            return attributes;
         }
     }
 

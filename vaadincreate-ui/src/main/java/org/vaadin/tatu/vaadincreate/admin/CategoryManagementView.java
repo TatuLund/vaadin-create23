@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.vaadin.tatu.vaadincreate.AttributeExtension;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
@@ -20,7 +20,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
-public class CategoryManagementView extends VerticalLayout implements TabView {
+public class CategoryManagementView extends VerticalLayout
+        implements TabView, HasAttributes {
 
     public static final String VIEW_NAME = "categories";
 
@@ -50,9 +51,8 @@ public class CategoryManagementView extends VerticalLayout implements TabView {
     @SuppressWarnings("java:S5669")
     public CategoryManagementView() {
         setSizeFull();
-        var attributes = AttributeExtension.of(this);
-        attributes.setAttribute("role", "region");
-        attributes.setAttribute("aria-labelledby", "view-name");
+        setAttribute("role", "region");
+        setAttribute("aria-labelledby", "view-name");
 
         list = new ComponentList<>(this::createCategoryForm);
 

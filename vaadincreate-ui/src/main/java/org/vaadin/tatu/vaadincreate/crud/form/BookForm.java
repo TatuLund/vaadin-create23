@@ -9,6 +9,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
@@ -537,7 +538,7 @@ public class BookForm extends Composite implements HasI18N {
      * screen readers, a role of "form", and aria-keyshortcuts for keyboard
      * navigation.
      */
-    public class Form extends VerticalLayout {
+    public class Form extends VerticalLayout implements HasAttributes {
 
         /**
          * Constructs a new Form instance and sets ARIA attributes to enhance
@@ -546,11 +547,9 @@ public class BookForm extends Composite implements HasI18N {
         public Form() {
             super();
             // Set ARIA attributes for the form to make it accessible
-            var attributes = AttributeExtension.of(this);
-            attributes.setAttribute("tabindex", "0");
-            attributes.setAttribute("role", "form");
-            attributes.setAttribute("aria-keyshortcuts",
-                    "Escape PageDown PageUp");
+            setAttribute("tabindex", "0");
+            setAttribute("role", "form");
+            setAttribute("aria-keyshortcuts", "Escape PageDown PageUp");
         }
     }
 

@@ -55,6 +55,11 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
      *            A Component
      */
     public static AttributeExtension of(AbstractComponent target) {
+        var optionalAttributeExtension = target.getExtensions().stream()
+                .filter(ext -> ext instanceof AttributeExtension).findFirst();
+        if (optionalAttributeExtension.isPresent()) {
+            return (AttributeExtension) optionalAttributeExtension.get();
+        }
         var extension = new AttributeExtension();
         extension.extend(target);
         return extension;
@@ -71,7 +76,9 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
          *
          * @return the AttributeExtension instance
          */
-        abstract AttributeExtension getAttributeExtension();
+        default AttributeExtension getAttributeExtension() {
+            return AttributeExtension.of((AbstractComponent) this);
+        }
 
         /**
          * Sets an attribute with the specified key and value.

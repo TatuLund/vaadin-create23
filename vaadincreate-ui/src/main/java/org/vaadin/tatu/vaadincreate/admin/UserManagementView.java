@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
@@ -27,7 +27,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
-public class UserManagementView extends VerticalLayout implements TabView {
+public class UserManagementView extends VerticalLayout
+        implements TabView, HasAttributes {
 
     public static final String VIEW_NAME = "users";
 
@@ -45,9 +46,8 @@ public class UserManagementView extends VerticalLayout implements TabView {
     private Button cancel = new Button(getTranslation(I18n.CANCEL));
 
     public UserManagementView() {
-        var attributes = AttributeExtension.of(this);
-        attributes.setAttribute("role", "region");
-        attributes.setAttribute("aria-labelledby", "view-name");
+        setAttribute("role", "region");
+        setAttribute("aria-labelledby", "view-name");
 
         var title = new Label(getTranslation(I18n.User.EDIT_USERS));
         title.addStyleName(ValoTheme.LABEL_H4);

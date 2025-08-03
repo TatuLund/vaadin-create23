@@ -7,7 +7,6 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateView;
@@ -403,16 +402,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
      * attributes.
      */
     public static class CustomChart extends Chart implements HasAttributes {
-        private AttributeExtension attributes;
-
         public CustomChart(ChartType type) {
             super(type);
-            attributes = AttributeExtension.of(this);
-        }
-
-        @Override
-        public AttributeExtension getAttributeExtension() {
-            return attributes;
         }
     }
 

@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
@@ -278,11 +277,8 @@ public class CategoryForm extends Composite implements HasI18N {
 
     static class NameField extends TextField implements HasI18N, HasAttributes {
 
-        private AttributeExtension attributes;
-
         public NameField(Category category) {
             super();
-            attributes = AttributeExtension.of(this);
             setAttribute("autocomplete", "off");
             setAttribute("aria-label",
                     getTranslation(I18n.Category.CATEGORY_BAME));
@@ -292,11 +288,6 @@ public class CategoryForm extends Composite implements HasI18N {
             setValueChangeTimeout(2000);
             setWidthFull();
             setPlaceholder(getTranslation(I18n.Category.INSTRUCTION));
-        }
-
-        @Override
-        public AttributeExtension getAttributeExtension() {
-            return attributes;
         }
     }
 }

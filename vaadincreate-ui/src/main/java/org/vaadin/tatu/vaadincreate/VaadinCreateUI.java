@@ -406,7 +406,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                     public void modifyBootstrapPage(
                             BootstrapPageResponse response) {
                         Cookie localeCookie = CookieUtils.getCookieByName(
-                                "language", response.getRequest());
+                                CookieUtils.COOKIE_LANGUAGE,
+                                response.getRequest());
                         response.getDocument().getElementsByTag("html").get(0)
                                 .attributes().add("lang",
                                         localeCookie != null
@@ -451,15 +452,15 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         private boolean handleRequest(VaadinSession session,
                 VaadinRequest request, VaadinResponse response) {
             var locale = new StringBuilder();
-            Cookie localeCookie = CookieUtils.getCookieByName("language",
-                    request);
+            Cookie localeCookie = CookieUtils
+                    .getCookieByName(CookieUtils.COOKIE_LANGUAGE, request);
             session.accessSynchronously(() -> {
                 var l = (String) session.getAttribute("locale");
                 if (l != null) {
                     locale.append(l);
                 }
             });
-            if (locale.length() != 0) {
+            if (locale.isEmpty()) {
                 boolean toSave = false;
                 if (localeCookie == null) {
                     localeCookie = createNewCookie(request, locale);
@@ -483,7 +484,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         private Cookie createNewCookie(VaadinRequest request,
                 StringBuilder locale) {
             Cookie localeCookie;
-            localeCookie = new Cookie("language", locale.toString());
+            localeCookie = new Cookie(CookieUtils.COOKIE_LANGUAGE,
+                    locale.toString());
             localeCookie.setPath(request.getContextPath());
             localeCookie.setMaxAge(60 * 60);
             return localeCookie;

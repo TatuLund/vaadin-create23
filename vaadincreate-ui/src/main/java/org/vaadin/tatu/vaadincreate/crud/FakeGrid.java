@@ -68,7 +68,8 @@ public class FakeGrid extends Composite implements HasI18N {
     }
 
     @SuppressWarnings("java:S2160")
-    static class Spinner extends Label implements HasAttributes, HasI18N {
+    static class Spinner extends Label
+            implements HasAttributes<Spinner>, HasI18N {
 
         /**
          * Creates a new spinner label with the loading style.

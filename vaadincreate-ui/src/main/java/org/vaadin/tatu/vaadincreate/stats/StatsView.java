@@ -401,7 +401,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
      * custom attributes. It uses the AttributeExtension to manage these
      * attributes.
      */
-    public static class CustomChart extends Chart implements HasAttributes {
+    public static class CustomChart extends Chart implements HasAttributes<CustomChart> {
         public CustomChart(ChartType type) {
             super(type);
         }

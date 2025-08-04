@@ -36,7 +36,7 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class NumberField extends CustomField<Integer>
-        implements HasI18N, HasAttributes {
+        implements HasI18N, HasAttributes<NumberField> {
 
     protected TextField textField = new TextField();
     private StockCountConverter stockCountConverter = new StockCountConverter(

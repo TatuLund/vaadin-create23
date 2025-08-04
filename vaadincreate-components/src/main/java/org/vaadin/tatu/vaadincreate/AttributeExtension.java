@@ -16,7 +16,8 @@ import com.vaadin.ui.AbstractComponent;
 public class AttributeExtension extends AbstractJavaScriptExtension {
 
     protected AttributeExtension() {
-        // Non-public constructor to discourage direct instantiation
+        // Constructor is protected to discourage direct instantiation; use the
+        // static factory method 'of' instead.
     }
 
     @Override
@@ -33,8 +34,9 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
      *            The value for the attribute
      */
     public void setAttribute(String attribute, String value) {
-        getState().attributes.put(attribute, value);
-        getState().removals.remove(attribute);
+        AttributeExtensionState state = getState();
+        state.attributes.put(attribute, value);
+        state.removals.remove(attribute);
     }
 
     /**
@@ -44,8 +46,9 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
      *            The name of the attribute
      */
     public void removeAttribute(String attribute) {
-        getState().attributes.remove(attribute);
-        getState().removals.add(attribute);
+        AttributeExtensionState state = getState();
+        state.attributes.remove(attribute);
+        state.removals.add(attribute);
     }
 
     /**
@@ -68,16 +71,24 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
     /**
      * Interface to be implemented by components that support attributes.
      * Provides methods to set and remove attributes.
+     * <p>
+     * This interface is generic and enforces that only subclasses of
+     * AbstractComponent can implement it, ensuring type safety for attribute
+     * extension operations.
+     *
+     * @param <T>
+     *            the type of the component, must extend AbstractComponent
      */
-    public interface HasAttributes {
+    public interface HasAttributes<T extends AbstractComponent> {
 
         /**
          * Gets the AttributeExtension associated with this component.
          *
          * @return the AttributeExtension instance
          */
-        default AttributeExtension getAttributeExtension() {
-            return AttributeExtension.of((AbstractComponent) this);
+        @SuppressWarnings("unchecked")
+        private AttributeExtension getAttributeExtension() {
+            return AttributeExtension.of((T) this);
         }
 
         /**

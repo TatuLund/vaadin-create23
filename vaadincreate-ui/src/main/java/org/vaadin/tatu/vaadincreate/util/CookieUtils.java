@@ -10,6 +10,8 @@ import com.vaadin.server.VaadinRequest;
 @NullMarked
 public class CookieUtils {
 
+    public static final String COOKIE_LANGUAGE = "language";
+
     private CookieUtils() {
         // private constructor to hide the implicit public one
     }

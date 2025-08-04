@@ -52,8 +52,8 @@ public interface I18NProvider extends Serializable {
         Locale locale = null;
         // First try to find locale Cookie
         if (request != null) {
-            Cookie localeCookie = CookieUtils.getCookieByName("language",
-                    request);
+            Cookie localeCookie = CookieUtils
+                    .getCookieByName(CookieUtils.COOKIE_LANGUAGE, request);
             if (localeCookie != null && localeCookie.getValue() != null) {
                 String lang = localeCookie.getValue();
                 Optional<Locale> localeFromCookie = getSupportedLocale(lang);

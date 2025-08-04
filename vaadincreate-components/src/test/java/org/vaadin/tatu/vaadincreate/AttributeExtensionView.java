@@ -24,18 +24,10 @@ public class AttributeExtensionView extends VerticalLayout implements View {
     }
 
     public static class AttributeTextField extends TextField
-            implements AttributeExtension.HasAttributes {
-
-        private final AttributeExtension attributes;
+            implements AttributeExtension.HasAttributes<AttributeTextField> {
 
         public AttributeTextField(String caption) {
             super(caption);
-            attributes = AttributeExtension.of(this);
-        }
-
-        @Override
-        public AttributeExtension getAttributeExtension() {
-            return attributes;
         }
     }
 }

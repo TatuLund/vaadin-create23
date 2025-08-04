@@ -241,7 +241,8 @@ public class AppLayout extends Composite implements HasI18N {
         return user.isPresent() ? user.get().getName() : "";
     }
 
-    public class MenuButton extends Button implements HasAttributes {
+    public class MenuButton extends Button
+            implements HasAttributes<MenuButton> {
 
         private String path;
         private String caption;

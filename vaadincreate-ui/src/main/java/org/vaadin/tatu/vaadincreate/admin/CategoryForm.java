@@ -275,7 +275,8 @@ public class CategoryForm extends Composite implements HasI18N {
         }
     }
 
-    static class NameField extends TextField implements HasI18N, HasAttributes {
+    static class NameField extends TextField
+            implements HasI18N, HasAttributes<NameField> {
 
         public NameField(Category category) {
             super();

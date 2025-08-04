@@ -538,7 +538,7 @@ public class BookForm extends Composite implements HasI18N {
      * screen readers, a role of "form", and aria-keyshortcuts for keyboard
      * navigation.
      */
-    public class Form extends VerticalLayout implements HasAttributes {
+    public class Form extends VerticalLayout implements HasAttributes<Form> {
 
         /**
          * Constructs a new Form instance and sets ARIA attributes to enhance

@@ -12,7 +12,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @NullMarked
 @SuppressWarnings("serial")
-public class NoMatches extends Composite implements HasI18N, HasAttributes {
+public class NoMatches extends Composite
+        implements HasI18N, HasAttributes<NoMatches> {
 
     public NoMatches() {
         var label = new Label(getTranslation(I18n.Books.NO_MATCHES));

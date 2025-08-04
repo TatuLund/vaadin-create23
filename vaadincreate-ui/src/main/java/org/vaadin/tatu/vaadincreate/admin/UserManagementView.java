@@ -28,7 +28,7 @@ import com.vaadin.ui.themes.ValoTheme;
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class UserManagementView extends VerticalLayout
-        implements TabView, HasAttributes {
+        implements TabView, HasAttributes<UserManagementView> {
 
     public static final String VIEW_NAME = "users";
 

@@ -18,7 +18,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
-public class FilterField extends TextField implements HasI18N, HasAttributes {
+public class FilterField extends TextField
+        implements HasI18N, HasAttributes<FilterField> {
 
     @Nullable
     private Registration shortcutRegistration;

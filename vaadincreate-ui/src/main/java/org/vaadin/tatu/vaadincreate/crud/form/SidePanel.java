@@ -14,7 +14,7 @@ import com.vaadin.ui.JavaScript;
  */
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
-public class SidePanel extends Composite implements HasAttributes {
+public class SidePanel extends Composite implements HasAttributes<SidePanel> {
     private static final String ARIA_HIDDEN = "aria-hidden";
     private CssLayout layout = new CssLayout();
 

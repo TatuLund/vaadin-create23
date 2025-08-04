@@ -9,6 +9,7 @@ import javax.servlet.http.Cookie;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.util.CookieUtils;
 
 import com.vaadin.server.VaadinRequest;
@@ -48,6 +49,7 @@ public interface I18NProvider extends Serializable {
      */
     @Nullable
     public static Locale fetchLocaleFromCookie() {
+        var logger = LoggerFactory.getLogger(I18NProvider.class);
         var request = VaadinRequest.getCurrent();
         Locale locale = null;
         // First try to find locale Cookie
@@ -59,8 +61,15 @@ public interface I18NProvider extends Serializable {
                 Optional<Locale> localeFromCookie = getSupportedLocale(lang);
                 if (localeFromCookie.isPresent()) {
                     locale = localeFromCookie.get();
+                } else {
+                    logger.warn("Unsupported locale found in cookie: {}", lang);
                 }
+            } else {
+                logger.warn("No locale cookie found");
             }
+        } else {
+            logger.warn(
+                    "No VaadinRequest available to fetch locale from cookie");
         }
         return locale;
     }
@@ -69,4 +78,5 @@ public interface I18NProvider extends Serializable {
         return I18NProvider.get().getLocales().stream()
                 .filter(loc -> loc.getLanguage().equals(lang)).findFirst();
     }
+
 }

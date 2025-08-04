@@ -457,10 +457,11 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             session.accessSynchronously(() -> {
                 var l = (String) session.getAttribute("locale");
                 if (l != null) {
+                    logger.debug("Found locale in session: {}", l);
                     locale.append(l);
                 }
             });
-            if (locale.isEmpty()) {
+            if (!locale.isEmpty()) {
                 boolean toSave = false;
                 if (localeCookie == null) {
                     localeCookie = createNewCookie(request, locale);

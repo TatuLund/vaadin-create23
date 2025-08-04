@@ -37,7 +37,6 @@ public class LoggingFilter implements Filter {
             FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpSession session = httpRequest.getSession(false);
-        httpRequest.getContextPath();
         // Check if the URL is a VAADIN request or a valid application URL
         if (!isGoodUrl(httpRequest)) {
             getHttpResponse(response, httpRequest);

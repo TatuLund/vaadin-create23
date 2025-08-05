@@ -52,7 +52,7 @@ public class NumberField extends CustomField<Integer>
      */
     public NumberField(String string) {
         super();
-        setAttribute("role", "field");
+        setRole("field");
         setCaption(string);
         setTypeNumber();
         textField.addValueChangeListener(valueChange -> {

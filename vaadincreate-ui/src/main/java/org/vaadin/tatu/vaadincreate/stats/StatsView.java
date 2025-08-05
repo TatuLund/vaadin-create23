@@ -183,14 +183,14 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
     @SuppressWarnings("java:S1192")
     private void updatePriceChartAccessibilityAttributes(
             DataSeries priceSeries) {
-        priceChart.setAttribute("role", "figure");
+        priceChart.setRole("figure");
         priceChart.setAttribute("tabindex", "0");
         var alt = String.format("%s:%s", getTranslation(I18n.Stats.PRICES),
                 priceSeries
                         .getData().stream().map(data -> String.format("%s %s",
                                 data.getName(), data.getY()))
                         .collect(Collectors.joining(",")));
-        priceChart.setAttribute("aria-label", alt);
+        priceChart.setAriaLabel(alt);
     }
 
     // Update the charts with the new data
@@ -223,7 +223,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
     @SuppressWarnings("java:S5411")
     private void updateCategoryChartAccessibilityAttributes(DataSeries titles,
             DataSeries stockCounts) {
-        categoryChart.setAttribute("role", "figure");
+        categoryChart.setRole("figure");
         categoryChart.setAttribute("tabindex", "0");
         categoryChart.setAttribute("aria-live", "polite");
 
@@ -246,7 +246,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         if (alt1.isEmpty() && alt2.isEmpty()) {
             alt1 = getTranslation(I18n.Stats.EMPTY);
         }
-        categoryChart.setAttribute("aria-label", alt1 + " " + alt2);
+        categoryChart.setAriaLabel(String.format("%s %s", alt1, alt2));
     }
 
     // Update the charts with the new data
@@ -269,7 +269,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
 
     private void updateAvailabilityChartAccessibilityAttributes(
             DataSeries availabilitySeries) {
-        availabilityChart.setAttribute("role", "figure");
+        availabilityChart.setRole("figure");
         availabilityChart.setAttribute("tabindex", "0");
         var alt = String.format("%s:%s",
                 getTranslation(I18n.Stats.AVAILABILITIES),
@@ -277,7 +277,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
                         .getData().stream().map(data -> String.format("%s %s",
                                 data.getName(), data.getY()))
                         .collect(Collectors.joining(",")));
-        availabilityChart.setAttribute("aria-label", alt);
+        availabilityChart.setAriaLabel(alt);
     }
 
     private DataSeries categorySeries(Map<String, Long[]> categories,
@@ -401,7 +401,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
      * custom attributes. It uses the AttributeExtension to manage these
      * attributes.
      */
-    public static class CustomChart extends Chart implements HasAttributes<CustomChart> {
+    public static class CustomChart extends Chart
+            implements HasAttributes<CustomChart> {
         public CustomChart(ChartType type) {
             super(type);
         }

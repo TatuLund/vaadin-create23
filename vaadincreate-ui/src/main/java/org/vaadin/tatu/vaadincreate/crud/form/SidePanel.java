@@ -29,8 +29,8 @@ public class SidePanel extends Composite implements HasAttributes<SidePanel> {
         layout.setId("book-form");
         layout.addStyleNames(VaadinCreateTheme.BOOKFORM,
                 VaadinCreateTheme.BOOKFORM_WRAPPER);
-        setAttribute("role", "dialog");
-        setAttribute("aria-label", "side panel");
+        setRole("dialog");
+        setAriaLabel("side panel");
         setAttribute(ARIA_HIDDEN, "true");
 
         setCompositionRoot(layout);
@@ -45,21 +45,6 @@ public class SidePanel extends Composite implements HasAttributes<SidePanel> {
     public void setContent(Component content) {
         layout.removeAllComponents();
         layout.addComponent(content);
-    }
-
-    /**
-     * Sets the ARIA label attribute of the component.
-     *
-     * <p>
-     * This method allows you to specify a descriptive label for the component,
-     * enhancing accessibility by providing assistive technologies with a text
-     * description of the element.
-     *
-     * @param label
-     *            the ARIA label to be set on the component.
-     */
-    public void setAriaLabel(String label) {
-        setAttribute("aria-label", label);
     }
 
     /**

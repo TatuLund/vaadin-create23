@@ -281,8 +281,7 @@ public class CategoryForm extends Composite implements HasI18N {
         public NameField(Category category) {
             super();
             setAttribute("autocomplete", "off");
-            setAttribute("aria-label",
-                    getTranslation(I18n.Category.CATEGORY_BAME));
+            setAriaLabel(getTranslation(I18n.Category.CATEGORY_NAME));
             removeAttribute("aria-labelledby");
             setId(String.format("name-%s", category.getId()));
             setValueChangeMode(ValueChangeMode.LAZY);

@@ -209,6 +209,25 @@ public class Utils {
         }
     }
 
+    public static <T extends Throwable> boolean throwableHasCause(
+            Throwable throwable, Class<T> cause) {
+        while (throwable != null) {
+            if (throwable.getClass().equals(cause)) {
+                return true;
+            }
+            throwable = throwable.getCause();
+        }
+        return false;
+    }
+
+    public static Throwable getRootCause(Throwable throwable) {
+        Throwable cause = throwable;
+        while (cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+        return cause;
+    }
+
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
 
 }

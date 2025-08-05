@@ -23,7 +23,7 @@ public class NoMatches extends Composite
         // With this attribute screen reader will announce the content of the
         // label when it becomes visible.
         setAttribute("aria-live", "assertive");
-        setAttribute("role", "alert");
+        setRole("alert");
 
         setCompositionRoot(label);
     }

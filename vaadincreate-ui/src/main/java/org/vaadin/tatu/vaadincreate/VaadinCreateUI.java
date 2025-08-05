@@ -21,6 +21,7 @@ import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.BasicAccessControl;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.AppDataService;
+import org.vaadin.tatu.vaadincreate.backend.DatabaseConnectionException;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -393,7 +394,15 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                     if (!(throwable.toString()
                             .contains("org.eclipse.jetty.io.EofException"))) {
                         String id = formatId();
-                        var message = throwable.getMessage();
+                        String message;
+                        // Handle DatabaseConnectionException separately
+                        if (Utils.throwableHasCause(throwable,
+                                DatabaseConnectionException.class)) {
+                            message = "Database connection error.";
+                        } else {
+                            message = Utils.getRootCause(throwable)
+                                    .getMessage();
+                        }
                         session.getUIs().forEach(
                                 ui -> ui.access(() -> ((VaadinCreateUI) ui)
                                         .showInternalError(message, id)));

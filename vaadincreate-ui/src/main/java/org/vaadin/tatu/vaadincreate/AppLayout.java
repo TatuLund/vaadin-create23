@@ -19,13 +19,11 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
@@ -43,11 +41,10 @@ public class AppLayout extends Composite implements HasI18N {
     private final HorizontalLayout layout = new HorizontalLayout();
     private final VerticalLayout content = new VerticalLayout();
     private final CssLayout menuLayout = new CssLayout();
-    private final CssLayout menuItems = new CssLayout();
+    private final Navigation menuItems = new Navigation();
     private final CssLayout title;
     private final UI ui;
     private AccessControl accessControl;
-    private Label announcer;
 
     /**
      * Constructor.
@@ -104,10 +101,7 @@ public class AppLayout extends Composite implements HasI18N {
         toggleButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
         toggleButton.addStyleName(ValoTheme.BUTTON_SMALL);
         menuLayout.addComponent(toggleButton);
-
-        AttributeExtension.of(menuItems).setAttribute("role", "navigation");
         menuLayout.addComponent(menuItems);
-        menuItems.addStyleName(ValoTheme.MENU_ITEMS);
 
         var logout = new MenuBar();
         logout.setId("logout");
@@ -139,8 +133,8 @@ public class AppLayout extends Composite implements HasI18N {
                 if (viewName.isEmpty()) {
                     viewName = "about";
                 }
-                clearSelected();
-                setSelected(viewName);
+                menuItems.clearSelected();
+                menuItems.setSelected(viewName);
                 logger.info("User '{}' navigated to view '{}'", getUserName(),
                         viewName);
                 menuLayout.removeStyleName(ValoTheme.MENU_VISIBLE);
@@ -153,11 +147,6 @@ public class AppLayout extends Composite implements HasI18N {
             }
 
         });
-
-        announcer = new Label();
-        announcer.setContentMode(ContentMode.HTML);
-        announcer.setPrimaryStyleName("announcer");
-        layout.addComponent(announcer);
 
         setCompositionRoot(layout);
     }
@@ -216,24 +205,7 @@ public class AppLayout extends Composite implements HasI18N {
         }
         var menuItem = new MenuButton(viewName, path, icon);
         ui.getNavigator().addView(path, view);
-        menuItems.addComponent(menuItem);
-    }
-
-    // Clear the menu
-    private void clearSelected() {
-        var iter = menuItems.iterator();
-        while (iter.hasNext()) {
-            iter.next().removeStyleName(ValoTheme.MENU_SELECTED);
-        }
-    }
-
-    // Set the selected menu item by path
-    private void setSelected(String path) {
-        var iter = menuItems.iterator();
-        while (iter.hasNext()) {
-            var menuItem = (MenuButton) iter.next();
-            menuItem.setSelected(menuItem.getPath().equals(path));
-        }
+        menuItems.addMenuButton(menuItem);
     }
 
     private static String getUserName() {
@@ -241,12 +213,25 @@ public class AppLayout extends Composite implements HasI18N {
         return user.isPresent() ? user.get().getName() : "";
     }
 
+    /**
+     * A button for the application menu.
+     */
     public class MenuButton extends Button
             implements HasAttributes<MenuButton> {
 
         private String path;
         private String caption;
 
+        /**
+         * Constructor.
+         *
+         * @param caption
+         *            The caption of the button
+         * @param path
+         *            The path of the view
+         * @param icon
+         *            The icon to be used in the menu item
+         */
         public MenuButton(String caption, String path, Resource icon) {
             super(caption);
             this.path = path;
@@ -259,23 +244,85 @@ public class AppLayout extends Composite implements HasI18N {
                 addStyleName(ValoTheme.MENU_SELECTED);
             }
             setIcon(icon);
-            setAttribute("role", "link");
+            setRole("link");
         }
 
+        /**
+         * Get the path of the menu item.
+         *
+         * @return the path of the menu item
+         */
         public String getPath() {
             return path;
         }
 
+        /**
+         * Set the selected state of the menu item. This will add or remove the
+         * {@link ValoTheme#MENU_SELECTED} style name.
+         * 
+         * @param selected
+         *            boolean value
+         */
         public void setSelected(boolean selected) {
             if (selected) {
                 addStyleName(ValoTheme.MENU_SELECTED);
-                setAttribute("aria-label",
-                        caption + " " + getTranslation(I18n.CURRENT_PAGE));
+                setAriaLabel(String.format("%s %s", caption,
+                        getTranslation(I18n.CURRENT_PAGE)));
             } else {
                 removeStyleName(ValoTheme.MENU_SELECTED);
-                setAttribute("aria-label", caption);
+                setAriaLabel(caption);
             }
         }
+    }
+
+    /**
+     * A navigation component for the application shell.
+     */
+    static class Navigation extends Composite
+            implements HasAttributes<Navigation> {
+
+        private CssLayout items = new CssLayout();
+
+        public Navigation() {
+            setCompositionRoot(items);
+            items.addStyleName(ValoTheme.MENU_ITEMS);
+            setRole("navigation");
+        }
+
+        /**
+         * Add a menu button to the navigation.
+         * 
+         * @param button
+         *            A MenuButton to be added
+         */
+        void addMenuButton(MenuButton button) {
+            items.addComponent(button);
+        }
+
+        /**
+         * Clear the selected state of all menu items.
+         */
+        void clearSelected() {
+            var iter = items.iterator();
+            while (iter.hasNext()) {
+                iter.next().removeStyleName(ValoTheme.MENU_SELECTED);
+            }
+        }
+
+        /**
+         * Set the selected state of the menu item based on the path.
+         * 
+         * @param path
+         *            The path to set as selected
+         */
+        void setSelected(String path) {
+            var iter = items.iterator();
+            while (iter.hasNext()) {
+                var menuItem = (MenuButton) iter.next();
+                menuItem.setSelected(menuItem.getPath().equals(path));
+            }
+        }
+
     }
 
     private static Logger logger = LoggerFactory.getLogger(AppLayout.class);

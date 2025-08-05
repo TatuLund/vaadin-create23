@@ -51,7 +51,7 @@ public class CategoryManagementView extends VerticalLayout
     @SuppressWarnings("java:S5669")
     public CategoryManagementView() {
         setSizeFull();
-        setAttribute("role", "region");
+        setRole("region");
         setAttribute("aria-labelledby", "view-name");
 
         list = new ComponentList<>(this::createCategoryForm);

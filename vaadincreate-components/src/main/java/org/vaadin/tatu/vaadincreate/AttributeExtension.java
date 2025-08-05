@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractJavaScriptExtension;
@@ -52,10 +53,29 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
     }
 
     /**
+     * Get the value of the given attribute.
+     * <p>
+     * Note: This is able to retrieve only the attributes that have been set on
+     * the server side. If the attribute was set on the client side using
+     * JavaScript, it will not be retrievable through this method.
+     *
+     * @param attribute
+     *            The name of the attribute
+     * @return the value of the attribute, or null if not set
+     */
+    @Nullable
+    public String getAttribute(String attribute) {
+        AttributeExtensionState state = getState();
+        return state.attributes.get(attribute);
+    }
+
+    /**
      * Extend the Component with attribute extension.
      *
      * @param target
      *            A Component
+     * @return the AttributeExtension instance associated with the target
+     *         component, creating it if necessary.
      */
     public static AttributeExtension of(AbstractComponent target) {
         var optionalAttributeExtension = target.getExtensions().stream()
@@ -111,6 +131,41 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
          */
         default void removeAttribute(String key) {
             getAttributeExtension().removeAttribute(key);
+        }
+
+        /**
+         * Sets the role attribute for accessibility purposes.
+         *
+         * @param role
+         *            the role value
+         */
+        default void setRole(String role) {
+            setAttribute("role", role);
+        }
+
+        /**
+         * Sets the aria-label attribute for accessibility purposes.
+         *
+         * @param label
+         *            the aria-label value
+         */
+        default void setAriaLabel(String label) {
+            setAttribute("aria-label", label);
+        }
+
+        /**
+         * Gets the value of the specified attribute.
+         * <p>
+         * This method retrieves the value of an attribute set on the server
+         * side.
+         *
+         * @param key
+         *            the attribute key
+         * @return the value of the attribute, or null if not set
+         */
+        @Nullable
+        default String getAttribute(String key) {
+            return getAttributeExtension().getAttribute(key);
         }
     }
 }

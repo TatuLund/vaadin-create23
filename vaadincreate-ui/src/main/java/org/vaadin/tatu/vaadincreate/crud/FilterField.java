@@ -37,7 +37,7 @@ public class FilterField extends TextField
         var resetButton = ResetButtonForTextField.of(this);
         resetButton.setButtonLabel(getTranslation(I18n.Books.CLEAR_TEXT));
         setAttribute("autocomplete", "off");
-        setAttribute("role", "searchbox");
+        setRole("searchbox");
         setShortcut();
     }
 

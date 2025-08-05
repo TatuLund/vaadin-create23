@@ -6,10 +6,12 @@ import java.util.function.Function;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.exception.JDBCConnectionException;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.backend.DatabaseConnectionException;
 
 /**
  * Utility class for managing Hibernate sessions and transactions.
@@ -72,6 +74,7 @@ public class HibernateUtil {
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
+            handleDatabaseException(e);
             throw e;
         } finally {
             session.close();
@@ -108,6 +111,7 @@ public class HibernateUtil {
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
+            handleDatabaseException(e);
             throw e;
         } finally {
             session.close();
@@ -135,6 +139,9 @@ public class HibernateUtil {
         var session = getSessionFactory().openSession();
         try {
             result = task.apply(session);
+        } catch (Exception e) {
+            handleDatabaseException(e);
+            throw e;
         } finally {
             session.close();
         }
@@ -159,12 +166,24 @@ public class HibernateUtil {
         var session = getSessionFactory().openSession();
         try {
             task.accept(session);
+        } catch (Exception e) {
+            handleDatabaseException(e);
+            throw e;
         } finally {
             session.close();
         }
         var time = System.currentTimeMillis() - start;
         if (time > DATABASE_CALL_WARN_LIMIT) {
             logWarning(time);
+        }
+    }
+
+    private static void handleDatabaseException(Exception e)
+            throws DatabaseConnectionException {
+        // handle JDBC connection issues
+        if (e instanceof JDBCConnectionException) {
+            throw new DatabaseConnectionException("Database connection error",
+                    e);
         }
     }
 

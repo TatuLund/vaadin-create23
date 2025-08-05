@@ -39,6 +39,7 @@ public final class I18n {
     public static final String CONFIRM = "confirm";
     public static final String CLOSED = "closed";
     public static final String LOGOUT_60S = "logout-60s";
+    public static final String DATABASE_CONNECTION_ERROR = null;
 
     public static final class Books {
         public static final String UPDATED = "updated";
@@ -178,7 +179,7 @@ public final class I18n {
         public static final String DUPLICATE = "category-duplicate";
         public static final String INSTRUCTION = "category-instruction";
         public static final String DELETE_ERROR = "category-delete-error";
-        public static final String CATEGORY_BAME = "category-name";
+        public static final String CATEGORY_NAME = "category-name";
 
         private Category() {
             // private constructor to hide the implicit public one

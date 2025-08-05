@@ -46,7 +46,7 @@ public class UserManagementView extends VerticalLayout
     private Button cancel = new Button(getTranslation(I18n.CANCEL));
 
     public UserManagementView() {
-        setAttribute("role", "region");
+        setRole("region");
         setAttribute("aria-labelledby", "view-name");
 
         var title = new Label(getTranslation(I18n.User.EDIT_USERS));

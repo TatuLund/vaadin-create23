@@ -78,9 +78,9 @@ public class FakeGrid extends Composite implements HasI18N {
             super();
             addStyleName(ValoTheme.LABEL_SPINNER);
             // Set ARIA attributes for the spinner to make it accessible
-            setAttribute("aria-label", getTranslation(I18n.Books.LOADING));
+            setAriaLabel(getTranslation(I18n.Books.LOADING));
             setAttribute("aria-live", "assertive");
-            setAttribute("role", "alert");
+            setRole("alert");
         }
     }
 }

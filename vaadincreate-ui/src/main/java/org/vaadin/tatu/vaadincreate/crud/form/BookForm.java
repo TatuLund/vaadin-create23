@@ -548,7 +548,7 @@ public class BookForm extends Composite implements HasI18N {
             super();
             // Set ARIA attributes for the form to make it accessible
             setAttribute("tabindex", "0");
-            setAttribute("role", "form");
+            setRole("form");
             setAttribute("aria-keyshortcuts", "Escape PageDown PageUp");
         }
     }

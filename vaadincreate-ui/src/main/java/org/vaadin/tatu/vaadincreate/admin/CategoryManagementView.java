@@ -5,6 +5,8 @@ import java.util.Collection;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
@@ -51,8 +53,8 @@ public class CategoryManagementView extends VerticalLayout
     @SuppressWarnings("java:S5669")
     public CategoryManagementView() {
         setSizeFull();
-        setRole("region");
-        setAttribute("aria-labelledby", "view-name");
+        setRole(AriaRoles.REGION);
+        setAttribute(AriaAttributes.LABELLEDBY, "view-name");
 
         categoryList = new ComponentList<>(this::createCategoryForm);
 

@@ -9,6 +9,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
@@ -377,7 +379,8 @@ public class BookForm extends Composite implements HasI18N {
         stockCount.setWidthFull();
         fieldWrapper.addComponents(price, stockCount);
 
-        AttributeExtension.of(category).setAttribute("role", "group");
+        AttributeExtension.of(category).setAttribute(AriaAttributes.ROLE,
+                AriaRoles.GROUP);
         category.setId("category");
         category.addStyleName(VaadinCreateTheme.CHECKBOXGROUP_SCROLL);
         category.setHeight("170px");
@@ -550,9 +553,9 @@ public class BookForm extends Composite implements HasI18N {
         public Form() {
             super();
             // Set ARIA attributes for the form to make it accessible
-            setAttribute("tabindex", "0");
-            setRole("form");
-            setAttribute("aria-keyshortcuts", "Escape PageDown PageUp");
+            setAttribute("tabindex", 0);
+            setRole(AriaRoles.FORM);
+            setAttribute(AriaAttributes.KEYSHORTCUTS, "Escape PageDown PageUp");
         }
     }
 

@@ -88,6 +88,39 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
         return extension;
     }
 
+    public static class AriaAttributes {
+
+        private AriaAttributes() {
+            // Private constructor to prevent instantiation
+        }
+
+        public static final String ROLE = "role";
+        public static final String LABEL = "aria-label";
+        public static final String DESCRIBEDBY = "aria-describedby";
+        public static final String HIDDEN = "aria-hidden";
+        public static final String LABELLEDBY = "aria-labelledby";
+        public static final String KEYSHORTCUTS = "aria-keyshortcuts";
+        public static final String LIVE = "aria-live";
+    }
+
+    public static class AriaRoles {
+
+        private AriaRoles() {
+            // Private constructor to prevent instantiation
+        }
+
+        public static final String ALERT = "alert";
+        public static final String LINK = "link";
+        public static final String FORM = "form";
+        public static final String GROUP = "group";
+        public static final String FIELD = "field";
+        public static final String DIALOG = "dialog";
+        public static final String SEARCHBOX = "searchbox";
+        public static final String REGION = "region";
+        public static final String FIGURE = "figure";
+        public static final String NAVIGATION = "navigation";
+    }
+
     /**
      * Interface to be implemented by components that support attributes.
      * Provides methods to set and remove attributes.
@@ -124,6 +157,30 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
         }
 
         /**
+         * Sets an attribute with the specified key and value.
+         *
+         * @param key
+         *            the attribute key
+         * @param value
+         *            the attribute value
+         */
+        default void setAttribute(String key, boolean value) {
+            getAttributeExtension().setAttribute(key, String.valueOf(value));
+        }
+
+        /**
+         * Sets an attribute with the specified key and value.
+         *
+         * @param key
+         *            the attribute key
+         * @param value
+         *            the attribute value
+         */
+        default void setAttribute(String key, int value) {
+            getAttributeExtension().setAttribute(key, String.valueOf(value));
+        }
+
+        /**
          * Removes an attribute with the specified key.
          *
          * @param key
@@ -140,7 +197,7 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
          *            the role value
          */
         default void setRole(String role) {
-            setAttribute("role", role);
+            setAttribute(AriaAttributes.ROLE, role);
         }
 
         /**
@@ -150,7 +207,7 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
          *            the aria-label value
          */
         default void setAriaLabel(String label) {
-            setAttribute("aria-label", label);
+            setAttribute(AriaAttributes.LABEL, label);
         }
 
         /**

@@ -7,6 +7,8 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateView;
@@ -186,8 +188,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
     @SuppressWarnings("java:S1192")
     private void updatePriceChartAccessibilityAttributes(
             DataSeries priceSeries) {
-        priceChart.setRole("figure");
-        priceChart.setAttribute("tabindex", "0");
+        priceChart.setRole(AriaRoles.FIGURE);
+        priceChart.setAttribute("tabindex", 0);
         var alt = String.format("%s:%s", getTranslation(I18n.Stats.PRICES),
                 priceSeries
                         .getData().stream().map(data -> String.format("%s %s",
@@ -226,9 +228,9 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
     @SuppressWarnings("java:S5411")
     private void updateCategoryChartAccessibilityAttributes(DataSeries titles,
             DataSeries stockCounts) {
-        categoryChart.setRole("figure");
-        categoryChart.setAttribute("tabindex", "0");
-        categoryChart.setAttribute("aria-live", "polite");
+        categoryChart.setRole(AriaRoles.FIGURE);
+        categoryChart.setAttribute("tabindex", 0);
+        categoryChart.setAttribute(AriaAttributes.LIVE, "polite");
 
         var alt1 = titles.isVisible() ? String.format("%s %s:%s",
                 getTranslation(I18n.Stats.CATEGORIES),
@@ -272,8 +274,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
 
     private void updateAvailabilityChartAccessibilityAttributes(
             DataSeries availabilitySeries) {
-        availabilityChart.setRole("figure");
-        availabilityChart.setAttribute("tabindex", "0");
+        availabilityChart.setRole(AriaRoles.FIGURE);
+        availabilityChart.setAttribute("tabindex", 0);
         var alt = String.format("%s:%s",
                 getTranslation(I18n.Stats.AVAILABILITIES),
                 availabilitySeries

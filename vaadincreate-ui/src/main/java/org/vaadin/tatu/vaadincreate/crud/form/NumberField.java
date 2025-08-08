@@ -9,6 +9,7 @@ import com.vaadin.ui.TextField;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
@@ -52,7 +53,7 @@ public class NumberField extends CustomField<Integer>
      */
     public NumberField(String string) {
         super();
-        setRole("field");
+        setRole(AriaRoles.FIELD);
         setCaption(string);
         setTypeNumber();
         textField.addValueChangeListener(valueChange -> {

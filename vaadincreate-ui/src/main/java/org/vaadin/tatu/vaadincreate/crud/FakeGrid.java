@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.crud;
 
 import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
@@ -78,8 +80,8 @@ public class FakeGrid extends Composite implements HasI18N {
             addStyleName(ValoTheme.LABEL_SPINNER);
             // Set ARIA attributes for the spinner to make it accessible
             setAriaLabel(getTranslation(I18n.Books.LOADING));
-            setAttribute("aria-live", "assertive");
-            setRole("alert");
+            setAttribute(AriaAttributes.LIVE, "assertive");
+            setRole(AriaRoles.ALERT);
         }
     }
 }

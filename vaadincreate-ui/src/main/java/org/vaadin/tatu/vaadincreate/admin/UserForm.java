@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
@@ -42,7 +44,8 @@ public class UserForm extends Composite implements HasI18N {
 
     public UserForm() {
         form.addStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM);
-        AttributeExtension.of(form).setAttribute("role", "form");
+        AttributeExtension.of(form).setAttribute(AriaAttributes.ROLE,
+                AriaRoles.FORM);
         username = new TextField(getTranslation(I18n.User.USERNAME));
         username.setId("user-field");
         AttributeExtension.of(username).setAttribute("autocomplete", "off");

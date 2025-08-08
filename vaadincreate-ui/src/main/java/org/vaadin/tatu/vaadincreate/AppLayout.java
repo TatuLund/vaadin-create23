@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
@@ -247,7 +248,7 @@ public class AppLayout extends Composite implements HasI18N {
                 addStyleName(ValoTheme.MENU_SELECTED);
             }
             setIcon(icon);
-            setRole("link");
+            setRole(AriaRoles.LINK);
         }
 
         /**

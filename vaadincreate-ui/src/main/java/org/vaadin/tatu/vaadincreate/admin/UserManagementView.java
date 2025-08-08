@@ -6,6 +6,8 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
@@ -46,8 +48,8 @@ public class UserManagementView extends VerticalLayout
     private Button cancel = new Button(getTranslation(I18n.CANCEL));
 
     public UserManagementView() {
-        setRole("region");
-        setAttribute("aria-labelledby", "view-name");
+        setRole(AriaRoles.REGION);
+        setAttribute(AriaAttributes.LABELLEDBY, "view-name");
 
         var title = new Label(getTranslation(I18n.User.EDIT_USERS));
         title.addStyleName(ValoTheme.LABEL_H4);

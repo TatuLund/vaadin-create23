@@ -2,6 +2,8 @@ package org.vaadin.tatu.vaadincreate.crud.form;
 
 import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 
 import com.vaadin.ui.Component;
@@ -15,7 +17,6 @@ import com.vaadin.ui.JavaScript;
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class SidePanel extends Composite implements HasAttributes<SidePanel> {
-    private static final String ARIA_HIDDEN = "aria-hidden";
     private CssLayout layout = new CssLayout();
 
     /**
@@ -29,9 +30,9 @@ public class SidePanel extends Composite implements HasAttributes<SidePanel> {
         layout.setId("book-form");
         layout.addStyleNames(VaadinCreateTheme.BOOKFORM,
                 VaadinCreateTheme.BOOKFORM_WRAPPER);
-        setRole("dialog");
+        setRole(AriaRoles.DIALOG);
         setAriaLabel("side panel");
-        setAttribute(ARIA_HIDDEN, "true");
+        setAttribute(AriaAttributes.HIDDEN, true);
 
         setCompositionRoot(layout);
     }
@@ -65,12 +66,12 @@ public class SidePanel extends Composite implements HasAttributes<SidePanel> {
                 getUI().runAfterRoundTrip(() -> {
                     layout.addStyleName(
                             VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
-                    setAttribute(ARIA_HIDDEN, "false");
+                    setAttribute(AriaAttributes.HIDDEN, false);
                 });
             }
         } else {
             layout.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
-            setAttribute(ARIA_HIDDEN, "true");
+            setAttribute(AriaAttributes.HIDDEN, true);
             if (isAttached()) {
                 getUI().runAfterRoundTrip(() -> JavaScript.eval(
                         "setTimeout(() => document.getElementById('book-form').style.display='none', 200);"));

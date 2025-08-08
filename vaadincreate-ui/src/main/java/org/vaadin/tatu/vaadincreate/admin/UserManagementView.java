@@ -183,6 +183,7 @@ public class UserManagementView extends VerticalLayout
         try {
             // Commit the form to the user object
             form.commit();
+            assert user != null : "User must not be null when saving";
             // Update the user in the backend
             presenter.updateUser(user);
             form.clear();

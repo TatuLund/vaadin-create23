@@ -44,6 +44,9 @@ import com.vaadin.ui.themes.ValoTheme;
 public class AboutView extends VerticalLayout
         implements VaadinCreateView, EventBusListener {
 
+    private static final Logger logger = LoggerFactory
+            .getLogger(AboutView.class);
+
     public static final String VIEW_NAME = "about";
 
     private AccessControl accessControl = VaadinCreateUI.get()
@@ -108,14 +111,14 @@ public class AboutView extends VerticalLayout
                     ValoTheme.BUTTON_SMALL);
             shutDownButton.setDescription(
                     getTranslation(I18n.About.SHUTDOWN_DESCRIPTION));
-            shutDownButton.addClickListener(click -> handleGloabalLogout());
+            shutDownButton.addClickListener(click -> handleGlobalLogout());
             addComponent(shutDownButton);
             setComponentAlignment(shutDownButton, Alignment.MIDDLE_CENTER);
         }
         getEventBus().registerEventBusListener(this);
     }
 
-    private void handleGloabalLogout() {
+    private void handleGlobalLogout() {
         accessControl.assertAdmin();
         var confirmDialog = new ConfirmDialog(
                 getTranslation(I18n.About.SHUTDOWN),
@@ -123,7 +126,7 @@ public class AboutView extends VerticalLayout
         confirmDialog.setConfirmText(getTranslation(I18n.CONFIRM));
         confirmDialog.setCancelText(getTranslation(I18n.CANCEL));
         confirmDialog.addConfirmedListener(confirmed -> {
-            logger.info("Global logout schduled in 60 seconds");
+            logger.info("Global logout scheduled in 60 seconds");
             getEventBus().post(new ShutdownEvent());
         });
         confirmDialog.addCancelledListener(
@@ -177,11 +180,12 @@ public class AboutView extends VerticalLayout
     private TextArea createTextArea() {
         var textArea = new TextArea();
         textArea.setId("admins-text-area");
-        textArea.setMaxLength(250);
+        int maxLength = 250;
+        textArea.setMaxLength(maxLength);
         textArea.setWidth("450px");
         textArea.setIcon(VaadinIcons.FILE_TEXT_O);
         textArea.setCaption("HTML");
-        textArea.setPlaceholder("max 250 chars");
+        textArea.setPlaceholder("max " + maxLength + " chars");
         textArea.addFocusListener(focused -> saveRegistration = textArea
                 .addShortcutListener(new ShortcutListener("Save", KeyCode.S,
                         new int[] { ModifierKey.CTRL }) {
@@ -268,5 +272,4 @@ public class AboutView extends VerticalLayout
         return VaadinCreateUI.get().getAppService();
     }
 
-    private static Logger logger = LoggerFactory.getLogger(AboutView.class);
 }

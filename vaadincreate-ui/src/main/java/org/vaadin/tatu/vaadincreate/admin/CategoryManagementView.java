@@ -32,7 +32,7 @@ public class CategoryManagementView extends VerticalLayout
     @Nullable
     private Collection<Category> categories;
 
-    private ComponentList<Category, CategoryForm> list;
+    private ComponentList<Category, CategoryForm> categoryList;
 
     private Registration shortcutRegistration;
 
@@ -54,7 +54,7 @@ public class CategoryManagementView extends VerticalLayout
         setRole("region");
         setAttribute("aria-labelledby", "view-name");
 
-        list = new ComponentList<>(this::createCategoryForm);
+        categoryList = new ComponentList<>(this::createCategoryForm);
 
         newCategoryButton = new Button(
                 getTranslation(I18n.Category.ADD_NEW_CATEGORY),
@@ -71,8 +71,8 @@ public class CategoryManagementView extends VerticalLayout
         // Cancel the form when the user presses escape
         shortcutRegistration = addShortcutListener(new EscapeListener());
 
-        addComponents(viewName, newCategoryButton, list);
-        setExpandRatio(list, 1);
+        addComponents(viewName, newCategoryButton, categoryList);
+        setExpandRatio(categoryList, 1);
     }
 
     private CategoryForm createCategoryForm(Category category) {
@@ -88,12 +88,12 @@ public class CategoryManagementView extends VerticalLayout
     private void handleSave(Category category) {
         var saved = presenter.updateCategory(category);
         if (saved != null) {
-            list.replaceItem(category, saved);
+            categoryList.replaceItem(category, saved);
 
             if (category.getId() == null) {
                 // If this was a new category, focus the form for easier data
                 // entry
-                var form = list.getComponentFor(saved);
+                var form = categoryList.getComponentFor(saved);
                 if (form != null) {
                     form.focus();
                 }
@@ -108,7 +108,7 @@ public class CategoryManagementView extends VerticalLayout
 
     private void handleDelete(Category category) {
         presenter.removeCategory(category);
-        list.removeItem(category);
+        categoryList.removeItem(category);
         if (categories != null) {
             categories.remove(category);
         }
@@ -116,7 +116,7 @@ public class CategoryManagementView extends VerticalLayout
 
     private void addCategory() {
         var newCategory = new Category();
-        list.addItem(newCategory);
+        categoryList.addItem(newCategory);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class CategoryManagementView extends VerticalLayout
      */
     public void setCategories(Collection<Category> categories) {
         this.categories = categories;
-        list.setItems(new ArrayList<>(categories));
+        categoryList.setItems(new ArrayList<>(categories));
     }
 
     @Override

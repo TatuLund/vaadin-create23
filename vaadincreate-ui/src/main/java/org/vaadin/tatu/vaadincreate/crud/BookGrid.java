@@ -216,7 +216,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
      * @return true if the data provider is an instance of ListDataProvider,
      *         false otherwise.
      */
-    public boolean hasDataProdiver() {
+    public boolean hasDataProvider() {
         return getDataProvider() instanceof ListDataProvider;
     }
 

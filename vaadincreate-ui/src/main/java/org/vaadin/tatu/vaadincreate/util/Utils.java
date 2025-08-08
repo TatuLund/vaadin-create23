@@ -31,6 +31,8 @@ import com.vaadin.ui.UI;
 @NullMarked
 public class Utils {
 
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+
     private Utils() {
         // private constructor to hide the implicit public one
     }
@@ -227,7 +229,5 @@ public class Utils {
         }
         return cause;
     }
-
-    private static Logger logger = LoggerFactory.getLogger(Utils.class);
 
 }

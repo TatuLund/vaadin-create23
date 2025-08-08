@@ -65,12 +65,12 @@ public class SidePanel extends Composite implements HasAttributes<SidePanel> {
                 getUI().runAfterRoundTrip(() -> {
                     layout.addStyleName(
                             VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
-                    setAttribute(ARIA_HIDDEN, "true");
+                    setAttribute(ARIA_HIDDEN, "false");
                 });
             }
         } else {
             layout.removeStyleName(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE);
-            setAttribute(ARIA_HIDDEN, "false");
+            setAttribute(ARIA_HIDDEN, "true");
             if (isAttached()) {
                 getUI().runAfterRoundTrip(() -> JavaScript.eval(
                         "setTimeout(() => document.getElementById('book-form').style.display='none', 200);"));

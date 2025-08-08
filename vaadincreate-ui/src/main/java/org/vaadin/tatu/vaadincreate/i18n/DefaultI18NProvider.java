@@ -16,6 +16,9 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("serial")
 public class DefaultI18NProvider implements I18NProvider {
 
+    private static final Logger logger = LoggerFactory
+            .getLogger(DefaultI18NProvider.class);
+
     private static final String BUNDLE_PREFIX = "translate";
 
     public static final Locale LOCALE_FI = new Locale("fi", "FI");
@@ -23,8 +26,8 @@ public class DefaultI18NProvider implements I18NProvider {
     public static final Locale LOCALE_DE = new Locale("de", "DE");
     public static final Locale LOCALE_SV = new Locale("sv", "SE");
 
-    public static final List<Locale> locales = Collections
-            .unmodifiableList(Arrays.asList(LOCALE_FI, LOCALE_EN, LOCALE_DE, LOCALE_SV));
+    public static final List<Locale> locales = Collections.unmodifiableList(
+            Arrays.asList(LOCALE_FI, LOCALE_EN, LOCALE_DE, LOCALE_SV));
 
     protected static I18NProvider instance;
 
@@ -62,6 +65,4 @@ public class DefaultI18NProvider implements I18NProvider {
         return value;
     }
 
-    private static Logger logger = LoggerFactory
-            .getLogger(DefaultI18NProvider.class);
 }

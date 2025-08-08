@@ -111,6 +111,7 @@ public class UserForm extends Composite implements HasI18N {
      *             if the data in the form fails validation
      */
     public void commit() throws ValidationException {
+        assert user != null : "User must not be null when committing";
         binder.writeBean(user);
     }
 

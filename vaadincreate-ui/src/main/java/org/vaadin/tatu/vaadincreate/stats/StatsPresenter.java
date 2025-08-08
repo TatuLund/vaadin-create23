@@ -24,6 +24,9 @@ import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 @SuppressWarnings("serial")
 public class StatsPresenter implements EventBusListener, Serializable {
 
+    private static final Logger logger = LoggerFactory
+            .getLogger(StatsPresenter.class);
+
     private StatsView view;
     @Nullable
     private transient CompletableFuture<Void> future;
@@ -45,7 +48,7 @@ public class StatsPresenter implements EventBusListener, Serializable {
 
     /**
      * Load the product data in background thread calculate statistics when
-     * loading completes. Finally push statitics data to UI.
+     * loading completes. Finally push statistics data to UI.
      */
     public void requestUpdateStats() {
         logger.info("Fetching products for statistics");
@@ -64,10 +67,9 @@ public class StatsPresenter implements EventBusListener, Serializable {
                     .calculatePriceStats(products);
 
             view.updateStatsAsync(availabilityStats, categoryStats, priceStats);
-            future = null;
             logger.info("Statistics updated in {}ms",
                     System.currentTimeMillis() - start);
-        });
+        }).whenComplete((result, throwable) -> future = null);
     }
 
     public void cancelUpdateStats() {
@@ -109,6 +111,4 @@ public class StatsPresenter implements EventBusListener, Serializable {
         }
     }
 
-    private static Logger logger = LoggerFactory
-            .getLogger(StatsPresenter.class);
 }

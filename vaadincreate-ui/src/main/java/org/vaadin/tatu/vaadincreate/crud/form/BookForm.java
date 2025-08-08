@@ -110,6 +110,9 @@ import com.vaadin.ui.themes.ValoTheme;
 @SuppressWarnings({ "serial", "java:S2160" })
 public class BookForm extends Composite implements HasI18N {
 
+    private static final Logger logger = LoggerFactory
+            .getLogger(BookForm.class);
+
     // The form fields are bound to the product object by naming convention.
     // E.g. using the field name "productName" will bind to the Product's
     // "productName" property.
@@ -553,5 +556,4 @@ public class BookForm extends Composite implements HasI18N {
         }
     }
 
-    private static Logger logger = LoggerFactory.getLogger(BookForm.class);
 }

@@ -54,7 +54,6 @@ public class FakeGrid extends Composite implements HasI18N {
         layout.setSpacing(false);
         var spinnerWrapper = new VerticalLayout();
         spinnerWrapper.addStyleName(VaadinCreateTheme.FAKEGRID_SPINNERWRAPPER);
-        spinnerWrapper = new VerticalLayout();
         spinnerWrapper.setHeightFull();
         spinnerWrapper.setMargin(false);
         spinnerWrapper.setSpacing(false);

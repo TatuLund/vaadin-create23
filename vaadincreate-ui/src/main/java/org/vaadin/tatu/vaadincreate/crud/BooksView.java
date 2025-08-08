@@ -44,6 +44,8 @@ import com.vaadin.ui.themes.ValoTheme;
 @RolesPermitted({ Role.USER, Role.ADMIN })
 public class BooksView extends CssLayout implements VaadinCreateView {
 
+    private static final Logger logger = LoggerFactory.getLogger(BooksView.class);
+
     public static final String VIEW_NAME = "inventory";
 
     private BookGrid grid;
@@ -573,7 +575,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
     }
 
     private boolean canPush() {
-        return isAttached() && grid.hasDataProdiver();
+        return isAttached() && grid.hasDataProvider();
     }
 
     @Nullable
@@ -591,7 +593,5 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         }
         return updatedProduct;
     }
-
-    private static Logger logger = LoggerFactory.getLogger(BooksView.class);
 
 }

@@ -14,9 +14,17 @@ import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.events.UserUpdatedEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
+/**
+ * Presenter for managing user-related actions in the User Management view. This
+ * class handles user updates, deletions, and retrievals, ensuring that only
+ * users with admin privileges can perform these actions.
+ */
 @NullMarked
 @SuppressWarnings("serial")
 public class UserManagementPresenter implements Serializable {
+
+    private static final Logger logger = LoggerFactory
+            .getLogger(UserManagementPresenter.class);
 
     private UserManagementView view;
     private AccessControl accessControl = VaadinCreateUI.get()
@@ -39,7 +47,7 @@ public class UserManagementPresenter implements Serializable {
     public void requestUpdateUsers() {
         accessControl.assertAdmin();
         logger.info("Fetching users");
-        view.setUsers(UserService.get().getAllUsers());
+        view.setUsers(getService().getAllUsers());
     }
 
     /**
@@ -108,6 +116,4 @@ public class UserManagementPresenter implements Serializable {
         return VaadinCreateUI.get().getUserService();
     }
 
-    private static Logger logger = LoggerFactory
-            .getLogger(UserManagementPresenter.class);
 }

@@ -69,7 +69,7 @@ public class StatsUtils {
                             .mapToLong(Product::getStockCount).sum();
                     return new Long[] { titles, instock };
                 }));
-        // filter out empty price brackets
+        // filter out categories with zero products
         categoryStats.entrySet().removeIf(entry -> entry.getValue()[0] == 0);
         return categoryStats;
     }
@@ -125,10 +125,15 @@ public class StatsUtils {
                 });
     }
 
+    /**
+     * Represents a price bracket where {@code max} is the upper bound
+     * (exclusive) and the lower bound is always {@code max - 10} (inclusive).
+     */
     record PriceBracket(int max) implements Serializable {
         public boolean isInPriceBracket(BigDecimal price) {
-            return price.doubleValue() < max
-                    && price.doubleValue() >= (max - 10);
+            BigDecimal upper = BigDecimal.valueOf(max);
+            BigDecimal lower = BigDecimal.valueOf(max - 10L);
+            return price.compareTo(upper) < 0 && price.compareTo(lower) >= 0;
         }
 
         @Override

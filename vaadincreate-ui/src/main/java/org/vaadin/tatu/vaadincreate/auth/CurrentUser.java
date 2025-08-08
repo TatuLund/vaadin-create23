@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.auth;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jspecify.annotations.NullMarked;
@@ -30,13 +31,15 @@ public final class CurrentUser {
     }
 
     /**
-     * Returns the name of the current user stored in the current session, or an
-     * empty string if no user name is stored.
+     * Returns the current {@link User} stored in the current session, or
+     * {@link Optional#empty()} if no user is stored.
      *
      * @throws IllegalStateException
      *             if the current session cannot be accessed.
      */
     public static Optional<User> get() {
+        Objects.requireNonNull(VaadinSession.getCurrent(),
+                "No Vaadin session is bound to the current thread");
         var session = VaadinSession.getCurrent().getSession();
         if (session == null) {
             return Optional.empty();
@@ -47,13 +50,15 @@ public final class CurrentUser {
     }
 
     /**
-     * Sets the name of the current user and stores it in the current session.
-     * Using a {@code null} username will remove the username from the session.
+     * Stores the current {@link User} instance in the current session. Using a
+     * {@code null} value will remove the user from the session.
      *
      * @throws IllegalStateException
      *             if the current session cannot be accessed.
      */
     public static void set(@Nullable User currentUser) {
+        Objects.requireNonNull(VaadinSession.getCurrent(),
+                "No Vaadin session is bound to the current thread");
         VaadinSession.getCurrent().getSession()
                 .setAttribute(CURRENT_USER_SESSION_ATTRIBUTE_KEY, currentUser);
     }

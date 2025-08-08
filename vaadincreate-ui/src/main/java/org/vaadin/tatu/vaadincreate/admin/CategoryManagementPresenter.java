@@ -20,7 +20,9 @@ import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 @SuppressWarnings("serial")
 public class CategoryManagementPresenter implements Serializable {
 
-    private CategoryManagementView view;
+    private static Logger logger = LoggerFactory
+            .getLogger(CategoryManagementPresenter.class);
+    private final CategoryManagementView view;
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
 
@@ -63,11 +65,14 @@ public class CategoryManagementPresenter implements Serializable {
     }
 
     /**
-     * Add a new category to the backend.
+     * Add a new category to the backend or update an existing one.
+     * <p>
+     * If the category does not exist, it will be created; if it exists, it will
+     * be updated.
      *
      * @param category
-     *            the category to add
-     * @return the new category
+     *            the category to add or update
+     * @return the new or updated category
      * @throws IllegalStateException
      *             if the user is not an admin
      */
@@ -99,6 +104,4 @@ public class CategoryManagementPresenter implements Serializable {
         return VaadinCreateUI.get().getProductService();
     }
 
-    private static Logger logger = LoggerFactory
-            .getLogger(CategoryManagementPresenter.class);
 }

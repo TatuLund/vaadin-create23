@@ -16,6 +16,20 @@ import com.vaadin.shared.Registration;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
+/**
+ * A custom text field component for filtering book entries. This component
+ * extends {@link TextField} and implements {@link HasI18N} and
+ * {@link HasAttributes}. It provides a search functionality with a reset button
+ * and a keyboard shortcut for quick access.
+ *
+ * <p>
+ * Example usage:
+ * </p>
+ *
+ * <pre>
+ * FilterField filterField = new FilterField();
+ * </pre>
+ */
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class FilterField extends TextField
@@ -25,7 +39,9 @@ public class FilterField extends TextField
     private Registration shortcutRegistration;
 
     /**
-     * A custom text field component for filtering book entries.
+     * Constructs a new FilterField with default settings. It sets the ID,
+     * style, placeholder, and description for the field, and adds a search
+     * icon. A reset button is also included for clearing the filter text.
      */
     public FilterField() {
         setId("filter-field");

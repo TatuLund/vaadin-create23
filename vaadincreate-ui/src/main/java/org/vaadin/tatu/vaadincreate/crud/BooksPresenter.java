@@ -41,10 +41,13 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 @SuppressWarnings("serial")
 public class BooksPresenter implements Serializable, EventBusListener {
 
-    private BooksView view;
+    private static final Logger logger = LoggerFactory
+            .getLogger(BooksPresenter.class);
+
+    private final BooksView view;
     @Nullable
     private transient CompletableFuture<Void> future;
-    private AccessControl accessControl = VaadinCreateUI.get()
+    private final AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
 
     @Nullable
@@ -470,8 +473,5 @@ public class BooksPresenter implements Serializable, EventBusListener {
     private EventBus getEventBus() {
         return EventBus.get();
     }
-
-    private static Logger logger = LoggerFactory
-            .getLogger(BooksPresenter.class);
 
 }

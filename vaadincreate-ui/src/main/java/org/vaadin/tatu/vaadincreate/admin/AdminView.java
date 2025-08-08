@@ -28,6 +28,9 @@ import com.vaadin.ui.themes.ValoTheme;
 @RolesPermitted({ Role.ADMIN })
 public class AdminView extends VerticalLayout implements View, HasI18N {
 
+    private static final Logger logger = LoggerFactory
+            .getLogger(AdminView.class);
+
     public static final String VIEW_NAME = "admin";
 
     public AdminView() {
@@ -49,9 +52,17 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
         tabSheet.addStyleNames(ValoTheme.TABSHEET_PADDED_TABBAR,
                 ValoTheme.TABSHEET_CENTERED_TABS);
         tabSheet.addSelectedTabChangeListener(tabChange -> {
-            var tabName = ((TabView) tabSheet.getSelectedTab()).getTabName();
-            setFragmentParameter(tabName);
-            ((TabView) tabSheet.getSelectedTab()).enter();
+            var selectedTab = tabSheet.getSelectedTab();
+            String tabName = null;
+            if (selectedTab instanceof TabView tabView) {
+                tabName = tabView.getTabName();
+                setFragmentParameter(tabName);
+                tabView.enter();
+                logger.info("Tab '{}' selected.", tabName);
+            } else {
+                logger.warn("Selected tab is not an instance of TabView: {}",
+                        selectedTab.getClass().getName());
+            }
             if (tabSheet.getTab(1).getComponent().getStyleName()
                     .contains(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES)) {
                 var errorMessage = new UserError(
@@ -61,18 +72,20 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
             } else {
                 tabSheet.getTab(1).setComponentError(null);
             }
-            logger.info("Tab '{}' selected.", tabName);
         });
         if (params.equals(UserManagementView.VIEW_NAME)) {
             tabSheet.setSelectedTab(users);
+            users.enter();
+            logger.info("Tab 'users' selected.");
         }
-        if (params.equals(CategoryManagementView.VIEW_NAME)) {
+        if (params.equals(CategoryManagementView.VIEW_NAME)
+                || params.equals("")) {
             tabSheet.setSelectedTab(categories);
+            categories.enter();
+            logger.info("Tab 'categories' selected.");
         }
         removeAllComponents();
         addComponent(tabSheet);
-        categories.enter();
-        logger.info("Tab 'categories' selected.");
         setSizeFull();
     }
 
@@ -96,5 +109,4 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
                 false);
     }
 
-    private static Logger logger = LoggerFactory.getLogger(AdminView.class);
 }

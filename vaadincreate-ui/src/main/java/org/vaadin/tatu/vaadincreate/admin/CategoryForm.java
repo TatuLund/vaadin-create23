@@ -82,6 +82,8 @@ public class CategoryForm extends Composite implements HasI18N {
         deleteButton.setDescription(String.format("%s: %s",
                 getTranslation(I18n.DELETE), category.getName()));
         deleteButton.setEnabled(category.getId() != null);
+        // Button is discarded upon refresh and replaced with a new one,
+        // so no need to re-enable it
         deleteButton.setDisableOnClick(true);
         deleteButton.setWidth("45px");
 

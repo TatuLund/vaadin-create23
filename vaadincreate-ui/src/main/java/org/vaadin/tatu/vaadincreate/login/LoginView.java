@@ -44,12 +44,19 @@ import com.vaadin.util.ReflectTools;
 @NullMarked
 public class LoginView extends Composite implements HasI18N {
 
-    final TextField usernameField = new TextField(getTranslation(I18n.USERNAME),
-            "Admin");
+    private static final Logger logger = LoggerFactory
+            .getLogger(LoginView.class);
+
+    // Package-private final fields
+    final TextField usernameField = new TextField(
+            getTranslation(I18n.USERNAME));
     final PasswordField passwordField = new PasswordField(
             getTranslation(I18n.PASSWORD));
     final Button login = new Button(getTranslation(I18n.Login.LOGIN_BUTTON));
 
+    // Private final fields
+    private final CssLayout layout = new CssLayout();
+    private final AccessControl accessControl;
     private final Button forgotPassword = new Button(
             getTranslation(I18n.Login.FORGOT_PASSWORD));
     private final CssLayout loginInformation;
@@ -59,12 +66,18 @@ public class LoginView extends Composite implements HasI18N {
     private final CapsLockWarning capsLockWarning = CapsLockWarning
             .warnFor(passwordField);
 
-    private final CssLayout layout = new CssLayout();
-    private final AccessControl accessControl;
-
+    // Private mutable fields
     @Nullable
     private Registration resizeReg;
 
+    /**
+     * Constructs the LoginView.
+     *
+     * @param accessControl
+     *            the access control implementation used for authentication
+     * @param loginListener
+     *            the listener to handle successful login events
+     */
     public LoginView(AccessControl accessControl, LoginListener loginListener) {
         this.accessControl = accessControl;
         // information text about logging in
@@ -296,6 +309,4 @@ public class LoginView extends Composite implements HasI18N {
             super(source);
         }
     }
-
-    private static Logger logger = LoggerFactory.getLogger(LoginView.class);
 }

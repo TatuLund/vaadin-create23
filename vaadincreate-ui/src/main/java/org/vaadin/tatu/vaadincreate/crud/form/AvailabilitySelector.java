@@ -30,6 +30,8 @@ public class AvailabilitySelector extends ComboBox<Availability> {
         setWidthFull();
 
         setItems(Availability.values());
+        // Disallow empty selection to ensure an availability status is always
+        // chosen
         setEmptySelectionAllowed(false);
         setTextInputAllowed(false);
         setItemIconGenerator(item -> VaadinIcons.CIRCLE);
@@ -44,6 +46,7 @@ public class AvailabilitySelector extends ComboBox<Availability> {
     }
 
     private String getAvailabilityStyle(Availability item) {
+        assert item != null : "Availability item must not be null";
         return String.format("bookform-availability-%s",
                 item.name().toLowerCase());
     }

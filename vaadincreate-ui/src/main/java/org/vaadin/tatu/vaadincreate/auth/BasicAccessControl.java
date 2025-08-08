@@ -61,7 +61,7 @@ public class BasicAccessControl implements AccessControl {
         throw new IllegalStateException("No user is signed in");
     }
 
-    private static Logger logger = LoggerFactory
+    private static final Logger logger = LoggerFactory
             .getLogger(BasicAccessControl.class);
 
 }

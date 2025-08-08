@@ -19,6 +19,12 @@ import com.vaadin.data.converter.StringToBigDecimalConverter;
 @SuppressWarnings("serial")
 public class EuroConverter extends StringToBigDecimalConverter {
 
+    /**
+     * Constructs a EuroConverter.
+     *
+     * @param message
+     *            the error message to display when conversion fails
+     */
     public EuroConverter(String message) {
         super(message);
     }
@@ -40,6 +46,7 @@ public class EuroConverter extends StringToBigDecimalConverter {
         if (format instanceof DecimalFormat decimalFormat) {
             decimalFormat.setMaximumFractionDigits(2);
             decimalFormat.setMinimumFractionDigits(2);
+            decimalFormat.setRoundingMode(java.math.RoundingMode.HALF_UP);
         }
         return format;
     }

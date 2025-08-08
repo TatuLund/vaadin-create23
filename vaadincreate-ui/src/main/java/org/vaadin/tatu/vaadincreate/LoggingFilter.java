@@ -23,13 +23,20 @@ import java.io.IOException;
 @WebFilter(urlPatterns = "/*", asyncSupported = true)
 public class LoggingFilter implements Filter {
 
+    private static final Logger logger = LoggerFactory
+            .getLogger(LoggingFilter.class);
+
     private static boolean isGoodUrl(HttpServletRequest request) {
-        // Check if the URL is a VAADIN
+        // Check if the URL is a VAADIN or valid application endpoint,
+        // considering context path
         String url = request.getRequestURI();
         String contextPath = request.getContextPath();
-        return url.equals(contextPath + "/") || url.contains("VAADIN")
-                || url.contains("UIDL") || url.contains("HEARTBEAT")
-                || url.contains("PUSH") || url.contains("APP");
+        return url.equals(contextPath + "/")
+                || url.startsWith(contextPath + "/VAADIN")
+                || url.startsWith(contextPath + "/UIDL")
+                || url.startsWith(contextPath + "/HEARTBEAT")
+                || url.startsWith(contextPath + "/PUSH")
+                || url.startsWith(contextPath + "/APP");
     }
 
     @Override
@@ -72,6 +79,4 @@ public class LoggingFilter implements Filter {
         }
     }
 
-    private static final Logger logger = LoggerFactory
-            .getLogger(LoggingFilter.class);
 }

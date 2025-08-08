@@ -38,13 +38,16 @@ import com.vaadin.ui.themes.ValoTheme;
 @SuppressWarnings({ "serial", "java:S2160" })
 public class AppLayout extends Composite implements HasI18N {
 
+    private static final Logger logger = LoggerFactory
+            .getLogger(AppLayout.class);
+
     private final HorizontalLayout layout = new HorizontalLayout();
     private final VerticalLayout content = new VerticalLayout();
     private final CssLayout menuLayout = new CssLayout();
     private final Navigation menuItems = new Navigation();
     private final CssLayout title;
     private final UI ui;
-    private AccessControl accessControl;
+    private final AccessControl accessControl;
 
     /**
      * Constructor.
@@ -193,7 +196,7 @@ public class AppLayout extends Composite implements HasI18N {
      *            The view class
      * @param viewName
      *            The name of the view shown in the menu
-     * @param Icon
+     * @param icon
      *            Icon to be used in menu
      * @param path
      *            The name / uri path
@@ -281,7 +284,7 @@ public class AppLayout extends Composite implements HasI18N {
     static class Navigation extends Composite
             implements HasAttributes<Navigation> {
 
-        private CssLayout items = new CssLayout();
+        private final CssLayout items = new CssLayout();
 
         public Navigation() {
             setCompositionRoot(items);
@@ -325,5 +328,4 @@ public class AppLayout extends Composite implements HasI18N {
 
     }
 
-    private static Logger logger = LoggerFactory.getLogger(AppLayout.class);
 }

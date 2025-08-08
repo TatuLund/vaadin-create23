@@ -38,6 +38,9 @@ import com.vaadin.ui.themes.ValoTheme;
 @RolesPermitted({ Role.USER, Role.ADMIN })
 public class StatsView extends VerticalLayout implements VaadinCreateView {
 
+    private static final Logger logger = LoggerFactory
+            .getLogger(StatsView.class);
+
     public static final String VIEW_NAME = "stats";
 
     private StatsPresenter presenter = new StatsPresenter(this);
@@ -285,9 +288,9 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         assert categories != null : "Categories must not be null";
 
         var series = new DataSeries();
+        series.setName(getTranslation(I18n.CATEGORIES));
         categories.forEach((category, count) -> {
             var item = new DataSeriesItem(category, count[index]);
-            series.setName(getTranslation(I18n.CATEGORIES));
             series.add(item);
         });
         return series;
@@ -301,9 +304,9 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         availabilities.forEach((availability, count) -> {
             var item = new DataSeriesItem(availability.name(), count);
             item.setColor(toColor(availability));
-            series.setName(getTranslation(I18n.Stats.AVAILABILITIES));
             series.add(item);
         });
+        series.setName(getTranslation(I18n.Stats.AVAILABILITIES));
         return series;
     }
 
@@ -331,9 +334,9 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         var series = new DataSeries();
         prices.forEach((pricebracket, count) -> {
             var item = new DataSeriesItem(pricebracket, count);
-            series.setName(getTranslation(I18n.Stats.PRICES));
             series.add(item);
         });
+        series.setName(getTranslation(I18n.Stats.PRICES));
         return series;
     }
 
@@ -387,6 +390,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         super.detach();
         resizeListener.remove();
         presenter.cancelUpdateStats();
+        ui = null;
     }
 
     public void setLoadingAsync() {
@@ -407,7 +411,5 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
             super(type);
         }
     }
-
-    private static Logger logger = LoggerFactory.getLogger(StatsView.class);
 
 }

@@ -9,7 +9,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
-import org.vaadin.tatu.vaadincreate.backend.data.Draft;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 
 /**
@@ -44,6 +43,7 @@ public class ProductDao {
             }
             return id;
         });
+        // Necessary: Refetch new version of the product
         return HibernateUtil.inSession(session -> {
             return session.get(Product.class, identifier);
         });
@@ -71,9 +71,12 @@ public class ProductDao {
      *            the ID of the product to be deleted
      */
     public void deleteProduct(Integer id) {
-        logger.info("Deleting Product: ({})", id);
         HibernateUtil.inTransaction(session -> {
             Product product = session.get(Product.class, id);
+            if (product == null) {
+                throw new IllegalArgumentException(
+                        "Product with ID " + id + " not found");
+            }
             session.delete(product);
         });
     }
@@ -206,35 +209,28 @@ public class ProductDao {
                 logger.warn("Category with ID ({}) not found", id);
                 return;
             }
-            var products = session.createQuery(
-                    "select p from Product p join p.category c where c.id = :id",
-                    Product.class).setParameter("id", category.getId()).list();
-            products.forEach(product -> {
-                if (product.getCategory().contains(category)) {
-                    var categories = product.getCategory();
-                    categories.remove(category);
-                    product.setCategory(categories);
-                    session.update(product);
-                    logger.info("Updated Product: ({}) '{}'", product.getId(),
-                            product.getProductName());
-                }
-            });
-            var drafts = session.createQuery(
-                    "select d from Draft d join d.category c where c.id = :id",
-                    Draft.class).setParameter("id", category.getId()).list();
-            drafts.forEach(draft -> {
-                if (draft.getCategory().contains(category)) {
-                    var categories = draft.getCategory();
-                    categories.remove(category);
-                    draft.setCategory(categories);
-                    session.update(draft);
-                    logger.info("Updated Draft: ({}) '{}'", draft.getId(),
-                            draft.getProductName());
-                }
-            });
+            // For many-to-many relationships, we need to remove the association
+            // by updating the join table, not the collection directly
+
+            // Remove category from products (assuming product_category join
+            // table)
+            int updatedProducts = session.createNativeQuery(
+                    "DELETE FROM product_category WHERE category_id = :categoryId")
+                    .setParameter("categoryId", id).executeUpdate();
+
+            // Remove category from drafts (assuming draft_category join table)
+            int updatedDrafts = session.createNativeQuery(
+                    "DELETE FROM draft_category WHERE category_id = :categoryId")
+                    .setParameter("categoryId", id).executeUpdate();
+
+            // Now safe to delete the category itself
             session.delete(category);
-            logger.info("Deleted Category: ({}) '{}'", category.getId(),
-                    category.getName());
+
+            logger.info(
+                    "Deleted Category: ({}) '{}', Updated {} products and {} drafts",
+                    category.getId(), category.getName(), updatedProducts,
+                    updatedDrafts);
+
         });
     }
 

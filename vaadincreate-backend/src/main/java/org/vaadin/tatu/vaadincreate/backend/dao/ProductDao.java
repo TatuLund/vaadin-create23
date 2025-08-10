@@ -77,6 +77,7 @@ public class ProductDao {
                 throw new IllegalArgumentException(
                         "Product with ID " + id + " not found");
             }
+            logger.info("Deleting Product: ({})", id);
             session.delete(product);
         });
     }

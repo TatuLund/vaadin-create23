@@ -6,6 +6,14 @@
     border: $v-grid-border;
   }
 
+  .v-slot-adminview-userform {
+    min-height: 160px;
+  }
+
+  .adminview-userview {
+    overflow: auto;
+  }
+
   .adminview-categorygrid {
     box-shadow: $light-shadow;
 

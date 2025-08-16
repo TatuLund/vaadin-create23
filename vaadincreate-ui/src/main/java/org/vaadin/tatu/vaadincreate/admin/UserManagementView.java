@@ -48,6 +48,7 @@ public class UserManagementView extends VerticalLayout
     private Button cancel = new Button(getTranslation(I18n.CANCEL));
 
     public UserManagementView() {
+        addStyleName(VaadinCreateTheme.ADMINVIEW_USERVIEW);
         setRole(AriaRoles.REGION);
         setAttribute(AriaAttributes.LABELLEDBY, "view-name");
 

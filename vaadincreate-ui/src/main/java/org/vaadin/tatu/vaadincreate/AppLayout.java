@@ -290,7 +290,7 @@ public class AppLayout extends Composite implements HasI18N {
         public Navigation() {
             setCompositionRoot(items);
             items.addStyleName(ValoTheme.MENU_ITEMS);
-            setRole("navigation");
+            setRole(AriaRoles.NAVIGATION);
         }
 
         /**

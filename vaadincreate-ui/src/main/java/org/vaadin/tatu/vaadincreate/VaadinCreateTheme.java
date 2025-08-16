@@ -34,6 +34,7 @@ public final class VaadinCreateTheme {
     public static final String ADMINVIEW_CATEGORY_GRID = "adminview-categorygrid";
     public static final String ADMINVIEW_USERFORM = "adminview-userform";
     public static final String ADMINVIEW_USERFORM_CHANGES = "adminview-userform-changes";
+    public static final String ADMINVIEW_USERVIEW = "adminview-userview";
 
     public static final String BOOKVIEW_GRID = "bookview-grid";
     public static final String BOOKVIEW_TOOLBAR = "bookview-toolbar";

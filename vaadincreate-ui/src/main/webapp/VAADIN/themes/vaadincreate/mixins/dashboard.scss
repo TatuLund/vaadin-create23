@@ -27,4 +27,27 @@
     outline-offset: 2px;
     border-radius: 2px;
   }
+
+  g.highcharts-button:focus {
+    outline: 2px solid $v-focus-color;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  .highcharts-contextmenu {
+
+    div:focus {
+      background: $v-focus-color !important;
+      color: white !important;
+      outline: unset;
+    }
+
+    div {
+      div:hover {
+        background: $v-focus-color !important;
+        color: white !important;
+        outline: unset;
+      }
+    }
+  }
 }

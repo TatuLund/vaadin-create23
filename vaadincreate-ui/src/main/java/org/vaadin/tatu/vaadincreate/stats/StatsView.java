@@ -19,10 +19,12 @@ import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.addon.charts.Chart;
+import com.vaadin.addon.charts.model.Buttons;
 import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
+import com.vaadin.addon.charts.model.Exporting;
 import com.vaadin.addon.charts.model.Lang;
 import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.model.style.SolidColor;
@@ -82,6 +84,16 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         setSizeFull();
         setMargin(false);
         addComponent(dashboard);
+        // Create the export configuration
+        var exporting = new Exporting(true);
+        // Customize the file name of the download file
+        exporting.setFilename("chart");
+        // Use the exporting configuration in the chart
+        exporting.setUrl("http://charts:export@127.0.0.1:8083/");
+        exporting.setButtons(new Buttons());
+        categoryChart.getConfiguration().setExporting(exporting);
+        availabilityChart.getConfiguration().setExporting(exporting);
+        priceChart.getConfiguration().setExporting(exporting);
         setComponentAlignment(dashboard, Alignment.MIDDLE_CENTER);
     }
 
@@ -359,32 +371,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         // when using non-fixed sizes.
         resizeListener = ui.getPage().addBrowserWindowResizeListener(
                 e -> JavaScript.eval("vaadin.forceLayout()"));
-
-        // Remove Highcharts desc-banners, they are announced by NVDA
-        // And add keyboard accessibility to legend items
-        JavaScript
-                .eval("""
-                        setTimeout(() => {
-                            Array.from(document.getElementsByTagName('svg'))
-                                .forEach(el => {
-                                    const desc = el.getElementsByTagName('desc')[0];
-                                    el.removeChild(desc);
-                                });
-                            Array.from(document.getElementsByClassName('highcharts-legend-item'))
-                                .forEach(el => {
-                                    el.setAttribute('tabindex', '0');
-                                    el.setAttribute('role', 'button');
-                                    el.setAttribute('aria-label', '%s ' + el.textContent);
-                                    el.addEventListener('keyup', (e) => {
-                                        if (e.key === 'Enter' || e.key === ' ') {
-                                            el.dispatchEvent(new CustomEvent('click'));
-                                        }
-                                    });
-                                });
-                        }, 1000);
-                        """
-                        .formatted(
-                                getTranslation(I18n.Stats.LEGEND_CLICKABLE)));
+        ChartAccessibility
+                .patchCharts(getTranslation(I18n.Stats.LEGEND_CLICKABLE));
     }
 
     @Override

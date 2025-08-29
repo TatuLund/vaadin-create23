@@ -134,6 +134,8 @@ public final class I18n {
         public static final String COUNT = "count";
         public static final String LEGEND_CLICKABLE = "legend-clickable";
         public static final String EMPTY = "empty";
+        public static final String CONTEXT_MENU = "chart-menu";
+        public static final String MENU_ENTRIES = "menu-entries";
 
         private Stats() {
             // private constructor to hide the implicit public one

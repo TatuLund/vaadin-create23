@@ -65,9 +65,9 @@ public final class VaadinCreateTheme {
     public static final String DASHBOARD_CHART = "dashboard-chart";
     public static final String DASHBOARD_CHART_FOCUSRING = "dashboard-chart-focusring";
 
-    public static final String COLOR_AVAILABLE = "var(--color-available)";
-    public static final String COLOR_COMING = "var(--color-coming)";
-    public static final String COLOR_DISCONTINUED = "var(--color-discontinued)";
+    public static final String COLOR_AVAILABLE = "var(--color-available, green)";
+    public static final String COLOR_COMING = "var(--color-coming, orange)";
+    public static final String COLOR_DISCONTINUED = "var(--color-discontinued, red)";
 
     public static final String GRID_NO_STRIPES = "no-stripes";
     public static final String GRID_NO_BORDERS = "no-borders";

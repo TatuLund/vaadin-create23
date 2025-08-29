@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.stats;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -10,11 +11,13 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
+import org.vaadin.tatu.vaadincreate.ChartAccessibilityExtension;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateView;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
@@ -370,9 +373,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         // however Chart requires re-layout also when window size changes
         // when using non-fixed sizes.
         resizeListener = ui.getPage().addBrowserWindowResizeListener(
-                e -> JavaScript.eval("vaadin.forceLayout()"));
-        ChartAccessibility
-                .patchCharts(getTranslation(I18n.Stats.LEGEND_CLICKABLE));
+                resizeEvent -> JavaScript.eval("vaadin.forceLayout()"));
     }
 
     @Override
@@ -396,9 +397,20 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
      * attributes.
      */
     public static class CustomChart extends Chart
-            implements HasAttributes<CustomChart> {
+            implements HasAttributes<CustomChart>, HasI18N {
         public CustomChart(ChartType type) {
             super(type);
+        }
+
+        @Override
+        public void attach() {
+            super.attach();
+            var a11y = ChartAccessibilityExtension.of(this);
+            a11y.setLegendsClickable(getTranslation(I18n.Stats.LEGEND_CLICKABLE));
+            a11y.setContextMenu(getTranslation(I18n.Stats.CONTEXT_MENU));
+            a11y.setMenuEntries(Arrays.asList(
+                    getTranslation(I18n.Stats.MENU_ENTRIES).split(",")));
+            a11y.applyPatches();
         }
     }
 

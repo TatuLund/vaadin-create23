@@ -177,10 +177,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
                 updateCategoryChart(categoryStats);
                 updatePriceChart(priceStats);
 
-                availabilityChart.setPatchLegend(false);
                 availabilityChart.drawChart();
                 categoryChart.drawChart();
-                priceChart.setPatchLegend(false);
                 priceChart.drawChart();
 
                 dashboard.addStyleName("loaded");

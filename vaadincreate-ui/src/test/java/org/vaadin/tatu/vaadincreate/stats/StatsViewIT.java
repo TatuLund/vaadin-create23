@@ -54,9 +54,12 @@ public class StatsViewIT extends AbstractViewTest {
         assertEquals("Hinnat:10 - 20 € 40,20 - 30 € 36,0 - 10 € 24",
                 chart.getAttribute("aria-label"));
 
+        // Wait until patches applied
+        waitUntil(driver -> chart.findElement(By.className("highcharts-button"))
+                .getAttribute("role") != null);
+
         // Verify the button role and tabindex, and aria-label
         var button = chart.findElement(By.className("highcharts-button"));
-        waitUntil(driver -> button.getAttribute("role") != null);
         assertEquals("button", button.getAttribute("role"));
         assertEquals("0", button.getAttribute("tabindex"));
         assertEquals("Kaavion tulostusvalikko",

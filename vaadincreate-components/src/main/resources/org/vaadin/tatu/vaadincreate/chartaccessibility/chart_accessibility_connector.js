@@ -1,11 +1,11 @@
 window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
   "use strict";
 
-  var connector = this;
-  var state = connector.getState();
+  let connector = this;
+  let state = connector.getState();
 
   // Store the current patch state to avoid duplicate patches
-  var patchedElements = new Set();
+  let patchedElements = new Set();
 
   /**
    * Finds the chart container based on the chart ID
@@ -18,7 +18,7 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
       return null;
     }
 
-    var chartElement = document.getElementById(chartId);
+    let chartElement = document.getElementById(chartId);
     if (!chartElement) {
       console.warn(
         "ChartAccessibilityExtension: Chart element not found with ID:",
@@ -29,12 +29,12 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
 
     // Navigate to find the actual chart container
     // Chart structure: div[id] -> div.wrapper -> svg
-    var wrapperDiv = chartElement.querySelector("div");
+    let wrapperDiv = chartElement.querySelector("div");
     if (!wrapperDiv) {
       return null;
     }
 
-    var svg = wrapperDiv.querySelector("svg");
+    let svg = wrapperDiv.querySelector("svg");
     if (!svg) {
       return null;
     }
@@ -67,13 +67,13 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
    * @returns {boolean} - True if the chart was successfully patched, false otherwise
    */
   function _patchSingleChart(chartId, legendsClickable) {
-    var chart = _findChartContainer(chartId);
+    let chart = _findChartContainer(chartId);
     if (!chart) {
       return false;
     }
 
-    var svg = chart.svg;
-    var chartElement = chart.chartElement;
+    let svg = chart.svg;
+    let chartElement = chart.chartElement;
 
     // Check if this chart has already been patched
     if (patchedElements.has(chartId)) {
@@ -86,14 +86,12 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
 
     try {
       // Remove Highcharts desc-banners (announced by screen readers)
-      var desc = svg.querySelector("desc");
-      if (desc && desc.parentNode) {
-        desc.parentNode.removeChild(desc);
-      }
+      let desc = svg.querySelector("desc");
+      desc?.parentNode?.removeChild(desc);
 
       // Add keyboard accessibility to legend items within this chart
       // Try multiple scopes: chartElement, svg, and document (for debugging)
-      var legendItems = svg.querySelectorAll(".highcharts-legend-item");
+      let legendItems = svg.querySelectorAll(".highcharts-legend-item");
 
       console.debug(
         "ChartAccessibilityExtension: Found",
@@ -128,7 +126,7 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
       });
 
       // Setup context menu accessibility for buttons within this chart
-      var buttons = svg.querySelectorAll(".highcharts-button");
+      let buttons = svg.querySelectorAll(".highcharts-button");
 
       console.debug(
         "ChartAccessibilityExtension: Found",
@@ -137,19 +135,20 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
         chartId
       );
 
-      var buttonIndex = 0;
+      let buttonIndex = 0;
 
-      buttons.forEach(function (button) {
+      buttons.forEach((button) => {
         if (!button.hasAttribute("data-accessibility-patched")) {
           buttonIndex++;
-          var menuId = "context-menu-" + chartId + "-" + buttonIndex;
+          let menuId = "context-menu-" + chartId + "-" + buttonIndex;
 
           button.setAttribute("tabindex", "0");
           button.setAttribute("role", "button");
           button.setAttribute("aria-haspopup", "true");
           button.setAttribute("aria-controls", menuId);
           button.setAttribute("aria-label", state.contextMenu);
-          button.getElementsByTagName("title")[0].textContent = state.contextMenu;
+          button.getElementsByTagName("title")[0].textContent =
+            state.contextMenu;
           button.toggleAttribute("data-accessibility-patched");
           console.debug(
             "ChartAccessibilityExtension: Patched button",
@@ -209,7 +208,7 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
     menu.style.display = "none";
     button.focus();
     button.removeAttribute("aria-expanded");
-    var rect = button.getElementsByTagName("rect")[0];
+    let rect = button.getElementsByTagName("rect")[0];
     if (rect) {
       rect.setAttribute("fill", "white");
       rect.setAttribute("stroke", "none");
@@ -225,15 +224,15 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
    */
   function _setupContextMenu(button, menuId, chartElement) {
     // Wait for context menu to appear
-    var attempts = 0;
-    var maxAttempts = 10;
+    let attempts = 0;
+    let maxAttempts = 10;
 
     function _waitForMenu() {
       attempts++;
 
-      var menu = chartElement.querySelector(".highcharts-contextmenu");
+      let menu = chartElement.querySelector(".highcharts-contextmenu");
       if (menu && menu.style.display !== "none") {
-        var menuItems = menu.children[0];
+        let menuItems = menu.children[0];
         if (
           menuItems &&
           !menuItems.hasAttribute("data-accessibility-patched")
@@ -244,9 +243,9 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
           menuItems.setAttribute("id", menuId);
           menuItems.toggleAttribute("data-accessibility-patched");
 
-          var items = menuItems.querySelectorAll("div");
-          var itemIndex = 0;
-          items.forEach(function (item) {
+          let items = menuItems.querySelectorAll("div");
+          let itemIndex = 0;
+          items.forEach((item) => {
             item.innerText = state.menuEntries[itemIndex] || item.innerText;
             itemIndex++;
             item.setAttribute("tabindex", "0");
@@ -276,11 +275,8 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
           if (items.length > 0) {
             items[0].focus();
           }
-        } else if (
-          menuItems &&
-          menuItems.hasAttribute("data-accessibility-patched")
-        ) {
-          var items = menuItems.querySelectorAll("div");
+        } else if (menuItems?.hasAttribute("data-accessibility-patched")) {
+          let items = menuItems.querySelectorAll("div");
           if (items.length > 0) {
             items[0].focus();
           }
@@ -297,10 +293,10 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
    * Applies patches with retry logic
    */
   function _applyPatchesWithRetry() {
-    var chartId = state.chartId;
-    var legendsClickable = state.legendsClickable || "Click to toggle";
-    var maxAttempts = state.maxAttempts || 20;
-    var retryInterval = state.retryInterval || 100;
+    let chartId = state.chartId;
+    let legendsClickable = state.legendsClickable || "Click to toggle";
+    let maxAttempts = state.maxAttempts || 20;
+    let retryInterval = state.retryInterval || 100;
 
     if (!chartId) {
       console.warn("ChartAccessibilityExtension: No chart ID specified");
@@ -312,7 +308,7 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
       chartId
     );
 
-    var attempts = 0;
+    let attempts = 0;
 
     function _tryPatch() {
       attempts++;

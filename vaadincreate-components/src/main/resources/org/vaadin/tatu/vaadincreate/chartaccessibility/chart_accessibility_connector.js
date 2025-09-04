@@ -176,6 +176,13 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
         }
       });
 
+      if (state.patchMenu && buttons.length == 0) {
+        return false;
+      }
+      if (state.patchLegend && legendItems.length == 0) {
+        return false;
+      }
+
       patchedElements.add(chartId);
       console.log(
         "ChartAccessibilityExtension: Successfully patched chart:",

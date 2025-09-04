@@ -124,6 +124,34 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
     }
 
     /**
+     * Sets the maximum number of retry attempts.
+     *
+     * @param maxAttempts
+     *            the new maximum number of retry attempts
+     */
+    public void setMaxAttempts(int maxAttempts) {
+        if (maxAttempts <= 0) {
+            throw new IllegalArgumentException(
+                    "Max attempts must be a positive integer");
+        }
+        getState().maxAttempts = maxAttempts;
+    }
+
+    /**
+     * Sets the retry interval.
+     *
+     * @param retryInterval
+     *            the new retry interval
+     */
+    public void setRetryInterval(int retryInterval) {
+        if (retryInterval <= 0) {
+            throw new IllegalArgumentException(
+                    "Retry interval must be a positive integer");
+        }
+        getState().retryInterval = retryInterval;
+    }
+
+    /**
      * Gets the current chart ID.
      *
      * @return the chart ID
@@ -151,6 +179,9 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
         callFunction("applyPatches");
     }
 
+    /**
+     * Sets the menu entries localized texts.
+     */
     public void setMenuEntries(List<String> menuEntries) {
         Objects.requireNonNull(menuEntries, "Menu entries cannot be null");
         if (menuEntries.size() != 5) {
@@ -158,5 +189,27 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
                     "Menu entries must contain exactly 5 items");
         }
         getState().menuEntries = menuEntries;
+    }
+
+    /**
+     * Sets the legend patching behavior. Default true, when false patching
+     * legend is not polled.
+     *
+     * @param patchLegend
+     *            boolean
+     */
+    public void setPatchLegend(boolean patchLegend) {
+        getState().patchLegend = patchLegend;
+    }
+
+    /**
+     * Sets the menu patching behavior. Default true, when false patching menu
+     * is not polled.
+     *
+     * @param patchMenu
+     *            boolean
+     */
+    public void setPatchMenu(boolean patchMenu) {
+        getState().patchMenu = patchMenu;
     }
 }

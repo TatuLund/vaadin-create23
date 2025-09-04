@@ -177,8 +177,10 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
                 updateCategoryChart(categoryStats);
                 updatePriceChart(priceStats);
 
+                availabilityChart.setPatchLegend(false);
                 availabilityChart.drawChart();
                 categoryChart.drawChart();
+                priceChart.setPatchLegend(false);
                 priceChart.drawChart();
 
                 dashboard.addStyleName("loaded");
@@ -398,6 +400,10 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
      */
     public static class CustomChart extends Chart
             implements HasAttributes<CustomChart>, HasI18N {
+
+        @Nullable
+        ChartAccessibilityExtension a11y;
+
         public CustomChart(ChartType type) {
             super(type);
         }
@@ -405,12 +411,34 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         @Override
         public void attach() {
             super.attach();
-            var a11y = ChartAccessibilityExtension.of(this);
-            a11y.setLegendsClickable(getTranslation(I18n.Stats.LEGEND_CLICKABLE));
-            a11y.setContextMenu(getTranslation(I18n.Stats.CONTEXT_MENU));
-            a11y.setMenuEntries(Arrays.asList(
-                    getTranslation(I18n.Stats.MENU_ENTRIES).split(",")));
-            a11y.applyPatches();
+            if (a11y == null) {
+                a11y = ChartAccessibilityExtension.of(this);
+                a11y.setLegendsClickable(
+                        getTranslation(I18n.Stats.LEGEND_CLICKABLE));
+                a11y.setContextMenu(getTranslation(I18n.Stats.CONTEXT_MENU));
+                a11y.setMenuEntries(Arrays.asList(
+                        getTranslation(I18n.Stats.MENU_ENTRIES).split(",")));
+            }
+        }
+
+        public void setPatchLegend(boolean patchLegend) {
+            if (a11y != null) {
+                a11y.setPatchLegend(patchLegend);
+            }
+        }
+
+        public void setPatchMenu(boolean patchMenu) {
+            if (a11y != null) {
+                a11y.setPatchMenu(patchMenu);
+            }
+        }
+
+        @Override
+        public void drawChart() {
+            super.drawChart();
+            if (a11y != null) {
+                a11y.applyPatches();
+            }
         }
     }
 

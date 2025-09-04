@@ -13,6 +13,7 @@ public class ChartAccessibilityExtensionState extends JavaScriptExtensionState {
 
     public String chartId;
 
+    @SuppressWarnings("java:S1948")
     public List<String> menuEntries = List.of("Print chart",
             "Download as PNG image", "Download as JPEG image",
             "Download as PDF document", "Download as SVG image");
@@ -29,4 +30,8 @@ public class ChartAccessibilityExtensionState extends JavaScriptExtensionState {
      * Interval between retry attempts in milliseconds.
      */
     public int retryInterval = 100;
+
+    public boolean patchLegend = true;
+
+    public boolean patchMenu = true;
 }

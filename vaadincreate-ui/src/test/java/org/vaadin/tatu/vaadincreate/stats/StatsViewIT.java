@@ -12,6 +12,8 @@ import org.junit.After;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 
 import com.vaadin.testbench.elements.UIElement;
@@ -44,7 +46,51 @@ public class StatsViewIT extends AbstractViewTest {
     }
 
     @Test
-    public void categopryChartAccessibility() {
+    public void priceChartAccessibility() {
+        waitForElementPresent(By.className("loaded"));
+
+        var chart = findElement(By.id("price-chart"));
+        assertEquals("0", chart.getAttribute("tabindex"));
+        assertEquals("Hinnat:10 - 20 € 40,20 - 30 € 36,0 - 10 € 24",
+                chart.getAttribute("aria-label"));
+
+        // Verify the button role and tabindex, and aria-label
+        var button = chart.findElement(By.className("highcharts-button"));
+        assertEquals("button", button.getAttribute("role"));
+        assertEquals("0", button.getAttribute("tabindex"));
+        assertEquals("Kaavion tulostusvalikko",
+                button.getAttribute("aria-label"));
+
+        // Verify that button opens menu with keyboard
+        button.sendKeys(Keys.SPACE);
+        var menu = chart.findElement(By.className("highcharts-contextmenu"));
+        assertTrue(menu.isDisplayed());
+        var items = menu.findElements(By.tagName("div")).stream()
+                .filter(div -> div.getAttribute("role").equals("menuitem"))
+                .toList();
+        assertEquals(5, items.size());
+        // Verify menu item text
+        assertEquals("Tulosta kaavio", items.get(0).getText());
+        assertEquals("Lataa PNG-muodossa", items.get(1).getText());
+        assertEquals("Lataa JPEG-muodossa", items.get(2).getText());
+        assertEquals("Lataa PDF-muodossa", items.get(3).getText());
+        assertEquals("Lataa SVG-muodossa", items.get(4).getText());
+
+        // Verify keyboard navigation
+        assertEquals(focusedElement(), items.get(0));
+        Actions actions = new Actions(getDriver());
+        actions.sendKeys(Keys.TAB).perform();
+        assertEquals(focusedElement(), items.get(1));
+        actions.sendKeys(Keys.ESCAPE).perform();
+        assertFalse(menu.isDisplayed());
+    }
+
+    private WebElement focusedElement() {
+        return getDriver().switchTo().activeElement();
+    }
+
+    @Test
+    public void categoryChartAccessibility() {
         waitForElementPresent(By.className("loaded"));
 
         var chart = findElement(By.id("category-chart"));

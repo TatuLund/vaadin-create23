@@ -56,6 +56,7 @@ public class StatsViewIT extends AbstractViewTest {
 
         // Verify the button role and tabindex, and aria-label
         var button = chart.findElement(By.className("highcharts-button"));
+        waitUntil(driver -> button.getAttribute("role") != null);
         assertEquals("button", button.getAttribute("role"));
         assertEquals("0", button.getAttribute("tabindex"));
         assertEquals("Kaavion tulostusvalikko",

@@ -4,32 +4,16 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
   let connector = this;
   let state = connector.getState();
 
-  // Store the current patch state to avoid duplicate patches
-  let patchedElements = new Set();
-
   /**
-   * Finds the chart container based on the chart ID
+   * Finds the chart container based on the chart element
    *
-   * @param {string} chartId - The ID of the chart
+   * @param {HTMLElement} element - The chart element
    * @returns {Object|null} - The chart container or null if not found
    */
-  function _findChartContainer(chartId) {
-    if (!chartId) {
-      return null;
-    }
-
-    let chartElement = document.getElementById(chartId);
-    if (!chartElement) {
-      console.warn(
-        "ChartAccessibilityExtension: Chart element not found with ID:",
-        chartId
-      );
-      return null;
-    }
-
+  function _findChartContainer(element) {
     // Navigate to find the actual chart container
     // Chart structure: div[id] -> div.wrapper -> svg
-    let wrapperDiv = chartElement.querySelector("div");
+    let wrapperDiv = element.querySelector("div");
     if (!wrapperDiv) {
       return null;
     }
@@ -39,21 +23,8 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
       return null;
     }
 
-    console.debug(
-      "ChartAccessibilityExtension: Found chart structure for",
-      chartId,
-      ":",
-      {
-        chartElement: chartElement.tagName,
-        wrapperDiv: wrapperDiv.tagName,
-        svg: svg.tagName,
-        chartElementClasses: chartElement.className,
-        wrapperDivClasses: wrapperDiv.className,
-      }
-    );
-
     return {
-      chartElement: chartElement,
+      chartElement: element,
       wrapperDiv: wrapperDiv,
       svg: svg,
     };
@@ -62,27 +33,18 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
   /**
    * Applies accessibility patches to a single chart
    *
-   * @param {string} chartId - The ID of the chart
+   * @param {HTMLElement} element - The chart element
    * @param {boolean} legendsClickable - Whether the legend items are clickable
    * @returns {boolean} - True if the chart was successfully patched, false otherwise
    */
-  function _patchSingleChart(chartId, legendsClickable) {
-    let chart = _findChartContainer(chartId);
+  function _patchSingleChart(element, legendsClickable) {
+    let chart = _findChartContainer(element);
     if (!chart) {
-      return false;
+      return;
     }
 
     let svg = chart.svg;
     let chartElement = chart.chartElement;
-
-    // Check if this chart has already been patched
-    if (patchedElements.has(chartId)) {
-      console.debug(
-        "ChartAccessibilityExtension: Chart already patched:",
-        chartId
-      );
-      return true;
-    }
 
     try {
       // Remove Highcharts desc-banners (announced by screen readers)
@@ -93,13 +55,6 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
       // Try multiple scopes: chartElement, svg, and document (for debugging)
       let legendItems = svg.querySelectorAll(".highcharts-legend-item");
 
-      console.debug(
-        "ChartAccessibilityExtension: Found",
-        legendItems.length,
-        "legend items for chart:",
-        chartId
-      );
-
       legendItems.forEach((legendButton) => {
         if (!legendButton.hasAttribute("data-accessibility-patched")) {
           legendButton.setAttribute("tabindex", "0");
@@ -109,12 +64,6 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
             legendsClickable + " " + legendButton.textContent
           );
           legendButton.toggleAttribute("data-accessibility-patched");
-          console.debug(
-            "ChartAccessibilityExtension: Patched legend item:",
-            legendButton.textContent,
-            "for chart:",
-            chartId
-          );
 
           legendButton.addEventListener("keyup", (event) => {
             if (event.key === "Enter" || event.key === " ") {
@@ -128,19 +77,12 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
       // Setup context menu accessibility for buttons within this chart
       let buttons = svg.querySelectorAll(".highcharts-button");
 
-      console.debug(
-        "ChartAccessibilityExtension: Found",
-        buttons.length,
-        "buttons for chart:",
-        chartId
-      );
-
       let buttonIndex = 0;
 
       buttons.forEach((button) => {
         if (!button.hasAttribute("data-accessibility-patched")) {
           buttonIndex++;
-          let menuId = "context-menu-" + chartId + "-" + buttonIndex;
+          let menuId = "context-menu-" + (element.id || "") + "-" + buttonIndex;
 
           button.setAttribute("tabindex", "0");
           button.setAttribute("role", "button");
@@ -150,12 +92,6 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
           button.getElementsByTagName("title")[0].textContent =
             state.contextMenu;
           button.toggleAttribute("data-accessibility-patched");
-          console.debug(
-            "ChartAccessibilityExtension: Patched button",
-            buttonIndex,
-            "for chart:",
-            chartId
-          );
 
           button.addEventListener("keyup", (event) => {
             if (
@@ -168,33 +104,18 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
             }
           });
 
-          button.addEventListener("click", (event) => {
+          button.addEventListener("click", () => {
             _setupContextMenu(button, menuId, chartElement);
             button.setAttribute("aria-expanded", "true");
           });
         }
       });
-
-      if (state.patchMenu && buttons.length == 0) {
-        return false;
-      }
-      if (state.patchLegend && legendItems.length == 0) {
-        return false;
-      }
-
-      patchedElements.add(chartId);
-      console.log(
-        "ChartAccessibilityExtension: Successfully patched chart:",
-        chartId
-      );
-      return true;
     } catch (error) {
       console.error(
         "ChartAccessibilityExtension: Error patching chart:",
-        chartId,
+        element.id || "",
         error
       );
-      return false;
     }
   }
 
@@ -291,55 +212,22 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
 
   /**
    * Applies patches with retry logic
+   *
+   * @param {HTMLElement} element Chart element to patch
    */
-  function _applyPatchesWithRetry() {
-    let chartId = state.chartId;
+  function _applyPatchesWithRetry(element) {
     let legendsClickable = state.legendsClickable || "Click to toggle";
     let maxAttempts = state.maxAttempts || 20;
     let retryInterval = state.retryInterval || 100;
-
-    if (!chartId) {
-      console.warn("ChartAccessibilityExtension: No chart ID specified");
-      return;
-    }
-
-    console.debug(
-      "ChartAccessibilityExtension: Starting patch attempts for chart:",
-      chartId
-    );
 
     let attempts = 0;
 
     function _tryPatch() {
       attempts++;
-      console.debug(
-        "ChartAccessibilityExtension: Attempt",
-        attempts,
-        "for chart:",
-        chartId
-      );
-
-      if (_patchSingleChart(chartId, legendsClickable)) {
-        console.debug(
-          "ChartAccessibilityExtension: Patches applied after",
-          attempts,
-          "attempts for chart:",
-          chartId
-        );
-        // Notify server that patches were applied
-        connector.getState().patchesApplied = true;
-        return;
-      }
+      _patchSingleChart(element, legendsClickable);
 
       if (attempts < maxAttempts) {
         setTimeout(_tryPatch, retryInterval);
-      } else {
-        console.warn(
-          "ChartAccessibilityExtension: Failed to apply patches after",
-          maxAttempts,
-          "attempts for chart:",
-          chartId
-        );
       }
     }
 
@@ -350,16 +238,13 @@ window.org_vaadin_tatu_vaadincreate_ChartAccessibilityExtension = function () {
    * Public function to reapply patches
    */
   connector.applyPatches = () => {
-    if (state.chartId) {
-      patchedElements.delete(state.chartId);
-      _applyPatchesWithRetry();
-    }
+    _applyPatchesWithRetry(this.chartElement);
   };
 
   /**
    * Called when state changes
    */
   connector.onStateChange = () => {
-    // NOP
+    this.chartElement = this.getElement(this.getParentId());
   };
 };

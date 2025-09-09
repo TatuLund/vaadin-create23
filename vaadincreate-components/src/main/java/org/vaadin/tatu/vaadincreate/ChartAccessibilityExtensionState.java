@@ -11,8 +11,6 @@ import com.vaadin.shared.JavaScriptExtensionState;
 @SuppressWarnings({ "serial", "java:S1104", "java:S1319" })
 public class ChartAccessibilityExtensionState extends JavaScriptExtensionState {
 
-    public String chartId;
-
     @SuppressWarnings("java:S1948")
     public List<String> menuEntries = List.of("Print chart",
             "Download as PNG image", "Download as JPEG image",
@@ -22,16 +20,10 @@ public class ChartAccessibilityExtensionState extends JavaScriptExtensionState {
 
     public String contextMenu = "Chart context menu";
 
-    public boolean patchesApplied = false;
-
     public int maxAttempts = 20;
 
     /**
      * Interval between retry attempts in milliseconds.
      */
     public int retryInterval = 100;
-
-    public boolean patchLegend = true;
-
-    public boolean patchMenu = true;
 }

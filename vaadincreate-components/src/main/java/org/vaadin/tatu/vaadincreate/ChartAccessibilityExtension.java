@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractJavaScriptExtension;
@@ -37,7 +36,6 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
      */
     public static ChartAccessibilityExtension of(AbstractComponent chart) {
         Objects.requireNonNull(chart, "Chart component cannot be null");
-        Objects.requireNonNull(chart.getId(), "Chart ID cannot be null");
 
         // Check that chart or its superclass is instance of Chart using class
         // name
@@ -56,7 +54,6 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
         // Create new extension
         var accessibilityExtension = new ChartAccessibilityExtension();
         accessibilityExtension.extend(chart);
-        accessibilityExtension.getState().chartId = chart.getId();
         return accessibilityExtension;
     }
 
@@ -78,20 +75,6 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
     @Override
     protected ChartAccessibilityExtensionState getState(boolean markAsDirty) {
         return (ChartAccessibilityExtensionState) super.getState(markAsDirty);
-    }
-
-    /**
-     * Updates the chart ID.
-     *
-     * @param chartId
-     *            the new chart ID
-     */
-    public void setChartId(String chartId) {
-        Objects.requireNonNull(chartId, "Chart ID cannot be null");
-        if (chartId.trim().isEmpty()) {
-            throw new IllegalArgumentException("Chart ID cannot be empty");
-        }
-        getState().chartId = chartId;
     }
 
     /**
@@ -152,16 +135,6 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
     }
 
     /**
-     * Gets the current chart ID.
-     *
-     * @return the chart ID
-     */
-    @Nullable
-    public String getChartId() {
-        return getState(false).chartId;
-    }
-
-    /**
      * Gets the current legends clickable text.
      *
      * @return the legends clickable text
@@ -189,27 +162,5 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
                     "Menu entries must contain exactly 5 items");
         }
         getState().menuEntries = menuEntries;
-    }
-
-    /**
-     * Sets the legend patching behavior. Default true, when false patching
-     * legend is not polled.
-     *
-     * @param patchLegend
-     *            boolean
-     */
-    public void setPatchLegend(boolean patchLegend) {
-        getState().patchLegend = patchLegend;
-    }
-
-    /**
-     * Sets the menu patching behavior. Default true, when false patching menu
-     * is not polled.
-     *
-     * @param patchMenu
-     *            boolean
-     */
-    public void setPatchMenu(boolean patchMenu) {
-        getState().patchMenu = patchMenu;
     }
 }

@@ -404,31 +404,12 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
 
         public CustomChart(ChartType type) {
             super(type);
-        }
-
-        @Override
-        public void attach() {
-            super.attach();
-            if (a11y == null) {
-                a11y = ChartAccessibilityExtension.of(this);
-                a11y.setLegendsClickable(
-                        getTranslation(I18n.Stats.LEGEND_CLICKABLE));
-                a11y.setContextMenu(getTranslation(I18n.Stats.CONTEXT_MENU));
-                a11y.setMenuEntries(Arrays.asList(
-                        getTranslation(I18n.Stats.MENU_ENTRIES).split(",")));
-            }
-        }
-
-        public void setPatchLegend(boolean patchLegend) {
-            if (a11y != null) {
-                a11y.setPatchLegend(patchLegend);
-            }
-        }
-
-        public void setPatchMenu(boolean patchMenu) {
-            if (a11y != null) {
-                a11y.setPatchMenu(patchMenu);
-            }
+            a11y = ChartAccessibilityExtension.of(this);
+            a11y.setLegendsClickable(
+                    getTranslation(I18n.Stats.LEGEND_CLICKABLE));
+            a11y.setContextMenu(getTranslation(I18n.Stats.CONTEXT_MENU));
+            a11y.setMenuEntries(Arrays.asList(
+                    getTranslation(I18n.Stats.MENU_ENTRIES).split(",")));
         }
 
         @Override

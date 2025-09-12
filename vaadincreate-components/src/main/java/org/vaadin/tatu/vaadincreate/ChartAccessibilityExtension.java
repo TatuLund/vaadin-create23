@@ -17,7 +17,7 @@ import com.vaadin.ui.AbstractComponent;
  */
 @NullMarked
 @SuppressWarnings("serial")
-@JavaScript("chartaccessibility/chart_accessibility_connector.js")
+@JavaScript("chartaccessibility/chart_accessibility_connector.min.js")
 public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
 
     protected ChartAccessibilityExtension() {

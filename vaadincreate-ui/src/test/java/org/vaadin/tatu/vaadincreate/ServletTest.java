@@ -83,22 +83,6 @@ public class ServletTest extends UIUnitTest {
         var session = VaadinSession.getCurrent();
         Locale.setDefault(DefaultI18NProvider.LOCALE_EN);
 
-        // Set uiId field value to 1 with reflection
-        // TODO: Add this to UIUnitTest mockjVaadin
-        Class<?> clazz = ui.getClass();
-        while (!clazz.equals(UI.class)) {
-            clazz = clazz.getSuperclass();
-        }
-        try {
-            var uiIdField = clazz.getDeclaredField("uiId");
-            uiIdField.setAccessible(true);
-            uiIdField.set(ui, 1);
-        } catch (NoSuchFieldException | SecurityException
-                | IllegalArgumentException | IllegalAccessException e) {
-            throw new RuntimeException("Failed to set uiId field", e);
-        }
-        session.addUI(ui);
-
         // Act
         servlet.handleError(new ErrorEvent(exception), session);
         waitWhile(Notification.class,

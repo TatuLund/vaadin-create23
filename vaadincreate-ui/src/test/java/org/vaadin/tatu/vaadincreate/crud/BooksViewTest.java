@@ -39,6 +39,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import elemental.events.KeyboardEvent.KeyCode;
+
 public class BooksViewTest extends AbstractUITest {
 
     private VaadinCreateUI ui;
@@ -89,6 +91,61 @@ public class BooksViewTest extends AbstractUITest {
 
     }
 
+    @Test
+    public void when_browsing_products_with_pgDown_pgUp_keys_the_form_is_populated_accordingly_and_Esc_closes_the_form() {
+        // WHEN: Clicking on the first row
+        test(grid).click(1, 0);
+        // THEN: Form is shown and populated with the first row data
+        assertTrue(form.isShown());
+        assertEquals(grid.getSelectedRow(), form.getProduct());
+        then_form_is_filled_with_values_from_grid_row(0);
+
+        // WHEN: Pressing page down
+        test(form).shortcut(KeyCode.PAGE_DOWN);
+        // THEN: Form is still shown and populated with the second row data and
+        // that row is selected
+        assertTrue(form.isShown());
+        assertEquals(grid.getSelectedRow(), form.getProduct());
+        then_form_is_filled_with_values_from_grid_row(1);
+
+        // WHEN: Pressing page down
+        test(form).shortcut(KeyCode.PAGE_DOWN);
+        // THEN: Form is still shown and populated with the third row data and
+        // that row is selected
+        assertTrue(form.isShown());
+        assertEquals(grid.getSelectedRow(), form.getProduct());
+        then_form_is_filled_with_values_from_grid_row(2);
+
+        // WHEN: Pressing page up
+        test(form).shortcut(KeyCode.PAGE_UP);
+        // THEN: Form is still shown and populated with the second row data and
+        // that row is selected
+        assertTrue(form.isShown());
+        assertEquals(grid.getSelectedRow(), form.getProduct());
+        then_form_is_filled_with_values_from_grid_row(1);
+
+        // WHEN: Pressing page up
+        test(form).shortcut(KeyCode.PAGE_UP);
+        // THEN: Form is still shown and populated with the first row data and
+        // that row is selected
+        assertTrue(form.isShown());
+        assertEquals(grid.getSelectedRow(), form.getProduct());
+        then_form_is_filled_with_values_from_grid_row(0);
+
+        // WHEN: Pressing page up
+        test(form).shortcut(KeyCode.PAGE_UP);
+        // THEN: Form is still shown and still populated with the first row data
+        // as it is the first row and that row is still selected
+        assertTrue(form.isShown());
+        assertEquals(grid.getSelectedRow(), form.getProduct());
+        then_form_is_filled_with_values_from_grid_row(0);
+
+        // WHEN: Pressing escape
+        test($(form, Button.class).id("cancel-button")).shortcut(KeyCode.ESC);
+        // THEN: Form is closed
+        assertFalse(form.isShown());
+    }
+
     private void then_form_is_filled_with_values_from_grid_row(int i) {
         var book = test(grid).item(i);
         assertEquals(book.getProductName(),
@@ -132,6 +189,17 @@ public class BooksViewTest extends AbstractUITest {
             assertTrue($(form, CheckBoxGroup.class).id("category").getValue()
                     .contains(items.get(j)));
         }
+    }
+
+    @Test
+    public void pressing_ctrl_F_will_focus_filter_field() {
+        // GIVEN: Focus is in the grid
+        var filter = $(FilterField.class).id("filter-field");
+        assertFalse(test(filter).isFocused());
+        // WHEN: Pressing ctrl+F
+        test(filter).shortcut(KeyCode.F, KeyCode.CTRL);
+        // THEN: Focus is in the filter field
+        assertTrue(test(filter).isFocused());
     }
 
     @Test

@@ -12,6 +12,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.admin.CategoryForm.NameField;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 
+import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
@@ -206,6 +207,19 @@ public class CategoryManagementViewTest extends AbstractUITest {
         test($(form, NameField.class).first()).focus();
         assertFalse($(cats, Button.class).id("new-category").isEnabled());
         test($(form, Button.class).first()).focus();
+        assertTrue($(cats, Button.class).id("new-category").isEnabled());
+    }
+
+    @Test
+    public void pressing_Esc_will_close_editor() {
+        assertTrue($(cats, Button.class).id("new-category").isEnabled());
+        @SuppressWarnings("unchecked")
+        var grid = (Grid<Category>) $(cats, Grid.class).single();
+        var form = (CategoryForm) test(grid).cell(0, 0);
+        var name = $(form, NameField.class).first();
+        test(name).focus();
+        assertFalse($(cats, Button.class).id("new-category").isEnabled());
+        test(cats).shortcut(KeyCode.ESCAPE);
         assertTrue($(cats, Button.class).id("new-category").isEnabled());
     }
 

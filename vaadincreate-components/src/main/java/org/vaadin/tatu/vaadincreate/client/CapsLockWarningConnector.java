@@ -30,6 +30,7 @@ public class CapsLockWarningConnector extends AbstractExtensionConnector {
         warning.setOwner(passwordWidget);
         messageElement = new HTML(getState().message);
         messageElement.setStyleName("capslock-message");
+        messageElement.getElement().setAttribute("aria-live", "polite");
         warning.add(messageElement);
         addKeyDownListener(passwordWidget.getElement());
     }

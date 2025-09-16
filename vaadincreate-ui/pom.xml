@@ -88,7 +88,12 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>5.3.6.Final</version>
+            <version>6.2.5.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.el</groupId>
+            <artifactId>el-ri</artifactId>
+            <version>3.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -123,7 +128,14 @@
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-testbench-core</artifactId>
             <version>${testbench.version}</version>
-            <scope>test</scope>            
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <!-- Exclude the license checker to use the latest -->
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>license-checker</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.vaadin.testbench</groupId>
@@ -140,6 +152,18 @@
                 <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.github.docker-java</groupId>
+                    <artifactId>docker-java-transport-httpclient5</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.java.dev.jna</groupId>
+                    <artifactId>jna</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.java.dev.jna</groupId>
+                    <artifactId>jna-platform</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -204,9 +228,6 @@
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>${jetty.plugin.version}</version>
-                <!--                <configuration>-->
-                <!--                    <scanIntervalSeconds>2</scanIntervalSeconds>-->
-                <!--                </configuration>-->
             </plugin>
 
             <plugin>

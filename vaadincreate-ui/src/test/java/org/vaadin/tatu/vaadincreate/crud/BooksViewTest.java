@@ -30,6 +30,8 @@ import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 
 import com.vaadin.data.ValueContext;
+import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
@@ -38,8 +40,6 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-
-import elemental.events.KeyboardEvent.KeyCode;
 
 public class BooksViewTest extends AbstractUITest {
 
@@ -141,7 +141,7 @@ public class BooksViewTest extends AbstractUITest {
         then_form_is_filled_with_values_from_grid_row(0);
 
         // WHEN: Pressing escape
-        test($(form, Button.class).id("cancel-button")).shortcut(KeyCode.ESC);
+        test($(form, Button.class).id("cancel-button")).shortcut(KeyCode.ESCAPE);
         // THEN: Form is closed
         assertFalse(form.isShown());
     }
@@ -197,7 +197,7 @@ public class BooksViewTest extends AbstractUITest {
         var filter = $(FilterField.class).id("filter-field");
         assertFalse(test(filter).isFocused());
         // WHEN: Pressing ctrl+F
-        test(filter).shortcut(KeyCode.F, KeyCode.CTRL);
+        test(filter).shortcut(KeyCode.F, ModifierKey.CTRL);
         // THEN: Focus is in the filter field
         assertTrue(test(filter).isFocused());
     }

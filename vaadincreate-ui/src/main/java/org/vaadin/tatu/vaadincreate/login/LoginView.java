@@ -9,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.CapsLockWarning;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.AttributeExtension;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18NProvider;
@@ -184,6 +187,10 @@ public class LoginView extends Composite implements HasI18N {
         loginForm.addStyleName(VaadinCreateTheme.LOGINVIEW_FORM);
         loginForm.setSizeUndefined();
         loginForm.setMargin(false);
+        AttributeExtension.of(loginForm).setAttribute(AriaAttributes.ROLE,
+                AriaRoles.FORM);
+        AttributeExtension.of(loginForm).setAttribute(AriaAttributes.LABEL,
+                getTranslation(I18n.Login.LOGIN_BUTTON));
 
         loginForm.addComponent(usernameField);
         usernameField.setWidth(18, Unit.EM);

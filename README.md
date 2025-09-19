@@ -1,14 +1,14 @@
 # Vaadin Create '23 demo app (Vaadin 8)
 
-This is show case application for advanced Vaadin 8 topics. The application focuses on UI design and architecture of the UI code. These techniques help to keep old Vaadin 8 applications upto date. The application is built with Vaadin 8.27, which is fully compatible with Java 11 and 17.
+This is show case application for advanced Vaadin 8 topics. The application focuses on UI design and architecture of the UI code. These techniques help to keep old Vaadin 8 applications up to date. The application is built with Vaadin 8.27, which is fully compatible with Java 11 and 17.
 
-This project is my dogfooding test application for legacy Vaadin 8 as we are still maintaining it under our commercial extended maintenance program. Thus, even it is a bit fabricated, I have added there many detail that you would find in real production application.
+This project is my dogfooding test application for legacy Vaadin 8 as we are still maintaining it under our commercial extended maintenance program. Thus, even it is a bit fabricated, I have added there are many details that you would find in real production application.
 
-Despite the application is using the old Vaadin 8, many of the examples featured by this application are applicable for more current Vaadin versions.
+Despite the application using the old Vaadin 8, many of the examples featured by this application are applicable for more current Vaadin versions.
 
 ## Covered topics
 
-Despites being somewhat artificial this demo app covers various use cases you may encounter in real life application. Source of the demonstrated cases has been actual customer questions I have seen during my career as a software consultant.
+Despite being somewhat artificial this demo app covers various use cases you may encounter in real life application. Source of the demonstrated cases has been actual customer questions I have seen during my career as a software consultant.
 
 - Multi-module project setup (backend, components and ui)
 - AppLayout uses ValoMenu to create responsive application shell
@@ -23,6 +23,7 @@ Despites being somewhat artificial this demo app covers various use cases you ma
 	- Async loading and showing no data label during loading.
 	- Multi-axis Chart example.
 	- Automatically update the charts when someone saves or deletes book, as well as adds, removes or updates a category.
+	- Enabled Chart export menu
 - BooksView
 	- Responsive Grid using BrowserResizeListener, 
 	- Responsive CSS in Grid column
@@ -51,6 +52,8 @@ Despites being somewhat artificial this demo app covers various use cases you ma
 	- User management view, use FormLayout light variant
 	- Optimistic locking used for handling concurrent edits
 	- Event based decoupling demo in UserForm
+	- Indicator in Tab when UserForm has un-saved changes
+	- Do not let session end when there is un-saved changes in UserForm
 - AboutView
 	- Demo how to correctly sanitize user input with Jsoup in order to avoid XSS,
 	- CustomLayout example
@@ -64,7 +67,7 @@ Despites being somewhat artificial this demo app covers various use cases you ma
 
 ### Backend
 
-The backend module features data access layer using Hibernate with a concise utility class for running queries in session and transaction, which is used by DAOs. There are couple of Service classes that are using by the presenters in the UI module. The backend also has RedisPubSubService, which is used by EventBus.  There is set of unit tests verifying the main functionalities.
+The backend module features data access layer using Hibernate with a concise utility class for running queries in session and transaction, which is used by DAOs. There are couple of Service classes that are using by the presenters in the UI module. The backend also has RedisPubSubService, which is used by EventBus.  There is a set of unit tests verifying the main functionalities.
 
 ### Automated testing
 
@@ -76,6 +79,7 @@ The test suite of the application follows the principles that I think are the be
     - Test as much as possible with unit tests
     - Prefer UI Unit Testing for testing UI logic including non-happy paths
     - Use UI Unit Testing for verifying various concurrent user actions scenarios
+	- ArchUnit tests guarding selected architecure conventions
     - Verify the most important parts with end to end tests using TestBench
     - Include few Screenshot tests to verify visuals
 
@@ -83,29 +87,31 @@ The test suite of the application follows the principles that I think are the be
 
 Vaadin 8 is not fully upto date with modern accessibility, but with some relatively simple workarounds acceptable accessibility can be still achieved and those are being demonstrated in this application.
 
-- Accessiblility
-    - In most of the views some additional attributes are set for better accessibility
+- Accessibility
+    - In most of the views some additional attributes are set for better accessibility, AttributeExtension and HasAttributes mixin are used to extend the components
     - In StatsView Charts are having role "figure" and "aria-label" set for audible version of data
-    - In BooksView the BookGrid has rows set "aria-live" for better situational awarenes
+	- Using ChatAccessibilityExtension to patch Chart's legends and context menus to be accesible
+    - In BooksView the BookGrid using Grid's accessible navigation mode for better situational awareness
     - The loading indicator in BooksView has audible alert
     - The label that appears when there is no books matching filter is audible
-    - VaadinCreateUI offers "announce" method, that produces audible notification, which used e.g. when view is opened or form is opened
+    - Using assistive Notification, which used e.g. when view is opened or form is opened
     - AppLayout menu has role "navigation" and the navigation buttons role "link". The buttons also have "aria-label" set according to whether the view is a current view or not.
     - In some places tooltips are used as audible hints
     - Keyboard navigation has been adjusted for better usability with assistive technologies
-    - Tabindex and visual focus ring is used to improve situational awateness
+    - Tabindex and visual focus ring is used to improve situational awareness
     - Using focus color in focused fields labels
 
 ### General use components
 
-The general use components have been isolated in their own module. This is to emphasize separation of concern, and also making it possible to have end-to-end tests of the components in isolation agains test UIs.
+The general use components have been isolated in their own module. This is to emphasize separation of concern, and also making it possible to have end-to-end tests of the components in isolation against test UIs.
 
 - Components module has examples of GWT and JavaScript extensions
 	- Reset button for text field extension with client side GWT,
 	- Character counter for TextArea and TextField showing remaining characters extension with GWT,
-	- Attribute extension using JavaScript. It used in form's number input, and is an essential instrument to adjust the accessibility attributes in various places.
+	- Attribute extension using JavaScript. It used in form's number input, and is an essential instrument to adjust the accessibility attributes in various places. The component has HasAttributes mixin that makes it convenient to use when more attributes are needed to be set.
 	- Java 11 code used in widgets,
 	- ConfirmDialog server side composition component,
+	- ChartAccessibilityExtension patches Chart legend and context menu as well as adss API to localize context menu texts, as those are not in Lang object.
 	- Suite of unit and integration tests for the components and standalone test UI for them
 
 ### Notes
@@ -119,11 +125,12 @@ This is intentional to demonstrate the current state of Vaadin 8 extended mainte
 
 The following commercial products are used.
 
-- Vaadin 8.27.7. The application uses some features it provides. (The latest free version 8.14.3)
+- Vaadin 8.28.4. The application uses some features it provides. (The latest free version 8.14.3)
   - Eager UI cleanup
   - Binder: change tracking
   - Binder: draft saving
   - Grid: read only state
+  - Grid: accessible navigation mode
   - ValoMenu: improved API
 - Vaadin Charts in stats dashboard view
 - TestBench and TestBench UI Unit Test add-on for testing 
@@ -212,7 +219,7 @@ Check Dockerfile first, add your license key there into VAADIN_PRO_KEY environme
 Then use command
 
 ```
-docker-compose build
+docker-compose build db
 ```
 
 The building of the application container can take 5-10 minutes depending on how fast the dependencies are loaded. This build does not run the tests in order to speed up the process. The setenv.sh file in the repository is injected to the application container and has the system properties set for the production mode app.
@@ -220,7 +227,6 @@ The building of the application container can take 5-10 minutes depending on how
 The other Dockerfile.db file is just for Postgres database.
 
 Then you need to load initial data from the script in this repository, start the database container and use commands:
-
 ```
 docker-compose up db
 docker exec -it vaadincreate23-db-1 mkdir /backup
@@ -243,7 +249,7 @@ docker-compose build app-1
 docker-compose build app-2
 ```
 
-The compose file builds also Redis and Nginx containers. Redis is used by EventBus for sharing events within the cluster and Nginx is used as load balancer. As the free edition of Nginx does not support real sticky sessions the nginx.conf demonstrates one potential workaroiund for this problem, which works also with session fixation.
+The compose file builds also HighCharts export service, Redis and Nginx containers. Redis is used by EventBus for sharing events within the cluster and Nginx is used as load balancer. As the free edition of Nginx does not support real sticky sessions the nginx.conf demonstrates one potential workaround for this problem.
 
 ## License & Author
 

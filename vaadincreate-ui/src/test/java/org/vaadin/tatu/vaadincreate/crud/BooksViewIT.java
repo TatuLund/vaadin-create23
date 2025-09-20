@@ -117,19 +117,42 @@ public class BooksViewIT extends AbstractViewTest {
     }
 
     private void assertAndCloseSaveNotification(String bookName) {
-        var notification = $(NotificationElement.class).all().stream()
-                .filter(n -> n.getCaption()
-                        .equals(String.format("\"%s\" päivitetty", bookName)))
-                .findFirst().orElseThrow(() -> new AssertionError(
-                        "Save notification not found"));
+        String expected = String.format("\"%s\" päivitetty", bookName);
+        NotificationElement notification = waitUntil(driver -> {
+            for (NotificationElement n : $(NotificationElement.class).all()) {
+                try {
+                    if (expected.equals(n.getCaption())) {
+                        return n;
+                    }
+                } catch (org.openqa.selenium.StaleElementReferenceException ignored) {
+                    return null; // force a retry
+                }
+            }
+            return null;
+        });
+        if (notification == null) {
+            throw new AssertionError("Save notification not found");
+        }
         notification.close();
     }
 
     private void assertAndCloseDeletionNotification() {
-        var notification = $(NotificationElement.class).all().stream()
-                .filter(n -> n.getCaption().equals("\"Test book\" poistettu"))
-                .findFirst().orElseThrow(() -> new AssertionError(
-                        "Deletion notification not found"));
+        String expected = "\"Test book\" poistettu";
+        NotificationElement notification = waitUntil(driver -> {
+            for (NotificationElement n : $(NotificationElement.class).all()) {
+                try {
+                    if (expected.equals(n.getCaption())) {
+                        return n;
+                    }
+                } catch (org.openqa.selenium.StaleElementReferenceException ignored) {
+                    return null;
+                }
+            }
+            return null;
+        });
+        if (notification == null) {
+            throw new AssertionError("Deletion notification not found");
+        }
         notification.close();
     }
 

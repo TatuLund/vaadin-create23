@@ -132,6 +132,7 @@ public class CategoryManagementView extends VerticalLayout
         openingView(VIEW_NAME);
         presenter.requestUpdateCategories();
         newCategoryButton.setEnabled(true);
+        newCategoryButton.focus();
     }
 
     /**

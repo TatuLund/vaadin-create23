@@ -46,8 +46,10 @@ public class CategoryManagementViewTest extends AbstractUITest {
 
     @Test
     public void create_and_delete_category() {
-        test($(cats, Button.class).id("new-category")).click();
-        assertFalse($(cats, Button.class).id("new-category").isEnabled());
+        var newCategoryButton = $(cats, Button.class).id("new-category");
+        test(newCategoryButton).isFocused();
+        test(newCategoryButton).click();
+        assertFalse(newCategoryButton.isEnabled());
 
         @SuppressWarnings("unchecked")
         var grid = (Grid<Category>) $(cats, Grid.class).single();

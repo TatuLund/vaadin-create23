@@ -363,6 +363,12 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         // There is no need to fetch data before navigation is complete, thus we
         // trigger it in enter, not in constructor
         presenter.requestUpdateStats();
+        JavaScript.eval("""
+            setTimeout(() => {
+                var chart = document.getElementById("availability-chart");
+                if (chart) { chart.focus(); }
+            }, 100);
+            """);
     }
 
     @Override

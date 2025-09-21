@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
@@ -13,6 +14,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
@@ -49,6 +51,9 @@ public class AppLayout extends Composite implements HasI18N {
     private final CssLayout title;
     private final UI ui;
     private final AccessControl accessControl;
+
+    @Nullable
+    private MenuButton firstItem;
 
     /**
      * Constructor.
@@ -153,6 +158,7 @@ public class AppLayout extends Composite implements HasI18N {
         });
 
         setCompositionRoot(layout);
+        addShortcutListener(new NavigationFocusListener());
     }
 
     private void handleConfirmLogoutWhenChanges(UI ui, Navigator nav) {
@@ -210,11 +216,30 @@ public class AppLayout extends Composite implements HasI18N {
         var menuItem = new MenuButton(viewName, path, icon);
         ui.getNavigator().addView(path, view);
         menuItems.addMenuButton(menuItem);
+        if (firstItem == null) {
+            firstItem = menuItem;
+        }
     }
 
     private static String getUserName() {
         var user = CurrentUser.get();
         return user.isPresent() ? user.get().getName() : "";
+    }
+
+    // Listener to focus the first menu item when Alt+Shift+N is pressed
+    class NavigationFocusListener extends ShortcutListener {
+
+        @SuppressWarnings("java:S3878")
+        public NavigationFocusListener() {
+            super("Navigation", KeyCode.N,
+                    new int[] { ModifierKey.ALT, ModifierKey.SHIFT });
+        }
+
+        @Override
+        public void handleAction(Object sender, Object target) {
+            assert firstItem != null : "First item is null";
+            firstItem.focus();
+        }
     }
 
     /**

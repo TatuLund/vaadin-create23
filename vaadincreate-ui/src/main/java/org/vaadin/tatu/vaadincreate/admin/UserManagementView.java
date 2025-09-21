@@ -47,6 +47,9 @@ public class UserManagementView extends VerticalLayout
     private Button delete = new Button(getTranslation(I18n.DELETE));
     private Button cancel = new Button(getTranslation(I18n.CANCEL));
 
+    @Nullable
+    private Button newUser;
+
     public UserManagementView() {
         addStyleName(VaadinCreateTheme.ADMINVIEW_USERVIEW);
         setRole(AriaRoles.REGION);
@@ -86,7 +89,7 @@ public class UserManagementView extends VerticalLayout
                 userSelected(valueChange.getValue());
             }
         });
-        var newUser = new Button(getTranslation(I18n.User.NEW_USER));
+        newUser = new Button(getTranslation(I18n.User.NEW_USER));
         newUser.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         newUser.setId("new-button");
         newUser.setIcon(VaadinIcons.PLUS_CIRCLE);
@@ -217,6 +220,7 @@ public class UserManagementView extends VerticalLayout
     public void enter() {
         openingView(VIEW_NAME);
         presenter.requestUpdateUsers();
+        newUser.focus();
     }
 
     @Override

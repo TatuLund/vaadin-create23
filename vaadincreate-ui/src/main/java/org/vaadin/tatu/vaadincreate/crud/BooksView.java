@@ -70,6 +70,9 @@ public class BooksView extends CssLayout implements VaadinCreateView {
     @Nullable
     private UI ui;
 
+    @Nullable
+    private FilterField filterField;
+
     public BooksView() {
         setSizeFull();
         addStyleName(VaadinCreateTheme.BOOKVIEW);
@@ -163,7 +166,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
      * @return the created HorizontalLayout for the top bar
      */
     private HorizontalLayout createTopBar() {
-        var filterField = new FilterField();
+        filterField = new FilterField();
         // Apply the filter to grid's data provider. TextField value is never
         // null
         filterField.addValueChangeListener(valueChange -> {

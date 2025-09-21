@@ -45,6 +45,7 @@ public class UserManagementViewTest extends AbstractUITest {
 
     @Test
     public void verify_that_initially_the_form_is_empty_and_buttons_are_not_enabled() {
+        test($(Button.class).id("new-button")).isFocused();
         then_form_is_empty_and_buttons_are_disabled();
     }
 

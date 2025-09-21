@@ -7,10 +7,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 
 import com.vaadin.testbench.elements.ButtonElement;
@@ -37,9 +35,8 @@ public class UserManagementViewIT extends AbstractViewTest {
     }
 
     @Test
-    @Ignore("This is flake when running in GitHub Actions. Works ok on Windows.")
     @SuppressWarnings("java:S5961")
-    public void createSaveAndDeleteUser() {
+    public void createAndSaveTestuser() {
         waitForElementPresent(By.id("new-button"));
 
         var user = $(TextFieldElement.class).id("user-field");
@@ -84,30 +81,34 @@ public class UserManagementViewIT extends AbstractViewTest {
         assertEquals("", password.getValue());
         assertEquals("", passwordRepeat.getValue());
         assertEquals("", role.getValue());
+    }
+
+    @Test
+    public void deleteUser4() {
+        waitForElementPresent(By.id("new-button"));
+
+        var user = $(TextFieldElement.class).id("user-field");
+        var role = $(ComboBoxElement.class).id("role-field");
+        var delete = $(ButtonElement.class).id("delete-button");
+        var save = $(ButtonElement.class).id("save-button");
+        var password = $(PasswordFieldElement.class).id("password-field");
+        var passwordRepeat = $(PasswordFieldElement.class)
+                .id("password-repeat");
 
         var userSelect = $(ComboBoxElement.class).id("user-select");
-        assertEquals("", userSelect.getValue());
-        userSelect.click();
-        userSelect.sendKeys("Testuser", Keys.ENTER);
-        waitUntil(driver -> userSelect.getValue().equals("Testuser"));
-        waitUntil(driver -> delete.isEnabled());
+        userSelect.selectByText("User4");
 
         assertFalse(save.isEnabled());
         assertTrue(delete.isEnabled());
-
-        assertEquals("Testuser", user.getValue());
-        assertEquals("testuser", password.getValue());
-        assertEquals("testuser", passwordRepeat.getValue());
-        assertEquals("USER", role.getValue());
 
         delete.click();
 
         var dialog = $(WindowElement.class).id("confirm-dialog");
         assertTrue(dialog.$(LabelElement.class).first().getText()
-                .contains("Testuser"));
+                .contains("User4"));
         dialog.$(ButtonElement.class).id("confirm-button").click();
 
-        assertEquals("Käyttäjä \"Testuser\" poistettu.",
+        assertEquals("Käyttäjä \"User4\" poistettu.",
                 $(NotificationElement.class).last().getText());
 
         assertEquals("", userSelect.getValue());
@@ -119,6 +120,37 @@ public class UserManagementViewIT extends AbstractViewTest {
         assertEquals("", password.getValue());
         assertEquals("", passwordRepeat.getValue());
         assertEquals("", role.getValue());
+    }
+
+    @Test
+    public void findUser2() {
+        waitForElementPresent(By.id("new-button"));
+
+        var user = $(TextFieldElement.class).id("user-field");
+        var role = $(ComboBoxElement.class).id("role-field");
+        var delete = $(ButtonElement.class).id("delete-button");
+        var save = $(ButtonElement.class).id("save-button");
+        var password = $(PasswordFieldElement.class).id("password-field");
+        var passwordRepeat = $(PasswordFieldElement.class)
+                .id("password-repeat");
+
+        assertFalse(delete.isEnabled());
+        assertFalse(save.isEnabled());
+
+        assertEquals("", user.getValue());
+        assertEquals("", password.getValue());
+        assertEquals("", passwordRepeat.getValue());
+        assertEquals("", role.getValue());
+
+        var userSelect = $(ComboBoxElement.class).id("user-select");
+        assertEquals("", userSelect.getValue());
+        userSelect.selectByText("User2");
+
+        assertFalse(save.isEnabled());
+        assertTrue(delete.isEnabled());
+
+        assertEquals("User2", user.getValue());
+        assertEquals("USER", role.getValue());
     }
 
     @Test

@@ -281,8 +281,10 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         conf.getLegend().setEnabled(false);
         var categories = availabilitySeries.getData().stream()
                 .map(item -> item.getName()).toArray(String[]::new);
-        var axis = conf.getxAxis();
-        axis.setCategories(categories);
+        var xaxis = conf.getxAxis();
+        xaxis.setCategories(categories);
+        var yaxis = conf.getyAxis();
+        yaxis.setTitle(getTranslation(I18n.Stats.COUNT));
 
         updateAvailabilityChartAccessibilityAttributes(availabilitySeries);
     }

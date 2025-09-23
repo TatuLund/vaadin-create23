@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Test;
@@ -36,18 +37,80 @@ public class StatsViewIT extends AbstractViewTest {
     }
 
     @Test
-    public void chartsRendered() {
+    public void availabilityChartContent() {
         waitForElementPresent(By.className("loaded"));
 
-        var dashboard = findElement(By.className("dashboard"));
-        var chartWrappers = dashboard.findElements(By.className("v-csslayout"));
-        assertEquals(3, chartWrappers.size());
-        $(ChartElement.class).all().forEach(chartWidget -> {
-            var chart = chartWidget.getSvg();
-            assertTrue(chart.isDisplayed());
-        });
+        var chart = $(ChartElement.class).id("availability-chart");
+        assertEquals("Saatavuustiedot", chart.getTitle());
+
+        var yAxisTitles = chart.getYAxisTitles();
+        assertEquals(1, yAxisTitles.size());
+        assertEquals("Määrä", yAxisTitles.get(0));
+
+        var yAxisLabels = chart.getYAxisLabels(0);
+        assertEquals("0", yAxisLabels.get(0));
+        assertEquals("40", yAxisLabels.get(4));
+
+        var xAxisLabels = chart.getXAxisLabels();
+        assertEquals(3, xAxisLabels.size());
+
+        assertEquals("COMING", xAxisLabels.get(0));
+        assertEquals("AVAILABLE", xAxisLabels.get(1));
+        assertEquals("DISCONTINUED", xAxisLabels.get(2));
+
         var focused = focusedElement();
         assertEquals("availability-chart", focused.getAttribute("id"));
+    }
+
+    @Test
+    public void priceChartContent() {
+        waitForElementPresent(By.className("loaded"));
+
+        var chart = $(ChartElement.class).id("price-chart");
+
+        assertEquals("Hinnat", chart.getTitle());
+
+        // Verify data labels
+        var dataLabels = chart.getDataLabels();
+        assertEquals(3, dataLabels.size());
+        assertTrue(dataLabels.contains("0 - 10 €"));
+        assertTrue(dataLabels.contains("10 - 20 €"));
+        assertTrue(dataLabels.contains("20 - 30 €"));
+    }
+
+    @Test
+    public void categoryChartContent() {
+        waitForElementPresent(By.className("loaded"));
+
+        var chart = $(ChartElement.class).id("category-chart");
+
+        assertEquals("Kategoriat", chart.getTitle());
+
+        // Verify Y axes
+        var yAxisTitles = chart.getYAxisTitles();
+        assertEquals(2, yAxisTitles.size());
+        assertEquals("Määrä", yAxisTitles.get(0));
+        assertEquals("Varastossa", yAxisTitles.get(1));
+
+        var yAxis0Labels = chart.getYAxisLabels(0);
+        assertEquals("0", yAxis0Labels.get(0));
+        assertEquals("40", yAxis0Labels.get(4));
+
+        var yAxis1Labels = chart.getYAxisLabels(1);
+        assertEquals("0", yAxis1Labels.get(0));
+        assertEquals("4k", yAxis1Labels.get(4));
+
+        // Verify X axis
+        var xAxisLabels = chart.getXAxisLabels();
+        assertEquals(8, xAxisLabels.size());
+        assertEquals("Non-fiction", xAxisLabels.get(0));
+        assertEquals("Sci-fi", xAxisLabels.get(1));
+        assertEquals("Thriller", xAxisLabels.get(2));
+        assertEquals("Romance", xAxisLabels.get(3));
+        assertEquals("Mystery", xAxisLabels.get(4));
+        assertEquals("Cookbooks", xAxisLabels.get(5));
+        assertEquals("Children's books", xAxisLabels.get(6));
+        assertEquals("Best sellers", xAxisLabels.get(7));
     }
 
     @Test
@@ -226,6 +289,79 @@ public class StatsViewIT extends AbstractViewTest {
          */
         public List<WebElement> getSeries() {
             return findElements(By.className("highcharts-series"));
+        }
+
+        /**
+         * Gets the Y axis title texts inside the chart.
+         *
+         * @return the list of Y axis title texts
+         */
+        public List<String> getYAxisTitles() {
+            return findElements(By.className("highcharts-yaxis-title")).stream()
+                    .map(WebElement::getText).toList();
+        }
+
+        /**
+         * Gets the Y axis label texts inside the chart.
+         *
+         * @param index
+         *            the Y axis index, 0 = first
+         * @return the list of Y axis label texts
+         */
+        public List<String> getYAxisLabels(int index) {
+            var yAxes = findElements(By.className("highcharts-yaxis-labels"));
+            var labelsContainer = yAxes.get(index);
+            return labelsContainer.findElements(By.tagName("text")).stream()
+                    .map(ChartElement::getLabelText).toList();
+        }
+
+        /**
+         * Gets the X axis label texts inside the chart.
+         *
+         * @return the list of X axis label texts
+         */
+        public List<String> getXAxisLabels() {
+            var labelsContainer = findElement(
+                    By.className("highcharts-xaxis-labels"));
+            var texts = labelsContainer.findElements(By.tagName("text"));
+            return texts.stream().map(ChartElement::getLabelText).toList();
+        }
+
+        private static String getLabelText(WebElement text) {
+            return text.findElements(By.tagName("tspan")).stream()
+                    .map(WebElement::getText).collect(Collectors.joining(" "));
+        }
+
+        /**
+         * Gets the data label texts inside the chart.
+         *
+         * @return the list of data label texts
+         */
+        public List<String> getDataLabels() {
+            return findElements(By.className("highcharts-data-labels")).stream()
+                    .flatMap(
+                            dl -> dl.findElements(By.tagName("tspan")).stream())
+                    .map(WebElement::getText).toList();
+        }
+
+        /**
+         * Gets the chart title text.
+         *
+         * @return the chart title text
+         */
+        public String getTitle() {
+            var title = findElement(By.className("highcharts-title"));
+            return getLabelText(title);
+        }
+
+        /**
+         * Gets the chart subtitle text.
+         *
+         * @return the chart subtitle text
+         */
+        public String getSubTitle() {
+            var subtitle = findElement(By.className("highcharts-subtitle"));
+            return getLabelText(subtitle);
         }
     }
 }

@@ -18,7 +18,6 @@ import org.vaadin.tatu.vaadincreate.crud.BookGrid;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
-import org.vaadin.tatu.vaadincreate.i18n.I18n.App;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;

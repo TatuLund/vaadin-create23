@@ -46,6 +46,7 @@ public class StatsViewTest extends AbstractUITest {
         login();
 
         view = navigate(StatsView.VIEW_NAME, StatsView.class);
+        assertAssistiveNotification("Statistics opened");
 
         dashboard = $(CssLayout.class).styleName(VaadinCreateTheme.DASHBOARD)
                 .first();

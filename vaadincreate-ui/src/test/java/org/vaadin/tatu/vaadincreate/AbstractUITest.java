@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -10,6 +11,7 @@ import org.vaadin.tatu.vaadincreate.crud.FakeGrid;
 import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
 import org.vaadin.tatu.vaadincreate.login.LanguageSelect;
 
+import com.vaadin.shared.Position;
 import com.vaadin.testbench.uiunittest.UIUnitTest;
 
 import com.vaadin.ui.Button;
@@ -97,5 +99,12 @@ public abstract class AbstractUITest extends UIUnitTest {
         assertTrue(String.format(
                 "Notification with caption '%s' not found in [%s].", message,
                 notifications), result);
+    }
+
+    protected void assertAssistiveNotification(
+            String notificatioText) {
+        var notification = $(Notification.class).last();
+        assertEquals(notificatioText, notification.getCaption());
+        assertEquals(Position.ASSISTIVE, notification.getPosition());
     }
 }

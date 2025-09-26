@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collections;
 
+import org.jsoup.Jsoup;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,7 @@ public class BooksViewTest extends AbstractUITest {
         login();
 
         view = navigate(BooksView.VIEW_NAME, BooksView.class);
+        assertAssistiveNotification("Inventory opened");
 
         var layout = $(view, VerticalLayout.class).first();
         grid = $(layout, BookGrid.class).single();
@@ -74,12 +76,15 @@ public class BooksViewTest extends AbstractUITest {
 
             // WHEN: Clicking on a row
             test(grid).click(1, i);
+            assertAssistiveNotification(String.format("%s opened",
+                    test(grid).item(i).getProductName()));
 
             // THEN: Focus is still in the grid
             assertTrue(test(grid).isFocused());
 
             then_form_is_filled_with_values_from_grid_row(i);
             then_selected_categories_are_shown_first();
+            then_availability_is_rendered_as_html(i);
 
             // WHEN: Clicking the row again
             test(grid).click(1, i);
@@ -141,9 +146,34 @@ public class BooksViewTest extends AbstractUITest {
         then_form_is_filled_with_values_from_grid_row(0);
 
         // WHEN: Pressing escape
-        test($(form, Button.class).id("cancel-button")).shortcut(KeyCode.ESCAPE);
+        test($(form, Button.class).id("cancel-button"))
+                .shortcut(KeyCode.ESCAPE);
         // THEN: Form is closed
         assertFalse(form.isShown());
+    }
+
+    private void then_availability_is_rendered_as_html(int i) {
+        var book = test(grid).item(i);
+        String color = "";
+        switch (book.getAvailability()) {
+        case AVAILABLE:
+            color = VaadinCreateTheme.COLOR_AVAILABLE;
+            break;
+        case DISCONTINUED:
+            color = VaadinCreateTheme.COLOR_DISCONTINUED;
+            break;
+        case COMING:
+            color = VaadinCreateTheme.COLOR_COMING;
+        }
+        var doc = Jsoup.parse((String) test(grid).cell(3, i));
+        assertEquals("v-icon",
+                doc.getElementsByTag("span").get(0).attr("class"));
+        assertEquals(String.format("font-family: Vaadin-Icons;color:%s", color),
+                doc.getElementsByTag("span").get(0).attr("style"));
+        assertEquals(VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL,
+                doc.getElementsByTag("span").get(1).attr("class"));
+        assertEquals(book.getAvailability().toString(),
+                doc.getElementsByTag("span").get(1).text());
     }
 
     private void then_form_is_filled_with_values_from_grid_row(int i) {
@@ -1146,8 +1176,11 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(grid.getColumns().get(4).isHidden());
         assertTrue(grid.getColumns().get(5).isHidden());
 
-        assertTrue(test(grid).description(0)
-                .contains(test(grid).item(0).getProductName()));
+        var doc = Jsoup.parse(test(grid).description(0));
+        var book = test(grid).item(0);
+        assertEquals(book.getProductName(),
+                doc.getElementsByTag("b").get(0).text());
+        assertEquals(1, doc.getElementsByClass("v-icon").size());
     }
 
     @Test

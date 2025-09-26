@@ -35,6 +35,7 @@ public class UserManagementViewTest extends AbstractUITest {
 
         navigate(AdminView.VIEW_NAME + "/" + UserManagementView.VIEW_NAME,
                 AdminView.class);
+        assertAssistiveNotification("Users opened");
     }
 
     @After

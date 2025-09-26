@@ -34,6 +34,8 @@ public class CategoryManagementViewTest extends AbstractUITest {
         login();
 
         admin = navigate(AdminView.VIEW_NAME, AdminView.class);
+        assertAssistiveNotification("Categories opened");
+
         tabs = $(admin, TabSheet.class).first();
         cats = (CategoryManagementView) test(tabs).current();
     }

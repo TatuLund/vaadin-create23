@@ -536,23 +536,6 @@ public class BooksView extends CssLayout implements VaadinCreateView {
     }
 
     /**
-     * Refreshes the given product asynchronously.
-     *
-     * @param product
-     *            the product to be refreshed
-     */
-    public void refreshProductAsync(Product product) {
-        Utils.access(ui, () -> {
-            if (canPush() && grid.getEdited() != product.getId()) {
-                logger.debug("Refreshing item ({}) {}", product.getId(),
-                        product.getProductName());
-                grid.setEdited(product);
-                grid.refresh(product);
-            }
-        });
-    }
-
-    /**
      * Refreshes the product asynchronously by its ID. This method uses the
      * provided UI access utility to ensure that the refresh operation is
      * performed in a thread-safe manner. If the UI can push updates, it filters

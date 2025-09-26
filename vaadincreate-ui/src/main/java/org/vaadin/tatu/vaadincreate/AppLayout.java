@@ -188,11 +188,15 @@ public class AppLayout extends Composite implements HasI18N {
                     break;
                 }
             }
+            if (!canAccess) {
+                logger.warn("User '{}' has no permission to view '{}'",
+                        getUserName(), view.getName());
+            }
             return canAccess;
         }
-        logger.warn("User '{}' has no permission to view '{}'", getUserName(),
-                view.getName());
-        return false;
+        throw new IllegalStateException(String.format(
+                "View '%s' must have either @AllPermitted or @RolesPermitted annotation",
+                view.getName()));
     }
 
     /**

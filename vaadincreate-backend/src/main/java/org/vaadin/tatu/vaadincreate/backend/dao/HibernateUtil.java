@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.JDBCConnectionException;
 import org.jspecify.annotations.NullMarked;
@@ -66,18 +67,24 @@ public class HibernateUtil {
      */
     public static <T> T inTransaction(Function<Session, T> transaction) {
         var start = System.currentTimeMillis();
-        var session = getSessionFactory().openSession();
-        var tx = session.beginTransaction();
         T result;
+        Session session = null;
+        Transaction tx = null;
         try {
+            session = getSessionFactory().openSession();
+            tx = session.beginTransaction();
             result = transaction.apply(session);
             tx.commit();
         } catch (Exception e) {
-            tx.rollback();
+            if (tx != null) {
+                tx.rollback();
+            }
             handleDatabaseException(e);
             throw e;
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
         var time = System.currentTimeMillis() - start;
         if (time > DATABASE_CALL_WARN_LIMIT) {
@@ -104,17 +111,23 @@ public class HibernateUtil {
      */
     public static void inTransaction(Consumer<Session> transaction) {
         var start = System.currentTimeMillis();
-        var session = getSessionFactory().openSession();
-        var tx = session.beginTransaction();
+        Session session = null;
+        Transaction tx = null;
         try {
+            session = getSessionFactory().openSession();
+            tx = session.beginTransaction();
             transaction.accept(session);
             tx.commit();
         } catch (Exception e) {
-            tx.rollback();
+            if (tx != null) {
+                tx.rollback();
+            }
             handleDatabaseException(e);
             throw e;
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
         var time = System.currentTimeMillis() - start;
         if (time > DATABASE_CALL_WARN_LIMIT) {
@@ -136,14 +149,17 @@ public class HibernateUtil {
     public static <T> T inSession(Function<Session, T> task) {
         var start = System.currentTimeMillis();
         T result;
-        var session = getSessionFactory().openSession();
+        Session session = null;
         try {
+            session = getSessionFactory().openSession();
             result = task.apply(session);
         } catch (Exception e) {
             handleDatabaseException(e);
             throw e;
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
         var time = System.currentTimeMillis() - start;
         if (time > DATABASE_CALL_WARN_LIMIT) {
@@ -163,14 +179,17 @@ public class HibernateUtil {
      */
     public static void inSession(Consumer<Session> task) {
         var start = System.currentTimeMillis();
-        var session = getSessionFactory().openSession();
+        Session session = null;
         try {
+            session = getSessionFactory().openSession();
             task.accept(session);
         } catch (Exception e) {
             handleDatabaseException(e);
             throw e;
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
         var time = System.currentTimeMillis() - start;
         if (time > DATABASE_CALL_WARN_LIMIT) {

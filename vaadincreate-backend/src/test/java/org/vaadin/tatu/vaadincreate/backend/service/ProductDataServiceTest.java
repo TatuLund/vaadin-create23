@@ -100,6 +100,17 @@ public class ProductDataServiceTest {
     }
 
     @Test
+    public void findCategoryById() {
+        var id = service.getAllCategories().stream().findFirst().get().getId();
+        assertNotNull(service.findCategoriesByIds(Set.of(id)));
+    }
+
+    @Test
+    public void findCategoryByNonExistentId() {
+        assertTrue(service.findCategoriesByIds(Set.of(10000)).isEmpty());
+    }
+
+    @Test
     public void optimisticLocking() {
         var id = service.getAllProducts().stream().findFirst().get().getId();
         var product = service.getProductById(id);

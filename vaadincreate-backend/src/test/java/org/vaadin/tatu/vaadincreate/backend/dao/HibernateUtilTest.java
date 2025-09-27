@@ -9,11 +9,13 @@ import java.util.function.Function;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.exception.JDBCConnectionException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.vaadin.tatu.vaadincreate.backend.DatabaseConnectionException;
 
 /**
  * Test class for {@link HibernateUtil}.
@@ -173,6 +175,25 @@ public class HibernateUtilTest {
             fail("Expected IllegalStateException was not thrown");
         } catch (IllegalStateException e) {
             assertEquals("SessionFactory was shut down", e.getMessage());
+        }
+    }
+
+    @Test
+    public void databaseConnectionException() {
+        var exception = new JDBCConnectionException("DB error", null);
+        when(mockFactory.openSession())
+                .thenThrow(exception);
+        try {
+            HibernateUtil.inSession(session -> "result");
+            fail("Expected DatabaseConnectionException was not thrown");
+        } catch (DatabaseConnectionException e) {
+            assertEquals(exception, e.getCause());
+        }
+        try {
+            HibernateUtil.inTransaction(session -> "result");
+            fail("Expected DatabaseConnectionException was not thrown");
+        } catch (DatabaseConnectionException e) {
+            assertEquals(exception, e.getCause());
         }
     }
 }

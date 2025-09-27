@@ -14,7 +14,6 @@ import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
-import org.vaadin.tatu.vaadincreate.i18n.I18NProvider;
 
 import com.vaadin.testbench.uiunittest.UIUnitTest;
 

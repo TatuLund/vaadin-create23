@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.FilterChain;
@@ -85,7 +86,7 @@ public class LoggingFilterTest extends UIUnitTest {
         var filter = new LoggingFilter();
         var request = new MockRequest(
                 (HttpServletRequest) VaadinRequest.getCurrent(),
-                (VaadinServletService) VaadinService.getCurrent());
+                (VaadinServletService) VaadinService.getCurrent(), "/wrong");
         var response = new MockResponse(
                 (HttpServletResponse) VaadinResponse.getCurrent(),
                 (VaadinServletService) VaadinService.getCurrent());
@@ -98,16 +99,52 @@ public class LoggingFilterTest extends UIUnitTest {
         assertEquals(0, counter.get());
     }
 
+    @Test
+    public void testGoodUrl() {
+        var goodUrls = Set.of("VAADIN", "APP", "UIDL", "HEARTBEAT", "PUSH");
+        goodUrls.forEach(this::testGoodUrl);
+    }
+
+    private void testGoodUrl(String url) {
+        AtomicInteger counter = new AtomicInteger(0);
+        FilterChain chain = new FilterChain() {
+            @Override
+            public void doFilter(ServletRequest request,
+                    ServletResponse response) {
+                counter.incrementAndGet();
+            }
+        };
+        var filter = new LoggingFilter();
+        var contextPath = VaadinRequest.getCurrent().getContextPath();
+        var request = new MockRequest(
+                (HttpServletRequest) VaadinRequest.getCurrent(),
+                (VaadinServletService) VaadinService.getCurrent(),
+                contextPath + "/" + url + "/something");
+        var response = new MockResponse(
+                (HttpServletResponse) VaadinResponse.getCurrent(),
+                (VaadinServletService) VaadinService.getCurrent());
+        try {
+            filter.doFilter(request, response, chain);
+        } catch (IOException | ServletException e) {
+            // Handle exception
+        }
+        assertEquals(200, response.getStatus());
+        assertEquals(1, counter.get());
+    }
+
     public static class MockRequest extends VaadinServletRequest {
 
+        private final String requestURI;
+
         public MockRequest(HttpServletRequest request,
-                VaadinServletService vaadinService) {
+                VaadinServletService vaadinService, String requestURI) {
             super(request, vaadinService);
+            this.requestURI = requestURI;
         }
 
         @Override
         public String getRequestURI() {
-            return "/wrong";
+            return requestURI;
         }
     }
 

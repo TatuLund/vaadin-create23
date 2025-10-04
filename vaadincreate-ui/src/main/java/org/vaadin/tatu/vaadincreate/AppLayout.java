@@ -4,6 +4,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
@@ -117,6 +118,7 @@ public class AppLayout extends Composite implements HasI18N {
         var item = logout.addItem(getTranslation(I18n.App.LOGOUT),
                 e -> handleConfirmLogoutWhenChanges(ui, nav));
         item.setIcon(VaadinIcons.KEY);
+
         item.setDescription(
                 getTranslation(I18n.App.LOGOUT_TOOLTIP, getUserName()));
         logout.addStyleName(ValoTheme.MENU_USER);
@@ -320,6 +322,7 @@ public class AppLayout extends Composite implements HasI18N {
             setCompositionRoot(items);
             items.addStyleName(ValoTheme.MENU_ITEMS);
             setRole(AriaRoles.NAVIGATION);
+            setAttribute(AriaAttributes.KEYSHORTCUTS, "Alt+Shift+N");
         }
 
         /**

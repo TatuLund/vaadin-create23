@@ -22,6 +22,7 @@ public class Has18NTest extends UIUnitTest {
         session.setLocale(DefaultI18NProvider.LOCALE_FI);
         label = new LocalizedLabel("save");
         Assert.assertEquals("Tallenna", label.getValue());
+        tearDown();
     }
 
     @SuppressWarnings("serial")

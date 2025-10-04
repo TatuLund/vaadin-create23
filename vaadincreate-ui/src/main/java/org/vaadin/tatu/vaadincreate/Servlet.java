@@ -153,7 +153,8 @@ public class Servlet extends VaadinServlet {
         if (!locale.isEmpty()) {
             boolean toSave = false;
             if (localeCookie == null) {
-                localeCookie = createNewCookie(request, locale);
+                localeCookie = CookieUtils.createNewCookie(request,
+                        locale.toString());
                 toSave = true;
             } else {
                 var newValue = locale.toString();
@@ -171,16 +172,6 @@ public class Servlet extends VaadinServlet {
             }
         }
         return false;
-    }
-
-    protected static Cookie createNewCookie(VaadinRequest request,
-            StringBuilder locale) {
-        Cookie localeCookie;
-        localeCookie = new Cookie(CookieUtils.COOKIE_LANGUAGE,
-                locale.toString());
-        localeCookie.setPath(request.getContextPath());
-        localeCookie.setMaxAge(60 * 60);
-        return localeCookie;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(Servlet.class);

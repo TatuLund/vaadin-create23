@@ -88,6 +88,17 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
         return extension;
     }
 
+    /**
+     * Common ARIA attributes.
+     * <p>
+     * This class provides constants for commonly used ARIA attributes to
+     * facilitate their usage in the attribute extension.
+     * </p>
+     * 
+     * @see <a href=
+     *      "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes">MDN
+     *      Web Docs: ARIA Attributes</a>
+     */
     public static class AriaAttributes {
 
         private AriaAttributes() {
@@ -103,6 +114,16 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
         public static final String LIVE = "aria-live";
     }
 
+    /**
+     * Common ARIA roles.
+     * <p>
+     * This class provides constants for commonly used ARIA roles to facilitate
+     * their usage in the attribute extension.
+     * </p>
+     *
+     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles">MDN
+     *      Web Docs: ARIA Roles</a>
+     */
     public static class AriaRoles {
 
         private AriaRoles() {

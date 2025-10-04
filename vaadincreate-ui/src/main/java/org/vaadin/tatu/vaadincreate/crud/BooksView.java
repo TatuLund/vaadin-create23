@@ -6,10 +6,12 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.VaadinCreateView;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
@@ -19,6 +21,8 @@ import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
+import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.ViewBeforeLeaveEvent;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -44,7 +48,8 @@ import com.vaadin.ui.themes.ValoTheme;
 @RolesPermitted({ Role.USER, Role.ADMIN })
 public class BooksView extends CssLayout implements VaadinCreateView {
 
-    private static final Logger logger = LoggerFactory.getLogger(BooksView.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(BooksView.class);
 
     public static final String VIEW_NAME = "inventory";
 
@@ -179,6 +184,9 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         newProduct.addStyleName(ValoTheme.BUTTON_PRIMARY);
         newProduct.setIcon(VaadinIcons.PLUS_CIRCLE);
         newProduct.addClickListener(click -> presenter.newProduct());
+        newProduct.setClickShortcut(KeyCode.N, ModifierKey.ALT);
+        AttributeExtension.of(newProduct)
+                .setAttribute(AriaAttributes.KEYSHORTCUTS, "Alt+N");
 
         var topLayout = new HorizontalLayout();
         topLayout.setWidth("100%");

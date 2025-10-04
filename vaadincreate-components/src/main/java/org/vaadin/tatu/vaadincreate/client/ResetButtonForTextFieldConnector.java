@@ -27,6 +27,9 @@ import com.vaadin.shared.ui.Connect;
 public class ResetButtonForTextFieldConnector extends AbstractExtensionConnector
         implements KeyUpHandler, AttachEvent.Handler {
 
+    /**
+     * CSS class name for the reset button extension.
+     */
     public static final String CLASSNAME = "resetbuttonfortextfield";
     private AbstractTextFieldConnector textFieldConnector;
     private VTextField textField;
@@ -81,6 +84,9 @@ public class ResetButtonForTextFieldConnector extends AbstractExtensionConnector
     });
     }-*/;
 
+    /**
+     * Removes the click listener from the specified element.
+     */
     public native void removeResetButtonClickListener(Element el)
     /*-{
     el.onclick = null;

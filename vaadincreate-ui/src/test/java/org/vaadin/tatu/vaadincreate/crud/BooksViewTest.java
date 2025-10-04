@@ -97,6 +97,7 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
+    @SuppressWarnings("java:S5961")
     public void when_browsing_products_with_pgDown_pgUp_keys_the_form_is_populated_accordingly_and_Esc_closes_the_form() {
         // WHEN: Clicking on the first row
         test(grid).click(1, 0);
@@ -613,6 +614,34 @@ public class BooksViewTest extends AbstractUITest {
 
         // FINALLY: Close form gracefully to avoid side effects
         test($(form, Button.class).id("cancel-button")).click();
+        assertFalse(form.isShown());
+    }
+
+    @Test
+    public void alt_n_will_open_new_book_form_and_esc_will_close_it() {
+        // WHEN: Pressing alt+N
+        test($(Button.class).id("new-product")).shortcut(KeyCode.N,
+                ModifierKey.ALT);
+
+        // THEN: New book form is opened
+        assertTrue(form.isShown());
+        then_form_fields_are_reset_state();
+        assertTrue(
+                test($(form, TextField.class).id("product-name")).isFocused());
+
+        // WHEN: Filling the form and pressing escape
+        test($(form, TextField.class).id("product-name")).setValue("Test book");
+        test($(form, Button.class).id("cancel-button"))
+                .shortcut(KeyCode.ESCAPE);
+
+        // THEN: Confirm dialog is shown
+        var dialog = $(Window.class).id("confirm-dialog");
+        var confirmButton = $(dialog, Button.class).id("confirm-button");
+
+        // WHEN: Confirming the cancel by pressing enter
+        test(confirmButton).shortcut(KeyCode.ENTER);
+
+        // THEN: Form is closed
         assertFalse(form.isShown());
     }
 

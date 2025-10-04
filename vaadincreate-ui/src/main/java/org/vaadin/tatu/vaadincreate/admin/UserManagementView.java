@@ -6,6 +6,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
@@ -104,6 +105,8 @@ public class UserManagementView extends VerticalLayout
         // Save button is enabled when the form is valid
         save.addStyleName(ValoTheme.BUTTON_PRIMARY);
         save.setClickShortcut(KeyCode.S, ModifierKey.CTRL);
+        AttributeExtension.of(save).setAttribute(AriaAttributes.KEYSHORTCUTS,
+                "Control+S");
         save.setId("save-button");
         save.addClickListener(click -> handleSave());
 
@@ -116,6 +119,8 @@ public class UserManagementView extends VerticalLayout
         // being created
         cancel.setId("cancel-button");
         cancel.setClickShortcut(KeyCode.ESCAPE);
+        AttributeExtension.of(cancel).setAttribute(AriaAttributes.KEYSHORTCUTS,
+                "Escape");
         cancel.addStyleName(VaadinCreateTheme.BUTTON_CANCEL);
         cancel.addClickListener(click -> handleCancel());
 

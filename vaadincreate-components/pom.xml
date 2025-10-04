@@ -91,12 +91,31 @@
 			<scope>provided</scope>
         </dependency>
 
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-testbench</artifactId>
-			<version>${testbench.version}</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-testbench</artifactId>
+            <version>${testbench.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-testbench-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-testbench-core</artifactId>
+            <version>${testbench.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <!-- Exclude the license checker to use the latest -->
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>license-checker</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 		<dependency>
 			<groupId>io.github.bonigarcia</groupId>
 			<artifactId>webdrivermanager</artifactId>
@@ -195,7 +214,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.6.3</version>
 				<executions>
 					<execution>
 						<id>attach-javadoc</id>
@@ -205,6 +224,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<doclint>all,-missing</doclint>
 					<failOnError>false</failOnError>
 				</configuration>
 			</plugin>

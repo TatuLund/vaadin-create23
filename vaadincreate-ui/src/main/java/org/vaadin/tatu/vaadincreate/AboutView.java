@@ -4,6 +4,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
@@ -195,6 +196,8 @@ public class AboutView extends VerticalLayout
                         closeEditor();
                     }
                 }));
+        AttributeExtension.of(textArea)
+                .setAttribute(AriaAttributes.KEYSHORTCUTS, "Control+S");
         CharacterCountExtension.extend(textArea);
         return textArea;
     }

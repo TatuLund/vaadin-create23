@@ -195,6 +195,8 @@ public class BookForm extends Composite implements HasI18N {
 
         saveButton.addClickListener(clicked -> handleSave());
         saveButton.setClickShortcut(KeyCode.S, ModifierKey.CTRL);
+        AttributeExtension.of(saveButton)
+                .setAttribute(AriaAttributes.KEYSHORTCUTS, "Control+S");
 
         discardButton.addClickListener(clicked -> {
             presenter.editProduct(currentProduct);
@@ -203,6 +205,8 @@ public class BookForm extends Composite implements HasI18N {
 
         cancelButton.addClickListener(clicked -> presenter.cancelProduct());
         cancelButton.setClickShortcut(KeyCode.ESCAPE);
+        AttributeExtension.of(cancelButton)
+                .setAttribute(AriaAttributes.KEYSHORTCUTS, "Escape");
 
         deleteButton.addClickListener(clicked -> handleDelete());
 

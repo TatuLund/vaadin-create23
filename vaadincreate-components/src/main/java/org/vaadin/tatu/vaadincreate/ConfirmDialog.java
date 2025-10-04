@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
 
 import com.vaadin.event.ConnectorEventListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -89,6 +90,8 @@ public class ConfirmDialog extends Composite {
             window.close();
         });
         cancelButton.setId("cancel-button");
+        AttributeExtension.of(cancelButton)
+                .setAttribute(AriaAttributes.KEYSHORTCUTS, "Escape");
         confirmButton = new Button("Confirm");
         confirmButton.addClickListener(click -> {
             confirmButton.removeClickShortcut();
@@ -97,6 +100,8 @@ public class ConfirmDialog extends Composite {
         });
         confirmButton.setId("confirm-button");
         confirmButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        AttributeExtension.of(confirmButton)
+                .setAttribute(AriaAttributes.KEYSHORTCUTS, "Enter");
         var buttons = new HorizontalLayout();
         buttons.addComponents(cancelButton, confirmButton);
         buttons.setComponentAlignment(cancelButton, Alignment.BOTTOM_LEFT);

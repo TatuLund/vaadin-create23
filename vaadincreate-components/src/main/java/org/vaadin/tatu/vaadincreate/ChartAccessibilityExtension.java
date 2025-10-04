@@ -30,8 +30,6 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
      *
      * @param chart
      *            the chart component to make accessible
-     * @param legendsClickable
-     *            descriptive text for legend items (e.g., "Click to toggle")
      * @return the extension instance
      */
     public static ChartAccessibilityExtension of(AbstractComponent chart) {
@@ -154,6 +152,11 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
 
     /**
      * Sets the menu entries localized texts.
+     *
+     * @param menuEntries
+     *            a list of 5 menu entry texts in the following order: "Print
+     *            chart", "Download as PNG image", "Download as JPEG image",
+     *            "Download as PDF document", "Download as SVG image"
      */
     public void setMenuEntries(List<String> menuEntries) {
         Objects.requireNonNull(menuEntries, "Menu entries cannot be null");

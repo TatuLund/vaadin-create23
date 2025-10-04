@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.jsoup.Jsoup;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
+import org.vaadin.tatu.vaadincreate.util.CookieUtils;
 
 import com.vaadin.server.BootstrapHandler;
 import com.vaadin.server.BootstrapPageResponse;
@@ -70,6 +71,8 @@ public class ServletTest extends UIUnitTest {
         assertNotNull(locale);
         assertEquals(DefaultI18NProvider.LOCALE_FI.getLanguage(),
                 locale.getLanguage());
+
+        tearDown();
     }
 
     @Test
@@ -95,6 +98,8 @@ public class ServletTest extends UIUnitTest {
 
         // Assert
         assertTrue(servlet.exceptionCount.get() > 0);
+
+        tearDown();
     }
 
     @Test
@@ -115,6 +120,8 @@ public class ServletTest extends UIUnitTest {
         // Assert
         assertEquals(DefaultI18NProvider.LOCALE_FI.getLanguage(),
                 response.getDocument().getElementsByTag("html").attr("lang"));
+    
+        tearDown();
     }
 
     public static class MockRequest extends VaadinServletRequest {
@@ -126,8 +133,8 @@ public class ServletTest extends UIUnitTest {
 
         @Override
         public Cookie[] getCookies() {
-            return new Cookie[] {
-                    Servlet.createNewCookie(this, new StringBuilder("fi")) };
+            return new Cookie[] { CookieUtils.createNewCookie(this,
+                    DefaultI18NProvider.LOCALE_FI.getLanguage()) };
         }
     }
 

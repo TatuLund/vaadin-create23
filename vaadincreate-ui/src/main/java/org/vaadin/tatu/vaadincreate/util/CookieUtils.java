@@ -43,4 +43,12 @@ public class CookieUtils {
         return null;
     }
 
+    public static Cookie createNewCookie(VaadinRequest request, String locale) {
+        Cookie localeCookie;
+        localeCookie = new Cookie(CookieUtils.COOKIE_LANGUAGE, locale);
+        localeCookie.setPath(request.getContextPath());
+        localeCookie.setMaxAge(60 * 60);
+        return localeCookie;
+    }
+
 }

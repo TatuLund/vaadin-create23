@@ -91,7 +91,10 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         var exporting = new Exporting(true);
         // Customize the file name of the download file
         exporting.setFilename("chart");
-        // Use the exporting configuration in the chart
+        // Use the exporting configuration in the chart, note in the
+        // real production environment the URL should point to a
+        // actual address where the application is hosted instead
+        // of localhost.
         exporting.setUrl("http://charts:export@127.0.0.1:8083/");
         exporting.setButtons(new Buttons());
         categoryChart.getConfiguration().setExporting(exporting);
@@ -131,8 +134,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
                     .getSeries().get(0);
             var stockCounts = (DataSeries) categoryChart.getConfiguration()
                     .getSeries().get(1);
+            categoryChart.setAttribute(AriaAttributes.LIVE, "polite");
             updateCategoryChartAccessibilityAttributes(titles, stockCounts);
-
         });
         return categoryChartWrapper;
     }
@@ -203,8 +206,6 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
     @SuppressWarnings("java:S1192")
     private void updatePriceChartAccessibilityAttributes(
             DataSeries priceSeries) {
-        priceChart.setRole(AriaRoles.FIGURE);
-        priceChart.setAttribute("tabindex", 0);
         var alt = String.format("%s:%s", getTranslation(I18n.Stats.PRICES),
                 priceSeries
                         .getData().stream().map(data -> String.format("%s %s",
@@ -243,10 +244,6 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
     @SuppressWarnings("java:S5411")
     private void updateCategoryChartAccessibilityAttributes(DataSeries titles,
             DataSeries stockCounts) {
-        categoryChart.setRole(AriaRoles.FIGURE);
-        categoryChart.setAttribute("tabindex", 0);
-        categoryChart.setAttribute(AriaAttributes.LIVE, "polite");
-
         var alt1 = titles.isVisible() ? String.format("%s %s:%s",
                 getTranslation(I18n.Stats.CATEGORIES),
                 getTranslation(I18n.Stats.COUNT),
@@ -291,8 +288,6 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
 
     private void updateAvailabilityChartAccessibilityAttributes(
             DataSeries availabilitySeries) {
-        availabilityChart.setRole(AriaRoles.FIGURE);
-        availabilityChart.setAttribute("tabindex", 0);
         var alt = String.format("%s:%s",
                 getTranslation(I18n.Stats.AVAILABILITIES),
                 availabilitySeries
@@ -365,12 +360,6 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         // There is no need to fetch data before navigation is complete, thus we
         // trigger it in enter, not in constructor
         presenter.requestUpdateStats();
-        JavaScript.eval("""
-            setTimeout(() => {
-                var chart = document.getElementById("availability-chart");
-                if (chart) { chart.focus(); }
-            }, 100);
-            """);
     }
 
     @Override
@@ -382,6 +371,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         // when using non-fixed sizes.
         resizeListener = ui.getPage().addBrowserWindowResizeListener(
                 resizeEvent -> JavaScript.eval("vaadin.forceLayout()"));
+        availabilityChart.focus();
     }
 
     @Override
@@ -402,13 +392,17 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
     /**
      * CustomChart is an extension of the Chart class that allows for setting
      * custom attributes. It uses the AttributeExtension to manage these
-     * attributes.
+     * attributes. Furthermore, it implements Focusable to allow focus
+     * management and HasI18N for internationalization support. Also, it
+     * integrates ChartAccessibilityExtension to enhance accessibility features
+     * for the chart.
      */
     public static class CustomChart extends Chart
-            implements HasAttributes<CustomChart>, HasI18N {
+            implements HasAttributes<CustomChart>, Focusable, HasI18N {
 
         @Nullable
         ChartAccessibilityExtension a11y;
+        private int tabIndex = -1;
 
         public CustomChart(ChartType type) {
             super(type);
@@ -418,6 +412,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
             a11y.setContextMenu(getTranslation(I18n.Stats.CONTEXT_MENU));
             a11y.setMenuEntries(Arrays.asList(
                     getTranslation(I18n.Stats.MENU_ENTRIES).split(",")));
+            setTabIndex(0);
+            setRole(AriaRoles.FIGURE);
         }
 
         @Override
@@ -426,6 +422,29 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
             if (a11y != null) {
                 a11y.applyPatches();
             }
+        }
+
+        @Override
+        public int getTabIndex() {
+            return tabIndex;
+        }
+
+        @Override
+        public void setTabIndex(int tabIndex) {
+            setAttribute("tabindex", tabIndex);
+            this.tabIndex = tabIndex;
+        }
+
+        @Override
+        public void focus() {
+            super.focus();
+            assert getId() != null : "Chart must have an id set to be focused";
+            JavaScript.eval("""
+                    setTimeout(() => {
+                        var chart = document.getElementById("%s");
+                        if (chart) { chart.focus(); }
+                    }, 100);
+                    """.formatted(getId()));
         }
     }
 

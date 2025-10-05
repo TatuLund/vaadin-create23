@@ -288,6 +288,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
             return null;
         }
         view.showSaveNotification(product.getProductName());
+        view.setNewProductEnabled(true);
 
         if (newBook) {
             // Add new product to the view
@@ -318,6 +319,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
         Objects.requireNonNull(id, "Product must have an ID to be deleted");
         view.showDeleteNotification(product.getProductName());
         view.clearSelection();
+        view.setNewProductEnabled(true);
         logger.info("Deleting product: {}", product.getId());
         getService().deleteProduct(id);
         view.removeProduct(product);

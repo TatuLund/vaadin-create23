@@ -122,6 +122,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
                 presenter.unlockBook();
                 form.showForm(false);
                 setFragmentParameter("");
+                newProduct.setEnabled(true);
             });
             dialog.addCancelledListener(
                     cancelled -> grid.select(form.getProduct()));
@@ -129,6 +130,8 @@ public class BooksView extends CssLayout implements VaadinCreateView {
             presenter.rowSelected(product);
             if (product != null) {
                 grid.select(product);
+            } else {
+                newProduct.setEnabled(true);
             }
         }
     }
@@ -183,6 +186,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         newProduct.setEnabled(false);
         newProduct.addStyleName(ValoTheme.BUTTON_PRIMARY);
         newProduct.setIcon(VaadinIcons.PLUS_CIRCLE);
+        newProduct.setDisableOnClick(true);
         newProduct.addClickListener(click -> presenter.newProduct());
         newProduct.setClickShortcut(KeyCode.N, ModifierKey.ALT);
         AttributeExtension.of(newProduct)
@@ -238,19 +242,20 @@ public class BooksView extends CssLayout implements VaadinCreateView {
             var dialog = createDiscardChangesConfirmDialog();
             dialog.open();
             dialog.addConfirmedListener(confirmed -> {
-                form.showForm(false);
-                clearSelection();
-                setFragmentParameter("");
-                presenter.unlockBook();
-                grid.focus();
+                closeForm();
             });
         } else {
-            form.showForm(false);
-            clearSelection();
-            setFragmentParameter("");
-            presenter.unlockBook();
-            grid.focus();
+            closeForm();
         }
+    }
+
+    private void closeForm() {
+        form.showForm(false);
+        clearSelection();
+        setFragmentParameter("");
+        presenter.unlockBook();
+        grid.focus();
+        newProduct.setEnabled(true);
     }
 
     /**
@@ -441,6 +446,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
 
     public void newProduct() {
         editProduct(new Product());
+        newProduct.setEnabled(false);
         form.focus();
     }
 
@@ -461,12 +467,15 @@ public class BooksView extends CssLayout implements VaadinCreateView {
                 product = updateProductInGrid(product);
                 if (product == null) {
                     showError(getTranslation(I18n.Books.PRODUCT_DELETED));
+                    newProduct.setEnabled(true);
                     return;
                 }
             }
             form.showForm(true);
+            newProduct.setEnabled(false);
         } else {
             form.showForm(false);
+            newProduct.setEnabled(true);
         }
         form.editProduct(product);
         if (draft != null) {

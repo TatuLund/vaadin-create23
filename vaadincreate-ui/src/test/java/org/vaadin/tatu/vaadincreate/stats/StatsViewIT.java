@@ -164,7 +164,7 @@ public class StatsViewIT extends AbstractViewTest {
         waitForElementPresent(By.className("loaded"));
 
         var chart = $(ChartElement.class).id("category-chart");
-        assertEquals("polite", chart.getAttribute("aria-live"));
+        assertNull(chart.getAttribute("aria-live"));
         assertEquals("0", chart.getAttribute("tabindex"));
 
         // Initially all series are visible
@@ -187,6 +187,7 @@ public class StatsViewIT extends AbstractViewTest {
 
         // Verify that added keyup event listeners are working
         buttons.get(0).sendKeys(Keys.SPACE);
+        assertEquals("polite", chart.getAttribute("aria-live"));
 
         // Verify that the first series is hidden and the second is visible
         series = chart.getSeries();

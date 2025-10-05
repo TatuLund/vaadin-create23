@@ -73,6 +73,7 @@ public class BooksViewEditIdTest extends AbstractUITest {
         assertEquals(product, grid.asSingleSelect().getSelectedItem().get());
 
         assertTrue(form.isShown());
+        assertFalse($(view, Button.class).id("new-product").isEnabled());
         assertTrue(test(grid).isFocused());
         assertEquals(product.getProductName(),
                 $(form, TextField.class).id("product-name").getValue());
@@ -109,6 +110,7 @@ public class BooksViewEditIdTest extends AbstractUITest {
         assertNotificationForUpdatedBook();
 
         assertFalse(form.isShown());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
 
         var savedProduct = ui.getProductService().getProductById(id);
         assertEquals("Modified book", savedProduct.getProductName());

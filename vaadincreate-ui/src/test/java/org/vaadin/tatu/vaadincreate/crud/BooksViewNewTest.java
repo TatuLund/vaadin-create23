@@ -52,6 +52,7 @@ public class BooksViewNewTest extends AbstractUITest {
     public void when_books_view_is_entered_with_new_as_url_parameter_form_is_shown_for_new_product_which_can_be_entered_and_saved() {
         // THEN: The form is shown and the first field is focused
         assertTrue(form.isShown());
+        assertFalse($(view, Button.class).id("new-product").isEnabled());
         assertTrue(
                 test($(form, TextField.class).id("product-name")).isFocused());
 
@@ -73,6 +74,7 @@ public class BooksViewNewTest extends AbstractUITest {
         // focused
         assertNotificationForUpdatedBook();
         assertFalse(form.isShown());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
 
         assertTrue(test(grid).isFocused());
 

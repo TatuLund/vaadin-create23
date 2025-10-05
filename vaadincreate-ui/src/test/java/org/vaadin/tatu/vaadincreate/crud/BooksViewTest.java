@@ -78,6 +78,7 @@ public class BooksViewTest extends AbstractUITest {
             test(grid).click(1, i);
             assertAssistiveNotification(String.format("%s opened",
                     test(grid).item(i).getProductName()));
+            assertFalse($(Button.class).id("new-product").isEnabled());
 
             // THEN: Focus is still in the grid
             assertTrue(test(grid).isFocused());
@@ -91,6 +92,7 @@ public class BooksViewTest extends AbstractUITest {
 
             // THEN: Form is closed
             assertFalse(form.isShown());
+            assertTrue($(Button.class).id("new-product").isEnabled());
             then_form_fields_are_reset_state();
         }
 
@@ -319,6 +321,7 @@ public class BooksViewTest extends AbstractUITest {
         test($(view, Button.class).id("new-product")).click();
 
         // THEN: Form is shown and product name field is focused
+        assertFalse($(view, Button.class).id("new-product").isEnabled());
         assertTrue(
                 test($(form, TextField.class).id("product-name")).isFocused());
 
@@ -344,6 +347,7 @@ public class BooksViewTest extends AbstractUITest {
         assertFalse(form.isShown());
         assertTrue(test(grid).isFocused());
         assertNotification("\"Filter book\" updated");
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
 
         // THEN: The book is added to the backend
         assertTrue(ui.getProductService().getAllProducts().stream()
@@ -376,6 +380,7 @@ public class BooksViewTest extends AbstractUITest {
 
         // THEN: Form is shown
         assertTrue(form.isShown());
+        assertFalse($(view, Button.class).id("new-product").isEnabled());
 
         // WHEN: Filling the form and canceling it
         test($(form, TextField.class).id("product-name")).setValue("New book");
@@ -395,12 +400,14 @@ public class BooksViewTest extends AbstractUITest {
         // THEN: Form is closed and grid is focused
         assertFalse(form.isShown());
         assertTrue(test(grid).isFocused());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
     }
 
     @Test
     public void opening_empty_product_form_can_be_cancelled_without_confirmation() {
         // WHEN: Opening empty product form
         test($(view, Button.class).id("new-product")).click();
+        assertFalse($(view, Button.class).id("new-product").isEnabled());
 
         // THEN: Form is shown
         assertTrue(form.isShown());
@@ -411,6 +418,7 @@ public class BooksViewTest extends AbstractUITest {
         // THEN: Form is closed and grid is focused
         assertFalse(form.isShown());
         assertTrue(test(grid).isFocused());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
     }
 
     @Test
@@ -429,6 +437,7 @@ public class BooksViewTest extends AbstractUITest {
 
         // WHEN: Deleting the book
         test(grid).click(1, row);
+        assertFalse($(view, Button.class).id("new-product").isEnabled());
         test($(form, Button.class).id("delete-button")).click();
 
         // THEN: Confirm dialog is shown
@@ -445,6 +454,7 @@ public class BooksViewTest extends AbstractUITest {
         assertFalse(form.isShown());
         assertEquals(null, ui.getProductService().getProductById(id));
         assertEquals(0, test(grid).size());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
     }
 
     @SuppressWarnings("unchecked")
@@ -487,6 +497,7 @@ public class BooksViewTest extends AbstractUITest {
         assertEquals("Product was deleted.",
                 $(Notification.class).last().getCaption());
         assertFalse(form.isShown());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
 
         assertEquals(0, test(grid).size());
     }
@@ -544,6 +555,7 @@ public class BooksViewTest extends AbstractUITest {
         // WHEN: Opening product from the first row and changing the product
         test(grid).click(1, 0);
         assertTrue(form.isShown());
+        assertFalse($(view, Button.class).id("new-product").isEnabled());
 
         test($(form, TextField.class).id("product-name"))
                 .setValue("Edited book");
@@ -569,6 +581,7 @@ public class BooksViewTest extends AbstractUITest {
         // focused
         assertFalse(form.isShown());
         assertTrue(test(grid).isFocused());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
 
         assertNull(LockedObjects.get().isLocked(book));
     }
@@ -582,6 +595,7 @@ public class BooksViewTest extends AbstractUITest {
 
         // THEN: Form is shown
         assertTrue(form.isShown());
+        assertFalse($(view, Button.class).id("new-product").isEnabled());
 
         // WHEN: Changing the product and clicking an another product
         test($(form, TextField.class).id("product-name"))
@@ -601,6 +615,7 @@ public class BooksViewTest extends AbstractUITest {
 
         // THEN: The form is closed
         assertFalse(form.isShown());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
 
         // WHEN: Opening the first row again
         test(grid).click(1, 0);
@@ -615,6 +630,7 @@ public class BooksViewTest extends AbstractUITest {
         // FINALLY: Close form gracefully to avoid side effects
         test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
     }
 
     @Test
@@ -653,6 +669,7 @@ public class BooksViewTest extends AbstractUITest {
         // WHEN: Opening product from the first row and changing the product
         test(grid).click(1, 0);
         assertTrue(form.isShown());
+        assertFalse($(view, Button.class).id("new-product").isEnabled());
 
         test($(form, TextField.class).id("product-name"))
                 .setValue("Changed book");
@@ -697,6 +714,7 @@ public class BooksViewTest extends AbstractUITest {
 
         // THEN: The form is closed
         assertFalse(form.isShown());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
     }
 
     @Test
@@ -734,7 +752,7 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    public void it_is_not_possible_To_open_locked_row_and_grid_shows_locked_by_tooltip() {
+    public void it_is_not_possible_to_open_locked_row_and_grid_shows_locked_by_tooltip() {
         // GIVEN: A locked book
         var book = test(grid).item(15);
         LockedObjects.get().lock(book, CurrentUser.get().get());
@@ -747,6 +765,7 @@ public class BooksViewTest extends AbstractUITest {
 
         // THEN: Form is not shown
         assertFalse(form.isShown());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
 
         // FINALLY: Unlock the book
         LockedObjects.get().unlock(book);
@@ -780,6 +799,7 @@ public class BooksViewTest extends AbstractUITest {
         // THEN: Form is closed and the book from the second row is not locked
         assertFalse(form.isShown());
         assertNull(LockedObjects.get().isLocked(test(grid).item(1)));
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
     }
 
     @Test
@@ -824,6 +844,7 @@ public class BooksViewTest extends AbstractUITest {
         assertFalse(form.isShown());
         assertFalse(test(grid).styleName(0)
                 .contains(VaadinCreateTheme.BOOKVIEW_GRID_LOCKED));
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
     }
 
     @Test
@@ -841,6 +862,7 @@ public class BooksViewTest extends AbstractUITest {
         // THEN: Notification is shown with the book name, form is closed
         assertNotification("\"Different book\" updated");
         assertFalse(form.isShown());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
 
         // THEN: The edited row is highlighted and has the new name
         assertTrue(test(grid).styleName(0)
@@ -854,6 +876,7 @@ public class BooksViewTest extends AbstractUITest {
 
         test($(form, Button.class).id("save-button")).click();
         assertEquals(name, test(grid).cell(1, 0));
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
     }
 
     @Test
@@ -884,12 +907,14 @@ public class BooksViewTest extends AbstractUITest {
 
         // THEN: Form is shown and the fields are updated with the new product
         assertTrue(form.isShown());
+        assertFalse($(view, Button.class).id("new-product").isEnabled());
         assertEquals($(form, TextField.class).id("product-name").getValue(),
                 test(grid).cell(1, 1));
 
         // FINALLY: Close form gracefully to avoid side effects
         test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
     }
 
     @Test
@@ -942,6 +967,7 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, Button.class).id("discard-button")).click();
         test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
     }
 
     @Test

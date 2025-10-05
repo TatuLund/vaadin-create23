@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.crud;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,6 +12,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
 
 import com.vaadin.server.ServiceException;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 
@@ -47,5 +49,6 @@ public class BooksViewIdNotFoundTest extends AbstractUITest {
         assertEquals("Product id \"12345\" not valid or found.",
                 $(Notification.class).last().getCaption());
         assertFalse(form.isShown());
+        assertTrue($(view, Button.class).id("new-product").isEnabled());
     }
 }

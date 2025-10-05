@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.stats;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -55,6 +56,12 @@ public class StatsViewTest extends AbstractUITest {
         category = new Category();
         category.setName("Empty");
         category = ui.getProductService().updateCategory(category);
+    }
+
+    @Test
+    public void availability_chart_is_focused_after_navigating_to_view() {
+        var chart = $(CustomChart.class).id("availability-chart");
+        assertTrue(test(chart).isFocused());
     }
 
     @Test

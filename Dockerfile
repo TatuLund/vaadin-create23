@@ -6,7 +6,7 @@ WORKDIR /app
 # Set Env variable VAADIN_PRO_KEY
 ENV VAADIN_PRO_KEY=
 # Build the WAR file
-RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests
+RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests -Prelease
 RUN mv /app/vaadincreate-ui/target/*.war /app/vaadincreate-ui/target/ROOT.war
 # Create the final image
 FROM tomcat:9-jre17

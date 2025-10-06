@@ -205,7 +205,9 @@
                 <version>${vaadin.plugin.version}</version>
                 <configuration>
                     <webappDirectory>${basedir}/target/classes/VAADIN/widgetsets</webappDirectory>
-                    <style>OBF</style>
+                    <draftCompile>true</draftCompile>
+                    <strict>false</strict>
+                    <style>PRETTY</style>
                 </configuration>
                 <executions>
                     <!-- You are free to mark this as permanently ignored in
@@ -260,6 +262,29 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>vaadin-maven-plugin</artifactId>
+                        <configuration>
+                            <draftCompile>false</draftCompile>
+                            <strict>true</strict>
+                            <style>OBF</style>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>appsec</id>
             <dependencies>

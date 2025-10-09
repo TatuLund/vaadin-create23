@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.backend.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -62,8 +63,7 @@ public class RedisPubSubServiceTest {
         // Arrange: Replace the publisherJedis with a mock that throws
         // exception.
         var publisherMock = mock(Jedis.class);
-        service.publishEvent("node1",
-                new MessageEvent("testEvent", LocalDateTime.now()));
+        service.publisherJedis = publisherMock;
 
         doThrow(new JedisConnectionException("Test exception"))
                 .when(publisherMock).publish(anyString(), anyString());

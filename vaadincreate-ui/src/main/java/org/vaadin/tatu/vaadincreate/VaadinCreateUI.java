@@ -76,6 +76,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     @Override
     protected void init(VaadinRequest request) {
+        getLoadingIndicatorConfiguration().setSecondDelay(1300);
+        getLoadingIndicatorConfiguration().setThirdDelay(2800);
         setTabIndex(0);
         setOverlayContainerLabel("");
         getNotificationConfiguration()

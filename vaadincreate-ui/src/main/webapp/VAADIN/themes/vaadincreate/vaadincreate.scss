@@ -196,10 +196,33 @@ $fake-grid-background-color: white;
     display: inline-block;
     background-color: transparent;
     box-sizing: border-box;
-    animation: rotation 1s linear infinite !important;
+    --spinner-speed: 1s;
+    animation: rotation var(--spinner-speed) linear infinite !important;
     position: fixed;
     top: 47%;
     left: 47%;
+  }
+
+  .v-ff {
+    .v-loading-indicator,
+    .v-loading-indicator-wait,
+    .v-loading-indicator-delay {
+      width: 48px !important;
+    }
+  }
+
+  .v-loading-indicator.second.v-loading-indicator-delay {
+    width: 48px;
+    border: 5px solid $v-error-indicator-level-warning-color;
+    border-bottom-color: transparent;
+    --spinner-speed: 1.5s;
+  }
+
+  .v-loading-indicator.third.v-loading-indicator-wait {
+    width: 48px;
+    border: 5px solid $v-error-indicator-color;
+    border-bottom-color: transparent;
+    --spinner-speed: 2s;
   }
 
   .v-loading-indicator[style*="none"] {

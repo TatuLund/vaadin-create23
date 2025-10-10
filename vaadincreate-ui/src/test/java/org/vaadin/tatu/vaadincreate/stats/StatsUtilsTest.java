@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.stats.StatsUtils.CategoryStats;
 import org.vaadin.tatu.vaadincreate.stats.StatsUtils.PriceBracket;
 
 public class StatsUtilsTest {
@@ -91,13 +93,13 @@ public class StatsUtilsTest {
     @Test
     public void calculateCategoryStats_WithProducts_ReturnsCategoryCounts() {
         List<Category> categories = List.of(category1, category2);
-        Map<String, Long[]> stats = StatsUtils
+        Map<String, CategoryStats> stats = StatsUtils
                 .calculateCategoryStats(categories, products);
 
         assertEquals("Expected 2 categories", 2, stats.size());
-        assertArrayEquals("Invalid stats for Category 1",
-                new Long[] { 1L, 10L }, stats.get("Category 1"));
-        assertArrayEquals("Invalid stats for Category 2", new Long[] { 1L, 5L },
+        assertEquals("Invalid stats for Category 1", new CategoryStats(1L, 10L),
+                stats.get("Category 1"));
+        assertEquals("Invalid stats for Category 2", new CategoryStats(1L, 5L),
                 stats.get("Category 2"));
 
         var category3 = new Category();
@@ -107,12 +109,10 @@ public class StatsUtilsTest {
         stats = StatsUtils.calculateCategoryStats(categories, products);
         assertEquals("Expected 3 categories after adding Category 3", 3,
                 stats.size());
-        assertArrayEquals(
-                "Invalid stats for Category 1 after adding Category 3",
-                new Long[] { 1L, 10L }, stats.get("Category 1"));
-        assertArrayEquals(
-                "Invalid stats for Category 3 after adding Category 3",
-                new Long[] { 1L, 10L }, stats.get("Category 3"));
+        assertEquals("Invalid stats for Category 1 after adding Category 3",
+                new CategoryStats(1L, 10L), stats.get("Category 1"));
+        assertEquals("Invalid stats for Category 3 after adding Category 3",
+                new CategoryStats(1L, 10L), stats.get("Category 3"));
 
         var product3 = new Product();
         product3.setProductName("Product 3");
@@ -125,10 +125,10 @@ public class StatsUtilsTest {
         stats = StatsUtils.calculateCategoryStats(categories, products);
         assertEquals("Expected 3 categories after adding Product 3", 3,
                 stats.size());
-        assertArrayEquals("Invalid stats for Category 3 after adding Product 3",
-                new Long[] { 2L, 12L }, stats.get("Category 3"));
-        assertArrayEquals("Invalid stats for Category 1 after adding Product 3",
-                new Long[] { 1L, 10L }, stats.get("Category 1"));
+        assertEquals("Invalid stats for Category 3 after adding Product 3",
+                new CategoryStats(2L, 12L), stats.get("Category 3"));
+        assertEquals("Invalid stats for Category 1 after adding Product 3",
+                new CategoryStats(1L, 10L), stats.get("Category 1"));
     }
 
     @Test
@@ -154,14 +154,15 @@ public class StatsUtilsTest {
         products.add(product3);
 
         stats = StatsUtils.calculateAvailabilityStats(products);
-        assertEquals("Expected all availability statuses after adding Product 3",
+        assertEquals(
+                "Expected all availability statuses after adding Product 3",
                 Availability.values().length, stats.size());
         assertEquals("Expected 1 COMING product after adding Product 3", 1L,
                 stats.get(Availability.COMING).longValue());
         assertEquals("Expected 1 AVAILABLE product after adding Product 3", 1L,
                 stats.get(Availability.AVAILABLE).longValue());
-        assertEquals("Expected 1 DISCONTINUED product after adding Product 3", 1L,
-                stats.get(Availability.DISCONTINUED).longValue());
+        assertEquals("Expected 1 DISCONTINUED product after adding Product 3",
+                1L, stats.get(Availability.DISCONTINUED).longValue());
 
         var product4 = new Product();
         product4.setProductName("Product 4");
@@ -172,34 +173,36 @@ public class StatsUtilsTest {
         products.add(product4);
 
         stats = StatsUtils.calculateAvailabilityStats(products);
-        assertEquals("Expected all availability statuses after adding Product 4",
+        assertEquals(
+                "Expected all availability statuses after adding Product 4",
                 Availability.values().length, stats.size());
         assertEquals("Expected 2 AVAILABLE products after adding Product 4", 2L,
                 stats.get(Availability.AVAILABLE).longValue());
         assertEquals("Expected 1 COMING product after adding Product 4", 1L,
                 stats.get(Availability.COMING).longValue());
-        assertEquals("Expected 1 DISCONTINUED product after adding Product 4", 1L,
-                stats.get(Availability.DISCONTINUED).longValue());
+        assertEquals("Expected 1 DISCONTINUED product after adding Product 4",
+                1L, stats.get(Availability.DISCONTINUED).longValue());
     }
 
     @Test
     public void getPriceBrackets_WithProducts_ReturnsCorrectBrackets() {
-        List<PriceBracket> brackets = StatsUtils.getPriceBrackets(products);
+        Stream<PriceBracket> brackets = StatsUtils.getPriceBrackets(products);
+        List<PriceBracket> bracketList = brackets.toList();
 
-        assertEquals("Expected 3 brackets", 3, brackets.size());
+        assertEquals("Expected 3 brackets", 3, bracketList.size());
         assertEquals("First bracket max should be 10", 10,
-                brackets.get(0).max());
+                bracketList.get(0).max());
         assertEquals("Second bracket max should be 20", 20,
-                brackets.get(1).max());
+                bracketList.get(1).max());
         assertEquals("Third bracket max should be 30", 30,
-                brackets.get(2).max());
+                bracketList.get(2).max());
     }
 
     @Test
     public void getPriceBrackets_WithEmptyList_ReturnsEmptyList() {
-        List<PriceBracket> brackets = StatsUtils
+        Stream<PriceBracket> brackets = StatsUtils
                 .getPriceBrackets(new ArrayList<>());
-        assertTrue("Expected empty brackets list", brackets.isEmpty());
+        assertEquals("Expected empty brackets list", 0, brackets.count());
     }
 
     @Test

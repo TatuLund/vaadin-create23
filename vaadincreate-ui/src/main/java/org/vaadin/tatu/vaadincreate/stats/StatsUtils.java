@@ -2,14 +2,13 @@ package org.vaadin.tatu.vaadincreate.stats;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
@@ -35,7 +34,7 @@ public class StatsUtils {
      */
     public static Map<String, Long> calculatePriceStats(
             Collection<Product> products) {
-        var priceStats = getPriceBrackets(products).stream()
+        var priceStats = getPriceBrackets(products)
                 .collect(Collectors.toMap(PriceBracket::toString,
                         priceBracket -> products.stream()
                                 .filter(product -> priceBracket
@@ -57,7 +56,7 @@ public class StatsUtils {
      * @return a map where keys are category names and values are arrays
      *         containing the counts of products in those categories
      */
-    public static Map<String, Long[]> calculateCategoryStats(
+    public static Map<String, CategoryStats> calculateCategoryStats(
             Collection<Category> categories, Collection<Product> products) {
         var categoryStats = categories.stream()
                 .collect(Collectors.toMap(Category::getName, category -> {
@@ -67,10 +66,11 @@ public class StatsUtils {
                     long instock = products.stream().filter(
                             product -> product.getCategory().contains(category))
                             .mapToLong(Product::getStockCount).sum();
-                    return new Long[] { titles, instock };
+                    return new CategoryStats(titles, instock);
                 }));
         // filter out categories with zero products
-        categoryStats.entrySet().removeIf(entry -> entry.getValue()[0] == 0);
+        categoryStats.entrySet()
+                .removeIf(entry -> entry.getValue().productCount() == 0);
         return categoryStats;
     }
 
@@ -92,25 +92,22 @@ public class StatsUtils {
                 .collect(toEnumMap(Availability.class));
     }
 
-    // SonarLint is not able to deduct from isEmpty() check that stream cannot
-    // be empty and hence get() is safe
-    @SuppressWarnings("java:S3655")
-    static List<PriceBracket> getPriceBrackets(Collection<Product> products) {
+    static Stream<PriceBracket> getPriceBrackets(Collection<Product> products) {
         assert products != null : PRODUCTS_NOT_NULL;
 
-        var brackets = new ArrayList<PriceBracket>();
         if (products.isEmpty()) {
-            return brackets;
+            return Stream.empty();
         }
 
+        // SonarLint is not able to deduct from isEmpty() check that stream
+        // cannot be empty and hence get() is safe
+        @SuppressWarnings("java:S3655")
         var max = products.stream()
                 .max((p1, p2) -> p1.getPrice().compareTo(p2.getPrice())).get()
                 .getPrice();
         var numBrackets = (max.intValue() / 10) + 1;
-        for (int i = 10; i <= (numBrackets * 10); i += 10) {
-            brackets.add(new PriceBracket(i));
-        }
-        return brackets;
+        return Stream.iterate(10, i -> i <= numBrackets * 10, i -> i + 10)
+                .map(PriceBracket::new);
     }
 
     // Collectors.toMap does not support EnumMap, so we need to implement our
@@ -123,6 +120,13 @@ public class StatsUtils {
                     map1.putAll(map2);
                     return map1;
                 });
+    }
+
+    /**
+     * Record to hold category statistics: number of products and total stock
+     * count.
+     */
+    public record CategoryStats(long productCount, long inStockCount) {
     }
 
     /**

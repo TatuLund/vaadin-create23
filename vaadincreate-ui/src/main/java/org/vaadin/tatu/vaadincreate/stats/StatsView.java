@@ -19,6 +19,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.stats.StatsUtils.CategoryStats;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.addon.charts.Chart;
@@ -173,7 +174,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
      *            A map containing price statistics.
      */
     public void updateStatsAsync(Map<Availability, Long> availabilityStats,
-            Map<String, Long[]> categoryStats, Map<String, Long> priceStats) {
+            Map<String, CategoryStats> categoryStats, Map<String, Long> priceStats) {
         Utils.access(ui, () -> {
             if (isAttached()) {
                 updateAvailabilityChart(availabilityStats);
@@ -215,13 +216,13 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
     }
 
     // Update the charts with the new data
-    private void updateCategoryChart(Map<String, Long[]> categoryStats) {
+    private void updateCategoryChart(Map<String, CategoryStats> categoryStats) {
         assert categoryStats != null : "Category stats must not be null";
         var conf = categoryChart.getConfiguration();
 
         // Show count of titles on primary axis
         conf.removexAxes();
-        var titles = categorySeries(categoryStats, 0);
+        var titles = categoryCountSeries(categoryStats);
         titles.setName(getTranslation(I18n.Stats.COUNT));
         conf.setSeries(titles);
         conf.getyAxis().setTitle(getTranslation(I18n.Stats.COUNT));
@@ -231,7 +232,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         var stockAxis = new YAxis();
         stockAxis.setOpposite(true);
         conf.addyAxis(stockAxis);
-        var stockCounts = categorySeries(categoryStats, 1);
+        var stockCounts = categoryStockSeries(categoryStats);
         stockCounts.setName(getTranslation(I18n.IN_STOCK));
         stockCounts.setyAxis(1);
         conf.addSeries(stockCounts);
@@ -297,14 +298,25 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         availabilityChart.setAriaLabel(alt);
     }
 
-    private DataSeries categorySeries(Map<String, Long[]> categories,
-            int index) {
+    private DataSeries categoryCountSeries(Map<String, CategoryStats> categories){
         assert categories != null : "Categories must not be null";
 
         var series = new DataSeries();
         series.setName(getTranslation(I18n.CATEGORIES));
-        categories.forEach((category, count) -> {
-            var item = new DataSeriesItem(category, count[index]);
+        categories.forEach((category, stats) -> {
+            var item = new DataSeriesItem(category, stats.productCount());
+            series.add(item);
+        });
+        return series;
+    }
+
+    private DataSeries categoryStockSeries(Map<String, CategoryStats> categories){
+        assert categories != null : "Categories must not be null";
+
+        var series = new DataSeries();
+        series.setName(getTranslation(I18n.CATEGORIES));
+        categories.forEach((category, stats) -> {
+            var item = new DataSeriesItem(category, stats.inStockCount());
             series.add(item);
         });
         return series;

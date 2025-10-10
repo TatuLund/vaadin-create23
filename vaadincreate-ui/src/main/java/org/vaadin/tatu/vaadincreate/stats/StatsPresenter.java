@@ -19,6 +19,7 @@ import org.vaadin.tatu.vaadincreate.backend.events.BooksChangedEvent;
 import org.vaadin.tatu.vaadincreate.backend.events.CategoriesUpdatedEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
+import org.vaadin.tatu.vaadincreate.stats.StatsUtils.CategoryStats;
 
 @NullMarked
 @SuppressWarnings("serial")
@@ -60,7 +61,7 @@ public class StatsPresenter implements EventBusListener, Serializable {
                     .calculateAvailabilityStats(products);
 
             var categories = service.getAllCategories();
-            Map<String, Long[]> categoryStats = StatsUtils
+            Map<String, CategoryStats> categoryStats = StatsUtils
                     .calculateCategoryStats(categories, products);
 
             Map<String, Long> priceStats = StatsUtils

@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -245,8 +246,7 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
         if (!readOnly) {
-            addStyleNames(
-                    VaadinCreateTheme.GRID_ROW_FOCUS);
+            addStyleNames(VaadinCreateTheme.GRID_ROW_FOCUS);
         } else {
             removeStyleName(VaadinCreateTheme.GRID_ROW_FOCUS);
         }
@@ -334,11 +334,21 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         }
 
         if (width > 650 && width < 800) {
-            getColumn(AVAILABILITY_ID).setDescriptionGenerator(
-                    book -> book.getAvailability().toString());
+            getColumn(AVAILABILITY_ID)
+                    .setDescriptionGenerator(this::availabilityDescription);
         } else {
             getColumn(AVAILABILITY_ID).setDescriptionGenerator(null);
         }
+    }
+
+    private String availabilityDescription(Product book) {
+        assert book != null : "Book must not be null";
+
+        if (book.getAvailability() == Availability.AVAILABLE) {
+            return String.format("%s: %d", book.getAvailability(),
+                    book.getStockCount());
+        }
+        return book.getAvailability().toString();
     }
 
     private String createTooltip(Product book) {

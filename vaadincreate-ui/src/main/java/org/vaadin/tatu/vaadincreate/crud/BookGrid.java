@@ -24,6 +24,7 @@ import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.components.grid.SingleSelectionModel;
 import com.vaadin.ui.renderers.HtmlRenderer;
 import com.vaadin.ui.renderers.NumberRenderer;
 
@@ -252,7 +253,25 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         }
     }
 
+    /**
+     * Returns all items currently in the grid with the current filter and
+     * sorting applied.
+     * 
+     * @return a list of all products currently displayed in the grid
+     */
+    public List<Product> getItems() {
+        assert getDataCommunicator() != null : "Data communicator must not be null";
+        return getDataCommunicator().fetchItemsWithRange(0,
+                getDataCommunicator().getDataProviderSize());
+    }
+
+    /**
+     * Returns the currently selected row in the grid.
+     * 
+     * @return the currently selected product, or null if no row is selected
+     */
     public Product getSelectedRow() {
+        assert getSelectionModel() instanceof SingleSelectionModel<?> : "Selection model must be single selection model";
         return asSingleSelect().getValue();
     }
 

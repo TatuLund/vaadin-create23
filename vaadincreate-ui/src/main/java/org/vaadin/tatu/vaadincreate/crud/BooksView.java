@@ -18,6 +18,13 @@ import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
+import org.vaadin.tatu.vaadincreate.crud.form.BookForm.SaveEvent;
+import org.vaadin.tatu.vaadincreate.crud.form.BookForm.DeleteEvent;
+import org.vaadin.tatu.vaadincreate.crud.form.BookForm.DiscardEvent;
+import org.vaadin.tatu.vaadincreate.crud.form.BookForm.CancelEvent;
+import org.vaadin.tatu.vaadincreate.crud.form.BookForm.NavigateNextEvent;
+import org.vaadin.tatu.vaadincreate.crud.form.BookForm.NavigatePreviousEvent;
+import org.vaadin.tatu.vaadincreate.crud.form.BookForm.DraftSaveEvent;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
@@ -96,7 +103,8 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         // Display fake Grid while loading data
         fakeGrid = new FakeGrid();
 
-        form = new BookForm(presenter, grid);
+        form = new BookForm();
+        registerFormListeners();
 
         var barAndGridLayout = new VerticalLayout();
         var gridWrapper = new CssLayout();
@@ -114,6 +122,81 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         presenter.init();
     }
 
+    private void registerFormListeners() {
+        form.addSaveListener(this::onFormSave);
+        form.addDeleteListener(this::onFormDelete);
+        form.addDiscardListener(this::onFormDiscard);
+        form.addCancelListener(this::onFormCancel);
+        form.addNavigateNextListener(this::onNavigateNext);
+        form.addNavigatePreviousListener(this::onNavigatePrevious);
+        form.addDraftSaveListener(this::onDraftSave);
+    }
+
+    private void onFormSave(SaveEvent saveEvent) {
+        var product = saveEvent.getProduct();
+        if (product == null) {
+            return;
+        }
+        // Validate categories before saving
+        if (!presenter.validateCategories(product.getCategory())) {
+            // Categories were invalid (some deleted concurrently). Reset form
+            // so user can cancel without confirm.
+            form.resetChanges();
+            return;
+        }
+        presenter.saveProduct(product);
+    }
+
+    private void onFormDelete(DeleteEvent deleteEvent) {
+        var product = deleteEvent.getProduct();
+        if (product == null) {
+            return;
+        }
+        presenter.deleteProduct(product);
+        form.showForm(false);
+    }
+
+    private void onFormDiscard(DiscardEvent discardEvent) {
+        // Reload original product from presenter/grid if needed
+        var product = discardEvent.getProduct();
+        if (product != null) {
+            presenter.editProduct(product);
+        }
+    }
+
+    private void onFormCancel(CancelEvent cancelEvent) {
+        presenter.cancelProduct();
+    }
+
+    private void onNavigateNext(NavigateNextEvent navigateNextEvent) {
+        navigateRelative(1);
+    }
+
+    private void onNavigatePrevious(
+            NavigatePreviousEvent navigatePreviousEvent) {
+        navigateRelative(-1);
+    }
+
+    private void navigateRelative(int delta) {
+        var current = form.getProduct();
+        if (current == null || current.getId() == null) {
+            return;
+        }
+        var items = grid.getItems();
+        var index = items.indexOf(current);
+        var target = index + delta;
+        if (target >= 0 && target < items.size()) {
+            presenter.selectProduct(items.get(target));
+        }
+    }
+
+    private void onDraftSave(DraftSaveEvent e) {
+        var draftFromEvent = e.getProduct();
+        if (draftFromEvent != null) {
+            presenter.saveDraft(draftFromEvent);
+        }
+    }
+
     public void handleSelectionChange(@Nullable Product product) {
         if (form.hasChanges()) {
             var dialog = createDiscardChangesConfirmDialog();
@@ -123,7 +206,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
                 form.showForm(false);
                 setFragmentParameter("");
                 newProduct.setEnabled(true);
-            });
+            }); // Keeping block due to multiple statements
             dialog.addCancelledListener(
                     cancelled -> grid.select(form.getProduct()));
         } else {
@@ -241,9 +324,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         if (form.hasChanges()) {
             var dialog = createDiscardChangesConfirmDialog();
             dialog.open();
-            dialog.addConfirmedListener(confirmed -> {
-                closeForm();
-            });
+            dialog.addConfirmedListener(confirmed -> closeForm());
         } else {
             closeForm();
         }
@@ -445,6 +526,8 @@ public class BooksView extends CssLayout implements VaadinCreateView {
     }
 
     public void newProduct() {
+        // Ensure categories are loaded before showing form
+        presenter.requestUpdateCategories();
         editProduct(new Product());
         newProduct.setEnabled(false);
         form.focus();
@@ -461,6 +544,9 @@ public class BooksView extends CssLayout implements VaadinCreateView {
             return;
         }
         grid.setEdited(null);
+        // Refresh categories each time a product is edited so category list is
+        // up to date
+        presenter.requestUpdateCategories();
         if (product != null) {
             // Ensure the product is up-to-date
             if (product.getId() != null) {
@@ -468,6 +554,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
                 if (product == null) {
                     showError(getTranslation(I18n.Books.PRODUCT_DELETED));
                     newProduct.setEnabled(true);
+                    presenter.unlockBook(); // release any stale lock
                     return;
                 }
             }

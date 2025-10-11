@@ -2,7 +2,7 @@ package org.vaadin.tatu.vaadincreate.crud.form;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.List;
+import java.lang.reflect.Method;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -21,8 +21,6 @@ import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
-import org.vaadin.tatu.vaadincreate.crud.BookGrid;
-import org.vaadin.tatu.vaadincreate.crud.BooksPresenter;
 import org.vaadin.tatu.vaadincreate.crud.EuroConverter;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
@@ -34,6 +32,7 @@ import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.event.ConnectorEventListener;
 import com.vaadin.server.AbstractErrorMessage;
 import com.vaadin.server.Page;
 import com.vaadin.server.UserError;
@@ -44,69 +43,44 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
 import com.vaadin.ui.Composite;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.util.ReflectTools;
 
 /**
- * Represents a form for creating or editing a book. This form is used in the
- * Vaadin Create application. It allows users to enter information about a book,
- * such as its price, stock count, and category. The form includes validation
- * for the entered data and provides buttons for saving, discarding, canceling,
- * and deleting the book. The form is bound to a presenter, which handles the
- * business logic for saving, editing, and deleting books.
+ * Form component for creating or editing a Product (book) in Vaadin Create.
  *
- * <p>
- * The form fields are bound to the product object by naming convention. E.g.
- * using the field name "productName" will bind to the Product's "productName"
- * property.
- * </p>
- *
- * <p>
- * The form includes the following fields:
+ * Key features:
  * <ul>
- * <li>productName - TextField for the product name</li>
- * <li>price - TextField for the product price</li>
- * <li>stockCount - NumberField for the stock count</li>
- * <li>availability - AvailabilitySelector for the product availability</li>
- * <li>category - CheckBoxGroup for the product categories</li>
+ * <li>Fields: productName, price, stockCount, availability, category
+ * (multi-select).</li>
+ * <li>Binding: BeanValidationBinder with field and bean-level (availability vs
+ * stock) validation.</li>
+ * <li>Event driven: emits save, delete, discard, cancel, navigate
+ * (next/previous), and draft save events instead of invoking a presenter
+ * directly (decoupled form).</li>
+ * <li>Dirty tracking: changed fields highlighted; tooltip shows previous value
+ * (formatted).</li>
+ * <li>Draft support: unsaved changes auto-saved as a draft on detach; draft can
+ * be merged (mergeDraft).</li>
+ * <li>Accessibility: ARIA roles/attributes, assistive notifications, keyboard
+ * shortcuts (Ctrl+S, Escape, PageDown, PageUp).</li>
+ * <li>Category handling: setCategories(Collection) populates and sorts with
+ * currently selected first.</li>
+ * <li>Deletion confirmation dialog; guarded by access control.</li>
  * </ul>
- * </p>
- *
- * <p>
- * The form includes the following buttons:
- * <ul>
- * <li>saveButton - Button for saving the product</li>
- * <li>discardButton - Button for discarding changes</li>
- * <li>cancelButton - Button for canceling the operation</li>
- * <li>deleteButton - Button for deleting the product</li>
- * </ul>
- * </p>
- *
- * <p>
- * The form uses a Binder for binding the fields to the Product object and
- * includes validation for the fields. It also includes bean level validation
- * for checking the availability vs. stock count.
- * </p>
- *
- * <p>
- * The form includes methods for handling save, delete, and other operations, as
- * well as methods for showing/hiding the form, checking for changes, and
- * updating dirty indicators.
- * </p>
- *
- * <p>
- * The form also includes methods for setting categories, editing a product,
- * merging a draft product, and focusing on the product name field.
- * </p>
- *
- * <p>
- * The form is designed to be used with a presenter, which handles the business
- * logic for saving, editing, and deleting products.
- * </p>
+ * Typical usage:
+ * <ol>
+ * <li>showForm(true); editProduct(product);</li>
+ * <li>Register listeners (addSaveListener, addDeleteListener, etc.).</li>
+ * <li>Before closing, call hasChanges() for confirmation logic.</li>
+ * </ol>
+ * UI thread only.
  */
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
@@ -140,22 +114,18 @@ public class BookForm extends Composite implements HasI18N {
     @Nullable
     private Product currentProduct;
     private SidePanel sidePanel = new SidePanel();
-    private BooksPresenter presenter;
     private boolean visible;
     private boolean isValid;
     private Registration pageDownRegistration;
     private Registration pageUpRegistration;
 
     /**
-     * Creates a new BookForm with the given presenter.
-     *
-     * @param presenter
-     *            the presenter for the form.
-     * @param grid
+     * Creates a new decoupled BookForm. External logic (presenter, grid
+     * selection, navigation etc.) must be handled by listeners registered in
+     * the owning view.
      */
     @SuppressWarnings("java:S5669")
-    public BookForm(BooksPresenter presenter, BookGrid grid) {
-        this.presenter = presenter;
+    public BookForm() {
         setCompositionRoot(sidePanel);
         buildForm();
 
@@ -198,43 +168,49 @@ public class BookForm extends Composite implements HasI18N {
         AttributeExtension.of(saveButton)
                 .setAttribute(AriaAttributes.KEYSHORTCUTS, "Control+S");
 
-        discardButton.addClickListener(clicked -> {
-            presenter.editProduct(currentProduct);
-            updateDirtyIndicators();
-        });
+        discardButton.addClickListener(clicked -> handleDiscard());
 
-        cancelButton.addClickListener(clicked -> presenter.cancelProduct());
+        cancelButton
+                .addClickListener(clicked -> fireEvent(new CancelEvent(this)));
         cancelButton.setClickShortcut(KeyCode.ESCAPE);
         AttributeExtension.of(cancelButton)
                 .setAttribute(AriaAttributes.KEYSHORTCUTS, "Escape");
 
         deleteButton.addClickListener(clicked -> handleDelete());
-
         pageDownRegistration = addShortcutListener(
                 new ShortcutListener("Next", KeyCode.PAGE_DOWN, null) {
                     @Override
                     public void handleAction(Object sender, Object target) {
-                        selectNextProduct(presenter, grid);
+                        fireEvent(new NavigateNextEvent(BookForm.this,
+                                currentProduct));
                     }
                 });
         pageUpRegistration = addShortcutListener(
                 new ShortcutListener("Previous", KeyCode.PAGE_UP, null) {
                     @Override
                     public void handleAction(Object sender, Object target) {
-                        selectPreviousProduct(presenter, grid);
+                        fireEvent(new NavigatePreviousEvent(BookForm.this,
+                                currentProduct));
                     }
                 });
     }
 
     private void handleSave() {
-        if (presenter.validateCategories(category.getValue())) {
-            if (currentProduct != null
-                    && binder.writeBeanIfValid(currentProduct)) {
-                presenter.saveProduct(currentProduct);
-            } else if (binderHasInvalidFieldsBound()) {
-                setStockCountAndAvailabilityInvalid(true);
-            }
+        if (currentProduct != null && binder.writeBeanIfValid(currentProduct)) {
+            fireEvent(new SaveEvent(this, currentProduct));
+        } else if (binderHasInvalidFieldsBound()) {
+            setStockCountAndAvailabilityInvalid(true);
         }
+    }
+
+    private void handleDiscard() {
+        if (currentProduct != null) {
+            binder.readBean(currentProduct);
+            saveButton.setEnabled(false);
+            discardButton.setEnabled(false);
+            updateDirtyIndicators();
+        }
+        fireEvent(new DiscardEvent(this, currentProduct));
     }
 
     private void handleDelete() {
@@ -246,10 +222,8 @@ public class BookForm extends Composite implements HasI18N {
             dialog.setConfirmText(getTranslation(I18n.DELETE));
             dialog.setCancelText(getTranslation(I18n.CANCEL));
             dialog.open();
-            dialog.addConfirmedListener(e -> {
-                presenter.deleteProduct(currentProduct);
-                showForm(false);
-            });
+            dialog.addConfirmedListener(
+                    e -> fireEvent(new DeleteEvent(this, currentProduct)));
         }
     }
 
@@ -429,7 +403,6 @@ public class BookForm extends Composite implements HasI18N {
 
     public void editProduct(@Nullable Product product) {
         accessControl.assertAdmin();
-        presenter.requestUpdateCategories();
         if (product == null) {
             product = new Product();
             readProduct(product);
@@ -481,7 +454,7 @@ public class BookForm extends Composite implements HasI18N {
             assert product != null;
             var draft = new Product(product);
             binder.writeBeanAsDraft(draft, true);
-            presenter.saveDraft(draft);
+            fireEvent(new DraftSaveEvent(this, draft));
         }
     }
 
@@ -512,34 +485,105 @@ public class BookForm extends Composite implements HasI18N {
         productName.focus();
     }
 
-    private static List<Product> getVisibleItems(BookGrid grid) {
-        return grid.getDataCommunicator().fetchItemsWithRange(0,
-                grid.getDataCommunicator().getDataProviderSize());
+    /**
+     * Reset current form field values back to the backing bean and clear dirty
+     * indicators so that the form is considered clean. Used after a failed save
+     * caused by concurrent category deletion so that Cancel can close the form
+     * without a confirmation dialog.
+     */
+    public void resetChanges() {
+        if (currentProduct != null) {
+            binder.readBean(currentProduct);
+        }
+        saveButton.setEnabled(false);
+        discardButton.setEnabled(false);
+        clearDirtyIndicators();
     }
 
-    private void selectPreviousProduct(BooksPresenter presenter,
-            BookGrid grid) {
-        var product = getProduct();
-        if (product == null || product.getId() == null) {
-            return;
-        }
-        var items = getVisibleItems(grid);
-        var current = items.indexOf(getProduct());
-        if (current > 0) {
-            presenter.selectProduct(items.get(current - 1));
-        }
+    /**
+     * Add a listener that is notified when the user clicks the Save button.
+     * 
+     * @param saveListener
+     *            the listener to add
+     * @return a registration for the listener
+     */
+    public Registration addSaveListener(SaveListener saveListener) {
+        return addListener(SaveEvent.class, saveListener, SaveListener.METHOD);
     }
 
-    private void selectNextProduct(BooksPresenter presenter, BookGrid grid) {
-        var product = getProduct();
-        if (product == null || product.getId() == null) {
-            return;
-        }
-        var items = getVisibleItems(grid);
-        var current = items.indexOf(getProduct());
-        if (current < items.size() - 1) {
-            presenter.selectProduct(items.get(current + 1));
-        }
+    /**
+     * Add a listener that is notified when the user clicks the Delete button.
+     * 
+     * @param deleteListener
+     *            the listener to add
+     * @return a registration for the listener
+     */
+    public Registration addDeleteListener(DeleteListener deleteListener) {
+        return addListener(DeleteEvent.class, deleteListener,
+                DeleteListener.METHOD);
+    }
+
+    /**
+     * Add a listener that is notified when the user clicks the Discard button.
+     * 
+     * @param discardListener
+     *            the listener to add
+     * @return a registration for the listener
+     */
+    public Registration addDiscardListener(DiscardListener discardListener) {
+        return addListener(DiscardEvent.class, discardListener,
+                DiscardListener.METHOD);
+    }
+
+    /**
+     * Add a listener that is notified when the user clicks the Cancel button.
+     * 
+     * @param cancelListener
+     *            the listener to add
+     * @return a registration for the listener
+     */
+    public Registration addCancelListener(CancelListener cancelListener) {
+        return addListener(CancelEvent.class, cancelListener,
+                CancelListener.METHOD);
+    }
+
+    /**
+     * Add a listener that is notified when the user navigates to the next
+     * 
+     * @param navigateNextListener
+     *            the listener to add
+     * @return a registration for the listener
+     */
+    public Registration addNavigateNextListener(
+            NavigateNextListener navigateNextListener) {
+        return addListener(NavigateNextEvent.class, navigateNextListener,
+                NavigateNextListener.METHOD);
+    }
+
+    /**
+     * Add a listener that is notified when the user navigates to the previous
+     * 
+     * @param navigatePreviousListener
+     *            the listener to add
+     * @return a registration for the listener
+     */
+    public Registration addNavigatePreviousListener(
+            NavigatePreviousListener navigatePreviousListener) {
+        return addListener(NavigatePreviousEvent.class,
+                navigatePreviousListener, NavigatePreviousListener.METHOD);
+    }
+
+    /**
+     * Add a listener that is notified when the user navigates to the previous
+     * 
+     * @param draftSaveListener
+     *            the listener to add
+     * @return a registration for the listener
+     */
+    public Registration addDraftSaveListener(
+            DraftSaveListener draftSaveListener) {
+        return addListener(DraftSaveEvent.class, draftSaveListener,
+                DraftSaveListener.METHOD);
     }
 
     /**
@@ -561,6 +605,130 @@ public class BookForm extends Composite implements HasI18N {
             setRole(AriaRoles.FORM);
             setAttribute(AriaAttributes.KEYSHORTCUTS, "Escape PageDown PageUp");
         }
+    }
+
+    abstract static class AbstractBookFormEvent extends Component.Event {
+        private static final long serialVersionUID = 1L;
+        @Nullable
+        private final Product product;
+
+        protected AbstractBookFormEvent(Component source,
+                @Nullable Product product) {
+            super(source);
+            this.product = product;
+        }
+
+        @Nullable
+        public Product getProduct() {
+            return product;
+        }
+    }
+
+    public static class SaveEvent extends AbstractBookFormEvent {
+        private static final long serialVersionUID = 1L;
+
+        public SaveEvent(Component source, Product product) {
+            super(source, product);
+        }
+    }
+
+    public static class DeleteEvent extends AbstractBookFormEvent {
+        private static final long serialVersionUID = 1L;
+
+        public DeleteEvent(Component source, Product product) {
+            super(source, product);
+        }
+    }
+
+    public static class DiscardEvent extends AbstractBookFormEvent {
+        private static final long serialVersionUID = 1L;
+
+        public DiscardEvent(Component source, @Nullable Product product) {
+            super(source, product);
+        }
+    }
+
+    public static class CancelEvent extends AbstractBookFormEvent {
+        private static final long serialVersionUID = 1L;
+
+        public CancelEvent(Component source) {
+            super(source, null);
+        }
+    }
+
+    public static class NavigateNextEvent extends AbstractBookFormEvent {
+        private static final long serialVersionUID = 1L;
+
+        public NavigateNextEvent(Component source, @Nullable Product product) {
+            super(source, product);
+        }
+    }
+
+    public static class NavigatePreviousEvent extends AbstractBookFormEvent {
+        private static final long serialVersionUID = 1L;
+
+        public NavigatePreviousEvent(Component source,
+                @Nullable Product product) {
+            super(source, product);
+        }
+    }
+
+    public static class DraftSaveEvent extends AbstractBookFormEvent {
+        private static final long serialVersionUID = 1L;
+
+        public DraftSaveEvent(Component source, Product product) {
+            super(source, product);
+        }
+    }
+
+    // Listener interfaces
+    public interface SaveListener extends ConnectorEventListener {
+        Method METHOD = ReflectTools.findMethod(SaveListener.class, "onSave",
+                SaveEvent.class);
+
+        void onSave(SaveEvent e);
+    }
+
+    public interface DeleteListener extends ConnectorEventListener {
+        Method METHOD = ReflectTools.findMethod(DeleteListener.class,
+                "onDelete", DeleteEvent.class);
+
+        void onDelete(DeleteEvent e);
+    }
+
+    public interface DiscardListener extends ConnectorEventListener {
+        Method METHOD = ReflectTools.findMethod(DiscardListener.class,
+                "onDiscard", DiscardEvent.class);
+
+        void onDiscard(DiscardEvent e);
+    }
+
+    public interface CancelListener extends ConnectorEventListener {
+        Method METHOD = ReflectTools.findMethod(CancelListener.class,
+                "onCancel", CancelEvent.class);
+
+        void onCancel(CancelEvent e);
+    }
+
+    public interface NavigateNextListener extends ConnectorEventListener {
+        Method METHOD = ReflectTools.findMethod(NavigateNextListener.class,
+                "onNext", NavigateNextEvent.class);
+
+        void onNext(NavigateNextEvent e);
+    }
+
+    public interface NavigatePreviousListener extends ConnectorEventListener {
+        Method METHOD = ReflectTools.findMethod(NavigatePreviousListener.class,
+                "onPrevious", NavigatePreviousEvent.class);
+
+        void onPrevious(NavigatePreviousEvent e);
+    }
+
+    public interface DraftSaveListener extends ConnectorEventListener {
+        Method METHOD = ReflectTools.findMethod(DraftSaveListener.class,
+                "onDraftSave", DraftSaveEvent.class);
+
+        void onDraftSave(DraftSaveEvent e);
     }
 
 }

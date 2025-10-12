@@ -37,6 +37,8 @@ import com.vaadin.ui.renderers.NumberRenderer;
 @SuppressWarnings({ "serial", "java:S2160" })
 public class BookGrid extends Grid<Product> implements HasI18N {
 
+    private static final String PRODUCT_MUST_NOT_BE_NULL = "Product must not be null";
+
     // Column keys
     private static final String STOCK_ID = "stock";
     private static final String NAME_ID = "name";
@@ -101,17 +103,11 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                         .getAvailability().toString()
                         .compareTo(product2.getAvailability().toString()))
                 .setId(AVAILABILITY_ID);
-        availabilityCaption = new Label(getTranslation(I18n.AVAILABILITY));
-        availabilityCaption
-                .addStyleName(VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL);
+        availabilityCaption = createAvailabilityCaption();
 
         // Show empty stock as "-"
-        var countCol = addColumn(product -> {
-            if (product.getStockCount() == 0) {
-                return "-";
-            }
-            return Integer.toString(product.getStockCount());
-        }).setCaption(getTranslation(I18n.IN_STOCK)).setResizable(false)
+        var countCol = addColumn(this::formatStockCount, new HtmlRenderer())
+                .setCaption(getTranslation(I18n.IN_STOCK)).setResizable(false)
                 .setComparator((product1, product2) -> Integer.compare(
                         product1.getStockCount(), product2.getStockCount()))
                 .setStyleGenerator(
@@ -127,6 +123,28 @@ public class BookGrid extends Grid<Product> implements HasI18N {
                 .setStyleName(VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT);
         getHeaderRow(0).getCell(countCol)
                 .setStyleName(VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT);
+    }
+
+    private String formatStockCount(Product product) {
+        assert product != null : PRODUCT_MUST_NOT_BE_NULL;
+        var text = Integer.toString(product.getStockCount());
+        var ariaLabel = text;
+        if (product.getStockCount() == 0) {
+            text = "-";
+            return String.format("<span aria-label='%s'>%s</span>", ariaLabel,
+                    text);
+        }
+        return text;
+    }
+
+    private Label createAvailabilityCaption() {
+        var captionHtml = String.format(
+                "<span class='%s' aria-label='%s'></span><span class='%s'>%s</span>",
+                VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL + "-aria-label",
+                getTranslation(I18n.AVAILABILITY),
+                VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL,
+                getTranslation(I18n.AVAILABILITY));
+        return new Label(captionHtml, ContentMode.HTML);
     }
 
     /**
@@ -276,22 +294,29 @@ public class BookGrid extends Grid<Product> implements HasI18N {
     }
 
     private String htmlFormatAvailability(Product product) {
-        assert product != null : "Product must not be null";
+        assert product != null : PRODUCT_MUST_NOT_BE_NULL;
 
         var availability = product.getAvailability();
         var text = availability.toString();
+        var ariaLabel = text;
+        if (product.getAvailability() == Availability.AVAILABLE) {
+            ariaLabel = String.format("%s %d", text, product.getStockCount());
+        }
 
         var iconCode = Utils.createAvailabilityIcon(availability);
 
-        return String.format("%s<span class=\"%s\"> %s</span>", iconCode,
-                VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL, text);
+        return String.format(
+                "%s<span class='%s' aria-label='%s'></span><span class='%s'> %s</span>",
+                iconCode,
+                VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL + "-aria-label",
+                ariaLabel, VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL, text);
     }
 
     private String formatCategories(Product product) {
-        assert product != null : "Product must not be null";
+        assert product != null : PRODUCT_MUST_NOT_BE_NULL;
 
         if (product.getCategory().isEmpty()) {
-            return "";
+            return getTranslation(I18n.Books.EMPTY);
         }
         return product.getCategory().stream()
                 .sorted(Comparator.comparing(Category::getId))

@@ -56,6 +56,7 @@ public final class I18n {
         public static final String LOADING = "loading";
         public static final String CLEAR_TEXT = "clear-text";
         public static final String PRODUCT_FORM = "product-form";
+        public static final String EMPTY = "empty";
 
         private Books() {
             // private constructor to hide the implicit public one
@@ -133,7 +134,7 @@ public final class I18n {
         public static final String PRICES = "prices";
         public static final String COUNT = "count";
         public static final String LEGEND_CLICKABLE = "legend-clickable";
-        public static final String EMPTY = "empty";
+        public static final String EMPTY = "series-empty";
         public static final String CONTEXT_MENU = "chart-menu";
         public static final String MENU_ENTRIES = "menu-entries";
 

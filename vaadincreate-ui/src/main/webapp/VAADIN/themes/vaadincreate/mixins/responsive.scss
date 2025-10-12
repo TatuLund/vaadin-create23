@@ -4,6 +4,10 @@
 // enabled in AppLayout for different display sizes
 @mixin responsive {
 
+  .bookview-availabilitylabel-aria-label {
+ 	  display: none;
+  }
+
   // Medium size changes
   .v-ui[width-range~="0-800px"] {
     
@@ -19,6 +23,10 @@
 
     .bookview-availabilitylabel {
       display: none;
+    }
+
+    .bookview-availabilitylabel-aria-label {
+      display: block;
     }
 
     .applayout {

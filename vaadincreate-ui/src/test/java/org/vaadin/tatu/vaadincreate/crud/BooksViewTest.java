@@ -25,6 +25,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
+import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.crud.form.AvailabilitySelector;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
 import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
@@ -173,10 +174,23 @@ public class BooksViewTest extends AbstractUITest {
                 doc.getElementsByTag("span").get(0).attr("class"));
         assertEquals(String.format("font-family: Vaadin-Icons;color:%s", color),
                 doc.getElementsByTag("span").get(0).attr("style"));
-        assertEquals(VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL,
+        assertEquals(
+                VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL + "-aria-label",
                 doc.getElementsByTag("span").get(1).attr("class"));
+        assertEquals(availability(book),
+                doc.getElementsByTag("span").get(1).attr("aria-label"));
+        assertEquals(VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL,
+                doc.getElementsByTag("span").get(2).attr("class"));
         assertEquals(book.getAvailability().toString(),
-                doc.getElementsByTag("span").get(1).text());
+                doc.getElementsByTag("span").get(2).text());
+    }
+
+    private static String availability(Product book) {
+        if (book.getAvailability() == Availability.AVAILABLE) {
+            return String.format("%s %d", book.getAvailability(),
+                    book.getStockCount());
+        }
+        return book.getAvailability().toString();
     }
 
     private void then_form_is_filled_with_values_from_grid_row(int i) {

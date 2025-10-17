@@ -94,7 +94,6 @@ public class ConfirmDialog extends Composite {
                 .setAttribute(AriaAttributes.KEYSHORTCUTS, "Escape");
         confirmButton = new Button("Confirm");
         confirmButton.addClickListener(click -> {
-            confirmButton.removeClickShortcut();
             fireEvent(new ConfirmedEvent(this));
             window.close();
         });
@@ -139,7 +138,7 @@ public class ConfirmDialog extends Composite {
      */
     public void open() {
         UI.getCurrent().addWindow(window);
-        cancelButton.setClickShortcut(KeyCode.ESCAPE);
+        Shortcuts.setEscapeShortcut("#confirm-dialog", "#cancel-button");
         confirmButton.setClickShortcut(KeyCode.ENTER);
     }
 

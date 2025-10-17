@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -35,7 +38,8 @@ import com.vaadin.ui.renderers.NumberRenderer;
  */
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
-public class BookGrid extends Grid<Product> implements HasI18N {
+public class BookGrid extends Grid<Product>
+        implements HasI18N, HasAttributes<BookGrid> {
 
     private static final String PRODUCT_MUST_NOT_BE_NULL = "Product must not be null";
 
@@ -65,6 +69,8 @@ public class BookGrid extends Grid<Product> implements HasI18N {
         setSizeFull();
         setAccessibleNavigation(true);
         addStyleNames(VaadinCreateTheme.GRID_ROW_FOCUS);
+        setRole(AriaRoles.REGION);
+        setAriaLabel(getTranslation(BooksView.VIEW_NAME));
 
         // Set highlight color to last edited row with style generator.
         setStyleGenerator(book -> {

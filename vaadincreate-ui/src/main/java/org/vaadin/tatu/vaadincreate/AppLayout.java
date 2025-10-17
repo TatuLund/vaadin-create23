@@ -56,6 +56,8 @@ public class AppLayout extends Composite implements HasI18N {
     @Nullable
     private MenuButton firstItem;
 
+    private Button toggleButton;
+
     /**
      * Constructor.
      *
@@ -93,7 +95,7 @@ public class AppLayout extends Composite implements HasI18N {
         menuLayout.addComponent(title);
 
         // Add a button to toggle the visibility of the menu when on mobile
-        var toggleButton = new Button(getTranslation(I18n.App.MENU), click -> {
+        toggleButton = new Button(getTranslation(I18n.App.MENU), click -> {
             if (menuLayout.getStyleName().contains(ValoTheme.MENU_VISIBLE)) {
                 menuLayout.removeStyleName(ValoTheme.MENU_VISIBLE);
                 Notification.show(getTranslation(I18n.App.MENU_CLOSE),
@@ -244,6 +246,7 @@ public class AppLayout extends Composite implements HasI18N {
         @Override
         public void handleAction(Object sender, Object target) {
             assert firstItem != null : "First item is null";
+            toggleButton.click();
             firstItem.focus();
         }
     }

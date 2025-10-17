@@ -4,6 +4,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.ResetButtonForTextField;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -54,6 +55,7 @@ public class FilterField extends TextField
         var resetButton = ResetButtonForTextField.of(this);
         resetButton.setButtonLabel(getTranslation(I18n.Books.CLEAR_TEXT));
         setAttribute("autocomplete", "off");
+        setAttribute(AriaAttributes.KEYSHORTCUTS, "Control+F");
         setRole(AriaRoles.SEARCHBOX);
         setShortcut();
     }

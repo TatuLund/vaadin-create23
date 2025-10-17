@@ -5,6 +5,7 @@ import java.util.List;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
+import org.vaadin.tatu.vaadincreate.Shortcuts;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
@@ -118,7 +119,6 @@ public class UserManagementView extends VerticalLayout
         // Cancel button is enabled when a user is being edited or a new user is
         // being created
         cancel.setId("cancel-button");
-        cancel.setClickShortcut(KeyCode.ESCAPE);
         AttributeExtension.of(cancel).setAttribute(AriaAttributes.KEYSHORTCUTS,
                 "Escape");
         cancel.addStyleName(VaadinCreateTheme.BUTTON_CANCEL);
@@ -226,6 +226,7 @@ public class UserManagementView extends VerticalLayout
         openingView(VIEW_NAME);
         presenter.requestUpdateUsers();
         newUser.focus();
+        Shortcuts.setEscapeShortcut(".adminview-userview", "#cancel-button");
     }
 
     @Override

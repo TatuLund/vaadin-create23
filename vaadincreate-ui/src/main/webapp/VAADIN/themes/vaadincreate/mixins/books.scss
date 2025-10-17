@@ -6,12 +6,23 @@
     position: relative;
 
     .bookview-filter {
+      display: var(--filter-and-grid-display, inline-block);
       width: round($v-unit-size * 9);
     }
 
     .bookview-gridwrapper {
       position: relative
     }
+
+    #book-grid {
+      display: var(--filter-and-grid-display, inline-block);
+    } 
+
+    div#book-grid:focus-visible {
+      outline: 2px solid $v-focus-color;
+      outline-offset: 2px;
+      border-radius: 2px;
+  	}
   }
 
   .bookview-nomatches {
@@ -32,14 +43,6 @@
 	  .v-grid-column-header-content {
       text-align: right;
     }	
-  }
-
-  .bookview {
-  	div#book-grid:focus-visible {
-      outline: 2px solid $v-focus-color;
-      outline-offset: 2px;
-      border-radius: 2px;
-  	}
   }
 
   .bookview-grid-edited {

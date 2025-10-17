@@ -114,11 +114,6 @@
   // Editor should take whole browser width when we are under 550px in width.
   .v-ui[width-range~="0-550px"] {
 
-    .bookview {
-      // Use CSS property as a proxy pattern to hide filter and grid
-      --filter-and-grid-display: none;
-    }
-
     .bookform-wrapper {
       width: 100%;
     }

@@ -13,3 +13,9 @@
     color: #dd8900;
   }
 }
+
+@media (max-width: 550px) {
+  .bookview:has(.bookform-wrapper-visible) {
+    --filter-and-grid-display: none;  
+  }
+}

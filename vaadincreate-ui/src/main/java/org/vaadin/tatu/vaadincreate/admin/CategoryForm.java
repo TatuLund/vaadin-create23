@@ -104,8 +104,11 @@ public class CategoryForm extends Composite implements HasI18N {
                 .withValidator(new CategoryNotDuplicateValidator())
                 .bind("name");
         binder.setBean(category);
-        binder.addValueChangeListener(
-                valueChange -> fireEvent(new FormSaveEvent(this, category)));
+        binder.addValueChangeListener(valueChange -> {
+            if (binder.isValid()) {
+                fireEvent(new FormSaveEvent(this, category));
+            }
+        });
     }
 
     /**

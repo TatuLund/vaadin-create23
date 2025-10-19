@@ -14,6 +14,7 @@ import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.CharacterCountExtension;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog;
+import org.vaadin.tatu.vaadincreate.Html;
 import org.vaadin.tatu.vaadincreate.ConfirmDialog.Type;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
@@ -321,9 +322,10 @@ public class BookForm extends Composite implements HasI18N {
             return Utils.convertToPresentation(price, euroConverter);
         }
         if (value instanceof Availability availability) {
-            return String.format("%s<span style='margin-right: 5px'>%s</span>",
-                    Utils.createAvailabilityIcon(availability),
-                    value.toString());
+            var icon = Utils.createAvailabilityIcon(availability).build();
+            var span = Html.span().style("margin-right: 5px")
+                    .text(value.toString()).build();
+            return icon + span;
         }
         return value.toString();
     }

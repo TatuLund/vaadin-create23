@@ -174,7 +174,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
      *            A map containing price statistics.
      */
     public void updateStatsAsync(Map<Availability, Long> availabilityStats,
-            Map<String, CategoryStats> categoryStats, Map<String, Long> priceStats) {
+            Map<String, CategoryStats> categoryStats,
+            Map<String, Long> priceStats) {
         Utils.access(ui, () -> {
             if (isAttached()) {
                 updateAvailabilityChart(availabilityStats);
@@ -298,7 +299,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         availabilityChart.setAriaLabel(alt);
     }
 
-    private DataSeries categoryCountSeries(Map<String, CategoryStats> categories){
+    private DataSeries categoryCountSeries(
+            Map<String, CategoryStats> categories) {
         assert categories != null : "Categories must not be null";
 
         var series = new DataSeries();
@@ -310,7 +312,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         return series;
     }
 
-    private DataSeries categoryStockSeries(Map<String, CategoryStats> categories){
+    private DataSeries categoryStockSeries(
+            Map<String, CategoryStats> categories) {
         assert categories != null : "Categories must not be null";
 
         var series = new DataSeries();

@@ -13,7 +13,9 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.AccessTask;
+import org.vaadin.tatu.vaadincreate.Html;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.Html.Span;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
@@ -135,7 +137,7 @@ public class Utils {
      *            the availability status for which to create an icon
      * @return the HTML representation of the icon
      */
-    public static String createAvailabilityIcon(Availability availability) {
+    public static Span createAvailabilityIcon(Availability availability) {
         var color = "";
         switch (availability) {
         case AVAILABLE:
@@ -150,11 +152,11 @@ public class Utils {
         default:
             break;
         }
-
-        return String.format(
-                "<span class='v-icon' style='font-family: %s;color:%s'>&#x%s;</span>",
-                VaadinIcons.CIRCLE.getFontFamily(), color,
-                Integer.toHexString(VaadinIcons.CIRCLE.getCodepoint()));
+        // Build icon span using Html builder
+        return Html.span().cls("v-icon")
+                .style("font-family: " + VaadinIcons.CIRCLE.getFontFamily()
+                        + ";color:" + color)
+                .text(Character.toString(VaadinIcons.CIRCLE.getCodepoint()));
     }
 
     /**

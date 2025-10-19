@@ -9,10 +9,12 @@ import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.vaadin.tatu.vaadincreate.Html;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
+import org.vaadin.tatu.vaadincreate.Html.Span;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -137,19 +139,21 @@ public class BookGrid extends Grid<Product>
         var ariaLabel = text;
         if (product.getStockCount() == 0) {
             text = "-";
-            return String.format("<span aria-label='%s'>%s</span>", ariaLabel,
-                    text);
+            // Use Html builder for consistent escaping
+            return Html.span().attr(AriaAttributes.LABEL, ariaLabel).text(text)
+                    .build();
         }
         return text;
     }
 
     private Label createAvailabilityCaption() {
-        var captionHtml = String.format(
-                "<span class='%s' aria-label='%s'></span><span class='%s'>%s</span>",
-                VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL + "-aria-label",
-                getTranslation(I18n.AVAILABILITY),
-                VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL,
-                getTranslation(I18n.AVAILABILITY));
+        var captionHtml = Html.span()
+                .cls(VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL
+                        + "-aria-label")
+                .attr(AriaAttributes.LABEL, getTranslation(I18n.AVAILABILITY))
+                .build()
+                + Html.span().cls(VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL)
+                        .text(getTranslation(I18n.AVAILABILITY)).build();
         return new Label(captionHtml, ContentMode.HTML);
     }
 
@@ -309,13 +313,16 @@ public class BookGrid extends Grid<Product>
             ariaLabel = String.format("%s %d", text, product.getStockCount());
         }
 
-        var iconCode = Utils.createAvailabilityIcon(availability);
-
-        return String.format(
-                "%s<span class='%s' aria-label='%s'></span><span class='%s'> %s</span>",
-                iconCode,
-                VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL + "-aria-label",
-                ariaLabel, VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL, text);
+        var iconSpan = Utils.createAvailabilityIcon(availability);
+        var wrapper = Html.div().add(iconSpan)
+                .add(Html.span()
+                        .cls(VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL
+                                + "-aria-label")
+                        .attr("aria-label", ariaLabel))
+                .add(Html.span()
+                        .cls(VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL)
+                        .text(" " + text));
+        return wrapper.build();
     }
 
     private String formatCategories(Product product) {
@@ -414,34 +421,31 @@ public class BookGrid extends Grid<Product>
         }
         var converter = new EuroConverter(
                 getTranslation(I18n.Grid.CANNOT_CONVERT));
-        String unsanitized = """
-                <div>
-                    %s <b>%s</b><br>
-                    %s %s<br>
-                    %s %s<br>
-                    %s %d<br>
-                    %s %s
-                </div>
-                """.formatted(
-                getDescriptionCaptionSpan(getTranslation(I18n.PRODUCT_NAME)),
-                book.getProductName(),
-                getDescriptionCaptionSpan(getTranslation(I18n.PRICE)),
-                Utils.convertToPresentation(book.getPrice(), converter),
-                getDescriptionCaptionSpan(getTranslation(I18n.AVAILABILITY)),
-                Utils.createAvailabilityIcon(book.getAvailability()),
-                getDescriptionCaptionSpan(getTranslation(I18n.IN_STOCK)),
-                book.getStockCount(),
-                getDescriptionCaptionSpan(getTranslation(I18n.CATEGORIES)),
-                formatCategories(book));
-        return Utils.sanitize(unsanitized);
+        // Build HTML using builder to ensure proper escaping of dynamic values.
+        var root = Html.div()
+                // @formatter:off
+                .add(createCaptionSpan(getTranslation(I18n.PRODUCT_NAME)))
+                    .add(Html.b().text(Utils.sanitize(book.getProductName())))
+                    .add(Html.br())
+                .add(createCaptionSpan(getTranslation(I18n.PRICE)))
+                    .add(Html.span().text(Utils.convertToPresentation(book.getPrice(), converter)))
+                    .add(Html.br())
+                .add(createCaptionSpan(getTranslation(I18n.AVAILABILITY)))
+                    .add(Utils.createAvailabilityIcon(book.getAvailability()))
+                    .add(Html.br())
+                .add(createCaptionSpan(getTranslation(I18n.IN_STOCK)))
+                    .add(Html.span().text(Integer.toString(book.getStockCount())))
+                    .add(Html.br())
+                .add(createCaptionSpan(getTranslation(I18n.CATEGORIES)))
+                    .add(Html.span().text(Utils.sanitize(formatCategories(book))));
+                // @formatter:on
+        return root.build();
     }
 
-    // Helper method to create a span with a caption
-    private static String getDescriptionCaptionSpan(String caption) {
-        assert caption != null : "Caption must not be null";
-
-        return String.format("<span class='%s'>%s:</span> ",
-                VaadinCreateTheme.BOOKVIEW_GRID_DESCRIPTIONCAPTION, caption);
+    private Span createCaptionSpan(String caption) {
+        return Html.span()
+                .cls(VaadinCreateTheme.BOOKVIEW_GRID_DESCRIPTIONCAPTION)
+                .text(caption + ": ");
     }
 
     @Override

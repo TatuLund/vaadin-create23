@@ -8,6 +8,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.CapsLockWarning;
+import org.vaadin.tatu.vaadincreate.Html;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
@@ -136,13 +137,14 @@ public class LoginView extends Composite implements HasI18N {
     }
 
     private String getLoginInfoText() {
-        var h1 = createH1(getTranslation(I18n.Login.LOGIN_INFO));
-        return String.format("%s %s", h1,
-                getTranslation(I18n.Login.LOGIN_INFO_TEXT));
-    }
-
-    private static String createH1(String text) {
-        return String.format("<h1>%s</h1>", text);
+        // Build heading and supporting text using Html builder (escaped by
+        // default)
+        var heading = Html.h1().text(getTranslation(I18n.Login.LOGIN_INFO))
+                .build();
+        var supporting = Html.span()
+                .text(getTranslation(I18n.Login.LOGIN_INFO_TEXT)).build();
+        // Preserve original spacing pattern between heading and text
+        return heading + " " + supporting;
     }
 
     @Override

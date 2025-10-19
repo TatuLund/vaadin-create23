@@ -140,6 +140,7 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
         public static final String REGION = "region";
         public static final String FIGURE = "figure";
         public static final String NAVIGATION = "navigation";
+        public static final String BUTTON = "button"; // Added to support HtmlBuilderTest
     }
 
     /**

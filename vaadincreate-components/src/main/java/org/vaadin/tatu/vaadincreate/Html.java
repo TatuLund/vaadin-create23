@@ -1,6 +1,10 @@
 package org.vaadin.tatu.vaadincreate;
 
 import java.util.*;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document.OutputSettings;
+import org.jsoup.safety.Safelist;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
@@ -114,7 +118,6 @@ public abstract class Html<T extends Html<T>> {
         return self();
     }
 
-
     /**
      * Add a child tag
      * 
@@ -143,8 +146,8 @@ public abstract class Html<T extends Html<T>> {
     }
 
     /**
-     * Build HTML string
-     * 
+     * Build HTML string and sanitize it with Jsoup.
+     *
      * @return the built HTML string
      */
     public String build() {
@@ -171,7 +174,38 @@ public abstract class Html<T extends Html<T>> {
             }
         }
         sb.append("</").append(name).append('>');
-        return sb.toString();
+        return sanitize(sb.toString());
+    }
+
+    /**
+     * Sanitizes the given string by removing any potentially unsafe HTML tags
+     * and attributes.
+     *
+     * @param unsanitized
+     *            the string to be sanitized
+     * @return the sanitized string
+     */
+    public static String sanitize(String unsanitized) {
+        var settings = new OutputSettings();
+        settings.prettyPrint(false);
+         // @formatter:off
+       var safelist = Safelist.relaxed().addAttributes(":all",
+                "id",
+                "class",
+                "style",
+                "tabindex",
+                "role",
+                "aria-label",
+                "aria-labelledby",
+                "aria-describedby",
+                "aria-live",
+                "aria-hidden",
+                "aria-expanded",
+                "aria-current",
+                "aria-roledescription",
+                "aria-pressed");
+        // @formatter:on
+        return Jsoup.clean(unsanitized, "", safelist, settings);
     }
 
     private static String escape(String s) {

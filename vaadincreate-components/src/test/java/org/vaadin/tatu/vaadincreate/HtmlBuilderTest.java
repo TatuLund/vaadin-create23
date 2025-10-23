@@ -42,7 +42,7 @@ public class HtmlBuilderTest {
     @Test
     public void rawHtmlInsertedUnescaped() {
         var html = Html.div().raw("<span class='x'>X</span>").build();
-        assertEquals("<div><span class='x'>X</span></div>", html);
+        assertEquals("<div><span class=\"x\">X</span></div>", html);
     }
 
     @Test

@@ -5,9 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document.OutputSettings;
-import org.jsoup.safety.Safelist;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -48,11 +45,7 @@ public class Utils {
      * @return the sanitized string
      */
     public static String sanitize(String unsanitized) {
-        var settings = new OutputSettings();
-        settings.prettyPrint(false);
-        return Jsoup.clean(unsanitized, "", Safelist.relaxed()
-                .addAttributes("span", "style").addAttributes("span", "class"),
-                settings);
+        return Html.sanitize(unsanitized);
     }
 
     /**

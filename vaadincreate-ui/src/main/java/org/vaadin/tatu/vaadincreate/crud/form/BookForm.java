@@ -306,9 +306,10 @@ public class BookForm extends Composite implements HasI18N {
             field.addStyleName(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY);
             var value = binding.getGetter().apply(currentProduct);
             if (value != null) {
-                field.setDescription(Utils.sanitize(String.format(
-                        "<b>%s:</b><br>%s", getTranslation(I18n.Form.WAS),
-                        convertValue(value))), ContentMode.HTML);
+                var html = Html.div()
+                        .add(Html.b().text(getTranslation(I18n.Form.WAS)))
+                        .add(Html.br()).raw(convertValue(value)).build();
+                field.setDescription(html, ContentMode.HTML);
             }
         });
     }

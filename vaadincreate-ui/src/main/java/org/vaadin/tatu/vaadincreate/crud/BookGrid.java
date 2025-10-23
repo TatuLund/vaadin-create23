@@ -425,7 +425,7 @@ public class BookGrid extends Grid<Product>
         var root = Html.div()
                 // @formatter:off
                 .add(createCaptionSpan(getTranslation(I18n.PRODUCT_NAME)))
-                    .add(Html.b().text(Utils.sanitize(book.getProductName())))
+                    .add(Html.b().raw(book.getProductName()))
                     .add(Html.br())
                 .add(createCaptionSpan(getTranslation(I18n.PRICE)))
                     .add(Html.span().text(Utils.convertToPresentation(book.getPrice(), converter)))
@@ -437,7 +437,7 @@ public class BookGrid extends Grid<Product>
                     .add(Html.span().text(Integer.toString(book.getStockCount())))
                     .add(Html.br())
                 .add(createCaptionSpan(getTranslation(I18n.CATEGORIES)))
-                    .add(Html.span().text(Utils.sanitize(formatCategories(book))));
+                    .add(Html.span().text(formatCategories(book)));
                 // @formatter:on
         return root.build();
     }

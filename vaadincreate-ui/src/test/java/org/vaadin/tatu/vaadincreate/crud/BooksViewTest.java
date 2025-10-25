@@ -156,6 +156,7 @@ public class BooksViewTest extends AbstractUITest {
         assertFalse(form.isShown());
     }
 
+    @SuppressWarnings("java:S100")
     private void then_availability_is_rendered_as_html(int i) {
         var book = test(grid).item(i);
         String color = "";

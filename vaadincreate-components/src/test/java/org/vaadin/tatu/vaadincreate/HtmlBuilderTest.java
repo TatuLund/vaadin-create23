@@ -33,6 +33,41 @@ public class HtmlBuilderTest {
     }
 
     @Test
+    public void multipleClassesJoined() {
+        var html = Html.div().cls("class1", "class2", "class3").build();
+        assertEquals("<div class=\"class1 class2 class3\"></div>", html);
+    }
+
+    @Test
+    public void allAriaAttributes() {
+        for (var field : AriaAttributes.class.getDeclaredFields()) {
+            try {
+                var attrName = (String) field.get(null);
+                var html = Html.div().attr(attrName, "value").build();
+                assertEquals("<div " + attrName + "=\"value\"></div>", html);
+            } catch (IllegalAccessException e) {
+                fail("Failed to access field: " + e.getMessage());
+            }
+        }
+    }
+
+    @Test
+    public void h1WithText() {
+        var html = Html.h1().text("Title").build();
+        assertEquals("<h1>Title</h1>", html);
+    }
+
+    @Test
+    public void sanitationOfRawHtml() {
+        var html = Html.div().raw("<script>alert('x')</script>").build();
+        assertEquals("<div></div>", html);
+        html = Html.div().raw("<span>Safe</span>").build();
+        assertEquals("<div><span>Safe</span></div>", html);
+        html = Html.div().raw("<span onclick='evil()'>X</span>").build();
+        assertEquals("<div><span>X</span></div>", html);
+    }
+
+    @Test
     public void nestedStructureEscapesChildren() {
         var outer = Html.div().add(Html.span().text("<unsafe>"));
         var html = outer.build();

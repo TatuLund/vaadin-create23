@@ -193,18 +193,17 @@ public abstract class Html<T extends Html<T>> {
                 "id",
                 "class",
                 "style",
-                "tabindex",
-                "role",
-                "aria-label",
-                "aria-labelledby",
-                "aria-describedby",
-                "aria-live",
-                "aria-hidden",
-                "aria-expanded",
-                "aria-current",
-                "aria-roledescription",
-                "aria-pressed");
+                "tabindex");
         // @formatter:on
+        // Add all constants in AriaAttributes to safelist
+        for (var field : AriaAttributes.class.getDeclaredFields()) {
+            try {
+                var attrName = (String) field.get(null);
+                safelist.addAttributes(":all", attrName);
+            } catch (IllegalAccessException e) {
+                // Ignore
+            }
+        }
         return Jsoup.clean(unsanitized, "", safelist, settings);
     }
 

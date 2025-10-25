@@ -34,6 +34,7 @@ public class LockedObjectsTest {
 
     @Test
     public void lockAndUnlockObject() {
+        latch = new CountDownLatch(1);
         var listener = new TestListener();
         var user = userService.getAllUsers().get(0);
 
@@ -90,6 +91,7 @@ public class LockedObjectsTest {
 
     @Test
     public void remoteLockingAndUnlocking() {
+        latch = new CountDownLatch(1);
         var listener = new TestListener();
         var user = userService.getAllUsers().get(0);
         var eventBus = EventBus.get();
@@ -97,7 +99,7 @@ public class LockedObjectsTest {
                 objects.get(0).getId(), user.getId(), user.getName(), true);
         eventBus.post(lockingEvent);
         try {
-            Thread.sleep(50);
+            latch.await();
         } catch (InterruptedException e) {
             // Ignore
         }
@@ -105,11 +107,12 @@ public class LockedObjectsTest {
 
         assertEquals(user.getName(), lockedObjects.isLocked(objects.get(0)));
 
+        latch = new CountDownLatch(1);
         lockingEvent = new LockingEvent(MockObject.class,
                 objects.get(0).getId(), user.getId(), user.getName(), false);
         eventBus.post(lockingEvent);
         try {
-            Thread.sleep(50);
+            latch.await();
         } catch (InterruptedException e) {
             // Ignore
         }

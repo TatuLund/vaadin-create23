@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -131,9 +132,10 @@ public class BooksViewIT extends AbstractViewTest {
             return null;
         });
         if (notification == null) {
-            throw new AssertionError("Save notification not found");
+            fail("Save notification not found");
+        } else {
+            notification.close();
         }
-        notification.close();
     }
 
     private void assertAndCloseDeletionNotification() {
@@ -151,9 +153,10 @@ public class BooksViewIT extends AbstractViewTest {
             return null;
         });
         if (notification == null) {
-            throw new AssertionError("Deletion notification not found");
+            fail("Deletion notification not found");
+        } else {
+            notification.close();
         }
-        notification.close();
     }
 
     @Test

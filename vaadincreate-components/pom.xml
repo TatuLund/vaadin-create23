@@ -245,6 +245,47 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <groupId>com.github.blutorange</groupId>
+                <artifactId>closure-compiler-maven-plugin</artifactId>
+                <version>2.26.0</version>
+                <configuration>
+	                <baseSourceDir>src/main/resources/org/vaadin/tatu/vaadincreate</baseSourceDir>
+                    <baseTargetDir>src/main/resources/org/vaadin/tatu/vaadincreate</baseTargetDir>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>minify-attribute-js</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDir>attributeextension</sourceDir>
+                            <includes>
+                                <include>attribute_extension_connector.js</include>
+                            </includes>
+                            <targetDir>attributeextension</targetDir>
+                            <outputFilename>attribute_extension_connector.min.js</outputFilename>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>minify-accessibility-js</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDir>chartaccessibility</sourceDir>
+                            <includes>
+                                <include>chart_accessibility_connector.js</include>
+                            </includes>
+                            <targetDir>chartaccessibility</targetDir>
+                            <outputFilename>chart_accessibility_connector.min.js</outputFilename>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 
 		<!-- This is needed for the sources required by the client-side compiler to be

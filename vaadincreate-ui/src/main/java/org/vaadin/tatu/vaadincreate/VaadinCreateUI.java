@@ -91,6 +91,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         } else {
             var id = Utils.getCurrentUserOrThrow().getId();
             assert id != null : "User id must not be null";
+            // Fetch user details again to have the latest info
+            // This is needed e.g. if user info was changed
+            // while user had closed the browser tab
             var user = getUserService().getUserById(id);
             CurrentUser.set(user);
             target = getInitialTarget();
@@ -330,6 +333,5 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     private static Logger logger = LoggerFactory
             .getLogger(VaadinCreateUI.class);
-
 
 }

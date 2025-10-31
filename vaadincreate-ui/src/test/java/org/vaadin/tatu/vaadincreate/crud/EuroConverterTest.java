@@ -35,7 +35,7 @@ public class EuroConverterTest {
     public void convertToModelFI() {
         var converter = new EuroConverter(MESSAGE);
         var field = new TextField();
-        var context = new ValueContext(null, field, new Locale("fi"));
+        var context = new ValueContext(null, field, Locale.of("fi", "FI"));
         var string = "10,1 €";
         var result = converter.convertToModel(string, context);
         var target = new BigDecimal("10.1");
@@ -77,7 +77,7 @@ public class EuroConverterTest {
     public void convertToPresentationFI() {
         var converter = new EuroConverter(MESSAGE);
         var field = new TextField();
-        var context = new ValueContext(null, field, new Locale("fi"));
+        var context = new ValueContext(null, field, Locale.of("fi", "FI"));
         var number = new BigDecimal("10.1");
         var string = "10,10 €";
         var result = converter.convertToPresentation(number, context);

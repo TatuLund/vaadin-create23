@@ -233,24 +233,28 @@ public class AboutView extends VerticalLayout
 
     @Override
     public void eventFired(AbstractEvent event) {
-        if (event instanceof MessageEvent message) {
-            Utils.access(ui, () -> {
-                if (adminsNoteField.isVisible()) {
-                    adminsNoteField.setVisible(false);
-                    Utils.stopPolling();
-                    adminsNote.setVisible(true);
-                    editButton.setVisible(true);
-                }
-                adminsNote.setCaption(
-                        Utils.formatDate(message.timeStamp(), getLocale()));
-                adminsNote.setValue(message.message());
-            });
-        } else if (event instanceof ShutdownEvent) {
+        switch (event) {
+        case MessageEvent message -> Utils.access(ui, () -> {
+            if (adminsNoteField.isVisible()) {
+                adminsNoteField.setVisible(false);
+                Utils.stopPolling();
+                adminsNote.setVisible(true);
+                editButton.setVisible(true);
+            }
+            adminsNote.setCaption(
+                    Utils.formatDate(message.timeStamp(), getLocale()));
+            adminsNote.setValue(message.message());
+        });
+        case ShutdownEvent shutdownEvent -> {
             Utils.access(ui, () -> {
                 if (shutDownButton != null) {
                     shutDownButton.setEnabled(false);
                 }
             });
+        }
+        default -> {
+            // No action
+        }
         }
     }
 

@@ -447,16 +447,21 @@ public class BooksPresenter implements Serializable, EventBusListener {
 
     @Override
     public void eventFired(AbstractEvent event) {
-        if (event instanceof LockingEvent lockingEvent) {
+        switch (event) {
+        case LockingEvent lockingEvent -> {
             var id = lockingEvent.id();
             view.refreshProductAsync(id);
         }
-        if (event instanceof BooksChangedEvent booksChanged) {
-            var id = booksChanged.productId();
+        case BooksChangedEvent booksChanged -> {
             if (booksChanged.change() != BookChange.SAVE) {
-                return;
+            return;
             }
+            var id = booksChanged.productId();
             view.refreshProductAsync(id);
+        }
+        default -> {
+            // No action
+        }
         }
     }
 

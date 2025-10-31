@@ -231,15 +231,14 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
 
     @Override
     public void eventFired(AbstractEvent event) {
-        if (event instanceof MessageEvent message) {
-            access(() -> {
-                var note = new Notification(
-                        Utils.formatDate(message.timeStamp(), getLocale()),
-                        message.message(), Type.TRAY_NOTIFICATION, true);
-                note.show(getPage());
-            });
-        }
-        if (event instanceof UserUpdatedEvent userUpdated) {
+        switch (event) {
+        case MessageEvent message -> access(() -> {
+            var note = new Notification(
+                    Utils.formatDate(message.timeStamp(), getLocale()),
+                    message.message(), Type.TRAY_NOTIFICATION, true);
+            note.show(getPage());
+        });
+        case UserUpdatedEvent userUpdated -> {
             var user = (User) getSession().getSession().getAttribute(
                     CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY);
             assert user != null : "User must not be null";
@@ -253,7 +252,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                         updatedUser));
             }
         }
-        if (event instanceof ShutdownEvent) {
+        case ShutdownEvent shutdownEvent -> {
             access(() -> Notification.show(getTranslation(I18n.LOGOUT_60S),
                     Type.WARNING_MESSAGE));
             CompletableFuture.runAsync(() -> access(() -> {
@@ -265,7 +264,10 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             }), CompletableFuture.delayedExecutor(60, TimeUnit.SECONDS,
                     getExecutor()));
         }
-
+        default -> {
+            // No action
+        }
+        }
     }
 
     @Override

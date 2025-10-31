@@ -21,10 +21,10 @@ public class DefaultI18NProvider implements I18NProvider {
 
     private static final String BUNDLE_PREFIX = "translate";
 
-    public static final Locale LOCALE_FI = new Locale("fi", "FI");
-    public static final Locale LOCALE_EN = new Locale("en", "GB");
-    public static final Locale LOCALE_DE = new Locale("de", "DE");
-    public static final Locale LOCALE_SV = new Locale("sv", "SE");
+    public static final Locale LOCALE_FI = Locale.of("fi", "FI");
+    public static final Locale LOCALE_EN = Locale.UK;
+    public static final Locale LOCALE_DE = Locale.GERMANY;
+    public static final Locale LOCALE_SV = Locale.of("sv", "SE");
 
     public static final List<Locale> locales = Collections.unmodifiableList(
             Arrays.asList(LOCALE_FI, LOCALE_EN, LOCALE_DE, LOCALE_SV));

@@ -315,20 +315,20 @@ public class BookForm extends Composite implements HasI18N {
     }
 
     private static <T> String convertValue(@Nullable T value) {
-        if (value == null) {
-            return "";
-        }
-        if (value instanceof BigDecimal price) {
+        return switch (value) {
+        case null -> "";
+        case BigDecimal price -> {
             var euroConverter = new EuroConverter("");
-            return Utils.convertToPresentation(price, euroConverter);
+            yield Utils.convertToPresentation(price, euroConverter);
         }
-        if (value instanceof Availability availability) {
+        case Availability availability -> {
             var icon = Utils.createAvailabilityIcon(availability).build();
             var span = Html.span().style("margin-right: 5px")
-                    .text(value.toString()).build();
-            return icon + span;
+                    .text(availability.toString()).build();
+            yield icon + span;
         }
-        return value.toString();
+        default -> value.toString();
+        };
     }
 
     private void clearDirtyIndicators() {

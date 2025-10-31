@@ -161,14 +161,9 @@ public class BooksViewTest extends AbstractUITest {
         var book = test(grid).item(i);
         String color = "";
         switch (book.getAvailability()) {
-        case AVAILABLE:
-            color = VaadinCreateTheme.COLOR_AVAILABLE;
-            break;
-        case DISCONTINUED:
-            color = VaadinCreateTheme.COLOR_DISCONTINUED;
-            break;
-        case COMING:
-            color = VaadinCreateTheme.COLOR_COMING;
+        case AVAILABLE -> color = VaadinCreateTheme.COLOR_AVAILABLE;
+        case DISCONTINUED -> color = VaadinCreateTheme.COLOR_DISCONTINUED;
+        case COMING -> color = VaadinCreateTheme.COLOR_COMING;
         }
         var doc = Jsoup.parse((String) test(grid).cell(3, i));
         assertEquals("v-icon",

@@ -133,17 +133,9 @@ public class Utils {
     public static Span createAvailabilityIcon(Availability availability) {
         var color = "";
         switch (availability) {
-        case AVAILABLE:
-            color = VaadinCreateTheme.COLOR_AVAILABLE;
-            break;
-        case COMING:
-            color = VaadinCreateTheme.COLOR_COMING;
-            break;
-        case DISCONTINUED:
-            color = VaadinCreateTheme.COLOR_DISCONTINUED;
-            break;
-        default:
-            break;
+        case AVAILABLE -> color = VaadinCreateTheme.COLOR_AVAILABLE;
+        case COMING -> color = VaadinCreateTheme.COLOR_COMING;
+        default -> color = VaadinCreateTheme.COLOR_DISCONTINUED;
         }
         // Build icon span using Html builder
         return Html.span().cls("v-icon")

@@ -344,15 +344,9 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
 
         String color;
         switch (availability) {
-        case COMING:
-            color = VaadinCreateTheme.COLOR_COMING;
-            break;
-        case AVAILABLE:
-            color = VaadinCreateTheme.COLOR_AVAILABLE;
-            break;
-        default:
-            color = VaadinCreateTheme.COLOR_DISCONTINUED;
-            break;
+        case COMING -> color = VaadinCreateTheme.COLOR_COMING;
+        case AVAILABLE -> color = VaadinCreateTheme.COLOR_AVAILABLE;
+        default -> color = VaadinCreateTheme.COLOR_DISCONTINUED;
         }
         return new SolidColor(color);
     }

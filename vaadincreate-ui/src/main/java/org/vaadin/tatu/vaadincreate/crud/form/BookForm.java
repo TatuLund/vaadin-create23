@@ -314,8 +314,10 @@ public class BookForm extends Composite implements HasI18N {
         });
     }
 
+    @SuppressWarnings("java:S2259")
     private static <T> String convertValue(@Nullable T value) {
         return switch (value) {
+        // bug in SonarQube, does not recognize null case here S2259
         case null -> "";
         case BigDecimal price -> {
             var euroConverter = new EuroConverter("");

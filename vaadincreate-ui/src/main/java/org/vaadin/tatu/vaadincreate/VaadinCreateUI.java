@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -232,19 +233,20 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     @Override
     public void eventFired(AbstractEvent event) {
         switch (event) {
-        case MessageEvent message -> access(() -> {
-            var note = new Notification(
-                    Utils.formatDate(message.timeStamp(), getLocale()),
-                    message.message(), Type.TRAY_NOTIFICATION, true);
-            note.show(getPage());
-        });
-        case UserUpdatedEvent userUpdated -> {
+        case MessageEvent(String message, LocalDateTime timeStamp) -> access(
+                () -> {
+                    var note = new Notification(
+                            Utils.formatDate(timeStamp, getLocale()), message,
+                            Type.TRAY_NOTIFICATION, true);
+                    note.show(getPage());
+                });
+        case UserUpdatedEvent(Integer userId) -> {
             var user = (User) getSession().getSession().getAttribute(
                     CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY);
             assert user != null : "User must not be null";
-            var userId = user.getId();
+            var userInSessionId = user.getId();
             assert userId != null : "User id must not be null";
-            if (userId.equals(userUpdated.userId())) {
+            if (userId.equals(userInSessionId)) {
                 logger.debug("User was updated, updating CurrentUser");
                 var updatedUser = getUserService().getUserById(userId);
                 access(() -> getSession().getSession().setAttribute(

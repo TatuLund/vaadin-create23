@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate;
 
+import java.time.LocalDateTime;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -234,24 +236,23 @@ public class AboutView extends VerticalLayout
     @Override
     public void eventFired(AbstractEvent event) {
         switch (event) {
-        case MessageEvent message -> Utils.access(ui, () -> {
-            if (adminsNoteField.isVisible()) {
-                adminsNoteField.setVisible(false);
-                Utils.stopPolling();
-                adminsNote.setVisible(true);
-                editButton.setVisible(true);
+        case MessageEvent(String message, LocalDateTime timeStamp) -> Utils
+                .access(ui, () -> {
+                    if (adminsNoteField.isVisible()) {
+                        adminsNoteField.setVisible(false);
+                        Utils.stopPolling();
+                        adminsNote.setVisible(true);
+                        editButton.setVisible(true);
+                    }
+                    adminsNote.setCaption(
+                            Utils.formatDate(timeStamp, getLocale()));
+                    adminsNote.setValue(message);
+                });
+        case ShutdownEvent shutdownEvent -> Utils.access(ui, () -> {
+            if (shutDownButton != null) {
+                shutDownButton.setEnabled(false);
             }
-            adminsNote.setCaption(
-                    Utils.formatDate(message.timeStamp(), getLocale()));
-            adminsNote.setValue(message.message());
         });
-        case ShutdownEvent shutdownEvent -> {
-            Utils.access(ui, () -> {
-                if (shutDownButton != null) {
-                    shutDownButton.setEnabled(false);
-                }
-            });
-        }
         default -> {
             // No action
         }

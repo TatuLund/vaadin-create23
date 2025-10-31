@@ -58,7 +58,8 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
                         e.getMessage());
             }
         }
-        executor = Executors.newSingleThreadExecutor();
+        executor = Executors.newSingleThreadExecutor(
+                Thread.ofVirtual().name("redis").factory());
 
         // Configure ObjectMapper with support for Java records and polymorphic
         // types.

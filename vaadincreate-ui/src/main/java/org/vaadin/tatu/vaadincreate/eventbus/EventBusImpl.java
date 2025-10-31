@@ -32,7 +32,7 @@ public class EventBusImpl implements EventBus {
     protected WeakHashMap<EventBusListener, Object> eventListeners = new WeakHashMap<>();
 
     private final ExecutorService executor = Executors.newFixedThreadPool(5,
-            Thread.ofVirtual().factory());
+            Thread.ofVirtual().name("eventbus").factory());
 
     public static synchronized EventBus getInstance() {
         if (instance == null) {

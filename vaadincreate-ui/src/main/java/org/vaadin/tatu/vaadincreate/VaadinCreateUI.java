@@ -307,8 +307,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     public ExecutorService getExecutor() {
         if (executor == null) {
             logger.info("Creating executor");
-            executor = Executors
-                    .newSingleThreadExecutor(Thread.ofVirtual().factory());
+            executor = Executors.newSingleThreadExecutor(
+                    Thread.ofVirtual().name("user-job").factory());
             executor.execute(() -> {
                 if (!executor.isShutdown()) {
                     // Add user id to MDC for logging

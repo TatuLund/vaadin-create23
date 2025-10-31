@@ -1,6 +1,6 @@
 # Vaadin Create '23 demo app (Vaadin 8)
 
-This is show case application for advanced Vaadin 8 topics. The application focuses on UI design and architecture of the UI code. These techniques help to keep old Vaadin 8 applications up to date. The application is built with Vaadin 8.27, which is fully compatible with Java 11 and 17.
+This is show case application for advanced Vaadin 8 topics. The application focuses on UI design and architecture of the UI code. These techniques help to keep old Vaadin 8 applications up to date. The application is built with Vaadin 8.28, which is fully compatible with Java 11 and 21.
 
 This project is my dogfooding test application for legacy Vaadin 8 as we are still maintaining it under our commercial extended maintenance program. Thus, even it is a bit fabricated, I have added there are many details that you would find in real production application.
 
@@ -37,7 +37,7 @@ Despite being somewhat artificial this demo app covers various use cases you may
 	- Description generator showing details in compact mode
 	- Pessimistic locking preventing concurrent edits
 - BookForm
-	- Use shared presenter with BooksView as BookForm is sub-component of BooksView
+	- Use event based decoupling with BooksView
 	- Demo of how to implement "dirty" state for the fields
 	- So previous value of the field when "dirty"
 	- Use change tracking in Binder, i.e. when user edits the value back to original Binder state is back hasChanges = false

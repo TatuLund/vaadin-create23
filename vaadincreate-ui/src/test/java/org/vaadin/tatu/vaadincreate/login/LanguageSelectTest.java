@@ -23,7 +23,7 @@ public class LanguageSelectTest extends UIUnitTest {
 
     @Before
     public void setUp() throws ServiceException {
-        Locale.setDefault(new Locale("en", "GB"));
+        Locale.setDefault(Locale.of("en", "GB"));
         ui = mockVaadin();
         languageSelect = new LanguageSelect();
         languageSelect.addValueChangeListener(valueChange -> {
@@ -51,9 +51,9 @@ public class LanguageSelectTest extends UIUnitTest {
                 items.getItems());
 
         // Expected captions for each locale
-        Map<Locale, String> expectedCaptions = Map.of(new Locale("fi", "FI"),
-                "Finnish", new Locale("en", "GB"), "English",
-                new Locale("de", "DE"), "German", new Locale("sv", "SE"),
+        Map<Locale, String> expectedCaptions = Map.of(Locale.of("fi", "FI"),
+                "Finnish", Locale.of("en", "GB"), "English",
+                Locale.of("de", "DE"), "German", Locale.of("sv", "SE"),
                 "Swedish");
         // Assert that item captions are set correctly
         items.getItems().forEach(item -> {
@@ -65,7 +65,7 @@ public class LanguageSelectTest extends UIUnitTest {
     @Test
     public void testLanguageSelectWithDifferentValue() {
         // Change the selected locale to Finnish
-        languageSelect.setValue(new Locale("fi", "FI"));
+        languageSelect.setValue(Locale.of("fi", "FI"));
 
         // Assert that the selected value is now Finnish
         assertEquals("fi", languageSelect.getValue().getLanguage());
@@ -73,9 +73,9 @@ public class LanguageSelectTest extends UIUnitTest {
         // Assert that item captions are set correctly
         @SuppressWarnings("unchecked")
         var items = (ListDataProvider<Locale>) languageSelect.getDataProvider();
-        Map<Locale, String> expectedCaptions = Map.of(new Locale("fi", "FI"),
-                "Suomi", new Locale("en", "GB"), "Englanti",
-                new Locale("de", "DE"), "Saksa", new Locale("sv", "SE"),
+        Map<Locale, String> expectedCaptions = Map.of(Locale.of("fi", "FI"),
+                "Suomi", Locale.of("en", "GB"), "Englanti",
+                Locale.of("de", "DE"), "Saksa", Locale.of("sv", "SE"),
                 "Ruotsi");
         items.getItems().forEach(item -> {
             assertEquals(expectedCaptions.get(item),

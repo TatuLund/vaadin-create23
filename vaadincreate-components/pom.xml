@@ -208,7 +208,7 @@
 							<!-- Package format version - do not change -->
 							<Vaadin-Package-Version>1</Vaadin-Package-Version>
 							<Vaadin-License-Title>${Vaadin-License-Title}</Vaadin-License-Title>
-							<Vaadin-Widgetsets>org.vaadin.tatu.vaadincreate.WidgetSet</Vaadin-Widgetsets>
+							<Vaadin-Widgetsets>org.vaadin.tatu.vaadincreate.components.WidgetSet</Vaadin-Widgetsets>
 						</manifestEntries>
 					</archive>
 				</configuration>
@@ -250,8 +250,8 @@
                 <artifactId>closure-compiler-maven-plugin</artifactId>
                 <version>2.26.0</version>
                 <configuration>
-	                <baseSourceDir>src/main/resources/org/vaadin/tatu/vaadincreate</baseSourceDir>
-                    <baseTargetDir>src/main/resources/org/vaadin/tatu/vaadincreate</baseTargetDir>
+	                <baseSourceDir>src/main/resources/org/vaadin/tatu/vaadincreate/components</baseSourceDir>
+                    <baseTargetDir>src/main/resources/org/vaadin/tatu/vaadincreate/components</baseTargetDir>
                 </configuration>
                 <executions>
                     <execution>

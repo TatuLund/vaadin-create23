@@ -10,12 +10,12 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.AccessTask;
-import org.vaadin.tatu.vaadincreate.Html;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
-import org.vaadin.tatu.vaadincreate.Html.Span;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
+import org.vaadin.tatu.vaadincreate.components.Html;
+import org.vaadin.tatu.vaadincreate.components.Html.Span;
 
 import com.vaadin.data.Converter;
 import com.vaadin.data.HasValue;

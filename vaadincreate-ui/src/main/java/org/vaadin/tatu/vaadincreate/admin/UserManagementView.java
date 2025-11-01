@@ -4,14 +4,14 @@ import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.vaadin.tatu.vaadincreate.ConfirmDialog;
-import org.vaadin.tatu.vaadincreate.Shortcuts;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
-import org.vaadin.tatu.vaadincreate.AttributeExtension;
-import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaAttributes;
-import org.vaadin.tatu.vaadincreate.AttributeExtension.AriaRoles;
-import org.vaadin.tatu.vaadincreate.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
+import org.vaadin.tatu.vaadincreate.components.ConfirmDialog;
+import org.vaadin.tatu.vaadincreate.components.Shortcuts;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 

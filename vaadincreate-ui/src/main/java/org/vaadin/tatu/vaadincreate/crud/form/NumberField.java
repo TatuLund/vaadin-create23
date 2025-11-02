@@ -8,7 +8,7 @@ import com.vaadin.ui.TextField;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
@@ -39,7 +39,7 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 public class NumberField extends CustomField<Integer>
         implements HasI18N, HasAttributes<NumberField> {
 
-    protected TextField textField = new TextField();
+    protected Input textField = new Input();
     private StockCountConverter stockCountConverter = new StockCountConverter(
             "");
     @Nullable
@@ -48,14 +48,13 @@ public class NumberField extends CustomField<Integer>
     /**
      * Creates a new number field with the given caption.
      *
-     * @param string
+     * @param caption
      *            the caption to set
      */
-    public NumberField(String string) {
+    public NumberField(String caption) {
         super();
         setRole(AriaRoles.FIELD);
-        setCaption(string);
-        setTypeNumber();
+        setCaption(caption);
         textField.addValueChangeListener(valueChange -> {
             var result = stockCountConverter.convertToModel(
                     textField.getValue(), Utils.createValueContext());
@@ -74,12 +73,7 @@ public class NumberField extends CustomField<Integer>
             });
             fireEvent(valueChange);
         });
-    }
-
-    private void setTypeNumber() {
-        // Mark the stock count field as numeric.
-        // This affects the virtual keyboard shown on mobile devices.
-        AttributeExtension.of(textField).setAttribute("type", "number");
+        textField.setAriaLabel(caption);
     }
 
     @Override
@@ -104,5 +98,35 @@ public class NumberField extends CustomField<Integer>
     @Override
     public Integer getValue() {
         return intValue;
+    }
+
+    @Override
+    public void setRequiredIndicatorVisible(boolean requiredIndicatorVisible) {
+        super.setRequiredIndicatorVisible(requiredIndicatorVisible);
+        if (requiredIndicatorVisible) {
+            textField.setAttribute(AriaAttributes.REQUIRED, true);
+        } else {
+            textField.removeAttribute(AriaAttributes.REQUIRED);
+        }
+    }
+
+    @Override
+    public void setCaption(@Nullable String caption) {
+        super.setCaption(caption);
+        if (caption != null) {
+            textField.setAriaLabel(caption);
+        } else {
+            textField.removeAttribute(AriaAttributes.LABEL);
+        }
+    }
+
+    static class Input extends TextField implements HasAttributes<Input> {
+
+        public Input() {
+            super();
+            // Mark the stock count field as numeric.
+            // This affects the virtual keyboard shown on mobile devices.
+            setAttribute("type", "number");
+        }
     }
 }

@@ -112,6 +112,7 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
         public static final String LABELLEDBY = "aria-labelledby";
         public static final String KEYSHORTCUTS = "aria-keyshortcuts";
         public static final String LIVE = "aria-live";
+        public static final String REQUIRED = "aria-required";
     }
 
     /**

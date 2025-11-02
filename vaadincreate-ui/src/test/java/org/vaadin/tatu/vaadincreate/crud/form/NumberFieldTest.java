@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
 
 import com.vaadin.server.ServiceException;
@@ -96,5 +97,39 @@ public class NumberFieldTest extends UIUnitTest {
     public void setValueNull() {
         field.setValue(null);
         assertEquals(Integer.valueOf(0), field.getValue());
+    }
+
+    @Test
+    public void requiredIndicatorAriaAttribute() {
+        field.setRequiredIndicatorVisible(true);
+        assertEquals("true",
+                field.textField.getAttribute(AriaAttributes.REQUIRED));
+
+        field.setRequiredIndicatorVisible(false);
+        assertNull(field.textField.getAttribute(AriaAttributes.REQUIRED));
+    }
+
+    @Test
+    public void ariaLabelIsSet() {
+        assertEquals("Field",
+                field.textField.getAttribute(AriaAttributes.LABEL));
+    }
+
+    @Test
+    public void ariaLabelIsUpdatedWhenCaptionChanges() {
+        field.setCaption("New caption");
+        assertEquals("New caption",
+                field.textField.getAttribute(AriaAttributes.LABEL));
+    }
+
+    @Test
+    public void ariaLabelIsRemovedWhenCaptionIsNull() {
+        field.setCaption(null);
+        assertNull(field.textField.getAttribute(AriaAttributes.LABEL));
+    }
+
+    @Test
+    public void numberInputType() {
+        assertEquals("number", field.textField.getAttribute("type"));
     }
 }

@@ -135,7 +135,6 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
         public static final String LINK = "link";
         public static final String FORM = "form";
         public static final String GROUP = "group";
-        public static final String FIELD = "field";
         public static final String DIALOG = "dialog";
         public static final String SEARCHBOX = "searchbox";
         public static final String REGION = "region";

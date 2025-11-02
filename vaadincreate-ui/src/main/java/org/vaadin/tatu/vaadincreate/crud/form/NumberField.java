@@ -53,7 +53,7 @@ public class NumberField extends CustomField<Integer>
      */
     public NumberField(String caption) {
         super();
-        setRole(AriaRoles.FIELD);
+        setRole(AriaRoles.GROUP);
         setCaption(caption);
         textField.addValueChangeListener(valueChange -> {
             var result = stockCountConverter.convertToModel(
@@ -108,6 +108,7 @@ public class NumberField extends CustomField<Integer>
         } else {
             textField.removeAttribute(AriaAttributes.REQUIRED);
         }
+        removeAttribute(AriaAttributes.REQUIRED);
     }
 
     @Override
@@ -118,6 +119,7 @@ public class NumberField extends CustomField<Integer>
         } else {
             textField.removeAttribute(AriaAttributes.LABEL);
         }
+        removeAttribute(AriaAttributes.LABELLEDBY);
     }
 
     static class Input extends TextField implements HasAttributes<Input> {

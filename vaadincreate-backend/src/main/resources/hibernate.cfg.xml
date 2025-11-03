@@ -1,4 +1,4 @@
-<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
         <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
@@ -10,6 +10,7 @@
         <property name="hibernate.hbm2ddl.auto">create</property>
         <property name="hibernate.show_sql">false</property>
         <property name="hibernate.format_sql">false</property>
+        <property name="hibernate.id.new_generator_mappings">true</property>
         <mapping class="org.vaadin.tatu.vaadincreate.backend.data.Product"/>
         <mapping class="org.vaadin.tatu.vaadincreate.backend.data.Category"/>
         <mapping class="org.vaadin.tatu.vaadincreate.backend.data.User"/>

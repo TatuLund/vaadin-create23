@@ -1,5 +1,5 @@
 <!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+    "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
 
@@ -22,6 +22,9 @@
         <!-- Optionally keep show_sql off to reduce log noise in production -->
         <property name="hibernate.show_sql">false</property>
         <property name="hibernate.format_sql">false</property>
+
+        <!-- Ensure new generator mappings are used -->
+        <property name="hibernate.id.new_generator_mappings">true</property>
 
         <!-- Entity mappings remain the same -->
         <mapping class="org.vaadin.tatu.vaadincreate.backend.data.Product"/>

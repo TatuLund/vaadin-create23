@@ -49,7 +49,7 @@ public class NumberField extends CustomField<Integer>
      * Creates a new number field with the given caption.
      *
      * @param caption
-     *            the caption to set
+     *                the caption to set
      */
     public NumberField(String caption) {
         super();
@@ -87,6 +87,13 @@ public class NumberField extends CustomField<Integer>
             value = 0;
         }
         super.setValue(value);
+        if (getUI() == null) {
+            return;
+        }
+        getUI().runAfterRoundTrip(() -> {
+            removeAttribute(AriaAttributes.LABELLEDBY);
+            removeAttribute(AriaAttributes.REQUIRED);
+        });
     }
 
     @Override

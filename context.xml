@@ -24,5 +24,5 @@
     <WatchedResource>WEB-INF/tomcat-web.xml</WatchedResource>
     <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
 
-    <Manager pathname="" saveSessions="false" />
+    <Manager pathname="" />
 </Context>

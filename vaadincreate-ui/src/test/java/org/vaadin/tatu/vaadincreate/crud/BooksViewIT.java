@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import org.junit.After;
 import org.junit.Test;
@@ -301,8 +301,7 @@ public class BooksViewIT extends AbstractViewTest {
             waitForElementPresent(By.id("book-grid"));
             $(ButtonElement.class).id("new-product").click();
             // The opening CSS animation is 300ms
-            driver.manage().timeouts().implicitlyWait(350,
-                    TimeUnit.MILLISECONDS);
+            driver.manage().timeouts().implicitlyWait(Duration.ofMillis(350));
             var form = $(CssLayoutElement.class).id("book-form");
             form.$(ComboBoxElement.class).id("availability").openPopup();
             assertTrue(

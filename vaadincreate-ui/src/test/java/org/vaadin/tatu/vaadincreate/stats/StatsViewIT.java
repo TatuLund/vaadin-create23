@@ -6,8 +6,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.junit.After;
@@ -215,7 +215,7 @@ public class StatsViewIT extends AbstractViewTest {
         if (visualTests()) {
             waitForElementPresent(By.className("loaded"));
             // Charts have animation, wait for stabilize before compare
-            driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(1));
             assertTrue($(UIElement.class).first().compareScreen("stats.png"));
         }
     }

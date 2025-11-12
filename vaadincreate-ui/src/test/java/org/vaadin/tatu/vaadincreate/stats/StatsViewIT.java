@@ -269,6 +269,8 @@ public class StatsViewIT extends AbstractViewTest {
          */
         public List<WebElement> getMenuItems() {
             var menu = getMenuOverlay();
+            getDriver().manage().timeouts()
+                    .implicitlyWait(Duration.ofMillis(100));
             return menu.findElements(By.tagName("div")).stream()
                     .filter(div -> div.getAttribute("role").equals("menuitem"))
                     .toList();

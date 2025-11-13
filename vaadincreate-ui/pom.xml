@@ -138,6 +138,12 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>com.deque.html.axe-core</groupId>
+            <artifactId>selenium</artifactId>
+            <version>4.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.vaadin.testbench</groupId>
             <artifactId>vaadin-uiunittest</artifactId>
             <version>5.2.0</version>
@@ -183,6 +189,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

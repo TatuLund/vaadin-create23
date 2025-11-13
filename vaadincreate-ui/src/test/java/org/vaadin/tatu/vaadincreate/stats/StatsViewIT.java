@@ -18,6 +18,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 
+import com.deque.html.axecore.selenium.AxeBuilder;
 import com.vaadin.testbench.elements.AbstractComponentElement;
 import com.vaadin.testbench.elements.UIElement;
 import com.vaadin.testbench.elementsbase.ServerClass;
@@ -218,6 +219,21 @@ public class StatsViewIT extends AbstractViewTest {
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(1));
             assertTrue($(UIElement.class).first().compareScreen("stats.png"));
         }
+    }
+
+    @Test
+    public void accessibility() {
+        waitForElementPresent(By.className("loaded"));
+
+        var chart = $(ChartElement.class).id("price-chart");
+        chart.getMenuButton().click();
+
+        var axeBuilder = new AxeBuilder();
+        axeBuilder.exclude(".v-tooltip");
+
+        var axeResults = axeBuilder.analyze(driver);
+        logViolations(axeResults);
+        assertTrue(axeResults.violationFree());
     }
 
     private static boolean seriesIsHidden(WebElement elem) {

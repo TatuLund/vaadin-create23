@@ -11,8 +11,10 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 
+import com.deque.html.axecore.selenium.AxeBuilder;
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.ComboBoxElement;
+import com.vaadin.testbench.elements.GridElement;
 import com.vaadin.testbench.elements.LabelElement;
 import com.vaadin.testbench.elements.NotificationElement;
 import com.vaadin.testbench.elements.PasswordFieldElement;
@@ -160,5 +162,15 @@ public class UserManagementViewIT extends AbstractViewTest {
         if (visualTests()) {
             assertTrue($(UIElement.class).first().compareScreen("user.png"));
         }
+    }
+
+    @Test
+    public void accessibility() {
+        var axeBuilder = new AxeBuilder();
+        axeBuilder.exclude(".v-tooltip", ".cancel-button");
+
+        var axeResults = axeBuilder.analyze(driver);
+        logViolations(axeResults);
+        assertTrue(axeResults.violationFree());
     }
 }

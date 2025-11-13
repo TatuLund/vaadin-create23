@@ -12,7 +12,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.deque.html.axecore.results.Results;
 import com.vaadin.testbench.Parameters;
 import com.vaadin.testbench.ScreenshotOnFailureRule;
 import com.vaadin.testbench.TestBench;
@@ -170,6 +173,16 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
         this.waitForElementPresent(By.id("AppWidgetset"));
     }
 
+    public void logViolations(Results axeResults) {
+        axeResults.getViolations().forEach(violation -> {
+            logger.error("Accessibility violation: {} (ID: {})",
+                    violation.getDescription(), violation.getId());
+            violation.getNodes().forEach(node -> {
+                logger.error("  Affected node: {}", node.getTarget());
+            });
+        });
+    }
+
     /**
      * Returns deployment host name concatenated with route.
      *
@@ -217,5 +230,8 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
     protected void waitForElementVisible(final By by) {
         waitUntil(ExpectedConditions.visibilityOfElementLocated(by));
     }
+
+    private static Logger logger = LoggerFactory
+            .getLogger(AbstractViewTest.class);
 
 }

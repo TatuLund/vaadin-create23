@@ -9,6 +9,7 @@ import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
@@ -83,10 +84,13 @@ public class AppLayout extends Composite implements HasI18N {
         menuLayout.addStyleName(ValoTheme.MENU_PART);
         menuLayout.setWidth(null);
         menuLayout.setHeight("100%");
+        AttributeExtension.of(menuLayout).setAttribute(AriaAttributes.ROLE,
+                AriaRoles.REGION);
 
         title = new CssLayout();
         var resource = new ThemeResource("images/bookstore.png");
         var image = new Image("", resource);
+        image.setAlternateText("Bookstore Logo");
         image.setPrimaryStyleName(ValoTheme.MENU_LOGO);
         image.setWidthUndefined();
         title.addComponents(image);
@@ -130,6 +134,8 @@ public class AppLayout extends Composite implements HasI18N {
         content.setSizeFull();
         content.setMargin(false);
         content.setSpacing(false);
+        AttributeExtension.of(content).setAttribute(AriaAttributes.ROLE,
+                AriaRoles.MAIN);
 
         layout.addComponent(menuLayout);
         layout.addComponent(content);

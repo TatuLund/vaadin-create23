@@ -16,6 +16,8 @@ import org.openqa.selenium.Keys;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 
+import com.deque.html.axecore.results.Results;
+import com.deque.html.axecore.selenium.AxeBuilder;
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.CheckBoxGroupElement;
 import com.vaadin.testbench.elements.ComboBoxElement;
@@ -310,6 +312,21 @@ public class BooksViewIT extends AbstractViewTest {
             assertFalse(form.getClassNames()
                     .contains(VaadinCreateTheme.BOOKFORM_WRAPPER_VISIBLE));
         }
+    }
+
+    @Test
+    public void accessibility() {
+        waitForElementPresent(By.id("book-grid"));
+
+        var row = $(GridElement.class).first().getRow(0);
+        row.click();
+
+        var axeBuilder = new AxeBuilder();
+        axeBuilder.exclude(".v-tooltip", ".cancel-button");
+
+        var axeResults = axeBuilder.analyze(driver);
+        logViolations(axeResults);
+        assertTrue(axeResults.violationFree());
     }
 
     private static String stockCount(String count) {

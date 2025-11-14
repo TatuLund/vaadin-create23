@@ -9,7 +9,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
+import org.vaadin.tatu.vaadincreate.stats.StatsViewIT.ChartElement;
 
+import com.deque.html.axecore.selenium.AxeBuilder;
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.GridElement;
 import com.vaadin.testbench.elements.LabelElement;
@@ -68,4 +70,15 @@ public class CategoryManagementViewIT extends AbstractViewTest {
                     $(UIElement.class).first().compareScreen("category.png"));
         }
     }
+
+    @Test
+    public void accessibility() {
+        var axeBuilder = new AxeBuilder();
+        axeBuilder.exclude(".v-tooltip");
+
+        var axeResults = axeBuilder.analyze(driver);
+        logViolations(axeResults);
+        assertTrue(axeResults.violationFree());
+    }
+
 }

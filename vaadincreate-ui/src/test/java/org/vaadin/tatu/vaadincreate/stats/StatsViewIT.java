@@ -66,7 +66,9 @@ public class StatsViewIT extends AbstractViewTest {
     @Test
     public void priceChartContent() {
         waitForElementPresent(By.className("loaded"));
-
+        // Wait for chart animation to stabilize
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(1));
+  
         var chart = $(ChartElement.class).id("price-chart");
 
         assertEquals("Hinnat", chart.getTitle());
@@ -284,12 +286,10 @@ public class StatsViewIT extends AbstractViewTest {
          * @return the menu item WebElements
          */
         public List<WebElement> getMenuItems() {
-            var menu = getMenuOverlay();
+            var menu = getMenuOverlay().findElement(By.tagName("div"));
             getDriver().manage().timeouts()
-                    .implicitlyWait(Duration.ofMillis(100));
-            return menu.findElements(By.tagName("div")).stream()
-                    .filter(div -> div.getAttribute("role").equals("menuitem"))
-                    .toList();
+                    .implicitlyWait(Duration.ofMillis(200));
+            return menu.findElements(By.tagName("div"));
         }
 
         /**

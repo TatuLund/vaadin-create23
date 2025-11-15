@@ -157,15 +157,8 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
         waitForAppLoaded();
     }
 
-    // Return true to enable visual tests. They depend on used OS and Browser
-    // version, hence disabled by default. Run tests once, screenshot tests
-    // will fail, and new reference pictures will be generated in
-    // error-screenshots folder. Check if they are ok and move to
-    // reference-screenshots folder. Rerun the tests to verify,
+    // Return false to disable visual tests
     protected boolean visualTests() {
-        if (Boolean.getBoolean("ghActions")) {
-            return false;
-        }
         return true;
     }
 

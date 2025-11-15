@@ -16,7 +16,6 @@ import org.openqa.selenium.Keys;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 
-import com.deque.html.axecore.results.Results;
 import com.deque.html.axecore.selenium.AxeBuilder;
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.CheckBoxGroupElement;

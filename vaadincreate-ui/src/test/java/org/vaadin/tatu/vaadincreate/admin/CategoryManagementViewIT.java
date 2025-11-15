@@ -9,7 +9,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
-import org.vaadin.tatu.vaadincreate.stats.StatsViewIT.ChartElement;
 
 import com.deque.html.axecore.selenium.AxeBuilder;
 import com.vaadin.testbench.elements.ButtonElement;

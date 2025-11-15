@@ -302,7 +302,7 @@ public class BooksViewIT extends AbstractViewTest {
             waitForElementPresent(By.id("book-grid"));
             $(ButtonElement.class).id("new-product").click();
             // The opening CSS animation is 300ms
-            driver.manage().timeouts().implicitlyWait(Duration.ofMillis(350));
+            driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
             var form = $(CssLayoutElement.class).id("book-form");
             form.$(ComboBoxElement.class).id("availability").openPopup();
             assertTrue(

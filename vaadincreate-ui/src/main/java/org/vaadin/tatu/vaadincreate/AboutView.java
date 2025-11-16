@@ -172,6 +172,8 @@ public class AboutView extends VerticalLayout
         editButton.addStyleNames(ValoTheme.BUTTON_BORDERLESS,
                 ValoTheme.BUTTON_SMALL);
         editButton.setDescription(getTranslation(I18n.About.EDIT_NOTE));
+        AttributeExtension.of(editButton)
+                .setAttribute(AriaAttributes.DESCRIBEDBY, "admins-note");
     }
 
     private void createAdminsNote() {
@@ -216,6 +218,7 @@ public class AboutView extends VerticalLayout
                         I18n.About.VAADIN, Version.getFullVersion()),
                 ContentMode.HTML);
         aboutLabel.addStyleName(VaadinCreateTheme.ABOUTVIEW_ABOUTLABEL);
+        aboutLabel.setId("info-label");
         // you can add Vaadin components in predefined slots in the custom
         // layout
         aboutContent.addComponent(aboutLabel, "info");

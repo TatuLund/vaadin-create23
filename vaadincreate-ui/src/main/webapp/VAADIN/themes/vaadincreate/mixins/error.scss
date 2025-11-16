@@ -1,0 +1,7 @@
+// ERROR VIEW
+@mixin error {
+  .errorview-explanation {
+    white-space: normal;
+    text-align: justify;
+  }
+}

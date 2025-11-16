@@ -10,7 +10,10 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -26,10 +29,17 @@ public class ErrorView extends VerticalLayout implements View, HasI18N {
     Label explanation = new Label();
 
     public ErrorView() {
+        setSizeFull();
+        var wrapper = new VerticalLayout();
         var header = new Label(getTranslation(I18n.Error.VIEW_NOT_FOUND));
         header.addStyleName(ValoTheme.LABEL_H1);
-        addComponent(header);
-        addComponent(explanation);
+        explanation.addStyleNames(ValoTheme.LABEL_FAILURE,
+                VaadinCreateTheme.ERRORVIEW_EXPLANATION);
+        wrapper.addComponents(header, explanation);
+        wrapper.setComponentAlignment(header, Alignment.MIDDLE_CENTER);
+        wrapper.setComponentAlignment(explanation, Alignment.MIDDLE_CENTER);
+        addComponent(wrapper);
+        setComponentAlignment(wrapper, Alignment.MIDDLE_CENTER);
     }
 
     @Override
@@ -40,6 +50,12 @@ public class ErrorView extends VerticalLayout implements View, HasI18N {
         }
         explanation.setValue(getTranslation(I18n.Error.NOT_FOUND_DESC,
                 viewChange.getViewName()));
+        Notification.show(
+                String.format("%s %s",
+                        getTranslation(I18n.Error.VIEW_NOT_FOUND),
+                        getTranslation(I18n.Error.NOT_FOUND_DESC,
+                                viewChange.getViewName())),
+                Type.ASSISTIVE_NOTIFICATION);
         var user = Utils.getCurrentUserOrThrow();
         logger.warn("User '{}' attempted to navigate non-existent view '{}'",
                 user.getName(), viewChange.getViewName());

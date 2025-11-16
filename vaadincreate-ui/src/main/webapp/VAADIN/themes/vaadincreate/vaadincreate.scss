@@ -60,6 +60,7 @@ $fake-grid-background-color: white;
 @import "mixins/about.scss";
 @import "mixins/admin.scss";
 @import "mixins/dashboard.scss";
+@import "mixins/error.scss";
 @import "mixins/utilities.scss";
 @import "mixins/responsive.scss";
 
@@ -84,6 +85,7 @@ $fake-grid-background-color: white;
   @include about;
   @include admin;
   @include dashboard;
+  @include error;
   @include utilities;
   @include responsive;
 

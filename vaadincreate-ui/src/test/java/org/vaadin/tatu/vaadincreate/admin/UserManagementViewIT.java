@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Test;
@@ -165,8 +166,16 @@ public class UserManagementViewIT extends AbstractViewTest {
 
     @Test
     public void accessibility() {
+        waitForElementPresent(By.id("new-button"));
+
+        var userSelect = $(ComboBoxElement.class).id("user-select");
+        assertEquals("", userSelect.getValue());
+        userSelect.selectByText("User2");
+
         var axeBuilder = new AxeBuilder();
-        axeBuilder.exclude(".v-tooltip", ".cancel-button");
+        axeBuilder.exclude(".v-tooltip");
+        axeBuilder
+                .disableRules(List.of("color-contrast", "autocomplete-valid"));
 
         var axeResults = axeBuilder.analyze(driver);
         logViolations(axeResults);

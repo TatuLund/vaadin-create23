@@ -249,6 +249,7 @@ public class LoginView extends Composite implements HasI18N {
         infoLayout.setId("info-layout");
         var resource = new ThemeResource("images/bookstore.png");
         var image = new Image("", resource);
+        image.setAlternateText("Bookstore logo");
         image.setWidthFull();
         infoLayout.setStyleName(VaadinCreateTheme.LOGINVIEW_INFORMATION);
         loginInfoText.setWidthFull();

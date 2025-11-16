@@ -65,6 +65,8 @@ public final class VaadinCreateTheme {
     public static final String DASHBOARD_CHART = "dashboard-chart";
     public static final String DASHBOARD_CHART_FOCUSRING = "dashboard-chart-focusring";
 
+    public static final String ERRORVIEW_EXPLANATION = "errorview-explanation";
+
     public static final String COLOR_AVAILABLE = "var(--color-available, green)";
     public static final String COLOR_COMING = "var(--color-coming, orange)";
     public static final String COLOR_DISCONTINUED = "var(--color-discontinued, red)";
@@ -77,5 +79,4 @@ public final class VaadinCreateTheme {
     public static final String CHECKBOXGROUP_SCROLL = "scrollable";
 
     public static final String BUTTON_CANCEL = "cancel";
-
 }

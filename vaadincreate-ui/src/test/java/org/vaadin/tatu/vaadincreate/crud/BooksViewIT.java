@@ -319,9 +319,12 @@ public class BooksViewIT extends AbstractViewTest {
 
         var row = $(GridElement.class).first().getRow(0);
         row.click();
+        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
 
         var axeBuilder = new AxeBuilder();
-        axeBuilder.exclude(".v-tooltip", ".cancel-button");
+        axeBuilder.exclude(".v-tooltip");
+        axeBuilder
+                .exclude("#cancel-button > .v-button-wrap > .v-button-caption");
 
         var axeResults = axeBuilder.analyze(driver);
         logViolations(axeResults);

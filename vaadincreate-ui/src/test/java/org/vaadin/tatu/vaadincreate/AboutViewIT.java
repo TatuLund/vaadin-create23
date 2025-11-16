@@ -1,11 +1,13 @@
 package org.vaadin.tatu.vaadincreate;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
+import com.deque.html.axecore.selenium.AxeBuilder;
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.LabelElement;
 import com.vaadin.testbench.elements.TextAreaElement;
@@ -49,4 +51,15 @@ public class AboutViewIT extends AbstractViewTest {
         area.setValue(oldText);
         waitForElementNotPresent(By.id("admins-text-area"));
     }
+
+    @Test
+    public void accessibility() {
+        var axeBuilder = new AxeBuilder();
+        axeBuilder.exclude(".v-tooltip");
+
+        var axeResults = axeBuilder.analyze(driver);
+        logViolations(axeResults);
+        assertTrue(axeResults.violationFree());
+    }
+
 }

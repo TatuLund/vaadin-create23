@@ -100,6 +100,7 @@ public class LockedObjectsTest {
         eventBus.post(lockingEvent);
         try {
             latch.await();
+            Thread.sleep(10);
         } catch (InterruptedException e) {
             // Ignore
         }
@@ -113,10 +114,12 @@ public class LockedObjectsTest {
         eventBus.post(lockingEvent);
         try {
             latch.await();
+            Thread.sleep(10);
         } catch (InterruptedException e) {
             // Ignore
         }
         assertNull(lockedObjects.isLocked(objects.get(0)));
+        listener.remove();
     }
 
     public static class TestListener implements EventBusListener {

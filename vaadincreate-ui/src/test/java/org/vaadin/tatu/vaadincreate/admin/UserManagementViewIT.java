@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 
 import org.junit.After;
@@ -157,9 +158,9 @@ public class UserManagementViewIT extends AbstractViewTest {
 
     @Test
     public void visual() throws IOException {
-        waitForElementPresent(By.id("new-button"));
-
         if (visualTests()) {
+            waitForElementPresent(By.id("new-button"));
+            driver.manage().timeouts().implicitlyWait(Duration.ofMillis(200));
             assertTrue($(UIElement.class).first().compareScreen("user.png"));
         }
     }

@@ -1,7 +1,9 @@
 package org.vaadin.tatu.vaadincreate;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
@@ -28,6 +30,7 @@ import com.vaadin.server.VaadinServletResponse;
 import com.vaadin.server.VaadinServletService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.testbench.uiunittest.UIUnitTest;
+import com.vaadin.testbench.uiunittest.mocks.MockServletRequest;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 
@@ -103,6 +106,29 @@ public class ServletTest extends UIUnitTest {
     }
 
     @Test
+    public void system_messages_provider_set_session_expired_disabled()
+            throws ServiceException {
+        mockVaadin();
+
+        var servlet = new Servlet() {
+            @Override
+            protected VaadinServletService getService() {
+                return (VaadinServletService) VaadinService.getCurrent();
+            }
+        };
+        servlet.servletInitialized();
+        var messages = VaadinService.getCurrent().getSystemMessages(
+                Locale.getDefault(),
+                new MockRequest(new MockServletRequest(null),
+                        VaadinService.getCurrent()));
+
+        assertNull(messages.getSessionExpiredURL());
+        assertFalse(messages.isSessionExpiredNotificationEnabled());
+
+        tearDown();
+    }
+
+    @Test
     public void bootstrapPageResponse_sets_html_lang_attribute()
             throws ServiceException {
         // Arrange
@@ -120,7 +146,7 @@ public class ServletTest extends UIUnitTest {
         // Assert
         assertEquals(DefaultI18NProvider.LOCALE_FI.getLanguage(),
                 response.getDocument().getElementsByTag("html").attr("lang"));
-    
+
         tearDown();
     }
 

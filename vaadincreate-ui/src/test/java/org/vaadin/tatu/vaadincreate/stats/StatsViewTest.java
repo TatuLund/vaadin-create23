@@ -27,6 +27,7 @@ import org.vaadin.tatu.vaadincreate.stats.StatsView.CustomChart;
 
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.server.ServiceException;
+import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.CssLayout;
 
 public class StatsViewTest extends AbstractUITest {
@@ -151,6 +152,11 @@ public class StatsViewTest extends AbstractUITest {
         then_statistics_match_given_reference(prices, availabilities,
                 stockTitles, stockCounts);
 
+    }
+
+    @Test
+    public void stats_view_is_serializable() {
+        SerializationDebugUtil.assertSerializable(view);
     }
 
     private BooksPresenter createBooksPresenter() {

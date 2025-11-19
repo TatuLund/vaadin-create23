@@ -13,6 +13,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
 import com.vaadin.server.ServiceException;
+import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
@@ -26,6 +27,7 @@ import com.vaadin.ui.Window;
 public class UserManagementViewTest extends AbstractUITest {
 
     private VaadinCreateUI ui;
+    private AdminView view;
 
     @Before
     public void setup() throws ServiceException {
@@ -33,7 +35,7 @@ public class UserManagementViewTest extends AbstractUITest {
         mockVaadin(ui);
         login();
 
-        navigate(AdminView.VIEW_NAME + "/" + UserManagementView.VIEW_NAME,
+        view = navigate(AdminView.VIEW_NAME + "/" + UserManagementView.VIEW_NAME,
                 AdminView.class);
         assertAssistiveNotification("Users opened");
     }
@@ -249,5 +251,10 @@ public class UserManagementViewTest extends AbstractUITest {
         tabSheet.setSelectedTab(0);
         assertNull(tabSheet.getTab(1).getComponentError());
         assertEquals(-1, ui.getPollInterval());
+    }
+
+    @Test
+    public void user_management_view_is_serializable() {
+        SerializationDebugUtil.assertSerializable(view);
     }
 }

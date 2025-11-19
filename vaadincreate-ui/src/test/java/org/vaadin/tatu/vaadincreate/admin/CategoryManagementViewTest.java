@@ -14,6 +14,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Category;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.ServiceException;
+import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Notification;
@@ -23,7 +24,7 @@ import com.vaadin.ui.Window;
 public class CategoryManagementViewTest extends AbstractUITest {
 
     private VaadinCreateUI ui;
-    private AdminView admin;
+    private AdminView view;
     private CategoryManagementView cats;
     private TabSheet tabs;
 
@@ -33,10 +34,10 @@ public class CategoryManagementViewTest extends AbstractUITest {
         mockVaadin(ui);
         login();
 
-        admin = navigate(AdminView.VIEW_NAME, AdminView.class);
+        view = navigate(AdminView.VIEW_NAME, AdminView.class);
         assertAssistiveNotification("Categories opened");
 
-        tabs = $(admin, TabSheet.class).first();
+        tabs = $(view, TabSheet.class).first();
         cats = (CategoryManagementView) test(tabs).current();
     }
 
@@ -278,5 +279,10 @@ public class CategoryManagementViewTest extends AbstractUITest {
         // Assert that delete failed and error shown
         assertEquals("Category was already deleted.",
                 $(Notification.class).last().getCaption());
+    }
+
+    @Test
+    public void category_management_view_is_serializable() {
+        SerializationDebugUtil.assertSerializable(view);
     }
 }

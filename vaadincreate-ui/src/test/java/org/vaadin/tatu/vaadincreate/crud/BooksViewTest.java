@@ -36,6 +36,7 @@ import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
 import com.vaadin.ui.Notification;
@@ -1299,19 +1300,7 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    @SuppressWarnings({ "unused", "java:S2699" })
-    public void book_view_is_serializable()
-            throws IOException, ClassNotFoundException {
-        var bs = new ByteArrayOutputStream();
-        var os = new ObjectOutputStream(bs);
-        os.writeObject(ui.getSession());
-        os.flush();
-        os.close();
-
-        var a = bs.toByteArray();
-        ByteArrayInputStream bis = new ByteArrayInputStream(a);
-        ObjectInputStream in = new ObjectInputStream(bis);
-        var v = (VaadinSession) in.readObject();
+    public void book_view_is_serializable() {
+        SerializationDebugUtil.assertSerializable(view);
     }
-
 }

@@ -91,6 +91,8 @@ public class UserManagementView extends VerticalLayout
                 userSelected(valueChange.getValue());
             }
         });
+        AttributeExtension.of(userSelect).setAttribute(AriaAttributes.LABEL,
+                getTranslation(I18n.User.SEARCH));
         newUser = new Button(getTranslation(I18n.User.NEW_USER));
         newUser.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         newUser.setId("new-button");

@@ -172,6 +172,8 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
                     violation.getDescription(), violation.getId());
             violation.getNodes().forEach(node -> {
                 logger.error("  Affected node: {}", node.getTarget());
+                logger.error("  Failure summary: {}", node.getFailureSummary());
+                logger.error("  Help: {}", violation.getHelp());
             });
         });
     }

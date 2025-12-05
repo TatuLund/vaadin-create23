@@ -302,7 +302,7 @@ public class BooksViewIT extends AbstractViewTest {
             waitForElementPresent(By.id("book-grid"));
             $(ButtonElement.class).id("new-product").click();
             // The opening CSS animation is 300ms
-            driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
+            wait(Duration.ofMillis(500));
             var form = $(CssLayoutElement.class).id("book-form");
             form.$(ComboBoxElement.class).id("availability").openPopup();
             assertTrue(
@@ -319,7 +319,7 @@ public class BooksViewIT extends AbstractViewTest {
 
         var row = $(GridElement.class).first().getRow(0);
         row.click();
-        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
+        wait(Duration.ofMillis(500));
 
         var axeBuilder = new AxeBuilder();
         axeBuilder.exclude(".v-tooltip");

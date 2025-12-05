@@ -160,7 +160,7 @@ public class UserManagementViewIT extends AbstractViewTest {
     public void visual() throws IOException {
         if (visualTests()) {
             waitForElementPresent(By.id("new-button"));
-            driver.manage().timeouts().implicitlyWait(Duration.ofMillis(200));
+            wait(Duration.ofMillis(200));
             assertTrue($(UIElement.class).first().compareScreen("user.png"));
         }
     }

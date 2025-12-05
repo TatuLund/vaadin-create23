@@ -67,8 +67,8 @@ public class StatsViewIT extends AbstractViewTest {
     public void priceChartContent() {
         waitForElementPresent(By.className("loaded"));
         // Wait for chart animation to stabilize
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(1));
-  
+        wait(Duration.ofSeconds(1));
+
         var chart = $(ChartElement.class).id("price-chart");
 
         assertEquals("Hinnat", chart.getTitle());
@@ -218,7 +218,7 @@ public class StatsViewIT extends AbstractViewTest {
         if (visualTests()) {
             waitForElementPresent(By.className("loaded"));
             // Charts have animation, wait for stabilize before compare
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(1));
+            wait(Duration.ofSeconds(1));
             assertTrue($(UIElement.class).first().compareScreen("stats.png"));
         }
     }
@@ -287,8 +287,11 @@ public class StatsViewIT extends AbstractViewTest {
          */
         public List<WebElement> getMenuItems() {
             var menu = getMenuOverlay().findElement(By.tagName("div"));
-            getDriver().manage().timeouts()
-                    .implicitlyWait(Duration.ofMillis(200));
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             return menu.findElements(By.tagName("div"));
         }
 

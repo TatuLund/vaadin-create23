@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -160,6 +161,17 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
     // Return false to disable visual tests
     protected boolean visualTests() {
         return true;
+    }
+
+    public void wait(Duration duration) {
+        long timeoutMillis = duration.toMillis();
+        if (timeoutMillis > 0) {
+            try {
+                Thread.sleep(timeoutMillis);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public void waitForAppLoaded() {

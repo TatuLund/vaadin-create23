@@ -3,7 +3,9 @@ package org.vaadin.tatu.vaadincreate.admin;
 import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 
+import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 
@@ -28,6 +30,7 @@ public interface TabView extends HasI18N {
                 String.format("%s %s", getTranslation(viewName),
                         getTranslation(I18n.OPENED)),
                 Notification.Type.ASSISTIVE_NOTIFICATION);
+        Telemetry.entered(null, (ComponentContainer) this);
     }
 
 }

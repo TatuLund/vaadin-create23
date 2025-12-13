@@ -10,6 +10,7 @@ import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.icons.VaadinIcons;
@@ -105,6 +106,7 @@ public class CategoryManagementView extends VerticalLayout
             newCategoryButton.setEnabled(true);
             Notification.show(getTranslation(I18n.Category.CATEGORY_SAVED,
                     saved.getName()));
+            Telemetry.saveItem(saved);
         }
     }
 
@@ -114,6 +116,7 @@ public class CategoryManagementView extends VerticalLayout
         if (categories != null) {
             categories.remove(category);
         }
+        Telemetry.deleteItem(category);
     }
 
     private void addCategory() {

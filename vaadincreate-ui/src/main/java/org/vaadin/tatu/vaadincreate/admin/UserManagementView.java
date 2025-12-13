@@ -13,6 +13,7 @@ import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.ValidationException;
@@ -179,6 +180,7 @@ public class UserManagementView extends VerticalLayout
             disableButtons();
             userSelect.setValue(null);
             removeStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES);
+            Telemetry.deleteItem(user);
         });
     }
 
@@ -202,6 +204,7 @@ public class UserManagementView extends VerticalLayout
             form.clear();
             disableButtons();
             userSelect.setValue(null);
+            Telemetry.saveItem(user);
         } catch (ValidationException e1) {
             // NOP
         }

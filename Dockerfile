@@ -10,6 +10,19 @@ RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests -Prelease
 RUN mv /app/vaadincreate-ui/target/*.war /app/vaadincreate-ui/target/ROOT.war
 # Create the final image
 FROM tomcat:9-jre21
+# Add OpenTelemetry Java agent (version can be updated)
+ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.22.0/opentelemetry-javaagent.jar /otel/opentelemetry-javaagent.jar
+
+# Configure agent
+ENV OTEL_SERVICE_NAME="vaadincreate"
+ENV OTEL_TRACES_EXPORTER="otlp"
+ENV OTEL_METRICS_EXPORTER="none"
+ENV OTEL_LOGS_EXPORTER="none"
+ENV OTEL_EXPORTER_OTLP_PROTOCOL="grpc"
+ENV OTEL_EXPORTER_OTLP_ENDPOINT="http://otel-collector:4317"
+ENV OTEL_TRACES_SAMPLER="parentbased_traceidratio"
+ENV OTEL_TRACES_SAMPLER_ARG="1.0"
+
 # Ensure the WAR file is available
 COPY --from=build /app/vaadincreate-ui/target/ROOT.war /usr/local/tomcat/webapps/
 

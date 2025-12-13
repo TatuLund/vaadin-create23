@@ -7,8 +7,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Test;
@@ -19,9 +17,8 @@ import org.openqa.selenium.interactions.Actions;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 
 import com.deque.html.axecore.selenium.AxeBuilder;
-import com.vaadin.testbench.elements.AbstractComponentElement;
+import com.vaadin.testbench.elements.ChartElement;
 import com.vaadin.testbench.elements.UIElement;
-import com.vaadin.testbench.elementsbase.ServerClass;
 
 public class StatsViewIT extends AbstractViewTest {
 
@@ -140,6 +137,7 @@ public class StatsViewIT extends AbstractViewTest {
         button.sendKeys(Keys.SPACE);
         var menu = chart.getMenuOverlay();
         assertTrue(menu.isDisplayed());
+        wait(Duration.ofMillis(200));
         var items = chart.getMenuItems();
         assertEquals(5, items.size());
         // Verify menu item text
@@ -179,7 +177,7 @@ public class StatsViewIT extends AbstractViewTest {
         assertFalse(chart.getAttribute("aria-label").contains("tyhjä"));
 
         // Verify the button role and tabindex, and aria-label
-        var buttons = chart.getLegendItemss();
+        var buttons = chart.getLegendItems();
         assertEquals("button", buttons.get(0).getAttribute("role"));
         assertEquals("0", buttons.get(0).getAttribute("tabindex"));
         assertTrue(buttons.get(0).getAttribute("aria-label").contains("Määrä"));
@@ -243,147 +241,5 @@ public class StatsViewIT extends AbstractViewTest {
             return false;
         }
         return elem.getAttribute("visibility").equals("hidden");
-    }
-
-    /**
-     * TestBench element for Vaadin Charts.
-     * 
-     * IMHO: This should be part of TestBench elements in the framework.
-     */
-    @ServerClass("com.vaadin.addon.charts.Chart")
-    public static class ChartElement extends AbstractComponentElement {
-
-        /**
-         * Gets the SVG element inside the chart.
-         *
-         * @return the SVG WebElement
-         */
-        public WebElement getSvg() {
-            return findElement(By.tagName("svg"));
-        }
-
-        /**
-         * Gets the menu button element inside the chart.
-         *
-         * @return the menu button WebElement, a SVG element
-         */
-        public WebElement getMenuButton() {
-            return findElement(By.className("highcharts-button"));
-        }
-
-        /**
-         * Gets the menu overlay element inside the chart.
-         *
-         * @return the menu overlay WebElement, a DIV element
-         */
-        public WebElement getMenuOverlay() {
-            return findElement(By.className("highcharts-contextmenu"));
-        }
-
-        /**
-         * Gets the menu item elements inside the chart menu overlay.
-         *
-         * @return the menu item WebElements
-         */
-        public List<WebElement> getMenuItems() {
-            var menu = getMenuOverlay().findElement(By.tagName("div"));
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            return menu.findElements(By.tagName("div"));
-        }
-
-        /**
-         * Gets the legend item elements inside the chart.
-         *
-         * @return the legend item WebElements, SVG elements
-         */
-        public List<WebElement> getLegendItemss() {
-            return findElements(By.className("highcharts-legend-item"));
-        }
-
-        /**
-         * Gets the series elements inside the chart.
-         *
-         * @return the series WebElements, SVG elements
-         */
-        public List<WebElement> getSeries() {
-            return findElements(By.className("highcharts-series"));
-        }
-
-        /**
-         * Gets the Y axis title texts inside the chart.
-         *
-         * @return the list of Y axis title texts
-         */
-        public List<String> getYAxisTitles() {
-            return findElements(By.className("highcharts-yaxis-title")).stream()
-                    .map(WebElement::getText).toList();
-        }
-
-        /**
-         * Gets the Y axis label texts inside the chart.
-         *
-         * @param index
-         *            the Y axis index, 0 = first
-         * @return the list of Y axis label texts
-         */
-        public List<String> getYAxisLabels(int index) {
-            var yAxes = findElements(By.className("highcharts-yaxis-labels"));
-            var labelsContainer = yAxes.get(index);
-            return labelsContainer.findElements(By.tagName("text")).stream()
-                    .map(ChartElement::getLabelText).toList();
-        }
-
-        /**
-         * Gets the X axis label texts inside the chart.
-         *
-         * @return the list of X axis label texts
-         */
-        public List<String> getXAxisLabels() {
-            var labelsContainer = findElement(
-                    By.className("highcharts-xaxis-labels"));
-            var texts = labelsContainer.findElements(By.tagName("text"));
-            return texts.stream().map(ChartElement::getLabelText).toList();
-        }
-
-        private static String getLabelText(WebElement text) {
-            return text.findElements(By.tagName("tspan")).stream()
-                    .map(WebElement::getText).collect(Collectors.joining(" "));
-        }
-
-        /**
-         * Gets the data label texts inside the chart.
-         *
-         * @return the list of data label texts
-         */
-        public List<String> getDataLabels() {
-            return findElements(By.className("highcharts-data-labels")).stream()
-                    .flatMap(
-                            dl -> dl.findElements(By.tagName("tspan")).stream())
-                    .map(WebElement::getText).toList();
-        }
-
-        /**
-         * Gets the chart title text.
-         *
-         * @return the chart title text
-         */
-        public String getTitle() {
-            var title = findElement(By.className("highcharts-title"));
-            return getLabelText(title);
-        }
-
-        /**
-         * Gets the chart subtitle text.
-         *
-         * @return the chart subtitle text
-         */
-        public String getSubTitle() {
-            var subtitle = findElement(By.className("highcharts-subtitle"));
-            return getLabelText(subtitle);
-        }
     }
 }

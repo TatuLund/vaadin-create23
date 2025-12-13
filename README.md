@@ -1,6 +1,6 @@
 # Vaadin Create '23 demo app (Vaadin 8)
 
-This is show case application for advanced Vaadin 8 topics. The application focuses on UI design and architecture of the UI code. These techniques help to keep old Vaadin 8 applications up to date. The application is built with Vaadin 8.28, which is fully compatible with Java 11 and 21.
+This is show case application for advanced Vaadin 8 topics. The application focuses on UI design and architecture of the UI code. These techniques help to keep old Vaadin 8 applications up to date. The application is built with Vaadin 8.30.0, which is fully compatible with Java 11 and 21.
 
 This project is my dogfooding test application for legacy Vaadin 8 as we are still maintaining it under our commercial extended maintenance program. Thus, even it is a bit fabricated, I have added there are many details that you would find in real production application.
 
@@ -64,6 +64,8 @@ Despite being somewhat artificial this demo app covers various use cases you may
 	- The EventBus uses RedisPubSubService to share the events within the cluster
 - The custom theme is using BEM (Block Element Modifier) naming scheme to avoid class name conflicts in CSS
 - Example of how to localize / provide translations for texts used in UI
+- Observability
+    - Simple utility class using OpenTelemetry adds events and attributes of the user actions to trace spans.
 
 ### Backend
 
@@ -125,7 +127,7 @@ This is intentional to demonstrate the current state of Vaadin 8 extended mainte
 
 The following commercial products are used.
 
-- Vaadin 8.28.4. The application uses some features it provides. (The latest free version 8.14.3)
+- Vaadin 8.30.0. The application uses some features it provides. (The latest free version 8.14.3)
   - Eager UI cleanup
   - Binder: change tracking
   - Binder: draft saving
@@ -212,7 +214,7 @@ Debugging client side code in the vaadincreate-ui project:
 
 ### Build simulated production setup with Docker
 
-The project root folder has Dockerfile, Dockerfile.db and docker-compose.yaml files for setting up five container demonstrator "production" environment. 
+The project root folder has Dockerfile, Dockerfile.db and docker-compose.yaml files for setting up eight container demonstrator "production" environment. 
 
 Check Dockerfile first, add your license key there into VAADIN_PRO_KEY environment variable, the license checker needs this during build time as it is using commercial assets.
 
@@ -249,7 +251,8 @@ docker-compose build app-1
 docker-compose build app-2
 ```
 
-The compose file builds also HighCharts export service, Redis and Nginx containers. Redis is used by EventBus for sharing events within the cluster and Nginx is used as load balancer. As the free edition of Nginx does not support real sticky sessions the nginx.conf demonstrates one potential workaround for this problem.
+The compose file builds also HighCharts export service, Redis and Nginx containers. Redis is used by EventBus for sharing events within the cluster and Nginx is used as load balancer. As the free edition of Nginx does not support real sticky sessions the nginx.conf demonstrates one potential workaround for this problem. Furthermore 
+the setup includes OpenTelemetry collector and Jaeger to view the telemetry data.
 
 ## License & Author
 

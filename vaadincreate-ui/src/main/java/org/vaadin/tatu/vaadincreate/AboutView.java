@@ -22,6 +22,7 @@ import org.vaadin.tatu.vaadincreate.components.ConfirmDialog.Type;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.HasValue.ValueChangeEvent;
@@ -162,6 +163,7 @@ public class AboutView extends VerticalLayout
             getEventBus().post(
                     new MessageEvent(mes.getMessage(), mes.getDateStamp()));
             logger.info("Admin message updated");
+            Telemetry.saveItem(mes);
         }
     }
 

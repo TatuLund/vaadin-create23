@@ -15,6 +15,7 @@ import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.icons.VaadinIcons;
@@ -25,6 +26,7 @@ import com.vaadin.server.Resource;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -157,6 +159,8 @@ public class AppLayout extends Composite implements HasI18N {
                 logger.info("User '{}' navigated to view '{}'", getUserName(),
                         viewName);
                 menuLayout.removeStyleName(ValoTheme.MENU_VISIBLE);
+                Telemetry.entered((ComponentContainer) afterChange.getOldView(),
+                        (ComponentContainer) afterChange.getNewView());
             }
 
             @Override

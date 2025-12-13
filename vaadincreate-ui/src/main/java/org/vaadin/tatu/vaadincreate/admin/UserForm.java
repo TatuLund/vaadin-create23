@@ -12,6 +12,7 @@ import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.BeanValidationBinder;
@@ -95,6 +96,7 @@ public class UserForm extends Composite implements HasI18N {
         username.focus();
         // Cannot change own role
         role.setEnabled(!Utils.getCurrentUserOrThrow().equals(user));
+        Telemetry.openedItem(user);
     }
 
     /**

@@ -26,6 +26,7 @@ import org.vaadin.tatu.vaadincreate.crud.form.BookForm.NavigateNextEvent;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm.NavigatePreviousEvent;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm.DraftSaveEvent;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -142,6 +143,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
             return;
         }
         presenter.saveProduct(product);
+        Telemetry.saveItem(product);
     }
 
     private void onFormDelete(DeleteEvent deleteEvent) {
@@ -151,6 +153,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         }
         presenter.deleteProduct(product);
         form.showForm(false);
+        Telemetry.deleteItem(product);
     }
 
     private void onFormDiscard(DiscardEvent discardEvent) {

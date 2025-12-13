@@ -25,6 +25,7 @@ import org.vaadin.tatu.vaadincreate.components.ConfirmDialog.Type;
 import org.vaadin.tatu.vaadincreate.crud.EuroConverter;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.BeanValidationBinder;
@@ -425,6 +426,7 @@ public class BookForm extends Composite implements HasI18N {
         }
 
         announceProductOpened(product);
+        Telemetry.openedItem(product);
     }
 
     private void readProduct(Product product) {

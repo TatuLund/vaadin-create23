@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.backend.dao;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -8,6 +9,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.JDBCConnectionException;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -46,7 +48,8 @@ public class HibernateUtil {
      *
      * @return the SessionFactory instance used for creating Hibernate sessions.
      */
-    public static SessionFactory getSessionFactory() {
+    @SuppressWarnings("null")
+    public synchronized static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             throw new IllegalStateException("SessionFactory was shut down");
         }
@@ -65,7 +68,8 @@ public class HibernateUtil {
      * @throws Exception
      *             if the transaction fails and is rolled back.
      */
-    public static <T> T inTransaction(Function<Session, T> transaction) {
+    @Nullable
+    public static <T> T inTransaction(Function<@NonNull Session, T> transaction) {
         var start = System.currentTimeMillis();
         T result;
         Session session = null;
@@ -109,7 +113,7 @@ public class HibernateUtil {
      *             if an error occurs during the transaction, it is propagated
      *             after rolling back the transaction
      */
-    public static void inTransaction(Consumer<Session> transaction) {
+    public static void inTransaction(Consumer<@NonNull Session> transaction) {
         var start = System.currentTimeMillis();
         Session session = null;
         Transaction tx = null;
@@ -146,13 +150,14 @@ public class HibernateUtil {
      *            a result of type T.
      * @return The result of the task.
      */
-    public static <T> T inSession(Function<Session, T> task) {
+    @Nullable
+    public static <T> T inSession(Function<@NonNull Session, T> task) {
         var start = System.currentTimeMillis();
         T result;
         Session session = null;
         try {
             session = getSessionFactory().openSession();
-            result = task.apply(session);
+            result = task.apply(Objects.requireNonNull(session));
         } catch (Exception e) {
             handleDatabaseException(e);
             throw e;
@@ -177,12 +182,12 @@ public class HibernateUtil {
      *            a {@link Consumer} that accepts a {@link Session} and performs
      *            operations within that session.
      */
-    public static void inSession(Consumer<Session> task) {
+    public static void inSession(Consumer<@NonNull Session> task) {
         var start = System.currentTimeMillis();
         Session session = null;
         try {
             session = getSessionFactory().openSession();
-            task.accept(session);
+            task.accept(Objects.requireNonNull(session));
         } catch (Exception e) {
             handleDatabaseException(e);
             throw e;
@@ -214,7 +219,8 @@ public class HibernateUtil {
     /**
      * Closes the SessionFactory and releases all resources.
      */
-    public static void shutdown() {
+    @SuppressWarnings("null")
+    public synchronized static void shutdown() {
         if (sessionFactory == null) {
             return;
         }
@@ -222,6 +228,7 @@ public class HibernateUtil {
         sessionFactory = null;
     }
 
-    private static Logger logger = LoggerFactory.getLogger(HibernateUtil.class);
+    private static Logger logger = Objects
+            .requireNonNull(LoggerFactory.getLogger(HibernateUtil.class));
 
 }

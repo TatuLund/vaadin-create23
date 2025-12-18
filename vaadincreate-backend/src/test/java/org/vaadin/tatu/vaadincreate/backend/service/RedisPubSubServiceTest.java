@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
+@SuppressWarnings("null")
 public class RedisPubSubServiceTest {
 
     private RedisPubSubServiceImpl service;

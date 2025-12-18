@@ -1,7 +1,9 @@
 package org.vaadin.tatu.vaadincreate.backend.dao;
 
 import java.util.List;
+import java.util.Objects;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -26,9 +28,11 @@ public class UserDao {
     public User findByName(String name) {
         logger.info("Finding user {}", name);
         return HibernateUtil.inSession(session -> {
-            return session
+            @Nullable
+            User user = session
                     .createQuery("from User where name = :name", User.class)
                     .setParameter("name", name).uniqueResult();
+            return user;
         });
     }
 
@@ -41,7 +45,6 @@ public class UserDao {
      *            the User object to be updated or saved
      * @return the updated User object retrieved from the database
      */
-
     public User updateUser(User user) {
         logger.info("Persisting User: ({}) '{}'", user.getId(), user.getName());
         var identifier = HibernateUtil.inTransaction(session -> {
@@ -54,9 +57,16 @@ public class UserDao {
             }
             return id;
         });
-        return HibernateUtil.inSession(session -> {
-            return session.get(User.class, identifier);
+        var result = HibernateUtil.inSession(session -> {
+            @Nullable
+            User u = session.get(User.class, identifier);
+            return u;
         });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Just saved user is now missing: " + identifier);
+        }
+        return result;
     }
 
     /**
@@ -71,7 +81,9 @@ public class UserDao {
     public User getUserById(Integer userId) {
         logger.info("Fetching User: ({})", userId);
         return HibernateUtil.inSession(session -> {
-            return session.get(User.class, userId);
+            @Nullable
+            User user = session.get(User.class, userId);
+            return user;
         });
     }
 
@@ -81,10 +93,17 @@ public class UserDao {
      * @param userId
      *            the ID of the user to be removed
      */
+    @SuppressWarnings("unused")
     public void removeUser(Integer userId) {
+        Objects.requireNonNull(userId, "User ID must not be null");
         logger.info("Deleting User: ({})", userId);
         HibernateUtil.inTransaction(session -> {
+            @Nullable
             User user = session.get(User.class, userId);
+            if (user == null) {
+                throw new IllegalArgumentException(
+                        "User to be deleted not found: " + userId);
+            }
             session.delete(user);
         });
     }
@@ -94,13 +113,14 @@ public class UserDao {
      *
      * @return a List of User objects representing all users in the database.
      */
-
-    public List<User> getAllUsers() {
+    public List<@NonNull User> getAllUsers() {
         logger.info("Fetching all Users");
-        return HibernateUtil.inSession(session -> {
+        List<@NonNull User> users = HibernateUtil.inSession(session -> {
             return session.createQuery("from User", User.class).list();
         });
+        return Objects.requireNonNull(users);
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private Logger logger = Objects
+            .requireNonNull(LoggerFactory.getLogger(this.getClass()));
 }

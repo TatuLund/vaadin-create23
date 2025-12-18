@@ -11,6 +11,7 @@ import org.vaadin.tatu.vaadincreate.backend.AppDataService;
  *
  * These integration tests run against the in-memory H2 database.
  */
+@SuppressWarnings("null")
 public class AppDataServiceTest {
 
     private AppDataService service;

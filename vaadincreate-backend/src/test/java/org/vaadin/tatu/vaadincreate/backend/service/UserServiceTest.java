@@ -18,6 +18,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
  *
  * These integration tests run against the in-memory H2 database.
  */
+@SuppressWarnings("null")
 public class UserServiceTest {
 
     private UserService service;

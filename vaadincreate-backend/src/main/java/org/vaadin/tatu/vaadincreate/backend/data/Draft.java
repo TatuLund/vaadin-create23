@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.backend.data;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -30,18 +31,20 @@ public class Draft extends AbstractEntity {
 
     @OneToOne
     @JoinColumn(name = "user_id")
+    @Nullable
     private User user;
 
     @Column(name = "product_name")
     private String productName = "";
 
     @Column(name = "price")
-    private BigDecimal price = BigDecimal.ZERO;
+    private BigDecimal price = Objects.requireNonNull(BigDecimal.ZERO);
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST,
             CascadeType.MERGE, CascadeType.DETACH })
     @JoinTable(name = "draft_category", joinColumns = @JoinColumn(name = "draft_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> category = Collections.emptySet();
+    private Set<Category> category = Objects
+            .requireNonNull(Collections.emptySet());
 
     @Column(name = "stock_count")
     private Integer stockCount = 0;
@@ -61,6 +64,8 @@ public class Draft extends AbstractEntity {
      *            the user associated with the draft
      */
     public Draft(Product product, User user) {
+        Objects.requireNonNull(product, "product must not be null");
+        Objects.requireNonNull(user, "user must not be null");
         setProductId(product.getId());
         setProductName(product.getProductName());
         setPrice(product.getPrice());
@@ -76,7 +81,6 @@ public class Draft extends AbstractEntity {
      * @return a Product instance with properties copied from the current Draft
      *         instance.
      */
-
     public Product toProduct() {
         Product product = new Product();
         product.setId(getProductId());
@@ -97,6 +101,7 @@ public class Draft extends AbstractEntity {
         this.productId = productId;
     }
 
+    @Nullable
     public User getUser() {
         return user;
     }

@@ -25,6 +25,7 @@ import javax.persistence.OptimisticLockException;
  *
  * These integration tests run against the in-memory H2 database.
  */
+@SuppressWarnings("null")
 public class ProductDataServiceTest {
 
     private ProductDataService service;

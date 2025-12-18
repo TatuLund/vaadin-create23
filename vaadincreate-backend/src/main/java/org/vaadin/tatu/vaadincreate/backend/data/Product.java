@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.backend.data;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -31,15 +32,15 @@ public class Product extends AbstractEntity {
 
     @Min(value = 0, message = "{price.not.negative}")
     @Column(name = "price")
-    private BigDecimal price = BigDecimal.ZERO;
+    private BigDecimal price = Objects.requireNonNull(BigDecimal.ZERO);
 
     // Using Eager as the category is shown in the Grid, Lazy would not help
     // performance.
-
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST,
             CascadeType.MERGE, CascadeType.DETACH })
     @JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> category = Collections.emptySet();
+    private Set<Category> category = Objects
+            .requireNonNull(Collections.emptySet());
 
     @Min(value = 0, message = "{stock.not.negative}")
     @NotNull(message = "{stock.required}")
@@ -64,6 +65,7 @@ public class Product extends AbstractEntity {
      *             if the provided Product instance is null
      */
     public Product(Product other) {
+        Objects.requireNonNull(other, "other product must not be null");
         setId(other.getId());
         setProductName(other.getProductName());
         setPrice(other.getPrice());

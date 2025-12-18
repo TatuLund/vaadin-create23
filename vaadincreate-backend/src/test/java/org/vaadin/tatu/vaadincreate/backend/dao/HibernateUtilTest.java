@@ -23,6 +23,7 @@ import org.vaadin.tatu.vaadincreate.backend.DatabaseConnectionException;
  * These unit tests use Mockito to mock the Hibernate Session and Transaction
  * objects.
  */
+@SuppressWarnings("null")
 public class HibernateUtilTest {
 
     @Mock

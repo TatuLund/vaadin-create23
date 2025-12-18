@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ public class ProductDataServiceImpl implements ProductDataService {
 
     // Service class for managing products
     // This class is a singleton
+    @Nullable
     private static ProductDataServiceImpl instance;
     private ProductDao productDao = new ProductDao();
     private DraftDao draftDao = new DraftDao();
@@ -48,6 +50,7 @@ public class ProductDataServiceImpl implements ProductDataService {
         }
     }
 
+    @SuppressWarnings("null")
     public static synchronized ProductDataService getInstance() {
         if (instance == null) {
             instance = new ProductDataServiceImpl();
@@ -78,13 +81,13 @@ public class ProductDataServiceImpl implements ProductDataService {
     }
 
     @Override
-    public synchronized Collection<Product> getAllProducts() {
+    public synchronized Collection<@NonNull Product> getAllProducts() {
         randomWait(6);
         return productDao.getAllProducts();
     }
 
     @Override
-    public synchronized Collection<Category> getAllCategories() {
+    public synchronized Collection<@NonNull Category> getAllCategories() {
         randomWait(2);
         return productDao.getAllCategories();
     }
@@ -102,7 +105,8 @@ public class ProductDataServiceImpl implements ProductDataService {
     }
 
     @Override
-    public synchronized Set<Category> findCategoriesByIds(Set<Integer> ids) {
+    public synchronized Set<@NonNull Category> findCategoriesByIds(
+            Set<Integer> ids) {
         Objects.requireNonNull(ids, "ids can't be null");
         randomWait(1);
         return productDao.getCategoriesByIds(ids);
@@ -111,9 +115,11 @@ public class ProductDataServiceImpl implements ProductDataService {
     @Override
     public synchronized Category updateCategory(Category category) {
         Objects.requireNonNull(category, "category can't be null");
+        var name = Objects.requireNonNull(category.getName(),
+                "category name can't be null");
         randomWait(1);
         if (category.getId() == null
-                && productDao.getCategoryByName(category.getName()) != null) {
+                && productDao.getCategoryByName(name) != null) {
             throw new IllegalArgumentException(
                     "Category with the same name already exists");
         }
@@ -155,6 +161,7 @@ public class ProductDataServiceImpl implements ProductDataService {
         }
     }
 
+    @SuppressWarnings("null")
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 }

@@ -1,9 +1,11 @@
 package org.vaadin.tatu.vaadincreate.backend.dao;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -31,6 +33,10 @@ public class ProductDao {
      * @return the persisted product with the updated information
      */
     public Product updateProduct(Product product) {
+        Objects.requireNonNull(product,
+                "Product to be updated must not be null");
+        Objects.requireNonNull(product.getProductName(),
+                "Product name must not be null");
         logger.info("Persisting Product: ({}) '{}'", product.getId(),
                 product.getProductName());
         var identifier = HibernateUtil.inTransaction(session -> {
@@ -44,9 +50,16 @@ public class ProductDao {
             return id;
         });
         // Necessary: Refetch new version of the product
-        return HibernateUtil.inSession(session -> {
-            return session.get(Product.class, identifier);
+        var result = HibernateUtil.inSession(session -> {
+            @Nullable
+            Product prod = session.get(Product.class, identifier);
+            return prod;
         });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Just saved product is now missing: " + identifier);
+        }
+        return result;
     }
 
     /**
@@ -57,10 +70,14 @@ public class ProductDao {
      * @return the Product object corresponding to the given id, or null if no
      *         such Product exists
      */
+    @Nullable
     public Product getProduct(Integer id) {
+        Objects.requireNonNull(id, "Product ID must not be null");
         logger.info("Fetching Product: ({})", id);
         return HibernateUtil.inSession(session -> {
-            return session.get(Product.class, id);
+            @Nullable
+            Product prod = session.get(Product.class, id);
+            return prod;
         });
     }
 
@@ -70,8 +87,11 @@ public class ProductDao {
      * @param id
      *            the ID of the product to be deleted
      */
+    @SuppressWarnings("unused")
     public void deleteProduct(Integer id) {
+        Objects.requireNonNull(id, "Product ID must not be null");
         HibernateUtil.inTransaction(session -> {
+            @Nullable
             Product product = session.get(Product.class, id);
             if (product == null) {
                 throw new IllegalArgumentException(
@@ -89,14 +109,20 @@ public class ProductDao {
      *            the category for which products are to be fetched
      * @return a collection of products that belong to the specified category
      */
-    public Collection<Product> getProductsByCategory(Category category) {
+    @SuppressWarnings("java:S1192")
+    public Collection<@NonNull Product> getProductsByCategory(
+            Category category) {
+        Objects.requireNonNull(category, "Category must not be null");
+        Objects.requireNonNull(category.getId(),
+                "Category ID must not be null");
         logger.info("Fetching Products by Category: ({}) '{}'",
                 category.getId(), category.getName());
-        return HibernateUtil.inSession(session -> {
+        var result = HibernateUtil.inSession(session -> {
             return session.createQuery(
                     "select p from Product p join p.category c where c.id = :id",
                     Product.class).setParameter("id", category.getId()).list();
         });
+        return Objects.requireNonNull(result);
     }
 
     /**
@@ -107,12 +133,16 @@ public class ProductDao {
      * 
      * @return a collection of all products available in the database.
      */
-    public Collection<Product> getAllProducts() {
+    public Collection<@NonNull Product> getAllProducts() {
         // Method returns all products from the database using HibernateUtil
         logger.info("Fetching all Products");
-        return HibernateUtil.inSession(session -> {
+        var result = HibernateUtil.inSession(session -> {
             return session.createQuery("from Product", Product.class).list();
         });
+        if (result == null) {
+            throw new IllegalStateException("Result of getAllProducts is null");
+        }
+        return result;
     }
 
     /**
@@ -124,8 +154,9 @@ public class ProductDao {
      *            the Category to be updated or created
      * @return the updated or newly created Category
      */
-
     public Category updateCategory(Category category) {
+        Objects.requireNonNull(category,
+                "Category to be updated must not be null");
         logger.info("Persisting Category: ({}) '{}'", category.getId(),
                 category.getName());
         var identifier = HibernateUtil.inTransaction(session -> {
@@ -138,9 +169,17 @@ public class ProductDao {
             }
             return id;
         });
-        return HibernateUtil.inSession(session -> {
-            return session.get(Category.class, identifier);
+        assert identifier != null;
+        var result = HibernateUtil.inSession(session -> {
+            @Nullable
+            Category cat = session.get(Category.class, identifier);
+            return cat;
         });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Just saved category is now missing: " + identifier);
+        }
+        return result;
     }
 
     /**
@@ -153,6 +192,7 @@ public class ProductDao {
      */
     @Nullable
     public Category getCategory(Integer id) {
+        Objects.requireNonNull(id, "Category ID must not be null");
         logger.info("Fetching Category: ({})", id);
         return HibernateUtil.inSession(session -> {
             return session.get(Category.class, id);
@@ -164,12 +204,16 @@ public class ProductDao {
      *
      * @return a collection of all categories.
      */
-
-    public Collection<Category> getAllCategories() {
+    public Collection<@NonNull Category> getAllCategories() {
         logger.info("Fetching all Categories");
-        return HibernateUtil.inSession(session -> {
+        var result = HibernateUtil.inSession(session -> {
             return session.createQuery("from Category", Category.class).list();
         });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Result of getAllCategories is null");
+        }
+        return result;
     }
 
     /**
@@ -179,16 +223,17 @@ public class ProductDao {
      *            a set of integer IDs representing the categories to be fetched
      * @return a set of Category objects corresponding to the provided IDs
      */
-
-    public Set<Category> getCategoriesByIds(Set<Integer> ids) {
+    public Set<@NonNull Category> getCategoriesByIds(Set<Integer> ids) {
+        Objects.requireNonNull(ids, "Category IDs must not be null");
         logger.info("Fetching Categories: {}", ids);
-        return HibernateUtil.inSession(session -> {
+        var result = HibernateUtil.inSession(session -> {
             return session
                     .createQuery("from Category where id in (:ids)",
                             Category.class)
                     .setParameter("ids", ids).list().stream()
                     .collect(Collectors.toSet());
         });
+        return Objects.requireNonNull(result);
     }
 
     /**
@@ -203,9 +248,12 @@ public class ProductDao {
      * @param id
      *            the ID of the category to be deleted
      */
+    @SuppressWarnings("unused")
     public void deleteCategory(Integer id) {
+        Objects.requireNonNull(id, "Category ID must not be null");
         HibernateUtil.inTransaction(session -> {
-            var category = session.get(Category.class, id);
+            @Nullable
+            Category category = session.get(Category.class, id);
             if (category == null) {
                 logger.warn("Category with ID ({}) not found", id);
                 return;
@@ -245,15 +293,18 @@ public class ProductDao {
      */
     @Nullable
     public Category getCategoryByName(String name) {
+        Objects.requireNonNull(name, "Category name must not be null");
         logger.info("Fetching Category by name: '{}'", name);
         return HibernateUtil.inSession(session -> {
-            return session
+            @Nullable
+            Category category = session
                     .createQuery("from Category where name = :name",
                             Category.class)
                     .setParameter("name", name).uniqueResult();
+            return category;
         });
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    private Logger logger = Objects
+            .requireNonNull(LoggerFactory.getLogger(this.getClass()));
 }

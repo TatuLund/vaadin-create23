@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.backend.service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -14,10 +15,13 @@ import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 @NullMarked
 @SuppressWarnings("java:S6548")
 public class AppDataServiceImpl implements AppDataService {
+
+    @Nullable
     private static AppDataServiceImpl instance;
 
     private MessageDao messageDao = new MessageDao();
 
+    @SuppressWarnings("null")
     public static synchronized AppDataService getInstance() {
         if (instance == null) {
             instance = new AppDataServiceImpl();
@@ -28,6 +32,7 @@ public class AppDataServiceImpl implements AppDataService {
     private AppDataServiceImpl() {
         var env = System.getProperty("generate.data");
         if (env == null || env.equals("true")) {
+            @SuppressWarnings("null")
             var message = new Message(MockDataGenerator.createMessage(),
                     LocalDateTime.now());
             messageDao.updateMessage(message);
@@ -37,6 +42,7 @@ public class AppDataServiceImpl implements AppDataService {
 
     @Override
     public synchronized Message updateMessage(String message) {
+        @SuppressWarnings("null")
         var messageEntity = new Message(message, LocalDateTime.now());
         return messageDao.updateMessage(messageEntity);
     }
@@ -47,6 +53,7 @@ public class AppDataServiceImpl implements AppDataService {
         return messageDao.getLastMessage();
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private Logger logger = Objects
+            .requireNonNull(LoggerFactory.getLogger(this.getClass()));
 
 }

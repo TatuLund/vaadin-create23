@@ -1,7 +1,9 @@
 package org.vaadin.tatu.vaadincreate.backend.dao;
 
 import java.util.Collection;
+import java.util.Objects;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -25,6 +27,8 @@ public class MessageDao {
      */
 
     public Message updateMessage(Message message) {
+        Objects.requireNonNull(message,
+                "Message to be updated must not be null");
         logger.info("Persisting Message: ({}) '{}'", message.getId(),
                 message.getMessage());
         var identifier = HibernateUtil.inTransaction(session -> {
@@ -37,9 +41,16 @@ public class MessageDao {
             }
             return id;
         });
-        return HibernateUtil.inSession(session -> {
-            return session.get(Message.class, identifier);
+        var result = HibernateUtil.inSession(session -> {
+            @Nullable
+            Message msg = session.get(Message.class, identifier);
+            return msg;
         });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Just saved Message is null, this should not happen");
+        }
+        return result;
     }
 
     /**
@@ -55,9 +66,11 @@ public class MessageDao {
     public Message getLastMessage() {
         logger.info("Fetching Message");
         return HibernateUtil.inSession(session -> {
-            return session
+            @Nullable
+            Message msg = session
                     .createQuery("from Message order by id desc", Message.class)
                     .setMaxResults(1).uniqueResult();
+            return msg;
         });
     }
 
@@ -66,13 +79,14 @@ public class MessageDao {
      *
      * @return a collection of all messages.
      */
-
-    public Collection<Message> getMessages() {
+    public Collection<@NonNull Message> getMessages() {
         logger.info("Fetching all Messages");
-        return HibernateUtil.inSession(session -> {
+        var result = HibernateUtil.inSession(session -> {
             return session.createQuery("from Message", Message.class).list();
         });
+        return Objects.requireNonNull(result, "Result of getMessages is null");
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private Logger logger = Objects
+            .requireNonNull(LoggerFactory.getLogger(this.getClass()));
 }

@@ -6,6 +6,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -27,8 +28,10 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
     private final ObjectMapper mapper;
     private boolean localMode = false;
 
+    @Nullable
     private static RedisPubSubServiceImpl instance;
 
+    @SuppressWarnings("null")
     public static synchronized RedisPubSubService getInstance() {
         if (instance == null) {
             instance = new RedisPubSubServiceImpl("redis", 6379,
@@ -58,8 +61,8 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
                         e.getMessage());
             }
         }
-        executor = Executors.newSingleThreadExecutor(
-                Thread.ofVirtual().name("redis").factory());
+        executor = Objects.requireNonNull(Executors.newSingleThreadExecutor(
+                Thread.ofVirtual().name("redis").factory()));
 
         // Configure ObjectMapper with support for Java records and polymorphic
         // types.
@@ -95,9 +98,11 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
             try {
                 subscriberJedis.subscribe(new JedisPubSub() {
                     @Override
-                    public void onMessage(String channel, String message) {
+                    public void onMessage(@Nullable String channel,
+                            @Nullable String message) {
                         try {
-                            var envelope = mapper.readValue(message,
+                            @Nullable
+                            EventEnvelope envelope = mapper.readValue(message,
                                     EventEnvelope.class);
                             envelopeHandler.accept(envelope);
                         } catch (JsonProcessingException e) {
@@ -132,6 +137,7 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
         }
     }
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private Logger logger = Objects
+            .requireNonNull(LoggerFactory.getLogger(this.getClass()));
 
 }

@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate.backend.data;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
@@ -42,6 +45,7 @@ public class User extends AbstractEntity {
     @NotNull(message = "{role.required}")
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
+    @Nullable
     private Role role;
 
     public User() {
@@ -79,9 +83,11 @@ public class User extends AbstractEntity {
      *             if the provided user is null
      */
     public User(User user) {
+        Objects.requireNonNull(user, "User to copy must not be null");
         this.id = user.id;
         this.name = user.name;
         this.passwd = user.passwd;
+        assert user.role != null;
         this.setRole(user.role);
         this.version = user.version;
     }
@@ -102,6 +108,7 @@ public class User extends AbstractEntity {
         this.passwd = passwd;
     }
 
+    @Nullable
     public Role getRole() {
         return role;
     }

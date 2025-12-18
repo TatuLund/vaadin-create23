@@ -25,6 +25,7 @@ public abstract class AbstractEntity implements Serializable {
     Integer id;
 
     @Version
+    @Nullable
     Integer version;
 
     @Nullable
@@ -36,7 +37,7 @@ public abstract class AbstractEntity implements Serializable {
         this.id = id;
     }
 
-    public Integer getVersion() {
+    public @Nullable Integer getVersion() {
         return version;
     }
 
@@ -54,7 +55,7 @@ public abstract class AbstractEntity implements Serializable {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj)
             return true;
         if (obj == null)

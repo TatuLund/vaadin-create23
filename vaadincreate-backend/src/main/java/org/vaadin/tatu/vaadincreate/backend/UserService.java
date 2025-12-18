@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate.backend;
 import java.util.List;
 import java.util.Optional;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
@@ -15,7 +16,7 @@ public interface UserService {
 
     public abstract User updateUser(User user);
 
-    public abstract List<User> getAllUsers();
+    public abstract List<@NonNull User> getAllUsers();
 
     @Nullable
     public User getUserById(Integer userId);

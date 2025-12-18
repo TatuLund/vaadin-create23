@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate.backend.dao;
 
+import java.util.Objects;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -25,6 +27,7 @@ public class DraftDao {
      *         database
      */
     public Draft updateDraft(Draft draft) {
+        Objects.requireNonNull(draft, "Draft to be updated must not be null");
         logger.info("Persisting Draft: ({}) '{}'", draft.getId(),
                 draft.getProductName());
         var identifier = HibernateUtil.inTransaction(session -> {
@@ -37,9 +40,16 @@ public class DraftDao {
             }
             return id;
         });
-        return HibernateUtil.inSession(session -> {
-            return session.get(Draft.class, identifier);
+        var result = HibernateUtil.inSession(session -> {
+            @Nullable
+            Draft d = session.get(Draft.class, identifier);
+            return d;
         });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Just saved Draft is null, this should not happen");
+        }
+        return result;
     }
 
     /**
@@ -66,14 +76,20 @@ public class DraftDao {
      */
     @Nullable
     public Draft findDraft(User user) {
-        logger.info("Fetching Draft for User: ({})", user.getId());
+        Objects.requireNonNull(user, "User must not be null");
+        var id = Objects.requireNonNull(user.getId(),
+                "User ID must not be null");
+        logger.info("Fetching Draft for User: ({})", id);
         return HibernateUtil.inSession(session -> {
-            return session
+            @Nullable
+            Draft draft = session
                     .createQuery("from Draft where user_id = :user_id",
                             Draft.class)
-                    .setParameter("user_id", user.getId()).uniqueResult();
+                    .setParameter("user_id", id).uniqueResult();
+            return draft;
         });
     }
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private Logger logger = Objects
+            .requireNonNull(LoggerFactory.getLogger(this.getClass()));
 }

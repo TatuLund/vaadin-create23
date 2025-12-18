@@ -30,7 +30,8 @@ public final class Telemetry {
     /**
      * Logs an item opened event to telemetry.
      * 
-     * @param item the opened item
+     * @param item
+     *            the opened item
      */
     public static void openedItem(AbstractEntity item) {
         item(item, "opened");
@@ -39,7 +40,8 @@ public final class Telemetry {
     /**
      * Logs an item deleted event to telemetry.
      * 
-     * @param item the deleted item
+     * @param item
+     *            the deleted item
      */
     public static void deleteItem(AbstractEntity item) {
         item(item, "deleted");
@@ -48,7 +50,8 @@ public final class Telemetry {
     /**
      * Logs an item saved event to telemetry.
      * 
-     * @param item the saved item
+     * @param item
+     *            the saved item
      */
     public static void saveItem(AbstractEntity item) {
         item(item, "saved");
@@ -64,8 +67,8 @@ public final class Telemetry {
         try {
             span.setAttribute("item.type", item.getClass().getSimpleName());
             span.setAttribute("item.action", action);
-            span.setAttribute("item.id",
-                    item.getId() != null ? item.getId() : -1);
+            int id = item.getId() != null ? item.getId() : -1;
+            span.setAttribute("item.id", ""+id);
             span.addEvent(action.toUpperCase());
         } finally {
             if (started) {
@@ -77,8 +80,10 @@ public final class Telemetry {
     /**
      * Logs a view entered event to telemetry.
      *
-     * @param oldView the previous view, or null if none
-     * @param newView the new view, or null if unknown
+     * @param oldView
+     *            the previous view, or null if none
+     * @param newView
+     *            the new view, or null if unknown
      */
     public static void entered(@Nullable ComponentContainer oldView,
             @Nullable ComponentContainer newView) {

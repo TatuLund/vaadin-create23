@@ -6,7 +6,6 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -61,13 +60,18 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
                         e.getMessage());
             }
         }
-        executor = Objects.requireNonNull(Executors.newSingleThreadExecutor(
-                Thread.ofVirtual().name("redis").factory()));
+        executor = buildVirtualThreadExecutor();
 
         // Configure ObjectMapper with support for Java records and polymorphic
         // types.
         this.mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
+    }
+
+    @SuppressWarnings("null")
+    private ExecutorService buildVirtualThreadExecutor() {
+        return Executors.newSingleThreadExecutor(
+                Thread.ofVirtual().name("redis").factory());
     }
 
     @Override
@@ -137,7 +141,7 @@ public class RedisPubSubServiceImpl implements RedisPubSubService {
         }
     }
 
-    private Logger logger = Objects
-            .requireNonNull(LoggerFactory.getLogger(this.getClass()));
+    @SuppressWarnings("null")
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 }

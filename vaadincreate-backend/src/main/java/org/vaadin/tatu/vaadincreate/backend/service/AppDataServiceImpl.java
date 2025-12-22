@@ -32,9 +32,8 @@ public class AppDataServiceImpl implements AppDataService {
     private AppDataServiceImpl() {
         var env = System.getProperty("generate.data");
         if (env == null || env.equals("true")) {
-            @SuppressWarnings("null")
             var message = new Message(MockDataGenerator.createMessage(),
-                    LocalDateTime.now());
+                    getNow());
             messageDao.updateMessage(message);
             logger.info("Generated mock app data");
         }
@@ -42,9 +41,14 @@ public class AppDataServiceImpl implements AppDataService {
 
     @Override
     public synchronized Message updateMessage(String message) {
-        @SuppressWarnings("null")
-        var messageEntity = new Message(message, LocalDateTime.now());
+        Objects.requireNonNull(message, "Message cannot be null");
+        var messageEntity = new Message(message, getNow());
         return messageDao.updateMessage(messageEntity);
+    }
+
+    @SuppressWarnings("null")
+    private LocalDateTime getNow() {
+        return LocalDateTime.now();
     }
 
     @Nullable
@@ -53,7 +57,7 @@ public class AppDataServiceImpl implements AppDataService {
         return messageDao.getLastMessage();
     }
 
-    private Logger logger = Objects
-            .requireNonNull(LoggerFactory.getLogger(this.getClass()));
+    @SuppressWarnings("null")
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 }

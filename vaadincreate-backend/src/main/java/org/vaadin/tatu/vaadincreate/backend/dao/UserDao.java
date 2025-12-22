@@ -115,12 +115,18 @@ public class UserDao {
      */
     public List<@NonNull User> getAllUsers() {
         logger.info("Fetching all Users");
-        List<@NonNull User> users = HibernateUtil.inSession(session -> {
-            return session.createQuery("from User", User.class).list();
+        var users = HibernateUtil.inSession(session -> {
+            List<@NonNull User> result = session
+                    .createQuery("from User", User.class).list();
+            return result;
         });
-        return Objects.requireNonNull(users);
+        if (users == null) {
+            throw new IllegalStateException(
+                    "Users list is null, this should not happen");
+        }
+        return users;
     }
 
-    private Logger logger = Objects
-            .requireNonNull(LoggerFactory.getLogger(this.getClass()));
+    @SuppressWarnings("null")
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

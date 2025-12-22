@@ -32,15 +32,16 @@ public class Product extends AbstractEntity {
 
     @Min(value = 0, message = "{price.not.negative}")
     @Column(name = "price")
-    private BigDecimal price = Objects.requireNonNull(BigDecimal.ZERO);
+    @SuppressWarnings("null")
+    private BigDecimal price = BigDecimal.ZERO;
 
     // Using Eager as the category is shown in the Grid, Lazy would not help
     // performance.
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST,
             CascadeType.MERGE, CascadeType.DETACH })
     @JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> category = Objects
-            .requireNonNull(Collections.emptySet());
+    @SuppressWarnings("null")
+    private Set<Category> category = Collections.emptySet();
 
     @Min(value = 0, message = "{stock.not.negative}")
     @NotNull(message = "{stock.required}")

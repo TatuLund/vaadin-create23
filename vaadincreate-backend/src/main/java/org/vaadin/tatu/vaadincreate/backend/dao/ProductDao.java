@@ -122,7 +122,11 @@ public class ProductDao {
                     "select p from Product p join p.category c where c.id = :id",
                     Product.class).setParameter("id", category.getId()).list();
         });
-        return Objects.requireNonNull(result);
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Result of getProductsByCategory is null, this should not happen");
+        }
+        return result;
     }
 
     /**
@@ -140,7 +144,8 @@ public class ProductDao {
             return session.createQuery("from Product", Product.class).list();
         });
         if (result == null) {
-            throw new IllegalStateException("Result of getAllProducts is null");
+            throw new IllegalStateException(
+                    "Result of getAllProducts is null, this should not happen");
         }
         return result;
     }
@@ -195,7 +200,9 @@ public class ProductDao {
         Objects.requireNonNull(id, "Category ID must not be null");
         logger.info("Fetching Category: ({})", id);
         return HibernateUtil.inSession(session -> {
-            return session.get(Category.class, id);
+            @Nullable
+            Category category = session.get(Category.class, id);
+            return category;
         });
     }
 
@@ -233,7 +240,11 @@ public class ProductDao {
                     .setParameter("ids", ids).list().stream()
                     .collect(Collectors.toSet());
         });
-        return Objects.requireNonNull(result);
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Result of getCategoriesByIds is null, this should not happen");
+        }
+        return result;
     }
 
     /**
@@ -305,6 +316,6 @@ public class ProductDao {
         });
     }
 
-    private Logger logger = Objects
-            .requireNonNull(LoggerFactory.getLogger(this.getClass()));
+    @SuppressWarnings("null")
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.components;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -151,8 +152,15 @@ public class ConfirmDialog extends Composite {
      * @return Registration Use Registration#remove() for listener removal.
      */
     public Registration addConfirmedListener(ConfirmedListener listener) {
-        return addListener(ConfirmedEvent.class, listener,
+        Objects.requireNonNull(listener, "Listener cannot be null");
+        assert ConfirmedListener.CONFIRMED_METHOD != null : "Confirmed method cannot be null";
+        var reg = addListener(ConfirmedEvent.class, listener,
                 ConfirmedListener.CONFIRMED_METHOD);
+        if (reg == null) {
+            throw new IllegalStateException(
+                    "Listener registration failed for ConfirmedEvent");
+        }
+        return reg;
     }
 
     /**
@@ -160,6 +168,7 @@ public class ConfirmDialog extends Composite {
      * inner class.
      */
     public interface ConfirmedListener extends ConnectorEventListener {
+        @Nullable
         Method CONFIRMED_METHOD = ReflectTools.findMethod(
                 ConfirmedListener.class, "confirmed", ConfirmedEvent.class);
 
@@ -186,8 +195,15 @@ public class ConfirmDialog extends Composite {
      * @return Registration Use Registration#remove() for listener removal.
      */
     public Registration addCancelledListener(CancelledListener listener) {
-        return addListener(CancelledEvent.class, listener,
+        Objects.requireNonNull(listener, "Listener cannot be null");
+        assert CancelledListener.CANCELLED_METHOD != null : "Cancelled method cannot be null";
+        var reg = addListener(CancelledEvent.class, listener,
                 CancelledListener.CANCELLED_METHOD);
+        if (reg == null) {
+            throw new IllegalStateException(
+                    "Listener registration failed for CancelledEvent");
+        }
+        return reg;
     }
 
     /**
@@ -195,6 +211,7 @@ public class ConfirmDialog extends Composite {
      * inner class.
      */
     public interface CancelledListener extends ConnectorEventListener {
+        @Nullable
         Method CANCELLED_METHOD = ReflectTools.findMethod(
                 CancelledListener.class, "cancelled", CancelledEvent.class);
 

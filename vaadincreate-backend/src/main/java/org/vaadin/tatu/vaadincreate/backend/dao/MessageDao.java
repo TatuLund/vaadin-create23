@@ -84,9 +84,13 @@ public class MessageDao {
         var result = HibernateUtil.inSession(session -> {
             return session.createQuery("from Message", Message.class).list();
         });
-        return Objects.requireNonNull(result, "Result of getMessages is null");
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Messages query returned null, this should not happen");
+        }
+        return result;
     }
 
-    private Logger logger = Objects
-            .requireNonNull(LoggerFactory.getLogger(this.getClass()));
+    @SuppressWarnings("null")
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

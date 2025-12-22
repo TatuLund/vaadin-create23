@@ -63,8 +63,13 @@ public class UserServiceImpl implements UserService {
     public synchronized Optional<User> findByName(String name) {
         Objects.requireNonNull(name, "Name must not be null");
         randomWait(1);
-        return Objects
-                .requireNonNull(Optional.ofNullable(userDao.findByName(name)));
+        User user = userDao.findByName(name);
+        return wrapUserInOptional(user);
+    }
+
+    @SuppressWarnings("null")
+    private Optional<User> wrapUserInOptional(@Nullable User user) {
+        return Optional.ofNullable(user);
     }
 
     @Nullable
@@ -101,7 +106,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private Logger logger = Objects
-            .requireNonNull(LoggerFactory.getLogger(this.getClass()));
+    @SuppressWarnings("null")
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 }

@@ -45,6 +45,7 @@ public class ResetButtonForTextField extends AbstractExtension {
     }
 
     @Override
+    @SuppressWarnings("null")
     public ResetButtonForTextFieldState getState() {
         return (ResetButtonForTextFieldState) super.getState();
     }

@@ -111,7 +111,7 @@ public class BookForm extends Composite implements HasI18N {
 
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
-    private Binder<Product> binder;
+    private final Binder<Product> binder;
 
     @Nullable
     private Product currentProduct;

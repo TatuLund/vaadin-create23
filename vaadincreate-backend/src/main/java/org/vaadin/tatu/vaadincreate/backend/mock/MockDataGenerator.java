@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -54,11 +53,10 @@ public class MockDataGenerator implements Serializable {
             categories.add(c);
         }
         return categories;
-
     }
 
     public static List<@NonNull Product> createProducts(
-            List<Category> categories) {
+            List<@NonNull Category> categories) {
         List<@NonNull Product> products = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             Product p = createProduct(categories);
@@ -105,8 +103,8 @@ public class MockDataGenerator implements Serializable {
         Product p = new Product();
         p.setProductName(generateName());
 
-        p.setPrice(Objects.requireNonNull(
-                BigDecimal.valueOf((random.nextInt(250) + 50) / 10.0)));
+        var price = getPrice();
+        p.setPrice(price);
         p.setAvailability(Availability.values()[random
                 .nextInt(Availability.values().length)]);
         if (p.getAvailability() == Availability.AVAILABLE) {
@@ -115,6 +113,11 @@ public class MockDataGenerator implements Serializable {
 
         p.setCategory(getCategory(categories, 1, 2));
         return p;
+    }
+
+    @SuppressWarnings("null")
+    private static BigDecimal getPrice() {
+        return BigDecimal.valueOf((random.nextInt(250) + 50) / 10.0);
     }
 
     private static Set<Category> getCategory(List<Category> categories, int min,

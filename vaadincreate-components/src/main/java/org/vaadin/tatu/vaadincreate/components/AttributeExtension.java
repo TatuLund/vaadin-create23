@@ -1,5 +1,9 @@
 package org.vaadin.tatu.vaadincreate.components;
 
+import java.util.Objects;
+import java.util.function.Supplier;
+
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -23,7 +27,11 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
 
     @Override
     protected AttributeExtensionState getState() {
-        return (AttributeExtensionState) super.getState();
+        var state = (AttributeExtensionState) super.getState();
+        if (state == null) {
+            throw new IllegalStateException("State cannot be null");
+        }
+        return state;
     }
 
     /**
@@ -35,8 +43,12 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
      *            The value for the attribute
      */
     public void setAttribute(String attribute, String value) {
+        Objects.requireNonNull(attribute, "Attribute cannot be null");
+        Objects.requireNonNull(value, "Value cannot be null");
         AttributeExtensionState state = getState();
+        assert state.attributes != null : "Attributes map cannot be null";
         state.attributes.put(attribute, value);
+        assert state.removals != null : "Removals list cannot be null";
         state.removals.remove(attribute);
     }
 
@@ -48,7 +60,9 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
      */
     public void removeAttribute(String attribute) {
         AttributeExtensionState state = getState();
+        assert state.attributes != null : "Attributes map cannot be null";
         state.attributes.remove(attribute);
+        assert state.removals != null : "Removals list cannot be null";
         state.removals.add(attribute);
     }
 
@@ -66,6 +80,7 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
     @Nullable
     public String getAttribute(String attribute) {
         AttributeExtensionState state = getState();
+        assert state.attributes != null : "Attributes map cannot be null";
         return state.attributes.get(attribute);
     }
 
@@ -78,14 +93,23 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
      *         component, creating it if necessary.
      */
     public static AttributeExtension of(AbstractComponent target) {
+        Objects.requireNonNull(target, "Target component cannot be null");
         var optionalAttributeExtension = target.getExtensions().stream()
-                .filter(ext -> ext instanceof AttributeExtension).findFirst();
-        if (optionalAttributeExtension.isPresent()) {
-            return (AttributeExtension) optionalAttributeExtension.get();
-        }
-        var extension = new AttributeExtension();
-        extension.extend(target);
-        return extension;
+                .filter(AttributeExtension.class::isInstance)
+                .map(AttributeExtension.class::cast).findFirst();
+        @Nullable
+        AttributeExtension ext = optionalAttributeExtension
+                .orElseGet(getExtension(target));
+        return ext;
+    }
+
+    private static Supplier<@NonNull AttributeExtension> getExtension(
+            AbstractComponent target) {
+        return () -> {
+            AttributeExtension extension = new AttributeExtension();
+            extension.extend(target);
+            return extension;
+        };
     }
 
     /**
@@ -122,7 +146,8 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
      * their usage in the attribute extension.
      * </p>
      *
-     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles">MDN
+     * @see <a href=
+     *      "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles">MDN
      *      Web Docs: ARIA Roles</a>
      */
     public static class AriaRoles {
@@ -141,7 +166,8 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
         public static final String FIGURE = "figure";
         public static final String NAVIGATION = "navigation";
         public static final String MAIN = "main";
-        public static final String BUTTON = "button"; // Added to support HtmlBuilderTest
+        public static final String BUTTON = "button"; // Added to support
+                                                      // HtmlBuilderTest
     }
 
     /**
@@ -176,6 +202,8 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
          *            the attribute value
          */
         default void setAttribute(String key, String value) {
+            Objects.requireNonNull(key, "Attribute key cannot be null");
+            Objects.requireNonNull(value, "Attribute value cannot be null");
             getAttributeExtension().setAttribute(key, value);
         }
 
@@ -188,7 +216,11 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
          *            the attribute value
          */
         default void setAttribute(String key, boolean value) {
-            getAttributeExtension().setAttribute(key, String.valueOf(value));
+            Objects.requireNonNull(key, "Attribute key cannot be null");
+            @Nullable
+            String stringValue = String.valueOf(value);
+            getAttributeExtension().setAttribute(key,
+                    stringValue != null ? stringValue : "");
         }
 
         /**
@@ -200,7 +232,11 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
          *            the attribute value
          */
         default void setAttribute(String key, int value) {
-            getAttributeExtension().setAttribute(key, String.valueOf(value));
+            Objects.requireNonNull(key, "Attribute key cannot be null");
+            @Nullable
+            String stringValue = String.valueOf(value);
+            getAttributeExtension().setAttribute(key,
+                    stringValue != null ? stringValue : "");
         }
 
         /**
@@ -210,6 +246,7 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
          *            the attribute key
          */
         default void removeAttribute(String key) {
+            Objects.requireNonNull(key, "Attribute key cannot be null");
             getAttributeExtension().removeAttribute(key);
         }
 
@@ -220,6 +257,7 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
          *            the role value
          */
         default void setRole(String role) {
+            Objects.requireNonNull(role, "Role cannot be null");
             setAttribute(AriaAttributes.ROLE, role);
         }
 
@@ -230,6 +268,7 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
          *            the aria-label value
          */
         default void setAriaLabel(String label) {
+            Objects.requireNonNull(label, "ARIA label cannot be null");
             setAttribute(AriaAttributes.LABEL, label);
         }
 
@@ -245,6 +284,7 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
          */
         @Nullable
         default String getAttribute(String key) {
+            Objects.requireNonNull(key, "Attribute key cannot be null");
             return getAttributeExtension().getAttribute(key);
         }
     }

@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate.components;
 
+import java.util.Objects;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
@@ -26,6 +28,7 @@ public class CapsLockWarning extends AbstractExtension {
      * @return CapsLockWarning extension
      */
     public static CapsLockWarning warnFor(PasswordField field) {
+        Objects.requireNonNull(field, "Field cannot be null");
         return new CapsLockWarning(field);
     }
 
@@ -36,20 +39,29 @@ public class CapsLockWarning extends AbstractExtension {
      *            String value
      */
     public void setMessage(String message) {
+        Objects.requireNonNull(message, "Message cannot be null");
         getState().message = sanitize(message);
     }
 
     @Override
     public CapsLockWarningState getState() {
-        return (CapsLockWarningState) super.getState();
+        var state = (CapsLockWarningState) super.getState();
+        if (state == null) {
+            throw new IllegalStateException("State cannot be null");
+        }
+        return state;
     }
 
     // Sanitize the message as it is set by the user
     private static String sanitize(String unsanitized) {
         var settings = new OutputSettings();
         settings.prettyPrint(false);
-        return Jsoup.clean(unsanitized, "", Safelist.relaxed()
+        var cleaned = Jsoup.clean(unsanitized, "", Safelist.relaxed()
                 .addAttributes("span", "style").addAttributes("span", "class"),
                 settings);
+        if (cleaned == null) {
+            cleaned = "";
+        }
+        return cleaned;
     }
 }

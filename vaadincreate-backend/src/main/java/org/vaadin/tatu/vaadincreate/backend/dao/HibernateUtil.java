@@ -1,6 +1,5 @@
 package org.vaadin.tatu.vaadincreate.backend.dao;
 
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -49,7 +48,7 @@ public class HibernateUtil {
      * @return the SessionFactory instance used for creating Hibernate sessions.
      */
     @SuppressWarnings("null")
-    public synchronized static SessionFactory getSessionFactory() {
+    public static synchronized SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             throw new IllegalStateException("SessionFactory was shut down");
         }
@@ -69,7 +68,8 @@ public class HibernateUtil {
      *             if the transaction fails and is rolled back.
      */
     @Nullable
-    public static <T> T inTransaction(Function<@NonNull Session, T> transaction) {
+    public static <T> T inTransaction(
+            Function<@NonNull Session, T> transaction) {
         var start = System.currentTimeMillis();
         T result;
         Session session = null;
@@ -90,10 +90,7 @@ public class HibernateUtil {
                 session.close();
             }
         }
-        var time = System.currentTimeMillis() - start;
-        if (time > DATABASE_CALL_WARN_LIMIT) {
-            logWarning(time);
-        }
+        logWarning(start);
         return result;
     }
 
@@ -133,10 +130,7 @@ public class HibernateUtil {
                 session.close();
             }
         }
-        var time = System.currentTimeMillis() - start;
-        if (time > DATABASE_CALL_WARN_LIMIT) {
-            logWarning(time);
-        }
+        logWarning(start);
     }
 
     /**
@@ -151,13 +145,13 @@ public class HibernateUtil {
      * @return The result of the task.
      */
     @Nullable
-    public static <T> T inSession(Function<@NonNull Session, T> task) {
+    public static <T> T inSession(Function<Session, T> task) {
         var start = System.currentTimeMillis();
         T result;
         Session session = null;
         try {
             session = getSessionFactory().openSession();
-            result = task.apply(Objects.requireNonNull(session));
+            result = task.apply(session);
         } catch (Exception e) {
             handleDatabaseException(e);
             throw e;
@@ -166,10 +160,7 @@ public class HibernateUtil {
                 session.close();
             }
         }
-        var time = System.currentTimeMillis() - start;
-        if (time > DATABASE_CALL_WARN_LIMIT) {
-            logWarning(time);
-        }
+        logWarning(start);
         return result;
     }
 
@@ -182,12 +173,12 @@ public class HibernateUtil {
      *            a {@link Consumer} that accepts a {@link Session} and performs
      *            operations within that session.
      */
-    public static void inSession(Consumer<@NonNull Session> task) {
+    public static void inSession(Consumer<Session> task) {
         var start = System.currentTimeMillis();
         Session session = null;
         try {
             session = getSessionFactory().openSession();
-            task.accept(Objects.requireNonNull(session));
+            task.accept(session);
         } catch (Exception e) {
             handleDatabaseException(e);
             throw e;
@@ -196,10 +187,7 @@ public class HibernateUtil {
                 session.close();
             }
         }
-        var time = System.currentTimeMillis() - start;
-        if (time > DATABASE_CALL_WARN_LIMIT) {
-            logWarning(time);
-        }
+        logWarning(start);
     }
 
     private static void handleDatabaseException(Exception e)
@@ -211,16 +199,19 @@ public class HibernateUtil {
         }
     }
 
-    private static void logWarning(long time) {
-        logger.warn("Database call duration exceeded {}ms, {}ms.",
-                DATABASE_CALL_WARN_LIMIT, time);
+    private static void logWarning(long start) {
+        var time = System.currentTimeMillis() - start;
+        if (time > DATABASE_CALL_WARN_LIMIT) {
+            logger.warn("Database call duration exceeded {}ms, {}ms.",
+                    DATABASE_CALL_WARN_LIMIT, time);
+        }
     }
 
     /**
      * Closes the SessionFactory and releases all resources.
      */
     @SuppressWarnings("null")
-    public synchronized static void shutdown() {
+    public static synchronized void shutdown() {
         if (sessionFactory == null) {
             return;
         }
@@ -228,7 +219,7 @@ public class HibernateUtil {
         sessionFactory = null;
     }
 
-    private static Logger logger = Objects
-            .requireNonNull(LoggerFactory.getLogger(HibernateUtil.class));
+    @SuppressWarnings("null")
+    private static Logger logger = LoggerFactory.getLogger(HibernateUtil.class);
 
 }

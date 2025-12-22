@@ -32,19 +32,21 @@ public class Draft extends AbstractEntity {
     @OneToOne
     @JoinColumn(name = "user_id")
     @Nullable
+    @NotNull
     private User user;
 
     @Column(name = "product_name")
     private String productName = "";
 
     @Column(name = "price")
-    private BigDecimal price = Objects.requireNonNull(BigDecimal.ZERO);
+    @SuppressWarnings("null")
+    private BigDecimal price = BigDecimal.ZERO;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST,
             CascadeType.MERGE, CascadeType.DETACH })
     @JoinTable(name = "draft_category", joinColumns = @JoinColumn(name = "draft_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> category = Objects
-            .requireNonNull(Collections.emptySet());
+    @SuppressWarnings("null")
+    private Set<Category> category = Collections.emptySet();
 
     @Column(name = "stock_count")
     private Integer stockCount = 0;

@@ -5,6 +5,7 @@ import java.util.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
@@ -17,7 +18,7 @@ import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes
 @NullMarked
 public abstract class Html<T extends Html<T>> {
     protected final String name;
-    protected final Map<String, String> attrs = new LinkedHashMap<>();
+    protected final Map<@NonNull String, @NonNull String> attrs = new LinkedHashMap<>();
     protected final List<Object> children = new ArrayList<>();
     protected @Nullable String text;
 
@@ -38,7 +39,11 @@ public abstract class Html<T extends Html<T>> {
      * @return this
      */
     public T tabindex(int index) {
-        return attr("tabindex", Integer.toString(index));
+        var value = Integer.toString(index);
+        if (value == null) {
+            value = "0";
+        }
+        return attr("tabindex", value);
     }
 
     /**
@@ -77,11 +82,17 @@ public abstract class Html<T extends Html<T>> {
      * @return this
      */
     public T cls(String... classes) {
+        Objects.requireNonNull(classes, "CSS classes array cannot be null");
         // Assume caller passes non-null; ignore empty array
         if (classes.length > 0) {
-            attr("class", String.join(" ", classes));
+            attr("class", joinClasses(classes));
         }
         return self();
+    }
+
+    @SuppressWarnings("null")
+    private static String joinClasses(String... classes) {
+        return String.join(" ", classes);
     }
 
     /**
@@ -160,7 +171,11 @@ public abstract class Html<T extends Html<T>> {
         boolean isVoid = this instanceof Br;
         if (isVoid) {
             sb.append('/').append('>');
-            return sb.toString();
+            var built = sb.toString();
+            if (built == null) {
+                built = "";
+            }
+            return built;
         }
         sb.append('>');
         if (text != null) {
@@ -174,7 +189,11 @@ public abstract class Html<T extends Html<T>> {
             }
         }
         sb.append("</").append(name).append('>');
-        return sanitize(sb.toString());
+        var built = sb.toString();
+        if (built == null) {
+            built = "";
+        }
+        return sanitize(built);
     }
 
     /**
@@ -186,9 +205,11 @@ public abstract class Html<T extends Html<T>> {
      * @return the sanitized string
      */
     public static String sanitize(String unsanitized) {
+        Objects.requireNonNull(unsanitized,
+                "Input string for sanitization cannot be null");
         var settings = new OutputSettings();
         settings.prettyPrint(false);
-         // @formatter:off
+        // @formatter:off
        var safelist = Safelist.relaxed().addAttributes(":all",
                 "id",
                 "class",
@@ -204,12 +225,21 @@ public abstract class Html<T extends Html<T>> {
                 // Ignore
             }
         }
-        return Jsoup.clean(unsanitized, "", safelist, settings);
+        var sanitized = Jsoup.clean(unsanitized, "", safelist, settings);
+        if (sanitized == null) {
+            sanitized = "";
+        }
+        return sanitized;
     }
 
     private static String escape(String s) {
-        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-                .replace("\"", "&quot;");
+        assert s != null;
+        var escaped = s.replace("&", "&amp;").replace("<", "&lt;")
+                .replace(">", "&gt;").replace("\"", "&quot;");
+        if (escaped == null) {
+            escaped = "";
+        }
+        return escaped;
     }
 
     private static final class Raw {

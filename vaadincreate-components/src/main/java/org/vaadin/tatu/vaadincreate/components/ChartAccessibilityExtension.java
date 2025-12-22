@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractJavaScriptExtension;
@@ -56,21 +57,24 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
     }
 
     private static boolean isChartComponent(AbstractComponent chart) {
-        while (chart != null) {
-            if (chart.getClass().getName().contains("Chart")) {
+        AbstractComponent parent = chart;
+        while (parent != null) {
+            if (parent.getClass().getName().contains("Chart")) {
                 return true;
             }
-            chart = (AbstractComponent) chart.getParent();
+            parent = (AbstractComponent) parent.getParent();
         }
         return false;
     }
 
     @Override
+    @SuppressWarnings("null")
     protected ChartAccessibilityExtensionState getState() {
         return (ChartAccessibilityExtensionState) super.getState();
     }
 
     @Override
+    @SuppressWarnings("null")
     protected ChartAccessibilityExtensionState getState(boolean markAsDirty) {
         return (ChartAccessibilityExtensionState) super.getState(markAsDirty);
     }
@@ -137,6 +141,7 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
      *
      * @return the legends clickable text
      */
+    @Nullable
     public String getLegendsClickable() {
         return getState(false).legendsClickable;
     }

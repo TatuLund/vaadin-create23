@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.backend.service;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
@@ -28,12 +29,15 @@ public class ProductDataServiceImpl implements ProductDataService {
     // This class is a singleton
     @Nullable
     private static ProductDataServiceImpl instance;
-    private ProductDao productDao = new ProductDao();
-    private DraftDao draftDao = new DraftDao();
-    private Random random = new Random();
+    private final ProductDao productDao;
+    private final DraftDao draftDao;
+    private final Random random;
     private boolean slow = false;
 
     private ProductDataServiceImpl() {
+        this.productDao = new ProductDao();
+        this.draftDao = new DraftDao();
+        this.random = new Random();
         var backendMode = System.getProperty("backend.mode");
         if (backendMode != null && backendMode.equals("slow")) {
             slow = true;
@@ -41,13 +45,17 @@ public class ProductDataServiceImpl implements ProductDataService {
         var env = System.getProperty("generate.data");
         if (env == null || env.equals("true")) {
             var categories = MockDataGenerator.createCategories();
-            categories.forEach(cat -> productDao.updateCategory(cat));
-            var savedCategories = productDao.getAllCategories().stream()
-                    .toList();
+            categories.forEach(productDao::updateCategory);
+            var savedCategories = getSavedCategories();
             var products = MockDataGenerator.createProducts(savedCategories);
             products.forEach(prod -> productDao.updateProduct(prod));
             logger.info("Generated mock product data");
         }
+    }
+
+    @SuppressWarnings("null")
+    private List<@NonNull Category> getSavedCategories() {
+        return productDao.getAllCategories().stream().toList();
     }
 
     @SuppressWarnings("null")
@@ -115,8 +123,8 @@ public class ProductDataServiceImpl implements ProductDataService {
     @Override
     public synchronized Category updateCategory(Category category) {
         Objects.requireNonNull(category, "category can't be null");
-        var name = Objects.requireNonNull(category.getName(),
-                "category name can't be null");
+        var name = category.getName();
+        Objects.requireNonNull(name, "category name can't be null");
         randomWait(1);
         if (category.getId() == null
                 && productDao.getCategoryByName(name) != null) {

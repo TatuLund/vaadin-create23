@@ -7,7 +7,10 @@ import org.vaadin.tatu.vaadincreate.backend.data.AbstractEntity;
 import com.vaadin.ui.ComponentContainer;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 
@@ -68,8 +71,13 @@ public final class Telemetry {
             span.setAttribute("item.type", item.getClass().getSimpleName());
             span.setAttribute("item.action", action);
             int id = item.getId() != null ? item.getId() : -1;
-            span.setAttribute("item.id", ""+id);
-            span.addEvent(action.toUpperCase());
+            span.setAttribute("item.id", String.valueOf(id));
+            span.addEvent(action.toUpperCase(),
+                    Attributes.of(AttributeKey.stringKey("item.id"),
+                            String.valueOf(id),
+                            AttributeKey.stringKey("item.type"),
+                            item.getClass().getSimpleName()));
+            span.setStatus(StatusCode.OK);
         } finally {
             if (started) {
                 span.end();
@@ -101,7 +109,40 @@ public final class Telemetry {
             span.setAttribute("view.to",
                     newView != null ? newView.getClass().getSimpleName()
                             : "unknown");
-            span.addEvent("ENTERED");
+            span.addEvent("ENTERED",
+                    Attributes.of(AttributeKey.stringKey("view.from"),
+                            oldView != null ? oldView.getClass().getSimpleName()
+                                    : "none",
+                            AttributeKey.stringKey("view.to"),
+                            newView != null ? newView.getClass().getSimpleName()
+                                    : "unknown"));
+            span.setStatus(StatusCode.OK);
+        } finally {
+            if (started) {
+                span.end();
+            }
+        }
+    }
+
+    /**
+     * Records an exception to telemetry.
+     * 
+     * @param exception
+     */
+    public static void exception(Throwable exception) {
+        Span span = Span.current();
+        boolean started = false;
+        if (!span.getSpanContext().isValid()) {
+            span = start("exception");
+            started = true;
+        }
+        try {
+            span.recordException(exception);
+            span.setAttribute("exception.type",
+                    exception.getClass().getSimpleName());
+            span.setAttribute("error", true);
+            span.addEvent("EXCEPTION");
+            span.setStatus(StatusCode.ERROR, exception.getMessage());
         } finally {
             if (started) {
                 span.end();

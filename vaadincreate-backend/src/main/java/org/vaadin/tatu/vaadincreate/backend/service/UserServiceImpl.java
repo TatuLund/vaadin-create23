@@ -19,8 +19,8 @@ import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 @SuppressWarnings("java:S6548")
 public class UserServiceImpl implements UserService {
 
-    private UserDao userDao = new UserDao();
-    private Random random = new Random();
+    private final UserDao userDao;
+    private final Random random;
     private boolean slow = false;
 
     @Nullable
@@ -35,6 +35,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserServiceImpl() {
+        this.userDao = new UserDao();
+        this.random = new Random();
         var backendMode = System.getProperty("backend.mode");
         if (backendMode != null && backendMode.equals("slow")) {
             slow = true;

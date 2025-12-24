@@ -19,7 +19,7 @@ public class AppDataServiceImpl implements AppDataService {
     @Nullable
     private static AppDataServiceImpl instance;
 
-    private MessageDao messageDao = new MessageDao();
+    private final MessageDao messageDao;
 
     @SuppressWarnings("null")
     public static synchronized AppDataService getInstance() {
@@ -30,6 +30,7 @@ public class AppDataServiceImpl implements AppDataService {
     }
 
     private AppDataServiceImpl() {
+        this.messageDao = new MessageDao();
         var env = System.getProperty("generate.data");
         if (env == null || env.equals("true")) {
             var message = new Message(MockDataGenerator.createMessage(),
@@ -47,7 +48,7 @@ public class AppDataServiceImpl implements AppDataService {
     }
 
     @SuppressWarnings("null")
-    private LocalDateTime getNow() {
+    private static LocalDateTime getNow() {
         return LocalDateTime.now();
     }
 

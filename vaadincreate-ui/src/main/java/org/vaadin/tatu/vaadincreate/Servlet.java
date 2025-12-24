@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.DatabaseConnectionException;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
+import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 import org.vaadin.tatu.vaadincreate.util.CookieUtils;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
@@ -128,6 +129,7 @@ public class Servlet extends VaadinServlet {
                     .showInternalError(message, id)));
             logger.error("Exception happened {}", id,
                     errorEvent.getThrowable());
+            Telemetry.exception(errorEvent.getThrowable());
         }
     }
 

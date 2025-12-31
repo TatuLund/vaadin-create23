@@ -227,8 +227,8 @@ public class UserManagementView extends VerticalLayout
     }
 
     @Override
-    public void enter() {
-        openingView(VIEW_NAME);
+    public void enter(ViewChangeEvent event) {
+        openingView(event);
         presenter.requestUpdateUsers();
         newUser.focus();
         Shortcuts.setEscapeShortcut(".adminview-userview", "#cancel-button");

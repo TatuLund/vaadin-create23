@@ -131,8 +131,8 @@ public class CategoryManagementView extends VerticalLayout
     }
 
     @Override
-    public void enter() {
-        openingView(VIEW_NAME);
+    public void enter(ViewChangeEvent event) {
+        openingView(event);
         presenter.requestUpdateCategories();
         newCategoryButton.setEnabled(true);
         newCategoryButton.focus();

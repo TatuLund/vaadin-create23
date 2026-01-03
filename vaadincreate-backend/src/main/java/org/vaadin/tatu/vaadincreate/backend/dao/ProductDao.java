@@ -141,7 +141,11 @@ public class ProductDao {
         // Method returns all products from the database using HibernateUtil
         logger.info("Fetching all Products");
         var result = HibernateUtil.inSession(session -> {
-            return session.createQuery("from Product", Product.class).list();
+            // Using LEFT JOIN FETCH to eagerly load associated categories
+            // to avoid N+1 select problem
+            return session.createQuery(
+                    "select distinct p from Product p left join fetch p.category",
+                    Product.class).list();
         });
         if (result == null) {
             throw new IllegalStateException(

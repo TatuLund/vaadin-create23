@@ -21,6 +21,8 @@ services:
     hostname: app-1
     build:
       context: .
+      args: 
+        VAADIN_PRO_KEY: ${VAADIN_PRO_KEY}
       dockerfile: Dockerfile
     environment:
       CATALINA_OPTS: "-Dvaadin.productionMode=true"
@@ -38,6 +40,8 @@ services:
     hostname: app-2
     build:
       context: .
+      args: 
+        VAADIN_PRO_KEY: ${VAADIN_PRO_KEY}
       dockerfile: Dockerfile
     environment:
       CATALINA_OPTS: "-Dvaadin.productionMode=true"

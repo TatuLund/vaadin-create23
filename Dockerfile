@@ -4,7 +4,8 @@ COPY . /app/
 # Set the working directory
 WORKDIR /app
 # Set Env variable VAADIN_PRO_KEY
-ENV VAADIN_PRO_KEY=
+ARG VAADIN_PRO_KEY
+ENV VAADIN_PRO_KEY=${VAADIN_PRO_KEY}
 # Build the WAR file
 RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests -Prelease
 RUN mv /app/vaadincreate-ui/target/*.war /app/vaadincreate-ui/target/ROOT.war

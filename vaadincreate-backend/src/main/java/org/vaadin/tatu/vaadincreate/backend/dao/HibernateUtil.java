@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.backend.dao;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -14,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.DatabaseConnectionException;
+import org.vaadin.tatu.vaadincreate.backend.data.AbstractEntity;
 
 /**
  * Utility class for managing Hibernate sessions and transactions.
@@ -188,6 +190,24 @@ public class HibernateUtil {
             }
         }
         logWarning(start);
+    }
+
+    /**
+     * Saves or updates the given entity in the database.
+     *
+     * @param <T>
+     *            the type of the entity
+     * @param entity
+     *            the entity to be saved or updated
+     * @return the persisted entity
+     */
+    public static <T extends AbstractEntity> T saveOrUpdate(T entity) {
+        Objects.requireNonNull(entity, "Entity must not be null");
+        inTransaction(session -> {
+            session.saveOrUpdate(entity);
+        });
+        // after commit, `entity` has its id + new version set
+        return entity;
     }
 
     private static void handleDatabaseException(Exception e)

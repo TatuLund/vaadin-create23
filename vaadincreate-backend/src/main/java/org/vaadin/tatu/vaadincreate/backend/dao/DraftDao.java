@@ -30,26 +30,7 @@ public class DraftDao {
         Objects.requireNonNull(draft, "Draft to be updated must not be null");
         logger.info("Persisting Draft: ({}) '{}'", draft.getId(),
                 draft.getProductName());
-        var identifier = HibernateUtil.inTransaction(session -> {
-            Integer id;
-            if (draft.getId() != null) {
-                session.update(draft);
-                id = draft.getId();
-            } else {
-                id = (Integer) session.save(draft);
-            }
-            return id;
-        });
-        var result = HibernateUtil.inSession(session -> {
-            @Nullable
-            Draft d = session.get(Draft.class, identifier);
-            return d;
-        });
-        if (result == null) {
-            throw new IllegalStateException(
-                    "Just saved Draft is null, this should not happen");
-        }
-        return result;
+        return HibernateUtil.saveOrUpdate(draft);
     }
 
     /**

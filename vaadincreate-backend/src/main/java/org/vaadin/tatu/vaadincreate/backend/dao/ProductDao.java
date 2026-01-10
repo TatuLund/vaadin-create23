@@ -39,27 +39,7 @@ public class ProductDao {
                 "Product name must not be null");
         logger.info("Persisting Product: ({}) '{}'", product.getId(),
                 product.getProductName());
-        var identifier = HibernateUtil.inTransaction(session -> {
-            Integer id;
-            if (product.getId() != null) {
-                session.update(product);
-                id = product.getId();
-            } else {
-                id = (Integer) session.save(product);
-            }
-            return id;
-        });
-        // Necessary: Refetch new version of the product
-        var result = HibernateUtil.inSession(session -> {
-            @Nullable
-            Product prod = session.get(Product.class, identifier);
-            return prod;
-        });
-        if (result == null) {
-            throw new IllegalStateException(
-                    "Just saved product is now missing: " + identifier);
-        }
-        return result;
+        return HibernateUtil.saveOrUpdate(product);
     }
 
     /**
@@ -168,27 +148,7 @@ public class ProductDao {
                 "Category to be updated must not be null");
         logger.info("Persisting Category: ({}) '{}'", category.getId(),
                 category.getName());
-        var identifier = HibernateUtil.inTransaction(session -> {
-            Integer id;
-            if (category.getId() != null) {
-                session.update(category);
-                id = category.getId();
-            } else {
-                id = (Integer) session.save(category);
-            }
-            return id;
-        });
-        assert identifier != null;
-        var result = HibernateUtil.inSession(session -> {
-            @Nullable
-            Category cat = session.get(Category.class, identifier);
-            return cat;
-        });
-        if (result == null) {
-            throw new IllegalStateException(
-                    "Just saved category is now missing: " + identifier);
-        }
-        return result;
+        return HibernateUtil.saveOrUpdate(category);
     }
 
     /**

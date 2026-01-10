@@ -1,7 +1,7 @@
 package org.vaadin.tatu.vaadincreate.backend.data;
 
 import java.math.BigDecimal;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -46,7 +46,7 @@ public class Draft extends AbstractEntity {
             CascadeType.MERGE, CascadeType.DETACH })
     @JoinTable(name = "draft_category", joinColumns = @JoinColumn(name = "draft_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     @SuppressWarnings("null")
-    private Set<Category> category = Collections.emptySet();
+    private Set<Category> category = new HashSet<>();
 
     @Column(name = "stock_count")
     private Integer stockCount = 0;

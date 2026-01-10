@@ -47,26 +47,7 @@ public class UserDao {
      */
     public User updateUser(User user) {
         logger.info("Persisting User: ({}) '{}'", user.getId(), user.getName());
-        var identifier = HibernateUtil.inTransaction(session -> {
-            Integer id;
-            if (user.getId() != null) {
-                session.update(user);
-                id = user.getId();
-            } else {
-                id = (Integer) session.save(user);
-            }
-            return id;
-        });
-        var result = HibernateUtil.inSession(session -> {
-            @Nullable
-            User u = session.get(User.class, identifier);
-            return u;
-        });
-        if (result == null) {
-            throw new IllegalStateException(
-                    "Just saved user is now missing: " + identifier);
-        }
-        return result;
+        return HibernateUtil.saveOrUpdate(user);
     }
 
     /**
@@ -115,10 +96,8 @@ public class UserDao {
      */
     public List<@NonNull User> getAllUsers() {
         logger.info("Fetching all Users");
-        var users = HibernateUtil.inSession(session -> {
-            List<@NonNull User> result = session
-                    .createQuery("from User", User.class).list();
-            return result;
+        List<@NonNull User> users = HibernateUtil.inSession(session -> {
+            return session.createQuery("from User", User.class).list();
         });
         if (users == null) {
             throw new IllegalStateException(

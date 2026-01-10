@@ -31,26 +31,7 @@ public class MessageDao {
                 "Message to be updated must not be null");
         logger.info("Persisting Message: ({}) '{}'", message.getId(),
                 message.getMessage());
-        var identifier = HibernateUtil.inTransaction(session -> {
-            Integer id;
-            if (message.getId() != null) {
-                session.update(message);
-                id = message.getId();
-            } else {
-                id = (Integer) session.save(message);
-            }
-            return id;
-        });
-        var result = HibernateUtil.inSession(session -> {
-            @Nullable
-            Message msg = session.get(Message.class, identifier);
-            return msg;
-        });
-        if (result == null) {
-            throw new IllegalStateException(
-                    "Just saved Message is null, this should not happen");
-        }
-        return result;
+        return HibernateUtil.saveOrUpdate(message);
     }
 
     /**

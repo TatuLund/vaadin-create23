@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate;
+package org.vaadin.tatu.vaadincreate.about;
 
 import java.time.LocalDateTime;
 
@@ -6,26 +6,22 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
+import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.VaadinCreateView;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
-import org.vaadin.tatu.vaadincreate.backend.AppDataService;
-import org.vaadin.tatu.vaadincreate.backend.data.Message;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
-import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
-import org.vaadin.tatu.vaadincreate.backend.events.MessageEvent;
-import org.vaadin.tatu.vaadincreate.backend.events.ShutdownEvent;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.components.CharacterCountExtension;
 import org.vaadin.tatu.vaadincreate.components.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.ConfirmDialog.Type;
-import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
-import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
-import com.vaadin.data.HasValue.ValueChangeEvent;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
@@ -48,8 +44,7 @@ import com.vaadin.ui.themes.ValoTheme;
 @NullMarked
 @AllPermitted
 @SuppressWarnings({ "serial", "java:S2160" })
-public class AboutView extends VerticalLayout
-        implements VaadinCreateView, EventBusListener {
+public class AboutView extends VerticalLayout implements VaadinCreateView {
 
     private static final Logger logger = LoggerFactory
             .getLogger(AboutView.class);
@@ -58,6 +53,8 @@ public class AboutView extends VerticalLayout
 
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
+
+    private AboutPresenter presenter = new AboutPresenter(this);
 
     @Nullable
     private Button editButton;
@@ -72,10 +69,13 @@ public class AboutView extends VerticalLayout
     @Nullable
     private Registration saveRegistration;
 
+    /**
+     * Constructor.
+     */
     public AboutView() {
         var aboutContent = createAboutContent();
 
-        adminsNoteField = createTextArea();
+        adminsNoteField = new AdminsNoteField();
         adminsNoteField.setVisible(false);
 
         var adminsContent = new HorizontalLayout();
@@ -100,9 +100,6 @@ public class AboutView extends VerticalLayout
                     Alignment.TOP_RIGHT);
         }
 
-        adminsNoteField.addValueChangeListener(this::handleValueChange);
-        adminsNoteField.setValueChangeMode(ValueChangeMode.BLUR);
-        adminsNoteField.addBlurListener(blurEvent -> closeEditor());
         setSizeFull();
         setMargin(false);
         setStyleName(VaadinCreateTheme.ABOUT_VIEW);
@@ -110,19 +107,22 @@ public class AboutView extends VerticalLayout
         setComponentAlignment(aboutContent, Alignment.MIDDLE_CENTER);
         setComponentAlignment(adminsContent, Alignment.MIDDLE_CENTER);
         if (accessControl.isUserInRole(Role.ADMIN)) {
-            shutDownButton = new Button(getTranslation(I18n.About.SHUTDOWN));
-            shutDownButton.setId("shutdown-button");
-            shutDownButton.setDisableOnClick(true);
-            shutDownButton.setIcon(VaadinIcons.POWER_OFF);
-            shutDownButton.addStyleNames(ValoTheme.BUTTON_BORDERLESS,
-                    ValoTheme.BUTTON_SMALL);
-            shutDownButton.setDescription(
-                    getTranslation(I18n.About.SHUTDOWN_DESCRIPTION));
-            shutDownButton.addClickListener(click -> handleGlobalLogout());
+            createShutdownButton();
             addComponent(shutDownButton);
             setComponentAlignment(shutDownButton, Alignment.MIDDLE_CENTER);
         }
-        getEventBus().registerEventBusListener(this);
+    }
+
+    private void createShutdownButton() {
+        shutDownButton = new Button(getTranslation(I18n.About.SHUTDOWN));
+        shutDownButton.setId("shutdown-button");
+        shutDownButton.setDisableOnClick(true);
+        shutDownButton.setIcon(VaadinIcons.POWER_OFF);
+        shutDownButton.addStyleNames(ValoTheme.BUTTON_BORDERLESS,
+                ValoTheme.BUTTON_SMALL);
+        shutDownButton.setDescription(
+                getTranslation(I18n.About.SHUTDOWN_DESCRIPTION));
+        shutDownButton.addClickListener(click -> handleGlobalLogout());
     }
 
     private void handleGlobalLogout() {
@@ -132,39 +132,11 @@ public class AboutView extends VerticalLayout
                 getTranslation(I18n.About.CONFIRM_SHUTDOWN), Type.ALERT);
         confirmDialog.setConfirmText(getTranslation(I18n.CONFIRM));
         confirmDialog.setCancelText(getTranslation(I18n.CANCEL));
-        confirmDialog.addConfirmedListener(confirmed -> {
-            logger.info("Global logout scheduled in 60 seconds");
-            getEventBus().post(new ShutdownEvent());
-        });
+        confirmDialog.addConfirmedListener(
+                confirmed -> presenter.scheduleShutdown());
         confirmDialog.addCancelledListener(
                 cancelled -> shutDownButton.setEnabled(true));
         confirmDialog.open();
-    }
-
-    private void closeEditor() {
-        adminsNote.setVisible(true);
-        adminsNoteField.setVisible(false);
-        editButton.setVisible(true);
-        if (saveRegistration != null) {
-            saveRegistration.remove();
-        }
-    }
-
-    private void handleValueChange(ValueChangeEvent<String> valueChange) {
-        if (valueChange.isUserOriginated()) {
-            var unsanitized = valueChange.getValue();
-            // Sanitize user input with Jsoup to avoid JavaScript injection
-            // vulnerabilities
-            var text = Utils.sanitize(unsanitized);
-            Message mes = getService().updateMessage(text);
-            adminsNote.setCaption(
-                    Utils.formatDate(mes.getDateStamp(), getLocale()));
-            adminsNote.setValue(mes.getMessage());
-            getEventBus().post(
-                    new MessageEvent(mes.getMessage(), mes.getDateStamp()));
-            logger.info("Admin message updated");
-            Telemetry.saveItem(mes);
-        }
     }
 
     private void createEditButton() {
@@ -183,32 +155,6 @@ public class AboutView extends VerticalLayout
         adminsNote.setContentMode(ContentMode.HTML);
         adminsNote.addStyleName(VaadinCreateTheme.WHITESPACE_PRE);
         adminsNote.setId("admins-note");
-    }
-
-    // Create text area for editing admins note
-    @SuppressWarnings("java:S3878")
-    private TextArea createTextArea() {
-        var textArea = new TextArea();
-        textArea.setId("admins-text-area");
-        int maxLength = 250;
-        textArea.setMaxLength(maxLength);
-        textArea.setWidth("450px");
-        textArea.setIcon(VaadinIcons.FILE_TEXT_O);
-        textArea.setCaption("HTML");
-        textArea.setPlaceholder("max " + maxLength + " chars");
-        textArea.addFocusListener(focused -> saveRegistration = textArea
-                .addShortcutListener(new ShortcutListener("Save", KeyCode.S,
-                        new int[] { ModifierKey.CTRL }) {
-                    @Override
-                    public void handleAction(Object sender, Object target) {
-                        textArea.setValue(textArea.getValue().trim());
-                        closeEditor();
-                    }
-                }));
-        AttributeExtension.of(textArea)
-                .setAttribute(AriaAttributes.KEYSHORTCUTS, "Control+S");
-        CharacterCountExtension.extend(textArea);
-        return textArea;
     }
 
     private CustomLayout createAboutContent() {
@@ -231,40 +177,49 @@ public class AboutView extends VerticalLayout
     public void enter(ViewChangeEvent event) {
         openingView(VIEW_NAME);
 
-        Message message = getService().getMessage();
+        var message = presenter.fetchMessage();
         if (message != null) {
-            adminsNote.setCaption(
-                    Utils.formatDate(message.getDateStamp(), getLocale()));
+            var timeStamp = message.getDateStamp();
+            if (timeStamp == null) {
+                timeStamp = LocalDateTime.now();
+            }
+            adminsNote.setCaption(Utils.formatDate(timeStamp, getLocale()));
             adminsNote.setValue(message.getMessage());
         } else {
             adminsNote.setValue(getTranslation(I18n.About.NO_MESSAGE));
         }
     }
 
-    @Override
-    public void eventFired(AbstractEvent event) {
-        switch (event) {
-        case MessageEvent(String message, LocalDateTime timeStamp) -> Utils
-                .access(ui, () -> {
-                    if (adminsNoteField.isVisible()) {
-                        adminsNoteField.setVisible(false);
-                        Utils.stopPolling();
-                        adminsNote.setVisible(true);
-                        editButton.setVisible(true);
-                    }
-                    adminsNote.setCaption(
-                            Utils.formatDate(timeStamp, getLocale()));
-                    adminsNote.setValue(message);
-                });
-        case ShutdownEvent shutdownEvent -> Utils.access(ui, () -> {
+    /**
+     * Updates the admin note asynchronously using accessing the UI.
+     * 
+     * @param message
+     *            the new message
+     * @param timeStamp
+     *            the timestamp of the message
+     */
+    public void updateAsync(String message, LocalDateTime timeStamp) {
+        Utils.access(ui, () -> {
+            if (adminsNoteField.isVisible()) {
+                adminsNoteField.setVisible(false);
+                Utils.stopPolling();
+                adminsNote.setVisible(true);
+                editButton.setVisible(true);
+            }
+            adminsNote.setCaption(Utils.formatDate(timeStamp, getLocale()));
+            adminsNote.setValue(message);
+        });
+    }
+
+    /**
+     * Enables the shutdown button asynchronously using accessing the UI.
+     */
+    public void enableShutdownAsync() {
+        Utils.access(ui, () -> {
             if (shutDownButton != null) {
                 shutDownButton.setEnabled(false);
             }
         });
-        default -> {
-            // No action
-        }
-        }
     }
 
     @Override
@@ -277,15 +232,63 @@ public class AboutView extends VerticalLayout
     public void detach() {
         super.detach();
         Utils.stopPolling();
-        getEventBus().unregisterEventBusListener(this);
+        presenter.unregister();
     }
 
-    private EventBus getEventBus() {
-        return EventBus.get();
-    }
+    class AdminsNoteField extends TextArea implements HasAttributes<TextArea> {
 
-    private AppDataService getService() {
-        return VaadinCreateUI.get().getAppService();
+        private static final int MAX_LENGTH = 250;
+
+        @SuppressWarnings("java:S3878")
+        AdminsNoteField() {
+            setId("admins-text-area");
+            setMaxLength(MAX_LENGTH);
+            setWidth("450px");
+            setIcon(VaadinIcons.FILE_TEXT_O);
+            setCaption("HTML");
+            setPlaceholder(getTranslation(I18n.About.ADMIN_NOTE_PLACEHOLDER,
+                    MAX_LENGTH));
+            addFocusListener(focused -> saveRegistration = addShortcutListener(
+                    new ShortcutListener("Save", KeyCode.S,
+                            new int[] { ModifierKey.CTRL }) {
+                        @Override
+                        public void handleAction(Object sender, Object target) {
+                            setValue(getValue().trim());
+                            closeEditor();
+                        }
+                    }));
+            setAttribute(AriaAttributes.KEYSHORTCUTS, "Control+S");
+            CharacterCountExtension.extend(this);
+            addValueChangeListener(this::handleValueChange);
+            setValueChangeMode(ValueChangeMode.BLUR);
+            addBlurListener(blurEvent -> closeEditor());
+        }
+
+        private void closeEditor() {
+            adminsNote.setVisible(true);
+            adminsNoteField.setVisible(false);
+            editButton.setVisible(true);
+            if (saveRegistration != null) {
+                saveRegistration.remove();
+            }
+        }
+
+        @SuppressWarnings("java:S4449")
+        private void handleValueChange(ValueChangeEvent<String> valueChange) {
+            if (valueChange.isUserOriginated()) {
+                var unsanitized = valueChange.getValue();
+                // Sanitize user input with Jsoup to avoid JavaScript injection
+                // vulnerabilities
+                var text = Utils.sanitize(unsanitized);
+                var mes = presenter.updateMessage(text);
+                adminsNote.setCaption(
+                        Utils.formatDate(mes.getDateStamp(), getLocale()));
+                adminsNote.setValue(mes.getMessage());
+                logger.info("Admin message updated");
+                Telemetry.saveItem(mes);
+            }
+        }
+
     }
 
 }

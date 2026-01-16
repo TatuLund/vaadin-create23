@@ -9,6 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AppLayout.MenuButton;
+import org.vaadin.tatu.vaadincreate.about.AboutView;
 import org.vaadin.tatu.vaadincreate.admin.AdminView;
 import org.vaadin.tatu.vaadincreate.admin.CategoryManagementView;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;

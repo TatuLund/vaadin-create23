@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.tatu.vaadincreate.about.AboutView;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
 import org.vaadin.tatu.vaadincreate.i18n.I18NProvider;

@@ -31,7 +31,7 @@ import com.tngtech.archunit.junit.ArchUnitRunner;
  * Architecture tests for Vaadin Create.
  * 
  * Summary of the rules: Services are called only by presenters, UI and auth
- * classes. EventBus is only used by presenters, UI and AboutView. DAOs are only
+ * classes. EventBus is only used by presenters and UI. DAOs are only
  * used by services. Backend should not use Vaadin classes. Service should be
  * used only via its interface outside of the backend. Presenters should not use
  * Vaadin classes. AppLayout should be used only by VaadinCreateUI. LoginView
@@ -53,7 +53,6 @@ public class ArchitectureTest {
             .byClassesThat(have(simpleNameEndingWith("Presenter"))
                     .or(have(simpleNameEndingWith("Test")))
                     .or(have(simpleName("VaadinCreateUI")))
-                    .or(have(simpleName("AboutView")))
                     .or(have(simpleName("LockedObjectsImpl")))
                     .or(have(simpleName("EventBusImpl")))
                     .or(have(simpleName("EventBus")))
@@ -68,7 +67,6 @@ public class ArchitectureTest {
             .byClassesThat(have(simpleNameEndingWith("Presenter"))
                     .or(have(simpleNameEndingWith("Test")))
                     .or(have(simpleName("VaadinCreateUI")))
-                    .or(have(simpleName("AboutView")))
                     .or(have(simpleName("Servlet")))
                     .or(resideInAPackage("..eventbus.."))
                     .or(resideInAPackage("..locking.."))

@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate;
+package org.vaadin.tatu.vaadincreate.about;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,15 +9,18 @@ import java.time.LocalDateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.tatu.vaadincreate.AbstractUITest;
+import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.AppLayout.MenuButton;
+import org.vaadin.tatu.vaadincreate.about.AboutView.AdminsNoteField;
 import org.vaadin.tatu.vaadincreate.backend.events.MessageEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
 import com.vaadin.server.ServiceException;
+import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -58,7 +61,7 @@ public class AboutViewTest extends AbstractUITest {
         test($(Button.class).id("admin-edit")).click();
 
         // THEN: Text area is shown
-        var area = $(TextArea.class).id("admins-text-area");
+        var area = $(AdminsNoteField.class).id("admins-text-area");
         assertTrue(area.isVisible());
         assertTrue(test(area).isFocused());
 
@@ -93,7 +96,7 @@ public class AboutViewTest extends AbstractUITest {
         test($(Button.class).id("admin-edit")).click();
 
         // THEN: Text area is shown
-        var area = $(TextArea.class).id("admins-text-area");
+        var area = $(AdminsNoteField.class).id("admins-text-area");
         assertTrue(area.isVisible());
 
         // WHEN: Posting a new message event
@@ -128,5 +131,10 @@ public class AboutViewTest extends AbstractUITest {
 
         // THEN: A notification is shown
         assertNotification("You will be logged out in 60 seconds.");
+    }
+
+    @Test
+    public void about_view_is_serializable() {
+       SerializationDebugUtil.assertSerializable(view);
     }
 }

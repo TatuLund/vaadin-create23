@@ -150,6 +150,7 @@ public final class I18n {
         public static final String SHUTDOWN = "shutdown";
         public static final String SHUTDOWN_DESCRIPTION = "shutdown-description";
         public static final String CONFIRM_SHUTDOWN = "confirm-shutdown";
+        public static final String ADMIN_NOTE_PLACEHOLDER = "admin-note-placeholder";
 
         private About() {
             // private constructor to hide the implicit public one

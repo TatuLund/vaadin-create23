@@ -66,9 +66,6 @@ public class AboutView extends VerticalLayout implements VaadinCreateView {
     @Nullable
     private UI ui;
 
-    @Nullable
-    private Registration saveRegistration;
-
     /**
      * Constructor.
      */
@@ -238,6 +235,8 @@ public class AboutView extends VerticalLayout implements VaadinCreateView {
     class AdminsNoteField extends TextArea implements HasAttributes<TextArea> {
 
         private static final int MAX_LENGTH = 250;
+        @Nullable
+        private Registration saveRegistration;
 
         @SuppressWarnings("java:S3878")
         AdminsNoteField() {
@@ -248,15 +247,14 @@ public class AboutView extends VerticalLayout implements VaadinCreateView {
             setCaption("HTML");
             setPlaceholder(getTranslation(I18n.About.ADMIN_NOTE_PLACEHOLDER,
                     MAX_LENGTH));
-            addFocusListener(focused -> saveRegistration = addShortcutListener(
-                    new ShortcutListener("Save", KeyCode.S,
-                            new int[] { ModifierKey.CTRL }) {
-                        @Override
-                        public void handleAction(Object sender, Object target) {
-                            setValue(getValue().trim());
-                            closeEditor();
-                        }
-                    }));
+            saveRegistration = addShortcutListener(new ShortcutListener("Save",
+                    KeyCode.S, new int[] { ModifierKey.CTRL }) {
+                @Override
+                public void handleAction(Object sender, Object target) {
+                    setValue(getValue().trim());
+                    closeEditor();
+                }
+            });
             setAttribute(AriaAttributes.KEYSHORTCUTS, "Control+S");
             CharacterCountExtension.extend(this);
             addValueChangeListener(this::handleValueChange);
@@ -268,9 +266,6 @@ public class AboutView extends VerticalLayout implements VaadinCreateView {
             adminsNote.setVisible(true);
             adminsNoteField.setVisible(false);
             editButton.setVisible(true);
-            if (saveRegistration != null) {
-                saveRegistration.remove();
-            }
         }
 
         @SuppressWarnings("java:S4449")
@@ -289,6 +284,14 @@ public class AboutView extends VerticalLayout implements VaadinCreateView {
             }
         }
 
+        @Override
+        public void detach() {
+            super.detach();
+            if (saveRegistration != null) {
+                saveRegistration.remove();
+                saveRegistration = null;
+            }
+        }   
     }
 
 }

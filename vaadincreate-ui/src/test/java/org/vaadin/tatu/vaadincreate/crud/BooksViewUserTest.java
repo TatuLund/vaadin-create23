@@ -43,7 +43,7 @@ public class BooksViewUserTest extends AbstractUITest {
     }
 
     @Test
-    public void _user_can_search_prodcuts_and_new_button_is_disabled_and_clicing_row_does_not_open_form() {
+    public void user_can_search_prodcuts_and_new_button_is_disabled_and_clicing_row_does_not_open_form() {
         assertFalse(
                 test($(view, Button.class).id("new-product")).isInteractable());
 

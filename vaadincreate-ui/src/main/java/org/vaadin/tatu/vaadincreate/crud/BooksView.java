@@ -526,8 +526,6 @@ public class BooksView extends CssLayout implements VaadinCreateView {
     }
 
     public void newProduct() {
-        // Ensure categories are loaded before showing form
-        presenter.requestUpdateCategories();
         editProduct(new Product());
         newProduct.setEnabled(false);
         form.focus();

@@ -16,6 +16,8 @@ import org.vaadin.tatu.vaadincreate.about.AboutView.AdminsNoteField;
 import org.vaadin.tatu.vaadincreate.backend.events.MessageEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
+import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.server.ServiceException;
 import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
@@ -91,6 +93,25 @@ public class AboutViewTest extends AbstractUITest {
     }
 
     @Test
+    public void pressing_ctrl_s_shortcut_will_close_editor() {
+        // WHEN: Clicking edit button
+        test($(Button.class).id("admin-edit")).click();
+
+        // THEN: Text area is shown
+        var area = $(AdminsNoteField.class).id("admins-text-area");
+        assertTrue(area.isVisible());
+        assertFalse($(Button.class).id("admin-edit").isVisible());
+        assertTrue(test(area).isFocused());
+
+        // WHEN: Pressing ctrl+s
+        test(area).shortcut(KeyCode.S, ModifierKey.CTRL);
+
+        // THEN: Text area is hidden
+        assertTrue($(Button.class).id("admin-edit").isVisible());
+        assertFalse(area.isVisible());
+    }
+
+    @Test
     public void when_posting_a_new_message_event_it_is_shown_in_notification() {
         // WHEN: Clicking edit button
         test($(Button.class).id("admin-edit")).click();
@@ -135,6 +156,6 @@ public class AboutViewTest extends AbstractUITest {
 
     @Test
     public void about_view_is_serializable() {
-       SerializationDebugUtil.assertSerializable(view);
+        SerializationDebugUtil.assertSerializable(view);
     }
 }

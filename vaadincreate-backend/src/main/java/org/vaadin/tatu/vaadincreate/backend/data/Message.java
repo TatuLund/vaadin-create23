@@ -5,9 +5,9 @@ import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
@@ -15,15 +15,15 @@ import org.jspecify.annotations.Nullable;
 public class Message extends AbstractEntity {
 
     @SuppressWarnings("java:S1700")
-
     @Column(name = "message")
     @NotNull
-    @Nullable
-    private String message;
+    private String message = "";
 
     @Column(name = "date_stamp")
-    @Nullable
-    private LocalDateTime dateStamp;
+    @NotNull
+    @PastOrPresent
+    @SuppressWarnings("null")
+    private LocalDateTime dateStamp = LocalDateTime.now();
 
     public Message() {
     }
@@ -41,7 +41,6 @@ public class Message extends AbstractEntity {
         this.dateStamp = dateStamp;
     }
 
-    @Nullable
     public String getMessage() {
         return message;
     }
@@ -50,7 +49,6 @@ public class Message extends AbstractEntity {
         this.message = message;
     }
 
-    @Nullable
     public LocalDateTime getDateStamp() {
         return dateStamp;
     }

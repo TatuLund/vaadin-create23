@@ -177,9 +177,6 @@ public class AboutView extends VerticalLayout implements VaadinCreateView {
         var message = presenter.fetchMessage();
         if (message != null) {
             var timeStamp = message.getDateStamp();
-            if (timeStamp == null) {
-                timeStamp = LocalDateTime.now();
-            }
             adminsNote.setCaption(Utils.formatDate(timeStamp, getLocale()));
             adminsNote.setValue(message.getMessage());
         } else {
@@ -268,7 +265,6 @@ public class AboutView extends VerticalLayout implements VaadinCreateView {
             editButton.setVisible(true);
         }
 
-        @SuppressWarnings("java:S4449")
         private void handleValueChange(ValueChangeEvent<String> valueChange) {
             if (valueChange.isUserOriginated()) {
                 var unsanitized = valueChange.getValue();

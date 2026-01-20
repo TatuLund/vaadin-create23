@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
+import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
 import org.vaadin.tatu.vaadincreate.backend.events.BooksChangedEvent;
@@ -41,10 +42,17 @@ public class StatsPresenter implements EventBusListener, Serializable {
         getEventBus().registerEventBusListener(this);
     }
 
-    private CompletableFuture<Collection<Product>> loadProductsAsync() {
+    record ProductData(Collection<Product> products,
+            Collection<Category> categories) {
+    }
+
+    private CompletableFuture<ProductData> loadProductsAsync() {
         var productService = getService();
-        return CompletableFuture.supplyAsync(productService::getAllProducts,
-                getExecutor());
+        return CompletableFuture
+                .supplyAsync(
+                        () -> new ProductData(productService.getAllProducts(),
+                                productService.getAllCategories()),
+                        getExecutor());
     }
 
     /**
@@ -53,24 +61,26 @@ public class StatsPresenter implements EventBusListener, Serializable {
      */
     public void requestUpdateStats() {
         logger.info("Fetching products for statistics");
-        future = loadProductsAsync().thenAccept(products -> {
-            var start = System.currentTimeMillis();
-            logger.info("Calculating statistics");
+        future = loadProductsAsync().thenAccept(this::calculateStatistics)
+                .whenComplete((result, throwable) -> future = null);
+    }
 
-            Map<Availability, Long> availabilityStats = StatsUtils
-                    .calculateAvailabilityStats(products);
+    private void calculateStatistics(ProductData productData) {
+        var start = System.currentTimeMillis();
+        logger.info("Calculating statistics");
 
-            var categories = service.getAllCategories();
-            Map<String, CategoryStats> categoryStats = StatsUtils
-                    .calculateCategoryStats(categories, products);
+        Map<Availability, Long> availabilityStats = StatsUtils
+                .calculateAvailabilityStats(productData.products());
 
-            Map<String, Long> priceStats = StatsUtils
-                    .calculatePriceStats(products);
+        Map<String, CategoryStats> categoryStats = StatsUtils
+                .calculateCategoryStats(productData.categories(),
+                        productData.products());
+        Map<String, Long> priceStats = StatsUtils
+                .calculatePriceStats(productData.products());
 
-            view.updateStatsAsync(availabilityStats, categoryStats, priceStats);
-            logger.info("Statistics updated in {}ms",
-                    System.currentTimeMillis() - start);
-        }).whenComplete((result, throwable) -> future = null);
+        view.updateStatsAsync(availabilityStats, categoryStats, priceStats);
+        logger.info("Statistics updated in {}ms",
+                System.currentTimeMillis() - start);
     }
 
     public void cancelUpdateStats() {

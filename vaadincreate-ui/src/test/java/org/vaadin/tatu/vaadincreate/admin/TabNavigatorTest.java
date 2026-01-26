@@ -15,6 +15,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+@SuppressWarnings("null")
 public class TabNavigatorTest extends UIUnitTest {
 
     private TabNavigator tabNavigator;

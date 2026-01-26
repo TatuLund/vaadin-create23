@@ -89,19 +89,9 @@ public class CategoryManagementView extends VerticalLayout
     }
 
     private void handleSave(Category category) {
+        assert category != null : "Category must not be null";
         var saved = presenter.updateCategory(category);
         if (saved != null) {
-            categoryList.replaceItem(category, saved);
-
-            if (category.getId() == null) {
-                // If this was a new category, focus the form for easier data
-                // entry
-                var form = categoryList.getComponentFor(saved);
-                if (form != null) {
-                    form.focus();
-                }
-            }
-
             presenter.requestUpdateCategories();
             newCategoryButton.setEnabled(true);
             Notification.show(getTranslation(I18n.Category.CATEGORY_SAVED,

@@ -26,11 +26,10 @@ import com.vaadin.ui.themes.ValoTheme;
 @SuppressWarnings({ "serial", "java:S2160" })
 public class ComponentList<T, V extends Component> extends Composite {
 
-    private Grid<T> grid;
+    Grid<T> grid;
     @Nullable
     private ListDataProvider<T> dataProvider;
     private Panel panel = new Panel();
-    private ValueProvider<T, V> componentProvider;
 
     /**
      * Creates a new instance of ComponentList.
@@ -40,28 +39,11 @@ public class ComponentList<T, V extends Component> extends Composite {
      */
     public ComponentList(ValueProvider<T, V> provider) {
         Objects.requireNonNull(provider, "ValueProvider cannot be null");
-        this.componentProvider = provider;
         grid = createGrid(provider);
         panel.setSizeFull();
         panel.setContent(grid);
         panel.addStyleName(ValoTheme.PANEL_BORDERLESS);
         setCompositionRoot(panel);
-    }
-
-    /**
-     * Replaces an item in the list with a new item and regenerates the
-     * component.
-     *
-     * @param removed
-     *            item to be removed
-     * @param added
-     *            item to be added
-     */
-    public void replaceItem(T removed, T added) {
-        throwIfDataProviderNotSet();
-        dataProvider.getItems().remove(removed);
-        dataProvider.getItems().add(added);
-        dataProvider.refreshAll();
     }
 
     /**
@@ -114,24 +96,6 @@ public class ComponentList<T, V extends Component> extends Composite {
         if (dataProvider == null) {
             throw new IllegalStateException("Data provider is not set");
         }
-    }
-
-    /**
-     * Gets the component associated with a specific item.
-     *
-     * @param item
-     *            the item to get the component for
-     * @return the component for the item, or null if the item is not found
-     */
-    @Nullable
-    public V getComponentFor(T item) {
-        if (componentProvider == null) {
-            throw new IllegalStateException("Component provider is not set");
-        }
-        if (dataProvider != null && dataProvider.getItems().contains(item)) {
-            return componentProvider.apply(item);
-        }
-        return null;
     }
 
     private Grid<T> createGrid(ValueProvider<T, V> provider) {

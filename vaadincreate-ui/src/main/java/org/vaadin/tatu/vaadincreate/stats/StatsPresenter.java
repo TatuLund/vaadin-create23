@@ -65,20 +65,32 @@ public class StatsPresenter implements EventBusListener, Serializable {
                 .whenComplete((result, throwable) -> future = null);
     }
 
+    /**
+     * A record to hold product statistics.
+     *
+     * @param availabilityStats
+     *           A map containing availability statistics.
+     * @param categoryStats
+     *          A map containing category statistics.
+     * @param priceStats
+     *          A map containing price statistics.
+     */
+    public record ProductStatistics(Map<Availability, Long> availabilityStats,
+            Map<String, CategoryStats> categoryStats,
+            Map<String, Long> priceStats) {
+    }
+
     private void calculateStatistics(ProductData productData) {
         var start = System.currentTimeMillis();
         logger.info("Calculating statistics");
 
-        Map<Availability, Long> availabilityStats = StatsUtils
-                .calculateAvailabilityStats(productData.products());
+        var stats = new ProductStatistics(
+                StatsUtils.calculateAvailabilityStats(productData.products()),
+                StatsUtils.calculateCategoryStats(productData.categories(),
+                        productData.products()),
+                StatsUtils.calculatePriceStats(productData.products()));
 
-        Map<String, CategoryStats> categoryStats = StatsUtils
-                .calculateCategoryStats(productData.categories(),
-                        productData.products());
-        Map<String, Long> priceStats = StatsUtils
-                .calculatePriceStats(productData.products());
-
-        view.updateStatsAsync(availabilityStats, categoryStats, priceStats);
+        view.updateStatsAsync(stats);
         logger.info("Statistics updated in {}ms",
                 System.currentTimeMillis() - start);
     }

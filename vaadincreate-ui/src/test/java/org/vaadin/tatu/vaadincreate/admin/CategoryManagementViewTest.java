@@ -58,7 +58,9 @@ public class CategoryManagementViewTest extends AbstractUITest {
         var grid = (Grid<Category>) $(cats, Grid.class).single();
         var gridSize = test(grid).size();
         var form = (CategoryForm) test(grid).cell(0, gridSize - 1);
-        test($(form, NameField.class).first()).setValue("Tech horror");
+        var nameField = $(form, NameField.class).first();
+        assertTrue(test(nameField).isFocused());
+        test(nameField).setValue("Tech horror");
 
         var cat = test(grid).item(gridSize - 1);
         assertEquals("Tech horror", cat.getName());

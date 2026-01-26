@@ -19,6 +19,7 @@ import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.stats.StatsPresenter.ProductStatistics;
 import org.vaadin.tatu.vaadincreate.stats.StatsUtils.CategoryStats;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
@@ -166,21 +167,15 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
     /**
      * Updates the statistics asynchronously.
      * 
-     * @param availabilityStats
-     *            A map containing availability statistics.
-     * @param categoryStats
-     *            A map containing category statistics.
-     * @param priceStats
-     *            A map containing price statistics.
+     * @param stats
+     *            The product statistics to update the view with.
      */
-    public void updateStatsAsync(Map<Availability, Long> availabilityStats,
-            Map<String, CategoryStats> categoryStats,
-            Map<String, Long> priceStats) {
+    public void updateStatsAsync(ProductStatistics stats) {
         Utils.access(ui, () -> {
             if (isAttached()) {
-                updateAvailabilityChart(availabilityStats);
-                updateCategoryChart(categoryStats);
-                updatePriceChart(priceStats);
+                updateAvailabilityChart(stats.availabilityStats());
+                updateCategoryChart(stats.categoryStats());
+                updatePriceChart(stats.priceStats());
 
                 availabilityChart.drawChart();
                 categoryChart.drawChart();

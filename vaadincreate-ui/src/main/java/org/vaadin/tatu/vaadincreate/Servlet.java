@@ -35,7 +35,7 @@ import com.vaadin.server.VaadinSession;
 @WebServlet(value = "/*", asyncSupported = true, initParams = {
         @WebInitParam(name = "org.atmosphere.cpr.AtmosphereConfig.getInitParameter", value = "true"),
         @WebInitParam(name = "org.atmosphere.websocket.maxIdleTime", value = "300000") })
-@VaadinServletConfiguration(productionMode = false, ui = VaadinCreateUI.class, heartbeatInterval = 60, closeIdleSessions = true)
+@VaadinServletConfiguration(productionMode = false, ui = VaadinCreateUI.class, heartbeatInterval = 60, closeIdleSessions = true, widgetset = "org.vaadin.tatu.vaadincreate.VaadinCreateWidgetSet")
 public class Servlet extends VaadinServlet {
 
     static final class LocaleBootstrapListener implements BootstrapListener {

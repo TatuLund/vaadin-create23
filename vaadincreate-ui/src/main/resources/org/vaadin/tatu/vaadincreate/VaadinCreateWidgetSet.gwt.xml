@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.5.1//EN" "http://google-web-toolkit.googlecode.com/svn/tags/2.5.1/distro-source/core/src/gwt-module.dtd">
+<module>
+    <inherits name="com.vaadin.DefaultWidgetSet" />
+
+    <inherits name="org.vaadin.tatu.vaadincreate.components.WidgetSet" />
+
+    <inherits name="com.vaadin.addon.charts.Widgetset" />
+
+	<source path="client/" />
+
+    <generate-with class="org.vaadin.tatu.vaadincreate.client.OptimizedConnectorBundleLoaderFactory">
+      <when-type-assignable class="com.vaadin.server.widgetsetutils.ConnectorBundleLoaderFactory" />
+    </generate-with>
+</module>

@@ -68,6 +68,7 @@ public class LoggingFilter implements Filter {
         httpResponse.setStatus(404);
     }
 
+    @SuppressWarnings("null")
     private static void populateUserDetails(HttpSession session) {
         // Add user id to log messages if the user is logged in
         var user = (User) session

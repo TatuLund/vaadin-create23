@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.jsoup.Jsoup;
 import org.junit.Test;
+import org.vaadin.tatu.vaadincreate.backend.DatabaseConnectionException;
 import org.vaadin.tatu.vaadincreate.i18n.DefaultI18NProvider;
 import org.vaadin.tatu.vaadincreate.util.CookieUtils;
 
@@ -85,7 +86,8 @@ public class ServletTest extends UIUnitTest {
         var ui = new VaadinCreateUI();
         mockVaadin(ui);
         var servlet = new Servlet();
-        var exception = new Exception("Test exception");
+        var rootCause = new Exception("Test exception");
+        var exception = new RuntimeException("Wrapper exception", rootCause);
         var session = VaadinSession.getCurrent();
         Locale.setDefault(DefaultI18NProvider.LOCALE_EN);
 
@@ -94,12 +96,42 @@ public class ServletTest extends UIUnitTest {
         waitWhile(Notification.class,
                 not -> $(Notification.class).first() != null, 1);
 
+        // Assert
         var notification = $(Notification.class).first();
         assertEquals("Exception happened: \"#0000000001\"",
                 notification.getCaption());
         assertEquals("Test exception", notification.getDescription());
 
+        assertTrue(servlet.exceptionCount.get() > 0);
+
+        tearDown();
+    }
+
+    @Test
+    public void handleError_displays_database_error_notification_when_exception_causes_contains_DataBaseConnectionException()
+            throws ServiceException {
+        // Arrange
+        var ui = new VaadinCreateUI();
+        mockVaadin(ui);
+        var servlet = new Servlet();
+        var specialCause = new DatabaseConnectionException("Database error",
+                new Throwable("Root cause"));
+        var exception = new RuntimeException("Wrapper exception", specialCause);
+        var session = VaadinSession.getCurrent();
+        Locale.setDefault(DefaultI18NProvider.LOCALE_EN);
+
+        // Act
+        servlet.handleError(new ErrorEvent(exception), session);
+        waitWhile(Notification.class,
+                not -> $(Notification.class).first() != null, 1);
+
         // Assert
+        var notification = $(Notification.class).first();
+        assertEquals("Exception happened: \"#0000000001\"",
+                notification.getCaption());
+        assertEquals("Database connection error.",
+                notification.getDescription());
+
         assertTrue(servlet.exceptionCount.get() > 0);
 
         tearDown();

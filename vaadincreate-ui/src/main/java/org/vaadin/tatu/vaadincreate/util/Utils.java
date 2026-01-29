@@ -198,6 +198,19 @@ public class Utils {
         }
     }
 
+    /**
+     * Checks if the given throwable or any of its causes is of the specified
+     * type.
+     *
+     * @param <T>
+     *            the type of the cause to check for
+     * @param throwable
+     *            the throwable to check
+     * @param cause
+     *            the class of the cause to check for
+     * @return true if the throwable or any of its causes is of the specified
+     *         type, false otherwise
+     */
     public static <T extends Throwable> boolean throwableHasCause(
             Throwable throwable, Class<T> cause) {
         while (throwable != null) {
@@ -209,6 +222,13 @@ public class Utils {
         return false;
     }
 
+    /**
+     * Gets the root cause of the given throwable.
+     *
+     * @param throwable
+     *            the throwable for which to find the root cause
+     * @return the root cause throwable
+     */
     public static Throwable getRootCause(Throwable throwable) {
         Throwable cause = throwable;
         while (cause.getCause() != null) {

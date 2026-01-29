@@ -175,7 +175,8 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
     }
 
     public void waitForAppLoaded() {
-        this.waitForElementPresent(By.id("AppWidgetset"));
+        this.waitForElementPresent(
+                By.id("org.vaadin.tatu.vaadincreate.VaadinCreateWidgetSet"));
     }
 
     public void logViolations(Results axeResults) {

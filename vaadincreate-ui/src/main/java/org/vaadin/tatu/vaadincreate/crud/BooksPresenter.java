@@ -286,6 +286,10 @@ public class BooksPresenter implements Serializable, EventBusListener {
                     e.getMessage());
             view.showInternalError();
             return null;
+        } finally {
+            if (!newBook) {
+                unlockBook();
+            }
         }
         view.showSaveNotification(product.getProductName());
         view.setNewProductEnabled(true);
@@ -296,7 +300,6 @@ public class BooksPresenter implements Serializable, EventBusListener {
         } else {
             // Update product in the view
             view.updateProduct(product);
-            unlockBook();
         }
         view.setFragmentParameter("");
         // Post SaveEvent to EventBus
@@ -317,13 +320,16 @@ public class BooksPresenter implements Serializable, EventBusListener {
         accessControl.assertAdmin();
         var id = product.getId();
         Objects.requireNonNull(id, "Product must have an ID to be deleted");
-        view.showDeleteNotification(product.getProductName());
-        view.clearSelection();
-        view.setNewProductEnabled(true);
-        logger.info("Deleting product: {}", product.getId());
-        getService().deleteProduct(id);
-        view.removeProduct(product);
-        unlockBook();
+        try {
+            view.showDeleteNotification(product.getProductName());
+            view.clearSelection();
+            view.setNewProductEnabled(true);
+            logger.info("Deleting product: {}", product.getId());
+            getService().deleteProduct(id);
+            view.removeProduct(product);
+        } finally {
+            unlockBook();
+        }
         view.setFragmentParameter("");
         getEventBus().post(
                 new BooksChangedEvent(id, BooksChangedEvent.BookChange.DELETE));

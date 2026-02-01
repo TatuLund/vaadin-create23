@@ -11,6 +11,7 @@ import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 // This is an example of a possible sub-navigation pattern in Vaadin 8
@@ -45,7 +46,14 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
         if (params.equals("")) {
             tabNavigator.navigate(categories);
         } else {
-            tabNavigator.navigate(params);
+            var attempted = VIEW_NAME + "/" + params;
+            try {
+                tabNavigator.navigate(params);
+            } catch (IllegalArgumentException e) {
+                var ui = UI.getCurrent();
+                ui.getNavigator().navigateTo("error/" + attempted);
+                ui.getPage().setUriFragment("!" + attempted, false);
+            }
         }
     }
 

@@ -178,6 +178,13 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         dialog.open();
     }
 
+    /**
+     * Get current VaadinCreateUI instance
+     * <p>
+     * Note: This method assumes that it is called from a UI thread.
+     *
+     * @return Current VaadinCreateUI instance
+     */
     public static VaadinCreateUI get() {
         return (VaadinCreateUI) UI.getCurrent();
     }

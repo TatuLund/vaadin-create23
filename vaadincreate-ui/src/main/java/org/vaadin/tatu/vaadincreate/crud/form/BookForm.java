@@ -142,7 +142,7 @@ public class BookForm extends Composite implements HasI18N {
         binder.forField(category).bind("category");
 
         // Add bean level validation for Availability vs. Stock count cross
-        // checking.
+        // checking. Note, "Error" is not shown.
         binder.withValidator(this::checkAvailabilityVsStockCount, "Error");
 
         binder.bindInstanceFields(this);
@@ -200,9 +200,9 @@ public class BookForm extends Composite implements HasI18N {
     private void handleSave() {
         if (currentProduct != null && binder.writeBeanIfValid(currentProduct)) {
             fireEvent(new SaveEvent(this, currentProduct));
-        } else if (binderHasInvalidFieldsBound()) {
-            setStockCountAndAvailabilityInvalid(true);
+            return;
         }
+        setStockCountAndAvailabilityInvalid(binderHasInvalidFieldsBound());
     }
 
     private void handleDiscard() {
@@ -305,6 +305,7 @@ public class BookForm extends Composite implements HasI18N {
         binder.getChangedBindings().forEach(binding -> {
             var field = ((AbstractComponent) binding.getField());
             field.addStyleName(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY);
+            assert currentProduct != null;
             var value = binding.getGetter().apply(currentProduct);
             if (value != null) {
                 var html = Html.div()

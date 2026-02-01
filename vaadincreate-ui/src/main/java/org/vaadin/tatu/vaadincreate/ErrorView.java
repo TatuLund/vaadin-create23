@@ -36,6 +36,7 @@ public class ErrorView extends VerticalLayout implements View, HasI18N {
         header.addStyleName(ValoTheme.LABEL_H1);
         explanation.addStyleNames(ValoTheme.LABEL_FAILURE,
                 VaadinCreateTheme.ERRORVIEW_EXPLANATION);
+        explanation.setId("explanation");
         wrapper.addComponents(header, explanation);
         wrapper.setComponentAlignment(header, Alignment.MIDDLE_CENTER);
         wrapper.setComponentAlignment(explanation, Alignment.MIDDLE_CENTER);
@@ -49,17 +50,19 @@ public class ErrorView extends VerticalLayout implements View, HasI18N {
             getUI().getNavigator().navigateTo(AboutView.VIEW_NAME);
             return;
         }
-        explanation.setValue(getTranslation(I18n.Error.NOT_FOUND_DESC,
-                viewChange.getViewName()));
+        var viewName = viewChange.getViewName();
+        var attempted = viewChange.getParameters().isEmpty() ? viewName
+                : viewChange.getParameters();
+        explanation
+                .setValue(getTranslation(I18n.Error.NOT_FOUND_DESC, attempted));
         Notification.show(
                 String.format("%s %s",
                         getTranslation(I18n.Error.VIEW_NOT_FOUND),
-                        getTranslation(I18n.Error.NOT_FOUND_DESC,
-                                viewChange.getViewName())),
+                        getTranslation(I18n.Error.NOT_FOUND_DESC, attempted)),
                 Type.ASSISTIVE_NOTIFICATION);
         var user = Utils.getCurrentUserOrThrow();
         logger.warn("User '{}' attempted to navigate non-existent view '{}'",
-                user.getName(), viewChange.getViewName());
+                user.getName(), attempted);
     }
 
     private static Logger logger = LoggerFactory.getLogger(ErrorView.class);

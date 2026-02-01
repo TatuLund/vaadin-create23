@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
@@ -70,7 +71,8 @@ public class Servlet extends VaadinServlet {
     }
 
     @Override
-    protected void servletInitialized() {
+    protected void servletInitialized() throws ServletException {
+        super.servletInitialized();
         // Disable session expired notification and redirect to login view
         getService().setSystemMessagesProvider(systemMessagesInfo -> {
             CustomizedSystemMessages messages = new CustomizedSystemMessages();

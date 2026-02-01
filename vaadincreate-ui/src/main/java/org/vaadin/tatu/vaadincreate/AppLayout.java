@@ -76,6 +76,7 @@ public class AppLayout extends Composite implements HasI18N {
         layout.addStyleName("applayout");
         Navigator nav = new Navigator(ui, content);
         nav.setErrorView(ErrorView.class);
+        nav.addView("error", ErrorView.class);
         ui.setNavigator(nav);
 
         layout.setSizeFull();

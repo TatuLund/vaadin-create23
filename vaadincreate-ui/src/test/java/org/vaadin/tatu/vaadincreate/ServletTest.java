@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Properties;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
@@ -139,7 +140,7 @@ public class ServletTest extends UIUnitTest {
 
     @Test
     public void system_messages_provider_set_session_expired_disabled()
-            throws ServiceException {
+            throws ServiceException, ServletException {
         mockVaadin();
 
         var servlet = new Servlet() {

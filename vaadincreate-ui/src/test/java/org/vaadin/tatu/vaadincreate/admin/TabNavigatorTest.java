@@ -80,6 +80,20 @@ public class TabNavigatorTest extends UIUnitTest {
         assertTrue(view2.isEnterCalled());
     }
 
+    @Test
+    public void testEnterNotCalledOnSameView() {
+        tabNavigator.navigate("test1");
+        assertTrue(!view2.isEnterCalled());
+    }
+
+    @Test
+    public void testInitialViewIsFirstTab() {
+        var tabSheet = $(TabSheet.class).first();
+        var selectedTab = tabSheet.getSelectedTab();
+        assertEquals(view1, selectedTab);
+    }
+
+
     public static class TestView1 extends VerticalLayout implements TabView {
 
         @Override

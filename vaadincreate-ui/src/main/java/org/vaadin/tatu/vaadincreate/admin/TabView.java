@@ -46,6 +46,8 @@ public interface TabView extends HasI18N {
                 String.format("%s %s", getTranslation(event.getViewName()),
                         getTranslation(I18n.OPENED)),
                 Notification.Type.ASSISTIVE_NOTIFICATION);
+        // The cast is safe as TabView is only added to TabNavigator
+        // which ensures that the views are ComponentContainers
         Telemetry.entered((ComponentContainer) event.getOldView(),
                 (ComponentContainer) this);
     }

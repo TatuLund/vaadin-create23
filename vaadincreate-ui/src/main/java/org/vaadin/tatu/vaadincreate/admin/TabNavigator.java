@@ -14,6 +14,7 @@ import com.vaadin.server.Resource;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ErrorLevel;
+import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
@@ -40,7 +41,7 @@ public class TabNavigator extends Composite {
      * Constructs a new TabNavigator for sub-navigation.
      *
      * @param baseViewName
-     *           The base view name of the view hosting this navigator
+     *            The base view name of the view hosting this navigator
      */
     public TabNavigator(String baseViewName) {
         this.baseViewName = baseViewName;
@@ -88,6 +89,10 @@ public class TabNavigator extends Composite {
         Objects.requireNonNull(tabView, "TabView cannot be null");
         Objects.requireNonNull(caption, "Caption cannot be null");
         Objects.requireNonNull(icon, "Icon cannot be null");
+        if (!(tabView instanceof ComponentContainer)) {
+            throw new IllegalArgumentException(
+                    "TabView must be a ComponentContainer");
+        }
         var tab = tabSheet.addTab(tabView, caption);
         tab.setIcon(icon);
     }

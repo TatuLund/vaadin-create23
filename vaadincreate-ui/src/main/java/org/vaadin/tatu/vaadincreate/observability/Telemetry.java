@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate.observability;
 
+import java.util.Objects;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.backend.data.AbstractEntity;
@@ -19,6 +21,7 @@ import io.opentelemetry.context.Context;
  */
 @NullMarked
 public final class Telemetry {
+    private static final String ITEM_CANNOT_BE_NULL = "Item cannot be null";
     private static final Tracer tracer = GlobalOpenTelemetry.get()
             .getTracer("vaadincreate");
 
@@ -30,13 +33,14 @@ public final class Telemetry {
                 .startSpan();
     }
 
-    /**
+    /*§*
      * Logs an item opened event to telemetry.
      * 
      * @param item
      *            the opened item
      */
     public static void openedItem(AbstractEntity item) {
+        Objects.requireNonNull(item, ITEM_CANNOT_BE_NULL);
         item(item, "opened");
     }
 
@@ -47,6 +51,7 @@ public final class Telemetry {
      *            the deleted item
      */
     public static void deleteItem(AbstractEntity item) {
+        Objects.requireNonNull(item, ITEM_CANNOT_BE_NULL);
         item(item, "deleted");
     }
 
@@ -57,10 +62,12 @@ public final class Telemetry {
      *            the saved item
      */
     public static void saveItem(AbstractEntity item) {
+        Objects.requireNonNull(item, ITEM_CANNOT_BE_NULL);
         item(item, "saved");
     }
 
     private static void item(AbstractEntity item, String action) {
+        assert action != null : "Action cannot be null";
         Span span = Span.current();
         boolean started = false;
         if (!span.getSpanContext().isValid()) {
@@ -130,6 +137,7 @@ public final class Telemetry {
      * @param exception
      */
     public static void exception(Throwable exception) {
+        Objects.requireNonNull(exception, "Exception cannot be null");
         Span span = Span.current();
         boolean started = false;
         if (!span.getSpanContext().isValid()) {

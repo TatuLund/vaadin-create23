@@ -11,6 +11,7 @@ import org.junit.Test;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.ServiceException;
 import com.vaadin.testbench.uiunittest.UIUnitTest;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -93,6 +94,12 @@ public class TabNavigatorTest extends UIUnitTest {
         assertEquals(view1, selectedTab);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void addTabView_withNonContainerTabView_throwsIllegalArgumentException() {
+        var nonContainerView = new NonContainerTabView();
+        tabNavigator.addTabView(nonContainerView, "NonContainer",
+                VaadinIcons.HOME);
+    }
 
     public static class TestView1 extends VerticalLayout implements TabView {
 
@@ -123,6 +130,19 @@ public class TabNavigatorTest extends UIUnitTest {
 
         public boolean isEnterCalled() {
             return enterCalled;
+        }
+    }
+
+    public static class NonContainerTabView extends Label implements TabView {
+
+        @Override
+        public String getTabName() {
+            return "nonContainer";
+        }
+
+        @Override
+        public void enter(ViewChangeEvent event) {
+            // No-op
         }
     }
 

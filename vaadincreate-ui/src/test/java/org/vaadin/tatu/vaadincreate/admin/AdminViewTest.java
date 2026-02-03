@@ -16,9 +16,11 @@ import com.vaadin.server.ServiceException;
 
 public class AdminViewTest extends AbstractUITest {
 
+    private VaadinCreateUI ui = new VaadinCreateUI();
+
     @Before
     public void setup() throws ServiceException {
-        mockVaadin(new VaadinCreateUI());
+        mockVaadin(ui);
         login();
     }
 
@@ -31,11 +33,9 @@ public class AdminViewTest extends AbstractUITest {
     @Test
     public void navigating_to_unknown_admin_subview_shows_ErrorView_and_preserves_fragment() {
         // WHEN: Navigating directly to an unknown admin subview
-        var ui = VaadinCreateUI.get();
-        ui.getNavigator().navigateTo(AdminView.VIEW_NAME + "/test");
+        var view = navigate(AdminView.VIEW_NAME + "/test", ErrorView.class);
 
         // THEN: Global ErrorView is shown
-        var view = ui.getNavigator().getCurrentView();
         assertNotNull(view);
         assertEquals(ErrorView.class, view.getClass());
 

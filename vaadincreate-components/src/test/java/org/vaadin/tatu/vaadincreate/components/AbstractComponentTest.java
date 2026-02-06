@@ -33,6 +33,7 @@ import com.vaadin.testbench.TestBenchTestCase;
  * "https://vaadin.com/docs/v10/testbench/testbench-overview.html">Vaadin
  * TestBench</a>.
  */
+@SuppressWarnings("null")
 public abstract class AbstractComponentTest extends TestBenchTestCase {
     private static final int SERVER_PORT = 8080;
 

@@ -9,6 +9,7 @@ import org.openqa.selenium.interactions.Actions;
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.NotificationElement;
 
+@SuppressWarnings("null")
 public class ConfirmDialogIT extends AbstractComponentTest {
 
     @Override

@@ -14,16 +14,16 @@
 	</prerequisites>
 
 	<properties>
-		<vaadin.version>8.30.0</vaadin.version>
+		<vaadin.version>8.30.1</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-		<logback.version>1.3.16</logback.version>
+		<logback.version>1.5.25</logback.version>
 		<slf4j.version>2.0.9</slf4j.version>
 		<testbench.version>5.4.0</testbench.version>
 		<webdrivermanager.version>6.3.3</webdrivermanager.version>
 		<jetty.plugin.version>12.0.15</jetty.plugin.version>
 		<jspecify.version>1.0.0</jspecify.version>
 		<servlet.version>4.0.1</servlet.version>
-		<selenium.version>4.38.0</selenium.version>
+		<selenium.version>4.40.0</selenium.version>
 	</properties>
 
 	<modules>

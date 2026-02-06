@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 
+@SuppressWarnings("null")
 public class HtmlBuilderTest {
 
     @Test

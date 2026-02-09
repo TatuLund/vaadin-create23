@@ -26,17 +26,30 @@ public class LoggingFilter implements Filter {
     private static final Logger logger = LoggerFactory
             .getLogger(LoggingFilter.class);
 
+    private static final String[] ALLOWED_PREFIXES = { "/", "/VAADIN", "/UIDL",
+            "/HEARTBEAT", "/PUSH", "/APP" };
+
     private static boolean isGoodUrl(HttpServletRequest request) {
-        // Check if the URL is a VAADIN or valid application endpoint,
-        // considering context path
-        String url = request.getRequestURI();
+        String uri = request.getRequestURI();
         String contextPath = request.getContextPath();
-        return url.equals(contextPath + "/")
-                || url.startsWith(contextPath + "/VAADIN")
-                || url.startsWith(contextPath + "/UIDL")
-                || url.startsWith(contextPath + "/HEARTBEAT")
-                || url.startsWith(contextPath + "/PUSH")
-                || url.startsWith(contextPath + "/APP");
+
+        // Normalize to a path starting with "/..."
+        String path = uri.startsWith(contextPath)
+                ? uri.substring(contextPath.length())
+                : uri;
+
+        // Root is allowed
+        if ("/".equals(path)) {
+            return true;
+        }
+
+        // Any of the known prefixes is allowed
+        for (String prefix : ALLOWED_PREFIXES) {
+            if (!"/".equals(prefix) && path.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

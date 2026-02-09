@@ -125,8 +125,16 @@ public class TabNavigator extends Composite {
                 return;
             }
         }
-        throw new IllegalArgumentException(
-                "No tab with view name: " + viewName);
+        var attempted = String.format("%s/%s", baseViewName, viewName);
+        var ui = UI.getCurrent();
+        var navigator = ui.getNavigator();
+        if (navigator == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Not tab view with name %s found and navigator is not available to navigate to error view.",
+                    viewName));
+        }
+        navigator.navigateTo(String.format("error/%s", attempted));
+        ui.getPage().setUriFragment(String.format("!%s", attempted), false);
     }
 
     /**

@@ -47,6 +47,17 @@ public class AppLayoutTest extends UIUnitTest {
     }
 
     @Test
+    public void addingNonComponentContainerViewThrows() {
+        var appLayout = new AppLayout(ui, new MockAccessControl("Admin"));
+        try {
+            appLayout.addView(NonComponentContainerView.class, "Test",
+                    VaadinIcons.INFO, "test");
+        } catch (IllegalArgumentException e) {
+            assertEquals("View must be a ComponentContainer", e.getMessage());
+        }
+    }
+
+    @Test
     public void testAppLayoutAccessControlAdminPass() {
         // App mocks
         var accessControl = new MockAccessControl("Admin");
@@ -169,4 +180,13 @@ public class AppLayoutTest extends UIUnitTest {
         }
     }
 
+    @SuppressWarnings("serial")
+    @RolesPermitted({ Role.USER })
+    public static class NonComponentContainerView extends Label
+            implements View, HasI18N {
+        @Override
+        public void enter(ViewChangeEvent event) {
+            // No-op
+        }
+    }
 }

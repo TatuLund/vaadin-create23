@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate;
 
+import java.util.Objects;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -219,16 +221,26 @@ public class AppLayout extends Composite implements HasI18N {
      * based on @AccessAllowed annotation in the view.
      *
      * @param view
-     *            The view class
+     *            The view class, not null and must be a ComponentContainer
      * @param viewName
-     *            The name of the view shown in the menu
+     *            The name of the view shown in the menu, not null
      * @param icon
-     *            Icon to be used in menu
+     *            Icon to be used in menu, not null
      * @param path
-     *            The name / uri path
+     *            The name / uri path, not null and must be unique for the view.
+     *            This is used in the url fragment for navigation and should be
+     *            unique among views.
      */
     public void addView(Class<? extends View> view, String viewName,
             Resource icon, String path) {
+        Objects.requireNonNull(view, "View must not be null");
+        Objects.requireNonNull(viewName, "View name must not be null");
+        Objects.requireNonNull(icon, "Icon must not be null");
+        Objects.requireNonNull(path, "Path must not be null");
+        if (!ComponentContainer.class.isAssignableFrom(view)) {
+            throw new IllegalArgumentException(
+                    "View must be a ComponentContainer");
+        }
         if (!hasAccessToView(view)) {
             return;
         }

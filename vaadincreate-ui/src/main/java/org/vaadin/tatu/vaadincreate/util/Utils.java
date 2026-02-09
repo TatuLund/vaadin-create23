@@ -155,7 +155,7 @@ public class Utils {
      *            the command to be executed
      */
     public static void access(@Nullable UI ui, Runnable command) {
-        if (ui != null) {
+        if (ui != null && !ui.isClosing()) {
             ui.access(new AccessTask(command));
         } else {
             logger.warn("No UI available for pushing updates.");

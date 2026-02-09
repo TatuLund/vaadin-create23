@@ -12,3 +12,9 @@ vaadincreate-backend/.project
 vaadincreate-backend/.classpath
 .settings/org.eclipse.m2e.core.prefs
 vaadincreate-components/error-screenshots/
+stats.ps1
+.vscode/
+vaadincreate-components/src/main/resources/org/vaadin/tatu/vaadincreate/components/attributeextension/attribute_extension_connector.min.js
+vaadincreate-components/src/main/resources/org/vaadin/tatu/vaadincreate/components/chartaccessibility/chart_accessibility_connector.min.js
+vaadincreate-ui/src/main/webapp/VAADIN/themes/vaadincreate/styles.css
+vaadincreate-ui/src/main/resources/hotswap-agent.properties

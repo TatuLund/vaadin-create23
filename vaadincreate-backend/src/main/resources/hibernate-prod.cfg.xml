@@ -32,6 +32,9 @@
         <mapping class="org.vaadin.tatu.vaadincreate.backend.data.User"/>
         <mapping class="org.vaadin.tatu.vaadincreate.backend.data.Draft"/>
         <mapping class="org.vaadin.tatu.vaadincreate.backend.data.Message"/>
+        <mapping class="org.vaadin.tatu.vaadincreate.backend.data.Purchase"/>
+        <mapping class="org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine"/>
+        <mapping class="org.vaadin.tatu.vaadincreate.backend.data.UserSupervisor"/>
 
     </session-factory>
 </hibernate-configuration>

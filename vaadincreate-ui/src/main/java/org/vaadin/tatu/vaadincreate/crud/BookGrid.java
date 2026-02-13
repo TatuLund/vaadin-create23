@@ -96,13 +96,12 @@ public class BookGrid extends Grid<Product>
         // Format and add " €" to price
         var priceCol = addColumn(
                 product -> String.format("%.2f €", product.getPrice()))
-                        .setCaption(getTranslation(I18n.PRICE))
-                        .setResizable(true)
-                        .setComparator((product1, product2) -> product1
-                                .getPrice().compareTo(product2.getPrice()))
-                        .setStyleGenerator(
-                                product -> VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT)
-                        .setId(PRICE_ID);
+                .setCaption(getTranslation(I18n.PRICE)).setResizable(true)
+                .setComparator((product1, product2) -> product1.getPrice()
+                        .compareTo(product2.getPrice()))
+                .setStyleGenerator(
+                        product -> VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT)
+                .setId(PRICE_ID);
 
         // Add an traffic light icon in front of availability
         addColumn(this::htmlFormatAvailability, new HtmlRenderer())
@@ -288,7 +287,8 @@ public class BookGrid extends Grid<Product>
      * @return a list of all products currently displayed in the grid
      */
     public List<Product> getItems() {
-        assert getDataCommunicator() != null : "Data communicator must not be null";
+        assert getDataCommunicator() != null
+                : "Data communicator must not be null";
         return getDataCommunicator().fetchItemsWithRange(0,
                 getDataCommunicator().getDataProviderSize());
     }
@@ -299,7 +299,8 @@ public class BookGrid extends Grid<Product>
      * @return the currently selected product, or null if no row is selected
      */
     public Product getSelectedRow() {
-        assert getSelectionModel() instanceof SingleSelectionModel<?> : "Selection model must be single selection model";
+        assert getSelectionModel() instanceof SingleSelectionModel<?>
+                : "Selection model must be single selection model";
         return asSingleSelect().getValue();
     }
 
@@ -423,7 +424,7 @@ public class BookGrid extends Grid<Product>
                 getTranslation(I18n.Grid.CANNOT_CONVERT));
         // Build HTML using builder to ensure proper escaping of dynamic values.
         var root = Html.div()
-                // @formatter:off
+        // @formatter:off
                 .add(createCaptionSpan(getTranslation(I18n.PRODUCT_NAME)))
                     .add(Html.b().raw(book.getProductName()))
                     .add(Html.br())

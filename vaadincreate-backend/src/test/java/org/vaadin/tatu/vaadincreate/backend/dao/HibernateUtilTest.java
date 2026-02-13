@@ -182,8 +182,7 @@ public class HibernateUtilTest {
     @Test
     public void databaseConnectionException() {
         var exception = new JDBCConnectionException("DB error", null);
-        when(mockFactory.openSession())
-                .thenThrow(exception);
+        when(mockFactory.openSession()).thenThrow(exception);
         try {
             HibernateUtil.inSession(session -> "result");
             fail("Expected DatabaseConnectionException was not thrown");

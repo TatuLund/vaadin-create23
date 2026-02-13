@@ -266,7 +266,8 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
     // Update the charts with the new data
     private void updateAvailabilityChart(
             Map<Availability, Long> availabilityStats) {
-        assert availabilityStats != null : "Availability stats must not be null";
+        assert availabilityStats != null
+                : "Availability stats must not be null";
 
         var availabilitySeries = availabilitySeries(availabilityStats);
         availabilitySeries.setName(getTranslation(I18n.Stats.COUNT));

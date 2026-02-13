@@ -35,8 +35,7 @@ public class DefaultViewTest extends AbstractUITest {
         mockVaadin(ui);
         var locale = I18NProvider.fetchLocaleFromCookie();
         assertEquals("fi", locale.getLanguage());
-        ui.getSession().setLocale(
-                locale != null ? locale : Locale.ENGLISH);
+        ui.getSession().setLocale(locale != null ? locale : Locale.ENGLISH);
         navigate("", AboutView.class);
     }
 

@@ -84,8 +84,8 @@ public class AboutPresenter implements EventBusListener, Serializable {
     @Override
     public void eventFired(AbstractEvent event) {
         switch (event) {
-        case MessageEvent(String message, LocalDateTime timeStamp) -> view
-                .updateAsync(message, timeStamp);
+        case MessageEvent(String message, LocalDateTime timeStamp) ->
+            view.updateAsync(message, timeStamp);
         case ShutdownEvent shutdownEvent -> view.enableShutdownAsync();
         default -> {
             // No action

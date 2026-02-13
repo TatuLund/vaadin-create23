@@ -101,8 +101,7 @@ public abstract class AbstractUITest extends UIUnitTest {
                 notifications), result);
     }
 
-    protected void assertAssistiveNotification(
-            String notificatioText) {
+    protected void assertAssistiveNotification(String notificatioText) {
         var notification = $(Notification.class).last();
         assertEquals(notificatioText, notification.getCaption());
         assertEquals(Position.ASSISTIVE, notification.getPosition());

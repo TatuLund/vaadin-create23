@@ -133,7 +133,8 @@ public abstract class AbstractComponentTest extends TestBenchTestCase {
     }
 
     public void waitForAppLoaded() {
-        this.waitForElementPresent(By.id("org.vaadin.tatu.vaadincreate.components.WidgetSet"));
+        this.waitForElementPresent(
+                By.id("org.vaadin.tatu.vaadincreate.components.WidgetSet"));
     }
 
     /**

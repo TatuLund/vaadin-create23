@@ -16,7 +16,7 @@ public class ResetButtonForTextFieldView extends VerticalLayout
         ResetButtonForTextField.of(field);
         field.addValueChangeListener(e -> {
             Label label = new Label();
-            label.setValue("Value:"+e.getValue());
+            label.setValue("Value:" + e.getValue());
             label.setId("value");
             addComponent(label);
         });

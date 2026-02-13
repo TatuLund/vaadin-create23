@@ -14,7 +14,8 @@ public class CharacterCountExtensionView extends VerticalLayout
         var field = new TextField("Field");
         field.setWidth("300px");
         field.setMaxLength(20);
-        field.setValue("This is a test value");;
+        field.setValue("This is a test value");
+        ;
         CharacterCountExtension.extend(field);
         var area = new TextArea("Area");
         area.setMaxLength(100);

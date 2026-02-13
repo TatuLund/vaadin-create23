@@ -49,7 +49,7 @@ public class NumberField extends CustomField<Integer>
      * Creates a new number field with the given caption.
      *
      * @param caption
-     *                the caption to set
+     *            the caption to set
      */
     public NumberField(String caption) {
         super();

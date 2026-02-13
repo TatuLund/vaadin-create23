@@ -242,13 +242,13 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     @Override
     public void eventFired(AbstractEvent event) {
         switch (event) {
-        case MessageEvent(String message, LocalDateTime timeStamp) -> access(
-                () -> {
-                    var note = new Notification(
-                            Utils.formatDate(timeStamp, getLocale()), message,
-                            Type.TRAY_NOTIFICATION, true);
-                    note.show(getPage());
-                });
+        case MessageEvent(String message, LocalDateTime timeStamp) ->
+            access(() -> {
+                var note = new Notification(
+                        Utils.formatDate(timeStamp, getLocale()), message,
+                        Type.TRAY_NOTIFICATION, true);
+                note.show(getPage());
+            });
         case UserUpdatedEvent(Integer userId) -> {
             var user = (User) getSession().getSession().getAttribute(
                     CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY);

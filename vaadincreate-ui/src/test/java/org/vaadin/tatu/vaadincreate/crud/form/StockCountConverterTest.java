@@ -21,14 +21,14 @@ public class StockCountConverterTest {
     private StockCountConverter converter;
     private TextField field;
     private ValueContext context;
-    
+
     @Before
     public void setup() {
         Locale.setDefault(Locale.ENGLISH);
         converter = new StockCountConverter(ERROR_MESSAGE);
 
         field = new TextField();
-        context = new ValueContext(null, field, Locale.ENGLISH);        
+        context = new ValueContext(null, field, Locale.ENGLISH);
     }
 
     @Test

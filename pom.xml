@@ -6,7 +6,7 @@
 	<groupId>org.vaadin.tatu</groupId>
 	<artifactId>vaadincreate-root</artifactId>
 	<packaging>pom</packaging>
-	<version>2.0-SNAPSHOT</version>
+	<version>3.0-SNAPSHOT</version>
 	<name>VaadinCreate 23 Root Project</name>
 
 	<prerequisites>
@@ -24,6 +24,7 @@
 		<jspecify.version>1.0.0</jspecify.version>
 		<servlet.version>4.0.1</servlet.version>
 		<selenium.version>4.40.0</selenium.version>
+		<spotless.version>3.2.1</spotless.version>
 	</properties>
 
 	<modules>
@@ -31,6 +32,54 @@
 		<module>vaadincreate-components</module>
 		<module>vaadincreate-ui</module>
 	</modules>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<!-- Module-friendly configuration: when running Maven inside a submodule,
+				     ${project.parent.basedir} points at the repo root. -->
+				<plugin>
+					<groupId>com.diffplug.spotless</groupId>
+					<artifactId>spotless-maven-plugin</artifactId>
+					<version>${spotless.version}</version>
+					<configuration>
+						<java>
+							<eclipse>
+								<version>4.29</version>
+								<file>${project.parent.basedir}/VaadinJavaConventions.xml</file>
+							</eclipse>
+						</java>
+					</configuration>
+					<executions>
+						<execution>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<!-- Root-only configuration so `mvn spotless:check` works at the repo root.
+			     Modules should declare the plugin (no config) to pick up pluginManagement. -->
+			<plugin>
+				<groupId>com.diffplug.spotless</groupId>
+				<artifactId>spotless-maven-plugin</artifactId>
+				<version>${spotless.version}</version>
+				<inherited>false</inherited>
+				<configuration>
+					<java>
+						<eclipse>
+							<version>4.29</version>
+							<file>${project.basedir}/java-formatter.xml</file>
+						</eclipse>
+					</java>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 	<profiles>
 		<profile>

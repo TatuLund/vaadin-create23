@@ -28,11 +28,11 @@ public interface I18NProvider extends Serializable {
     public abstract List<Locale> getLocales();
 
     public static Locale getCurrentSupportedLocale() {
-        assert VaadinSession
-                .getCurrent() != null : "No VaadinSession available";
+        assert VaadinSession.getCurrent() != null
+                : "No VaadinSession available";
         return getSupportedLocale(
                 VaadinSession.getCurrent().getLocale().getLanguage())
-                        .orElse(DefaultI18NProvider.LOCALE_EN);
+                .orElse(DefaultI18NProvider.LOCALE_EN);
     }
 
     /**

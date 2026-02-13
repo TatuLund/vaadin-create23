@@ -153,7 +153,8 @@ public class ConfirmDialog extends Composite {
      */
     public Registration addConfirmedListener(ConfirmedListener listener) {
         Objects.requireNonNull(listener, "Listener cannot be null");
-        assert ConfirmedListener.CONFIRMED_METHOD != null : "Confirmed method cannot be null";
+        assert ConfirmedListener.CONFIRMED_METHOD != null
+                : "Confirmed method cannot be null";
         var reg = addListener(ConfirmedEvent.class, listener,
                 ConfirmedListener.CONFIRMED_METHOD);
         if (reg == null) {
@@ -196,7 +197,8 @@ public class ConfirmDialog extends Composite {
      */
     public Registration addCancelledListener(CancelledListener listener) {
         Objects.requireNonNull(listener, "Listener cannot be null");
-        assert CancelledListener.CANCELLED_METHOD != null : "Cancelled method cannot be null";
+        assert CancelledListener.CANCELLED_METHOD != null
+                : "Cancelled method cannot be null";
         var reg = addListener(CancelledEvent.class, listener,
                 CancelledListener.CANCELLED_METHOD);
         if (reg == null) {

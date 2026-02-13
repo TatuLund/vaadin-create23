@@ -3,7 +3,7 @@
 <module>
     <inherits name="com.vaadin.DefaultWidgetSet" />
 
-    <inherits name="org.vaadin.tatu.vaadincreate.components.WidgetSet" />
+    
 
     <inherits name="com.vaadin.addon.charts.Widgetset" />
 
@@ -12,4 +12,6 @@
     <generate-with class="org.vaadin.tatu.vaadincreate.client.OptimizedConnectorBundleLoaderFactory">
       <when-type-assignable class="com.vaadin.server.widgetsetutils.ConnectorBundleLoaderFactory" />
     </generate-with>
+
+    <inherits name="org.vaadin.tatu.vaadincreate.components.WidgetSet" />
 </module>

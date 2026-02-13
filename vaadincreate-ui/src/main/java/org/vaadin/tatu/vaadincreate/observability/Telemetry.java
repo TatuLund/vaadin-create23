@@ -33,11 +33,10 @@ public final class Telemetry {
                 .startSpan();
     }
 
-    /*§*
-     * Logs an item opened event to telemetry.
+    /*
+     * §* Logs an item opened event to telemetry.
      * 
-     * @param item
-     *            the opened item
+     * @param item the opened item
      */
     public static void openedItem(AbstractEntity item) {
         Objects.requireNonNull(item, ITEM_CANNOT_BE_NULL);

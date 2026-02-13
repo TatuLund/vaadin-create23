@@ -100,7 +100,7 @@ public class LockedObjectsTest {
         eventBus.post(lockingEvent);
         try {
             latch.await();
-            Thread.sleep(10);
+            Thread.sleep(20);
         } catch (InterruptedException e) {
             // Ignore
         }
@@ -114,7 +114,7 @@ public class LockedObjectsTest {
         eventBus.post(lockingEvent);
         try {
             latch.await();
-            Thread.sleep(10);
+            Thread.sleep(20);
         } catch (InterruptedException e) {
             // Ignore
         }

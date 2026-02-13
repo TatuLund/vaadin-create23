@@ -174,9 +174,12 @@ No approval UI, no stock changes yet. Basic “My purchases” history can be a 
    - Responsive behavior:
      - On **wide** screens: wizard and history side-by-side (horizontal).
      - On **narrow** screens: stacked vertically.
-     - Implementation can be via CSS media queries or explicit orientation switch; requirements:
+     - Implementation can be via Vaadin responsive using CSS 
        - Desktop: both panels visible side-by-side.
        - Mobile: wizard above, history below.
+       - Add responsive style rules to responsive.scss
+   - Follow similar styling than the rest of the application
+     - Create view specific storefront.scss for the other view specific styles
 
 #### 2.2.2 PurchaseWizard behavior
 

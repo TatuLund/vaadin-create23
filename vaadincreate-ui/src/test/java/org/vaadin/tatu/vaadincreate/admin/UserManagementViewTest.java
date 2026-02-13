@@ -35,7 +35,8 @@ public class UserManagementViewTest extends AbstractUITest {
         mockVaadin(ui);
         login();
 
-        view = navigate(AdminView.VIEW_NAME + "/" + UserManagementView.VIEW_NAME,
+        view = navigate(
+                AdminView.VIEW_NAME + "/" + UserManagementView.VIEW_NAME,
                 AdminView.class);
         assertAssistiveNotification("Users opened");
     }

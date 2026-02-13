@@ -69,11 +69,11 @@ public class StatsPresenter implements EventBusListener, Serializable {
      * A record to hold product statistics.
      *
      * @param availabilityStats
-     *           A map containing availability statistics.
+     *            A map containing availability statistics.
      * @param categoryStats
-     *          A map containing category statistics.
+     *            A map containing category statistics.
      * @param priceStats
-     *          A map containing price statistics.
+     *            A map containing price statistics.
      */
     public record ProductStatistics(Map<Availability, Long> availabilityStats,
             Map<String, CategoryStats> categoryStats,

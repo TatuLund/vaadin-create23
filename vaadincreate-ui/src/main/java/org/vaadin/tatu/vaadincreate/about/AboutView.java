@@ -287,7 +287,7 @@ public class AboutView extends VerticalLayout implements VaadinCreateView {
                 saveRegistration.remove();
                 saveRegistration = null;
             }
-        }   
+        }
     }
 
 }

@@ -21,3 +21,5 @@ vaadincreate-ui/src/main/resources/hotswap-agent.properties
 vaadincreate-ui/src/main/webapp/VAADIN/themes/vaadincreate/styles.scss.cache
 vaadincreate-components/src/main/resources/rebel.xml
 vaadincreate-ui/src/main/resources/rebel.xml
+target/
+effective-pom.xml

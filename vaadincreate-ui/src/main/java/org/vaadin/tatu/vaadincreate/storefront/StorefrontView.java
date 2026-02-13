@@ -40,7 +40,8 @@ public class StorefrontView extends CssLayout implements VaadinCreateView {
 
         // Create placeholder for history on the right
         historyPlaceholder = new Label("My Purchases (coming in Step 3)");
-        historyPlaceholder.addStyleName(VaadinCreateTheme.STOREFRONTVIEW_HISTORY);
+        historyPlaceholder
+                .addStyleName(VaadinCreateTheme.STOREFRONTVIEW_HISTORY);
 
         addComponents(wizard, historyPlaceholder);
     }

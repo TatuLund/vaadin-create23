@@ -143,8 +143,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         }
 
         prevButton.setEnabled(step > 1);
-        nextButton.setCaption(step == 4
-                ? getTranslation(I18n.Storefront.SUBMIT)
+        nextButton.setCaption(step == 4 ? getTranslation(I18n.Storefront.SUBMIT)
                 : getTranslation(I18n.Storefront.NEXT));
     }
 
@@ -162,8 +161,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
                 .collect(Collectors.toList());
         productGrid.setItems(products);
 
-        quantityField = new TextField(
-                getTranslation(I18n.Storefront.QUANTITY));
+        quantityField = new TextField(getTranslation(I18n.Storefront.QUANTITY));
         quantityField.setValue("1");
 
         var addToCartButton = new Button(
@@ -206,8 +204,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
             // Update cart count
             var cartLabel = (Label) stepContent.getComponent(3);
-            cartLabel.setValue(getTranslation(I18n.Storefront.CART_ITEMS)
-                    + ": " + cart.size());
+            cartLabel.setValue(getTranslation(I18n.Storefront.CART_ITEMS) + ": "
+                    + cart.size());
         } catch (NumberFormatException ex) {
             Notification.show(getTranslation(I18n.Storefront.INVALID_QUANTITY),
                     Notification.Type.ERROR_MESSAGE);
@@ -221,14 +219,15 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
         streetField = new TextField(getTranslation(I18n.Storefront.STREET));
         streetField.setWidth("100%");
-        addressBinder.forField(streetField).asRequired(
-                getTranslation(I18n.Storefront.STREET_REQUIRED))
+        addressBinder.forField(streetField)
+                .asRequired(getTranslation(I18n.Storefront.STREET_REQUIRED))
                 .bind(Address::getStreet, Address::setStreet);
 
         postalCodeField = new TextField(
                 getTranslation(I18n.Storefront.POSTAL_CODE));
-        addressBinder.forField(postalCodeField).asRequired(
-                getTranslation(I18n.Storefront.POSTAL_CODE_REQUIRED))
+        addressBinder.forField(postalCodeField)
+                .asRequired(
+                        getTranslation(I18n.Storefront.POSTAL_CODE_REQUIRED))
                 .bind(Address::getPostalCode, Address::setPostalCode);
 
         cityField = new TextField(getTranslation(I18n.Storefront.CITY));
@@ -255,9 +254,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
         supervisorComboBox.setWidth("100%");
 
         // Load users with USER or ADMIN roles
-        var supervisors = userService.getAllUsers().stream()
-                .filter(u -> u.getRole() == Role.USER
-                        || u.getRole() == Role.ADMIN)
+        var supervisors = userService.getAllUsers().stream().filter(
+                u -> u.getRole() == Role.USER || u.getRole() == Role.ADMIN)
                 .collect(Collectors.toList());
         supervisorComboBox.setItems(supervisors);
         supervisorComboBox.setItemCaptionGenerator(User::getName);
@@ -284,22 +282,22 @@ public class PurchaseWizard extends Composite implements HasI18N {
         sb.append("<h3>").append(getTranslation(I18n.Storefront.ORDER_SUMMARY))
                 .append("</h3>");
 
-        sb.append("<h4>")
-                .append(getTranslation(I18n.Storefront.ITEMS_ORDERED))
+        sb.append("<h4>").append(getTranslation(I18n.Storefront.ITEMS_ORDERED))
                 .append("</h4>");
         sb.append("<ul>");
         for (var entry : cart.getItems().entrySet()) {
             var product = entry.getKey();
             var quantity = entry.getValue();
-            var lineTotal = product.getPrice().multiply(
-                    new java.math.BigDecimal(quantity));
+            var lineTotal = product.getPrice()
+                    .multiply(new java.math.BigDecimal(quantity));
             sb.append("<li>").append(product.getProductName()).append(" x ")
                     .append(quantity).append(" @ ").append(product.getPrice())
                     .append(" = ").append(lineTotal).append("</li>");
         }
         sb.append("</ul>");
 
-        sb.append("<h4>").append(getTranslation(I18n.Storefront.DELIVERY_ADDRESS))
+        sb.append("<h4>")
+                .append(getTranslation(I18n.Storefront.DELIVERY_ADDRESS))
                 .append("</h4>");
         sb.append("<p>").append(address.toString()).append("</p>");
 
@@ -317,8 +315,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
     private void handleNext() {
         if (currentStep == 1) {
             if (cart.isEmpty()) {
-                Notification.show(
-                        getTranslation(I18n.Storefront.CART_EMPTY),
+                Notification.show(getTranslation(I18n.Storefront.CART_EMPTY),
                         Notification.Type.WARNING_MESSAGE);
                 return;
             }
@@ -354,9 +351,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
     private void submitPurchase() {
         try {
-            var currentUser = CurrentUser.get()
-                    .orElseThrow(() -> new IllegalStateException(
-                            "User must be logged in"));
+            var currentUser = CurrentUser.get().orElseThrow(
+                    () -> new IllegalStateException("User must be logged in"));
 
             var purchase = purchaseService.createPendingPurchase(cart, address,
                     currentUser, selectedSupervisor);
@@ -375,8 +371,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
         } catch (Exception ex) {
             logger.error("Failed to create purchase", ex);
-            Notification.show(
-                    getTranslation(I18n.Storefront.PURCHASE_FAILED),
+            Notification.show(getTranslation(I18n.Storefront.PURCHASE_FAILED),
                     Notification.Type.ERROR_MESSAGE);
         }
     }

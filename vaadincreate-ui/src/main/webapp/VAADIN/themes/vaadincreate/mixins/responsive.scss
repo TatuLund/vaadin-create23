@@ -188,11 +188,11 @@
       width: calc(100% - 20px);
     }
 
-	  .dashboard-chart-wide {
+    .dashboard-chart-wide {
       width: calc(100% - 20px);
     }
-  }	
-}
+  }
+
   // Storefront responsive layout
   @media (max-width: 800px) {
     .storefrontview {
@@ -204,3 +204,4 @@
       }
     }
   }
+}

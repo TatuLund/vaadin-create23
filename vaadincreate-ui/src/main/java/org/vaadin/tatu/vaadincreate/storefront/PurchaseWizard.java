@@ -67,6 +67,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
     private Grid<Product> productGrid;
     @Nullable
     private TextField quantityField;
+    @Nullable
+    private Label cartItemsLabel;
 
     // Step 2 components
     @Nullable
@@ -169,7 +171,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         addToCartButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         addToCartButton.addClickListener(e -> addToCart());
 
-        var cartItemsLabel = new Label(
+        cartItemsLabel = new Label(
                 getTranslation(I18n.Storefront.CART_ITEMS) + ": "
                         + cart.size());
         cartItemsLabel.setId("cart-items-label");
@@ -203,9 +205,11 @@ public class PurchaseWizard extends Composite implements HasI18N {
                     Notification.Type.TRAY_NOTIFICATION);
 
             // Update cart count
-            var cartLabel = (Label) stepContent.getComponent(3);
-            cartLabel.setValue(getTranslation(I18n.Storefront.CART_ITEMS) + ": "
-                    + cart.size());
+            if (cartItemsLabel != null) {
+                cartItemsLabel.setValue(
+                        getTranslation(I18n.Storefront.CART_ITEMS) + ": "
+                                + cart.size());
+            }
         } catch (NumberFormatException ex) {
             Notification.show(getTranslation(I18n.Storefront.INVALID_QUANTITY),
                     Notification.Type.ERROR_MESSAGE);

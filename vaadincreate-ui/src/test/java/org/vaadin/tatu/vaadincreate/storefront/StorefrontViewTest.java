@@ -255,7 +255,7 @@ public class StorefrontViewTest extends AbstractUITest {
         var supervisors = supervisorCombo.getDataCommunicator()
                 .fetchItemsWithRange(0, 1);
         if (supervisors.size() > 0) {
-            test(supervisorCombo).selectItem(supervisors.get(0));
+            test(supervisorCombo).clickItem(supervisors.get(0));
             test(nextButton).click();
 
             // Step 4: Submit

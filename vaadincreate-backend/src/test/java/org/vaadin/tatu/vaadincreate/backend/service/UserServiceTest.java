@@ -87,7 +87,7 @@ public class UserServiceTest {
     @Test
     public void removeUser() {
         var oldSize = service.getAllUsers().size();
-        var u = service.getAllUsers().iterator().next();
+        var u = service.getAllUsers().get(oldSize - 1);
         var uid = u.getId();
         service.removeUser(uid);
         assertEquals(null, service.getUserById(uid));

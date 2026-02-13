@@ -73,7 +73,7 @@
 					<java>
 						<eclipse>
 							<version>4.29</version>
-							<file>${project.basedir}/java-formatter.xml</file>
+							<file>${project.basedir}/VaadinJavaConventions.xml</file>
 						</eclipse>
 					</java>
 				</configuration>

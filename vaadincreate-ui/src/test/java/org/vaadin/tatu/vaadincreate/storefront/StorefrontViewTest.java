@@ -59,7 +59,8 @@ public class StorefrontViewTest extends AbstractUITest {
 
         // THEN: First step (product selection) should be shown
         var stepTitle = $(Label.class).stream()
-                .filter(l -> l.getStyleName().contains("v-label-h2"))
+                .filter(l -> l.getStyleName() != null
+                        && l.getStyleName().contains("v-label-h2"))
                 .findFirst().orElse(null);
         assertNotNull("Step title should be present", stepTitle);
 

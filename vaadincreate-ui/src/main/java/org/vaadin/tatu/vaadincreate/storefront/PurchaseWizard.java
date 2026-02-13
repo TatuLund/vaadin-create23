@@ -1,8 +1,6 @@
 package org.vaadin.tatu.vaadincreate.storefront;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -15,7 +13,6 @@ import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.Address;
-import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Cart;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
@@ -26,7 +23,6 @@ import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
-import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -108,6 +104,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
         stepContent = new VerticalLayout();
         stepContent.setSpacing(true);
+        stepContent.setSizeFull();
 
         nextButton = new Button(getTranslation(I18n.Storefront.NEXT));
         nextButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
@@ -118,6 +115,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         prevButton.setEnabled(false);
 
         root.addComponents(stepTitle, stepContent, prevButton, nextButton);
+        root.setExpandRatio(stepContent, 1.0f);
 
         setCompositionRoot(root);
         showStep(1);
@@ -157,10 +155,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         productGrid.setSizeFull();
 
         // Load orderable products (AVAILABLE and stock > 0)
-        var products = productService.getAllProducts().stream()
-                .filter(p -> p.getAvailability() == Availability.AVAILABLE
-                        && p.getStockCount() > 0)
-                .collect(Collectors.toList());
+        var products = productService.getOrderableProducts();
         productGrid.setItems(products);
 
         quantityField = new TextField(getTranslation(I18n.Storefront.QUANTITY));

@@ -193,3 +193,14 @@
     }
   }	
 }
+  // Storefront responsive layout
+  @media (max-width: 800px) {
+    .storefrontview {
+      flex-direction: column;
+
+      .storefrontview-wizard {
+        max-width: 100%;
+        min-width: 100%;
+      }
+    }
+  }

@@ -171,9 +171,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
         addToCartButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         addToCartButton.addClickListener(e -> addToCart());
 
-        cartItemsLabel = new Label(
-                getTranslation(I18n.Storefront.CART_ITEMS) + ": "
-                        + cart.size());
+        cartItemsLabel = new Label(getTranslation(I18n.Storefront.CART_ITEMS)
+                + ": " + cart.size());
         cartItemsLabel.setId("cart-items-label");
 
         stepContent.addComponents(productGrid, quantityField, addToCartButton,
@@ -181,6 +180,11 @@ public class PurchaseWizard extends Composite implements HasI18N {
     }
 
     private void addToCart() {
+        if (productGrid == null || quantityField == null) {
+            logger.warn("addToCart called before step 1 initialized");
+            return;
+        }
+
         var selected = productGrid.asSingleSelect().getValue();
         if (selected == null) {
             Notification.show(
@@ -206,9 +210,9 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
             // Update cart count
             if (cartItemsLabel != null) {
-                cartItemsLabel.setValue(
-                        getTranslation(I18n.Storefront.CART_ITEMS) + ": "
-                                + cart.size());
+                cartItemsLabel
+                        .setValue(getTranslation(I18n.Storefront.CART_ITEMS)
+                                + ": " + cart.size());
             }
         } catch (NumberFormatException ex) {
             Notification.show(getTranslation(I18n.Storefront.INVALID_QUANTITY),
@@ -325,6 +329,10 @@ public class PurchaseWizard extends Composite implements HasI18N {
             }
             showStep(2);
         } else if (currentStep == 2) {
+            if (addressBinder == null) {
+                logger.error("addressBinder is null in step 2");
+                return;
+            }
             try {
                 addressBinder.writeBean(address);
                 showStep(3);
@@ -334,6 +342,10 @@ public class PurchaseWizard extends Composite implements HasI18N {
                         Notification.Type.WARNING_MESSAGE);
             }
         } else if (currentStep == 3) {
+            if (supervisorComboBox == null) {
+                logger.error("supervisorComboBox is null in step 3");
+                return;
+            }
             selectedSupervisor = supervisorComboBox.getValue();
             if (selectedSupervisor == null) {
                 Notification.show(

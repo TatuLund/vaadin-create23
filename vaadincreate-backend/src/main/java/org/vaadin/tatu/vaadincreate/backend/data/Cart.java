@@ -8,9 +8,8 @@ import java.util.Objects;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * Simple in-memory cart model for collecting products and quantities
- * before creating a purchase request.
- * This is not a persistent entity.
+ * Simple in-memory cart model for collecting products and quantities before
+ * creating a purchase request. This is not a persistent entity.
  */
 @NullMarked
 @SuppressWarnings("serial")
@@ -21,8 +20,10 @@ public class Cart implements Serializable {
     /**
      * Adds a product to the cart with the specified quantity.
      *
-     * @param product the product to add
-     * @param quantity the quantity to add
+     * @param product
+     *            the product to add
+     * @param quantity
+     *            the quantity to add
      */
     public void addItem(Product product, int quantity) {
         Objects.requireNonNull(product, "Product must not be null");
@@ -35,8 +36,10 @@ public class Cart implements Serializable {
     /**
      * Sets the quantity for a product in the cart.
      *
-     * @param product the product
-     * @param quantity the quantity to set
+     * @param product
+     *            the product
+     * @param quantity
+     *            the quantity to set
      */
     public void setQuantity(Product product, int quantity) {
         Objects.requireNonNull(product, "Product must not be null");
@@ -49,7 +52,8 @@ public class Cart implements Serializable {
     /**
      * Removes a product from the cart.
      *
-     * @param product the product to remove
+     * @param product
+     *            the product to remove
      */
     public void removeItem(Product product) {
         Objects.requireNonNull(product, "Product must not be null");

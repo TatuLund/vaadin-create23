@@ -23,9 +23,9 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Entity representing a purchase request in the system.
- * A purchase contains multiple lines of products, delivery information,
- * and approval workflow state.
+ * Entity representing a purchase request in the system. A purchase contains
+ * multiple lines of products, delivery information, and approval workflow
+ * state.
  */
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
@@ -79,12 +79,16 @@ public class Purchase extends AbstractEntity {
     /**
      * Constructs a Purchase with required fields.
      *
-     * @param requester the user making the purchase request
-     * @param deliveryAddress the delivery address for this purchase
+     * @param requester
+     *            the user making the purchase request
+     * @param deliveryAddress
+     *            the delivery address for this purchase
      */
     public Purchase(User requester, Address deliveryAddress) {
-        this.requester = Objects.requireNonNull(requester, "Requester must not be null");
-        this.deliveryAddress = Objects.requireNonNull(deliveryAddress, "Delivery address must not be null");
+        this.requester = Objects.requireNonNull(requester,
+                "Requester must not be null");
+        this.deliveryAddress = Objects.requireNonNull(deliveryAddress,
+                "Delivery address must not be null");
         this.createdAt = Instant.now();
         this.status = PurchaseStatus.PENDING;
     }
@@ -157,10 +161,11 @@ public class Purchase extends AbstractEntity {
     }
 
     /**
-     * Adds a line item to this purchase.
-     * This is a convenience method that maintains the bidirectional relationship.
+     * Adds a line item to this purchase. This is a convenience method that
+     * maintains the bidirectional relationship.
      *
-     * @param line the line to add
+     * @param line
+     *            the line to add
      */
     public void addLine(PurchaseLine line) {
         Objects.requireNonNull(line, "Line must not be null");
@@ -171,7 +176,8 @@ public class Purchase extends AbstractEntity {
     /**
      * Removes a line item from this purchase.
      *
-     * @param line the line to remove
+     * @param line
+     *            the line to remove
      */
     public void removeLine(PurchaseLine line) {
         Objects.requireNonNull(line, "Line must not be null");
@@ -180,15 +186,14 @@ public class Purchase extends AbstractEntity {
     }
 
     /**
-     * Calculates the total amount for this purchase.
-     * This is a derived value summing all line totals.
+     * Calculates the total amount for this purchase. This is a derived value
+     * summing all line totals.
      *
      * @return the total purchase amount
      */
     @Transient
     public BigDecimal getTotalAmount() {
-        return lines.stream()
-                .map(PurchaseLine::getLineTotal)
+        return lines.stream().map(PurchaseLine::getLineTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

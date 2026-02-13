@@ -42,35 +42,36 @@ public class PurchaseServiceTest {
         purchaseService = PurchaseServiceImpl.getInstance();
         userService = UserServiceImpl.getInstance();
         productService = ProductDataServiceImpl.getInstance();
-        
+
         // Use existing users or get first users by role
         // Try to find existing users with CUSTOMER and USER roles
         var allUsers = userService.getAllUsers();
-        
+
         // Find or create a customer user
         customerUser = allUsers.stream()
-            .filter(u -> u.getRole() == User.Role.CUSTOMER)
-            .findFirst()
-            .orElseGet(() -> {
-                User newCustomer = new User();
-                newCustomer.setName("testcustomer_" + System.currentTimeMillis());
-                newCustomer.setPasswd("password");
-                newCustomer.setRole(User.Role.CUSTOMER);
-                return userService.updateUser(newCustomer);
-            });
-        
+                .filter(u -> u.getRole() == User.Role.CUSTOMER).findFirst()
+                .orElseGet(() -> {
+                    User newCustomer = new User();
+                    newCustomer.setName(
+                            "testcustomer_" + System.currentTimeMillis());
+                    newCustomer.setPasswd("password");
+                    newCustomer.setRole(User.Role.CUSTOMER);
+                    return userService.updateUser(newCustomer);
+                });
+
         // Find or create a supervisor user
         supervisorUser = allUsers.stream()
-            .filter(u -> u.getRole() == User.Role.USER || u.getRole() == User.Role.ADMIN)
-            .findFirst()
-            .orElseGet(() -> {
-                User newSupervisor = new User();
-                newSupervisor.setName("testsupervisor_" + System.currentTimeMillis());
-                newSupervisor.setPasswd("password");
-                newSupervisor.setRole(User.Role.USER);
-                return userService.updateUser(newSupervisor);
-            });
-        
+                .filter(u -> u.getRole() == User.Role.USER
+                        || u.getRole() == User.Role.ADMIN)
+                .findFirst().orElseGet(() -> {
+                    User newSupervisor = new User();
+                    newSupervisor.setName(
+                            "testsupervisor_" + System.currentTimeMillis());
+                    newSupervisor.setPasswd("password");
+                    newSupervisor.setRole(User.Role.USER);
+                    return userService.updateUser(newSupervisor);
+                });
+
         // Get a test product
         testProduct = productService.getAllProducts().iterator().next();
     }
@@ -80,12 +81,13 @@ public class PurchaseServiceTest {
         // Arrange
         Cart cart = new Cart();
         cart.addItem(testProduct, 2);
-        
+
         Address address = new Address("123 Main St", "12345", "Anytown", "USA");
-        
+
         // Act
-        Purchase purchase = purchaseService.createPendingPurchase(cart, address, customerUser, supervisorUser);
-        
+        Purchase purchase = purchaseService.createPendingPurchase(cart, address,
+                customerUser, supervisorUser);
+
         // Assert
         assertNotNull(purchase);
         assertNotNull(purchase.getId());
@@ -94,22 +96,23 @@ public class PurchaseServiceTest {
         assertEquals(supervisorUser.getId(), purchase.getApprover().getId());
         assertNotNull(purchase.getCreatedAt());
         assertNull(purchase.getDecidedAt());
-        
+
         // Verify address snapshot
         assertEquals("123 Main St", purchase.getDeliveryAddress().getStreet());
         assertEquals("12345", purchase.getDeliveryAddress().getPostalCode());
         assertEquals("Anytown", purchase.getDeliveryAddress().getCity());
         assertEquals("USA", purchase.getDeliveryAddress().getCountry());
-        
+
         // Verify purchase lines
         assertEquals(1, purchase.getLines().size());
         var line = purchase.getLines().get(0);
         assertEquals(testProduct.getId(), line.getProduct().getId());
         assertEquals(Integer.valueOf(2), line.getQuantity());
         assertEquals(testProduct.getPrice(), line.getUnitPrice());
-        
+
         // Verify derived total
-        BigDecimal expectedLineTotal = testProduct.getPrice().multiply(BigDecimal.valueOf(2));
+        BigDecimal expectedLineTotal = testProduct.getPrice()
+                .multiply(BigDecimal.valueOf(2));
         assertEquals(expectedLineTotal, line.getLineTotal());
         assertEquals(expectedLineTotal, purchase.getTotalAmount());
     }
@@ -119,17 +122,18 @@ public class PurchaseServiceTest {
         // Arrange
         Cart cart = new Cart();
         cart.addItem(testProduct, 1);
-        
+
         Address address = new Address("123 Main St", "12345", "Anytown", "USA");
         BigDecimal originalPrice = testProduct.getPrice();
-        
+
         // Act
-        Purchase purchase = purchaseService.createPendingPurchase(cart, address, customerUser, supervisorUser);
-        
+        Purchase purchase = purchaseService.createPendingPurchase(cart, address,
+                customerUser, supervisorUser);
+
         // Now change the product price
         testProduct.setPrice(originalPrice.multiply(BigDecimal.valueOf(2)));
         productService.updateProduct(testProduct);
-        
+
         // Assert - purchase line should still have the original price
         var line = purchase.getLines().get(0);
         assertEquals(originalPrice, line.getUnitPrice());
@@ -140,15 +144,17 @@ public class PurchaseServiceTest {
         // Arrange
         Cart cart = new Cart();
         cart.addItem(testProduct, 2);
-        
+
         Address address = new Address("123 Main St", "12345", "Anytown", "USA");
         Integer originalStock = testProduct.getStockCount();
-        
+
         // Act
-        purchaseService.createPendingPurchase(cart, address, customerUser, supervisorUser);
-        
+        purchaseService.createPendingPurchase(cart, address, customerUser,
+                supervisorUser);
+
         // Assert - stock should remain unchanged
-        Product reloadedProduct = productService.getProductById(testProduct.getId());
+        Product reloadedProduct = productService
+                .getProductById(testProduct.getId());
         assertEquals(originalStock, reloadedProduct.getStockCount());
     }
 
@@ -157,9 +163,10 @@ public class PurchaseServiceTest {
         // Arrange
         Cart emptyCart = new Cart();
         Address address = new Address("123 Main St", "12345", "Anytown", "USA");
-        
+
         // Act
-        purchaseService.createPendingPurchase(emptyCart, address, customerUser, supervisorUser);
+        purchaseService.createPendingPurchase(emptyCart, address, customerUser,
+                supervisorUser);
     }
 
     @Test
@@ -170,18 +177,19 @@ public class PurchaseServiceTest {
         var iter = products.iterator();
         Product product1 = iter.next();
         Product product2 = iter.next();
-        
+
         cart.addItem(product1, 1);
         cart.addItem(product2, 3);
-        
+
         Address address = new Address("123 Main St", "12345", "Anytown", "USA");
-        
+
         // Act
-        Purchase purchase = purchaseService.createPendingPurchase(cart, address, customerUser, supervisorUser);
-        
+        Purchase purchase = purchaseService.createPendingPurchase(cart, address,
+                customerUser, supervisorUser);
+
         // Assert
         assertEquals(2, purchase.getLines().size());
-        
+
         BigDecimal expectedTotal = product1.getPrice()
                 .add(product2.getPrice().multiply(BigDecimal.valueOf(3)));
         assertEquals(expectedTotal, purchase.getTotalAmount());
@@ -193,19 +201,21 @@ public class PurchaseServiceTest {
         Cart cart = new Cart();
         cart.addItem(testProduct, 1);
         Address address = new Address("123 Main St", "12345", "Anytown", "USA");
-        
-        purchaseService.createPendingPurchase(cart, address, customerUser, supervisorUser);
-        purchaseService.createPendingPurchase(cart, address, customerUser, supervisorUser);
-        
+
+        purchaseService.createPendingPurchase(cart, address, customerUser,
+                supervisorUser);
+        purchaseService.createPendingPurchase(cart, address, customerUser,
+                supervisorUser);
+
         // Act
         var purchases = purchaseService.findMyPurchases(customerUser, 0, 10);
         long count = purchaseService.countMyPurchases(customerUser);
-        
+
         // Assert
         assertFalse(purchases.isEmpty());
         assertTrue(purchases.size() >= 2);
         assertEquals(purchases.size(), count);
-        
+
         // Verify all purchases belong to the customer
         for (Purchase p : purchases) {
             assertEquals(customerUser.getId(), p.getRequester().getId());
@@ -218,17 +228,19 @@ public class PurchaseServiceTest {
         Cart cart = new Cart();
         cart.addItem(testProduct, 1);
         Address address = new Address("123 Main St", "12345", "Anytown", "USA");
-        
-        purchaseService.createPendingPurchase(cart, address, customerUser, supervisorUser);
-        
+
+        purchaseService.createPendingPurchase(cart, address, customerUser,
+                supervisorUser);
+
         // Act
-        var pendingPurchases = purchaseService.findPendingForApprover(supervisorUser, 0, 10);
+        var pendingPurchases = purchaseService
+                .findPendingForApprover(supervisorUser, 0, 10);
         long count = purchaseService.countPendingForApprover(supervisorUser);
-        
+
         // Assert
         assertFalse(pendingPurchases.isEmpty());
         assertTrue(count > 0);
-        
+
         // Verify all purchases are pending and assigned to supervisor
         for (Purchase p : pendingPurchases) {
             assertEquals(PurchaseStatus.PENDING, p.getStatus());
@@ -242,15 +254,16 @@ public class PurchaseServiceTest {
         Cart cart = new Cart();
         cart.addItem(testProduct, 1);
         Address address = new Address("123 Main St", "12345", "Anytown", "USA");
-        
+
         long initialCount = purchaseService.countAll();
-        
-        purchaseService.createPendingPurchase(cart, address, customerUser, supervisorUser);
-        
+
+        purchaseService.createPendingPurchase(cart, address, customerUser,
+                supervisorUser);
+
         // Act
         var allPurchases = purchaseService.findAll(0, 100);
         long count = purchaseService.countAll();
-        
+
         // Assert
         assertFalse(allPurchases.isEmpty());
         assertEquals(initialCount + 1, count);
@@ -261,28 +274,29 @@ public class PurchaseServiceTest {
         // Arrange
         Purchase purchase = new Purchase();
         purchase.setRequester(customerUser);
-        purchase.setDeliveryAddress(new Address("123 Main St", "12345", "Anytown", "USA"));
-        
+        purchase.setDeliveryAddress(
+                new Address("123 Main St", "12345", "Anytown", "USA"));
+
         var products = productService.getAllProducts();
         var iter = products.iterator();
         Product product1 = iter.next();
         Product product2 = iter.next();
-        
+
         var line1 = new org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine();
         line1.setProduct(product1);
         line1.setQuantity(2);
         line1.setUnitPrice(new BigDecimal("10.00"));
         purchase.addLine(line1);
-        
+
         var line2 = new org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine();
         line2.setProduct(product2);
         line2.setQuantity(3);
         line2.setUnitPrice(new BigDecimal("5.50"));
         purchase.addLine(line2);
-        
+
         // Act
         BigDecimal total = purchase.getTotalAmount();
-        
+
         // Assert
         // (2 * 10.00) + (3 * 5.50) = 20.00 + 16.50 = 36.50
         assertEquals(new BigDecimal("36.50"), total);
@@ -294,16 +308,17 @@ public class PurchaseServiceTest {
         Cart cart = new Cart();
         cart.addItem(testProduct, 1);
         Address address = new Address("123 Main St", "12345", "Anytown", "USA");
-        
+
         // Create 5 purchases
         for (int i = 0; i < 5; i++) {
-            purchaseService.createPendingPurchase(cart, address, customerUser, supervisorUser);
+            purchaseService.createPendingPurchase(cart, address, customerUser,
+                    supervisorUser);
         }
-        
+
         // Act
         var page1 = purchaseService.findMyPurchases(customerUser, 0, 2);
         var page2 = purchaseService.findMyPurchases(customerUser, 2, 2);
-        
+
         // Assert
         assertEquals(2, page1.size());
         assertEquals(2, page2.size());

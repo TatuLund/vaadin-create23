@@ -21,8 +21,8 @@ import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 
 /**
- * Implementation of PurchaseService.
- * This is a singleton service managing purchase operations.
+ * Implementation of PurchaseService. This is a singleton service managing
+ * purchase operations.
  */
 @NullMarked
 @SuppressWarnings("java:S6548")
@@ -51,7 +51,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public synchronized Purchase createPendingPurchase(Cart cart, Address address, User requester, @Nullable User defaultApproverOrNull) {
+    public synchronized Purchase createPendingPurchase(Cart cart,
+            Address address, User requester,
+            @Nullable User defaultApproverOrNull) {
         Objects.requireNonNull(cart, "Cart must not be null");
         Objects.requireNonNull(address, "Address must not be null");
         Objects.requireNonNull(requester, "Requester must not be null");
@@ -60,21 +62,19 @@ public class PurchaseServiceImpl implements PurchaseService {
             throw new IllegalArgumentException("Cart cannot be empty");
         }
 
-        logger.info("Creating pending purchase for requester: '{}'", requester.getName());
+        logger.info("Creating pending purchase for requester: '{}'",
+                requester.getName());
 
         // Create the purchase entity
         Purchase purchase = new Purchase();
         purchase.setRequester(requester);
         purchase.setStatus(PurchaseStatus.PENDING);
         purchase.setCreatedAt(Instant.now());
-        
+
         // Snapshot the delivery address
-        Address addressSnapshot = new Address(
-            address.getStreet(),
-            address.getPostalCode(),
-            address.getCity(),
-            address.getCountry()
-        );
+        Address addressSnapshot = new Address(address.getStreet(),
+                address.getPostalCode(), address.getCity(),
+                address.getCountry());
         purchase.setDeliveryAddress(addressSnapshot);
 
         // Determine approver
@@ -89,28 +89,29 @@ public class PurchaseServiceImpl implements PurchaseService {
         for (Map.Entry<Product, Integer> entry : cart.getItems().entrySet()) {
             Product product = entry.getKey();
             Integer quantity = entry.getValue();
-            
+
             // Snapshot the current price
             PurchaseLine line = new PurchaseLine();
             line.setPurchase(purchase);
             line.setProduct(product);
             line.setQuantity(quantity);
             line.setUnitPrice(product.getPrice());
-            
+
             purchase.addLine(line);
         }
 
         // Persist the purchase (with cascading to lines)
         Purchase savedPurchase = purchaseDao.updatePurchase(purchase);
-        
-        logger.info("Created pending purchase with ID: {} for requester: '{}'", 
+
+        logger.info("Created pending purchase with ID: {} for requester: '{}'",
                 savedPurchase.getId(), requester.getName());
-        
+
         return savedPurchase;
     }
 
     @Override
-    public synchronized List<@NonNull Purchase> findMyPurchases(User requester, int offset, int limit) {
+    public synchronized List<@NonNull Purchase> findMyPurchases(User requester,
+            int offset, int limit) {
         Objects.requireNonNull(requester, "Requester must not be null");
         return purchaseDao.findByRequester(requester, offset, limit);
     }
@@ -132,15 +133,18 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public synchronized List<@NonNull Purchase> findPendingForApprover(User approver, int offset, int limit) {
+    public synchronized List<@NonNull Purchase> findPendingForApprover(
+            User approver, int offset, int limit) {
         Objects.requireNonNull(approver, "Approver must not be null");
-        return purchaseDao.findByApproverAndStatus(approver, PurchaseStatus.PENDING, offset, limit);
+        return purchaseDao.findByApproverAndStatus(approver,
+                PurchaseStatus.PENDING, offset, limit);
     }
 
     @Override
     public synchronized long countPendingForApprover(User approver) {
         Objects.requireNonNull(approver, "Approver must not be null");
-        return purchaseDao.countByApproverAndStatus(approver, PurchaseStatus.PENDING);
+        return purchaseDao.countByApproverAndStatus(approver,
+                PurchaseStatus.PENDING);
     }
 
     @SuppressWarnings("null")

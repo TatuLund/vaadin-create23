@@ -24,8 +24,10 @@ public class User extends AbstractEntity {
      * <p>
      * The roles available are:
      * <ul>
-     * <li>{@link #CUSTOMER} - Customer role for employees who create purchase requests.</li>
-     * <li>{@link #USER} - Regular user with standard permissions, can act as supervisor.</li>
+     * <li>{@link #CUSTOMER} - Customer role for employees who create purchase
+     * requests.</li>
+     * <li>{@link #USER} - Regular user with standard permissions, can act as
+     * supervisor.</li>
      * <li>{@link #ADMIN} - Administrator with elevated permissions.</li>
      * </ul>
      */

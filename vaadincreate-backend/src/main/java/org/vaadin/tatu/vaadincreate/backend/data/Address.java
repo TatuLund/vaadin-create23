@@ -10,8 +10,8 @@ import javax.validation.constraints.NotNull;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * Value object representing a physical address.
- * This is used as an embedded object in entities to store address information.
+ * Value object representing a physical address. This is used as an embedded
+ * object in entities to store address information.
  */
 @NullMarked
 @Embeddable
@@ -43,16 +43,23 @@ public class Address implements Serializable {
     /**
      * Constructs an Address with all fields.
      *
-     * @param street the street address
-     * @param postalCode the postal code
-     * @param city the city name
-     * @param country the country name
+     * @param street
+     *            the street address
+     * @param postalCode
+     *            the postal code
+     * @param city
+     *            the city name
+     * @param country
+     *            the country name
      */
-    public Address(String street, String postalCode, String city, String country) {
+    public Address(String street, String postalCode, String city,
+            String country) {
         this.street = Objects.requireNonNull(street, "Street must not be null");
-        this.postalCode = Objects.requireNonNull(postalCode, "Postal code must not be null");
+        this.postalCode = Objects.requireNonNull(postalCode,
+                "Postal code must not be null");
         this.city = Objects.requireNonNull(city, "City must not be null");
-        this.country = Objects.requireNonNull(country, "Country must not be null");
+        this.country = Objects.requireNonNull(country,
+                "Country must not be null");
     }
 
     public String getStreet() {
@@ -89,13 +96,15 @@ public class Address implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Address address = (Address) o;
-        return Objects.equals(street, address.street) &&
-                Objects.equals(postalCode, address.postalCode) &&
-                Objects.equals(city, address.city) &&
-                Objects.equals(country, address.country);
+        return Objects.equals(street, address.street)
+                && Objects.equals(postalCode, address.postalCode)
+                && Objects.equals(city, address.city)
+                && Objects.equals(country, address.country);
     }
 
     @Override

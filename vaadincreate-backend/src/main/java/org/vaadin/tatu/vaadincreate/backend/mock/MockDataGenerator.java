@@ -90,6 +90,14 @@ public class MockDataGenerator implements Serializable {
         admin.setPasswd("super");
         admin.setRole(Role.ADMIN);
         users.add(admin);
+        // Create 100 CUSTOMER users for testing storefront functionality
+        for (Integer i = 0; i < 100; i++) {
+            User customer = new User();
+            customer.setName("Customer" + i);
+            customer.setPasswd("customer" + i);
+            customer.setRole(Role.CUSTOMER);
+            users.add(customer);
+        }
         return users;
     }
 

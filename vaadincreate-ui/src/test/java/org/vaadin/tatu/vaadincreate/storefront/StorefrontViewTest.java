@@ -31,7 +31,7 @@ public class StorefrontViewTest extends AbstractUITest {
         ui = new VaadinCreateUI();
         mockVaadin(ui);
         // Login as CUSTOMER to access storefront
-        login("User0", "user0");
+        login("Customer0", "customer0");
     }
 
     @After

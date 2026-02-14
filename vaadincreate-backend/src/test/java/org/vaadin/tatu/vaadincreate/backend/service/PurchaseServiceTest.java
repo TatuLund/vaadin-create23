@@ -47,30 +47,14 @@ public class PurchaseServiceTest {
         // Try to find existing users with CUSTOMER and USER roles
         var allUsers = userService.getAllUsers();
 
-        // Find or create a customer user
+        // Find e a customer user
         customerUser = allUsers.stream()
                 .filter(u -> u.getRole() == User.Role.CUSTOMER).findFirst()
-                .orElseGet(() -> {
-                    User newCustomer = new User();
-                    newCustomer.setName(
-                            "testcustomer_" + System.currentTimeMillis());
-                    newCustomer.setPasswd("password");
-                    newCustomer.setRole(User.Role.CUSTOMER);
-                    return userService.updateUser(newCustomer);
-                });
+                .get();
 
-        // Find or create a supervisor user
+        // Find a supervisor user
         supervisorUser = allUsers.stream()
-                .filter(u -> u.getRole() == User.Role.USER
-                        || u.getRole() == User.Role.ADMIN)
-                .findFirst().orElseGet(() -> {
-                    User newSupervisor = new User();
-                    newSupervisor.setName(
-                            "testsupervisor_" + System.currentTimeMillis());
-                    newSupervisor.setPasswd("password");
-                    newSupervisor.setRole(User.Role.USER);
-                    return userService.updateUser(newSupervisor);
-                });
+                .filter(u -> u.getRole() == User.Role.USER).findFirst().get();
 
         // Get a test product
         testProduct = productService.getAllProducts().iterator().next();

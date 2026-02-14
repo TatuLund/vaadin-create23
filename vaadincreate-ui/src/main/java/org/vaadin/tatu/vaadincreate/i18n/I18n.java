@@ -190,4 +190,42 @@ public final class I18n {
         }
     }
 
+    public static final class Storefront {
+        public static final String NEXT = "next";
+        public static final String PREVIOUS = "previous";
+        public static final String SUBMIT = "submit";
+        public static final String STEP1_TITLE = "step1-title";
+        public static final String STEP2_TITLE = "step2-title";
+        public static final String STEP3_TITLE = "step3-title";
+        public static final String STEP4_TITLE = "step4-title";
+        public static final String QUANTITY = "quantity";
+        public static final String ADD_TO_CART = "add-to-cart";
+        public static final String CART_ITEMS = "cart-items";
+        public static final String SELECT_PRODUCT_FIRST = "select-product-first";
+        public static final String QUANTITY_POSITIVE = "quantity-positive";
+        public static final String ADDED_TO_CART = "added-to-cart";
+        public static final String INVALID_QUANTITY = "invalid-quantity";
+        public static final String STREET = "street";
+        public static final String POSTAL_CODE = "postal-code";
+        public static final String CITY = "city";
+        public static final String COUNTRY = "country";
+        public static final String STREET_REQUIRED = "street-required";
+        public static final String POSTAL_CODE_REQUIRED = "postal-code-required";
+        public static final String CITY_REQUIRED = "city-required";
+        public static final String COUNTRY_REQUIRED = "country-required";
+        public static final String SUPERVISOR = "supervisor";
+        public static final String ORDER_SUMMARY = "order-summary";
+        public static final String ITEMS_ORDERED = "items-ordered";
+        public static final String DELIVERY_ADDRESS = "delivery-address";
+        public static final String CART_EMPTY = "cart-empty";
+        public static final String FILL_REQUIRED_FIELDS = "fill-required-fields";
+        public static final String SELECT_SUPERVISOR = "select-supervisor";
+        public static final String PURCHASE_CREATED = "purchase-created";
+        public static final String PURCHASE_FAILED = "purchase-failed";
+
+        private Storefront() {
+            // private constructor to hide the implicit public one
+        }
+    }
+
 }

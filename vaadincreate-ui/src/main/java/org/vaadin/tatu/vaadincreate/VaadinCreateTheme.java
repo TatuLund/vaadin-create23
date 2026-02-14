@@ -79,4 +79,8 @@ public final class VaadinCreateTheme {
     public static final String CHECKBOXGROUP_SCROLL = "scrollable";
 
     public static final String BUTTON_CANCEL = "cancel";
+
+    public static final String STOREFRONTVIEW = "storefrontview";
+    public static final String STOREFRONTVIEW_WIZARD = "storefrontview-wizard";
+    public static final String STOREFRONTVIEW_HISTORY = "storefrontview-history";
 }

@@ -155,22 +155,22 @@ public class UserManagementViewTest extends AbstractUITest {
     @SuppressWarnings("unchecked")
     @Test
     public void clicking_delete_will_present_confirm_dialog_and_confirming_will_show_delete_message_and_form_will_be_cleared() {
-        test($(ComboBox.class).id("user-select")).setInput("User0");
+        test($(ComboBox.class).id("user-select")).setInput("Customer50");
         assertTrue($(FormLayout.class).single().isEnabled());
 
         test($(Button.class).id("delete-button")).click();
 
         var dialog = $(Window.class).id("confirm-dialog");
-        assertEquals("\"User0\" will be deleted.",
+        assertEquals("\"Customer50\" will be deleted.",
                 $(dialog, Label.class).single().getValue());
         test($(dialog, Button.class).id("confirm-button")).click();
 
-        assertEquals("User \"User0\" removed.",
+        assertEquals("User \"Customer50\" removed.",
                 $(Notification.class).last().getCaption());
 
         assertFalse($(FormLayout.class).single().isEnabled());
 
-        test($(ComboBox.class).id("user-select")).setInput("User0");
+        test($(ComboBox.class).id("user-select")).setInput("Customer50");
         then_form_is_empty_and_buttons_are_disabled();
     }
 

@@ -95,6 +95,13 @@ public class UserServiceImpl implements UserService {
         return userDao.getAllUsers();
     }
 
+    @Override
+    public synchronized List<@NonNull User> getUsersByRole(User.Role role) {
+        Objects.requireNonNull(role, "Role must not be null");
+        randomWait(2);
+        return userDao.getUsersByRole(role);
+    }
+
     @SuppressWarnings("java:S2142")
     private void randomWait(int count) {
         if (!slow) {

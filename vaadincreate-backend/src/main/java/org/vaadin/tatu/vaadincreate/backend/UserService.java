@@ -18,6 +18,8 @@ public interface UserService {
 
     public abstract List<@NonNull User> getAllUsers();
 
+    public abstract List<@NonNull User> getUsersByRole(User.Role role);
+
     @Nullable
     public User getUserById(Integer userId);
 

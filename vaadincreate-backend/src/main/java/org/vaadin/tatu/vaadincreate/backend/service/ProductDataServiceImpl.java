@@ -95,6 +95,12 @@ public class ProductDataServiceImpl implements ProductDataService {
     }
 
     @Override
+    public synchronized Collection<@NonNull Product> getOrderableProducts() {
+        randomWait(6);
+        return productDao.getOrderableProducts();
+    }
+
+    @Override
     public synchronized Collection<@NonNull Category> getAllCategories() {
         randomWait(2);
         return productDao.getAllCategories();

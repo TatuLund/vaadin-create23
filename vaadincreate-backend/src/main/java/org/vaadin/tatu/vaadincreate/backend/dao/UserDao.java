@@ -106,6 +106,28 @@ public class UserDao {
         return users;
     }
 
+    /**
+     * Retrieves a list of users with the specified role from the database.
+     *
+     * @param role
+     *            the role to filter users by
+     * @return a List of User objects with the specified role
+     */
+    public List<@NonNull User> getUsersByRole(User.Role role) {
+        Objects.requireNonNull(role, "Role must not be null");
+        logger.info("Fetching Users with role {}", role);
+        List<@NonNull User> users = HibernateUtil.inSession(session -> {
+            return session
+                    .createQuery("from User where role = :role", User.class)
+                    .setParameter("role", role).list();
+        });
+        if (users == null) {
+            throw new IllegalStateException(
+                    "Users list is null, this should not happen");
+        }
+        return users;
+    }
+
     @SuppressWarnings("null")
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

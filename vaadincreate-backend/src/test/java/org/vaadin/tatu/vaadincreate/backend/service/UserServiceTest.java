@@ -87,7 +87,7 @@ public class UserServiceTest {
     @Test
     public void removeUser() {
         var oldSize = service.getAllUsers().size();
-        var u = service.getAllUsers().iterator().next();
+        var u = service.getAllUsers().get(oldSize - 1);
         var uid = u.getId();
         service.removeUser(uid);
         assertEquals(null, service.getUserById(uid));
@@ -108,6 +108,24 @@ public class UserServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void removeUserByNonExistentId() {
         service.removeUser(1000);
+    }
+
+    @Test
+    public void getUsersByRole() {
+        var userRoleUsers = service.getUsersByRole(Role.USER);
+        assertFalse(userRoleUsers.isEmpty());
+        assertTrue(
+                userRoleUsers.stream().allMatch(u -> u.getRole() == Role.USER));
+
+        var adminUsers = service.getUsersByRole(Role.ADMIN);
+        assertFalse(adminUsers.isEmpty());
+        assertTrue(
+                adminUsers.stream().allMatch(u -> u.getRole() == Role.ADMIN));
+
+        var customerUsers = service.getUsersByRole(Role.CUSTOMER);
+        assertFalse(customerUsers.isEmpty());
+        assertTrue(customerUsers.stream()
+                .allMatch(u -> u.getRole() == Role.CUSTOMER));
     }
 
 }

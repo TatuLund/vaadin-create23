@@ -143,6 +143,12 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 VaadinIcons.INFO, AboutView.VIEW_NAME);
         appLayout.addView(BooksView.class, getTranslation(BooksView.VIEW_NAME),
                 VaadinIcons.TABLE, BooksView.VIEW_NAME);
+        appLayout.addView(
+                org.vaadin.tatu.vaadincreate.storefront.StorefrontView.class,
+                getTranslation(
+                        org.vaadin.tatu.vaadincreate.storefront.StorefrontView.VIEW_NAME),
+                VaadinIcons.SHOP,
+                org.vaadin.tatu.vaadincreate.storefront.StorefrontView.VIEW_NAME);
         appLayout.addView(StatsView.class, getTranslation(StatsView.VIEW_NAME),
                 VaadinIcons.CHART, StatsView.VIEW_NAME);
         appLayout.addView(AdminView.class, getTranslation(AdminView.VIEW_NAME),

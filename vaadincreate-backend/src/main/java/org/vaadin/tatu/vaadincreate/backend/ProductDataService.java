@@ -25,6 +25,13 @@ public interface ProductDataService {
     public abstract Collection<@NonNull Product> getAllProducts();
 
     /**
+     * Get all orderable products (AVAILABLE and stock > 0).
+     * 
+     * @return Collection of orderable Product
+     */
+    public abstract Collection<@NonNull Product> getOrderableProducts();
+
+    /**
      * Get all Categories in the database.
      * 
      * @return Collection of Category

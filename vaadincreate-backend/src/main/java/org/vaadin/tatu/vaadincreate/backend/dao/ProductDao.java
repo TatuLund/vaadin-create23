@@ -135,6 +135,26 @@ public class ProductDao {
     }
 
     /**
+     * Retrieves all orderable Products from the database (AVAILABLE and stock >
+     * 0).
+     *
+     * @return a collection of orderable Product objects
+     */
+    public Collection<@NonNull Product> getOrderableProducts() {
+        logger.info("Fetching orderable Products");
+        var result = HibernateUtil.inSession(session -> {
+            return session.createQuery(
+                    "select distinct p from Product p left join fetch p.category where p.availability = org.vaadin.tatu.vaadincreate.backend.data.Availability.AVAILABLE and p.stockCount > 0",
+                    Product.class).list();
+        });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Result of getOrderableProducts is null, this should not happen");
+        }
+        return result;
+    }
+
+    /**
      * Updates the given Category in the database. If the Category has an ID, it
      * will be updated. Otherwise, a new Category will be created and its ID
      * will be assigned.

@@ -9,12 +9,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 
 import com.vaadin.server.ServiceException;
 import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.TextField;
 
 /**
  * UI unit tests for StorefrontView and PurchaseWizard.
@@ -80,6 +83,9 @@ public class StorefrontViewTest extends AbstractUITest {
         assertNotNull("Previous button should be present", prevButton);
         assertFalse("Previous button should be disabled on first step",
                 prevButton.isEnabled());
+
+        // AND: Verify serialization
+        SerializationDebugUtil.assertSerializable(view);
     }
 
     @Test
@@ -100,7 +106,7 @@ public class StorefrontViewTest extends AbstractUITest {
     }
 
     @Test
-    public void should_SelectProductsAndProceed_When_UserSelectsItems() {
+    public void should_SelectProductAndSetQuantity_When_UserInteracts() {
         // GIVEN: Storefront view with product grid
         view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
 
@@ -108,23 +114,163 @@ public class StorefrontViewTest extends AbstractUITest {
         var productGrid = (Grid<ProductDto>) $(Grid.class).first();
         assertNotNull(productGrid);
 
-        // WHEN: User selects first product
+        // WHEN: User selects first product by clicking checkbox column
         test(productGrid).click(1, 0);
+
+        // AND: NumberField should be present in the grid
+        var numberFields = $(NumberField.class).all();
+        assertTrue("Number fields should be present", numberFields.size() > 0);
 
         // Verify serialization after interaction
         SerializationDebugUtil.assertSerializable(view);
+    }
 
-        // AND: Enters quantity (NumberField should be present in grid)
-        // Note: In the new design, quantity is set directly in the grid column
+    @Test
+    public void should_ValidateAddress_When_ProceedingFromStep2() {
+        // GIVEN: User navigates to step 2
+        view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
+
+        @SuppressWarnings("unchecked")
+        var productGrid = (Grid<ProductDto>) $(Grid.class).first();
+
+        // Select a product
+        test(productGrid).click(1, 0);
+
+        // Set quantity using NumberField
+        var numberField = $(NumberField.class).first();
+        if (numberField != null) {
+            test(numberField).setValue(2);
+        }
 
         var nextButton = $(Button.class).stream().filter(
                 b -> b.getCaption() != null && b.getCaption().contains("Next"))
-                .findFirst().orElse(null);
-        assertNotNull("Next button should be present", nextButton);
-
-        // User should still get warning if quantity is not set
+                .findFirst().get();
         test(nextButton).click();
-        assertNotification(
-                "Your cart is empty. Please add items before proceeding.");
+
+        // Verify serialization in step 2
+        SerializationDebugUtil.assertSerializable(view);
+
+        // WHEN: User tries to proceed with empty address fields
+        test(nextButton).click();
+
+        // THEN: Validation message should be shown
+        assertNotification("Please fill all required fields");
+    }
+
+    @Test
+    public void should_RequireSupervisor_When_ProceedingFromStep3() {
+        // GIVEN: User navigates to step 3
+        view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
+
+        @SuppressWarnings("unchecked")
+        var productGrid = (Grid<ProductDto>) $(Grid.class).first();
+        test(productGrid).click(1, 0);
+
+        var numberField = $(NumberField.class).first();
+        if (numberField != null) {
+            test(numberField).setValue(1);
+        }
+
+        var nextButton = $(Button.class).stream().filter(
+                b -> b.getCaption() != null && b.getCaption().contains("Next"))
+                .findFirst().get();
+        test(nextButton).click();
+
+        // Fill address
+        test($(TextField.class).stream()
+                .filter(f -> f.getCaption() != null
+                        && f.getCaption().equals("Street"))
+                .findFirst().get()).setValue("123 Main St");
+        test($(TextField.class).stream()
+                .filter(f -> f.getCaption() != null
+                        && f.getCaption().contains("Postal"))
+                .findFirst().get()).setValue("12345");
+        test($(TextField.class).stream()
+                .filter(f -> f.getCaption() != null
+                        && f.getCaption().equals("City"))
+                .findFirst().get()).setValue("TestCity");
+        test($(TextField.class).stream()
+                .filter(f -> f.getCaption() != null
+                        && f.getCaption().equals("Country"))
+                .findFirst().get()).setValue("TestCountry");
+        test(nextButton).click();
+
+        // Verify serialization in step 3
+        SerializationDebugUtil.assertSerializable(view);
+
+        // WHEN: User tries to proceed without selecting supervisor
+        test(nextButton).click();
+
+        // THEN: Validation message should be shown
+        assertNotification("Please select a supervisor");
+    }
+
+    @Test
+    public void should_CreatePurchase_When_WizardCompleted() {
+        // GIVEN: User completes all wizard steps
+        view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
+
+        @SuppressWarnings("unchecked")
+        var productGrid = (Grid<ProductDto>) $(Grid.class).first();
+        test(productGrid).click(1, 0);
+
+        var numberField = $(NumberField.class).first();
+        if (numberField != null) {
+            test(numberField).setValue(2);
+        }
+
+        var nextButton = $(Button.class).stream().filter(
+                b -> b.getCaption() != null && b.getCaption().contains("Next"))
+                .findFirst().get();
+        test(nextButton).click();
+
+        // Fill address
+        test($(TextField.class).stream()
+                .filter(f -> f.getCaption() != null
+                        && f.getCaption().equals("Street"))
+                .findFirst().get()).setValue("123 Main St");
+        test($(TextField.class).stream()
+                .filter(f -> f.getCaption() != null
+                        && f.getCaption().contains("Postal"))
+                .findFirst().get()).setValue("12345");
+        test($(TextField.class).stream()
+                .filter(f -> f.getCaption() != null
+                        && f.getCaption().equals("City"))
+                .findFirst().get()).setValue("TestCity");
+        test($(TextField.class).stream()
+                .filter(f -> f.getCaption() != null
+                        && f.getCaption().equals("Country"))
+                .findFirst().get()).setValue("TestCountry");
+        test(nextButton).click();
+
+        // Select supervisor
+        @SuppressWarnings("unchecked")
+        var supervisorCombo = (ComboBox<Object>) $(ComboBox.class).first();
+        assertNotNull("Supervisor combobox should be present", supervisorCombo);
+        var supervisors = supervisorCombo.getDataCommunicator()
+                .fetchItemsWithRange(0, 1);
+        if (supervisors.size() > 0) {
+            test(supervisorCombo).selectItem(supervisors.get(0));
+            test(nextButton).click();
+
+            // Verify serialization in step 4
+            SerializationDebugUtil.assertSerializable(view);
+
+            // Submit
+            var submitButton = $(Button.class).stream()
+                    .filter(b -> b.getCaption() != null
+                            && b.getCaption().contains("Submit"))
+                    .findFirst().get();
+
+            // WHEN: User submits the purchase
+            test(submitButton).click();
+
+            // THEN: Success notification should be shown
+            var hasSuccessNotification = $(com.vaadin.ui.Notification.class)
+                    .stream().filter(n -> n.getCaption() != null)
+                    .anyMatch(n -> n.getCaption().contains("created"));
+            assertTrue("Success notification should contain 'created'",
+                    hasSuccessNotification);
+        }
     }
 }

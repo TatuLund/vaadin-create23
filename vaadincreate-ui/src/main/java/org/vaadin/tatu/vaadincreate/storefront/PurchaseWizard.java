@@ -11,20 +11,14 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
-import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
-import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
-import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.Address;
 import org.vaadin.tatu.vaadincreate.backend.data.Cart;
-import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
-import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.crud.EuroConverter;
 import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
-import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
@@ -91,10 +85,6 @@ public class PurchaseWizard extends Composite implements HasI18N {
     // Step 4 components
     @Nullable
     private Label reviewLabel;
-
-    private final UserService userService = VaadinCreateUI.get()
-            .getUserService();
-    private final PurchaseService purchaseService = PurchaseService.get();
 
     public PurchaseWizard() {
         root = new VerticalLayout();
@@ -169,10 +159,10 @@ public class PurchaseWizard extends Composite implements HasI18N {
         productGrid.addColumn(ProductDto::getProductName)
                 .setCaption(getTranslation(I18n.PRODUCT_NAME));
         productGrid.addColumn(ProductDto::getStockCount).setCaption("Stock");
-        productGrid
-                .addColumn(
-                        product -> String.format("%.2f €", product.getPrice()))
-                .setCaption(getTranslation(I18n.PRICE));
+        productGrid.addColumn(ProductDto::getPrice)
+                .setCaption(getTranslation(I18n.PRICE))
+                .setConverter(new EuroConverter(
+                        getTranslation(I18n.Form.CANNOT_CONVERT)));
 
         // Add quantity column with NumberField
         productGrid.addComponentColumn(dto -> {
@@ -181,7 +171,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
             numberField.setValue(dto.getOrderQuantity());
             numberField.setWidth("100px");
             numberField.addValueChangeListener(e -> {
-                dto.setOrderQuantity(numberField.getValue());
+                dto.setOrderQuantity(e.getValue());
                 updateFooter();
             });
             quantityFields.put(dto.getProductId(), numberField);
@@ -196,6 +186,9 @@ public class PurchaseWizard extends Composite implements HasI18N {
         var footerRow = productGrid.appendFooterRow();
         footerRow.getCell(productGrid.getColumns().get(0))
                 .setText(getTranslation(I18n.Storefront.ORDER_SUMMARY));
+        footerRow.getCell(productGrid.getColumns().get(2)).setId("total-price");
+        footerRow.getCell(productGrid.getColumns().get(3))
+                .setId("total-quantity");
 
         updateFooter();
 
@@ -222,8 +215,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
         var footerRow = productGrid.getFooterRow(0);
         var euroConverter = new EuroConverter("");
-        footerRow.getCell(productGrid.getColumns().get(2)).setText(euroConverter
-                .convertToPresentation(totalPrice, Utils.createValueContext()));
+        footerRow.getCell(productGrid.getColumns().get(2))
+                .setText(euroConverter.convertToPresentation(totalPrice, null));
         footerRow.getCell(productGrid.getColumns().get(3))
                 .setText(String.valueOf(totalQuantity));
     }
@@ -269,10 +262,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
                 getTranslation(I18n.Storefront.SUPERVISOR));
         supervisorComboBox.setWidth("100%");
 
-        // Load users with USER or ADMIN roles
-        var supervisors = userService.getAllUsers().stream().filter(
-                u -> u.getRole() == Role.USER || u.getRole() == Role.ADMIN)
-                .collect(Collectors.toList());
+        // Load supervisors via presenter
+        var supervisors = presenter.getSupervisors();
         supervisorComboBox.setItems(supervisors);
         supervisorComboBox.setItemCaptionGenerator(User::getName);
 
@@ -344,17 +335,18 @@ public class PurchaseWizard extends Composite implements HasI18N {
                 return;
             }
 
-            // Add products to cart
+            // Add products to cart - fetch actual Product entities from backend
             for (var dto : selectedProducts) {
                 if (dto.getOrderQuantity() != null
                         && dto.getOrderQuantity() > 0) {
-                    // We need to get the actual Product
-                    // entity
-                    var product = new Product();
-                    product.setId(dto.getProductId());
-                    product.setProductName(dto.getProductName());
-                    product.setPrice(dto.getPrice());
-                    cart.setQuantity(product, dto.getOrderQuantity());
+                    // Fetch the actual Product entity from backend by ID
+                    var product = presenter.getProductById(dto.getProductId());
+                    if (product != null) {
+                        cart.setQuantity(product, dto.getOrderQuantity());
+                    } else {
+                        logger.error("Product with ID {} not found",
+                                dto.getProductId());
+                    }
                 }
             }
 
@@ -407,7 +399,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
             var currentUser = CurrentUser.get().orElseThrow(
                     () -> new IllegalStateException("User must be logged in"));
 
-            var purchase = purchaseService.createPendingPurchase(cart, address,
+            var purchase = presenter.createPendingPurchase(cart, address,
                     currentUser, selectedSupervisor);
 
             logger.info("Purchase created: {}", purchase.getId());

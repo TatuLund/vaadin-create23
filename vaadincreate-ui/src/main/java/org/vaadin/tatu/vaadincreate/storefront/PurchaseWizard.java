@@ -259,7 +259,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         // Load users with USER or ADMIN roles
         var supervisors = userService.getAllUsers().stream().filter(
                 u -> u.getRole() == Role.USER || u.getRole() == Role.ADMIN)
-                .collect(Collectors.toList());
+                .toList();
         supervisorComboBox.setItems(supervisors);
         supervisorComboBox.setItemCaptionGenerator(User::getName);
 

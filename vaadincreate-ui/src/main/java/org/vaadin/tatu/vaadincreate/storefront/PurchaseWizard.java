@@ -19,10 +19,12 @@ import org.vaadin.tatu.vaadincreate.crud.EuroConverter;
 import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.shared.ui.ContentMode;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Composite;
@@ -64,7 +66,6 @@ public class PurchaseWizard extends Composite implements HasI18N {
     // Step 1 components
     @Nullable
     private Grid<ProductDto> productGrid;
-    private final Map<Integer, NumberField> quantityFields = new HashMap<>();
 
     // Step 2 components
     @Nullable
@@ -112,6 +113,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
         var buttonLayout = new HorizontalLayout(prevButton, nextButton);
         buttonLayout.setSpacing(true);
         buttonLayout.setWidth("100%");
+        buttonLayout.setComponentAlignment(prevButton, Alignment.MIDDLE_LEFT);
+        buttonLayout.setComponentAlignment(nextButton, Alignment.MIDDLE_RIGHT);
 
         root.addComponents(stepTitle, stepContent, buttonLayout);
         root.setExpandRatio(stepContent, 1.0f);
@@ -123,7 +126,6 @@ public class PurchaseWizard extends Composite implements HasI18N {
     private void showStep(int step) {
         currentStep = step;
         stepContent.removeAllComponents();
-        quantityFields.clear();
 
         switch (step) {
         case 1:
@@ -159,24 +161,45 @@ public class PurchaseWizard extends Composite implements HasI18N {
         productGrid.addColumn(ProductDto::getProductName)
                 .setCaption(getTranslation(I18n.PRODUCT_NAME));
         productGrid.addColumn(ProductDto::getStockCount).setCaption("Stock");
-        productGrid.addColumn(ProductDto::getPrice)
-                .setCaption(getTranslation(I18n.PRICE))
-                .setConverter(new EuroConverter(
-                        getTranslation(I18n.Form.CANNOT_CONVERT)));
+        productGrid
+                .addColumn(
+                        product -> String.format("%.2f €", product.getPrice()))
+                .setCaption(getTranslation(I18n.PRICE));
 
         // Add quantity column with NumberField
         productGrid.addComponentColumn(dto -> {
-            var numberField = new NumberField(
-                    getTranslation(I18n.Storefront.QUANTITY));
-            numberField.setValue(dto.getOrderQuantity());
-            numberField.setWidth("100px");
-            numberField.addValueChangeListener(e -> {
-                dto.setOrderQuantity(e.getValue());
-                updateFooter();
-            });
-            quantityFields.put(dto.getProductId(), numberField);
-            return numberField;
+            var layout = new HorizontalLayout();
+            layout.setMargin(false);
+            layout.setSpacing(false);
+            if (productGrid.getSelectedItems().contains(dto)) {
+                var numberField = new NumberField(null);
+                numberField
+                        .setAriaLabel(getTranslation(I18n.Storefront.QUANTITY));
+                numberField.setValue(dto.getOrderQuantity());
+                numberField.setWidth("100px");
+                numberField.addValueChangeListener(e -> {
+                    dto.setOrderQuantity(e.getValue());
+                    updateFooter();
+                });
+                layout.addComponent(numberField);
+            } else {
+                layout.addComponent(new Label("-"));
+            }
+            return layout;
         }).setCaption(getTranslation(I18n.Storefront.QUANTITY));
+
+        // Update quantities when selection changes
+        productGrid.addSelectionListener(e -> {
+            for (var dto : productGrid.getDataProvider()
+                    .fetch(new com.vaadin.data.provider.Query<>())
+                    .collect(Collectors.toList())) {
+                if (!e.getAllSelectedItems().contains(dto)) {
+                    dto.setOrderQuantity(0);
+                }
+            }
+            productGrid.getDataProvider().refreshAll();
+            updateFooter();
+        });
 
         // Load products via presenter
         var products = presenter.getOrderableProducts();
@@ -186,9 +209,6 @@ public class PurchaseWizard extends Composite implements HasI18N {
         var footerRow = productGrid.appendFooterRow();
         footerRow.getCell(productGrid.getColumns().get(0))
                 .setText(getTranslation(I18n.Storefront.ORDER_SUMMARY));
-        footerRow.getCell(productGrid.getColumns().get(2)).setId("total-price");
-        footerRow.getCell(productGrid.getColumns().get(3))
-                .setId("total-quantity");
 
         updateFooter();
 
@@ -215,8 +235,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
         var footerRow = productGrid.getFooterRow(0);
         var euroConverter = new EuroConverter("");
-        footerRow.getCell(productGrid.getColumns().get(2))
-                .setText(euroConverter.convertToPresentation(totalPrice, null));
+        footerRow.getCell(productGrid.getColumns().get(2)).setText(euroConverter
+                .convertToPresentation(totalPrice, Utils.createValueContext()));
         footerRow.getCell(productGrid.getColumns().get(3))
                 .setText(String.valueOf(totalQuantity));
     }

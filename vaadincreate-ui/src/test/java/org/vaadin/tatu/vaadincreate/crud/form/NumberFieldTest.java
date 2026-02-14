@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.crud.form;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.Locale;
@@ -81,6 +82,13 @@ public class NumberFieldTest extends UIUnitTest {
         field.addValueChangeListener(e -> {
             if (e.isUserOriginated()) {
                 user.addAndGet(1);
+                Integer value = e.getValue();
+                assertNotNull(value);
+                assertEquals(Integer.valueOf(40), value);
+            } else {
+                Integer value = e.getValue();
+                assertNotNull(value);
+                assertEquals(Integer.valueOf(20), value);
             }
             count.addAndGet(1);
         });

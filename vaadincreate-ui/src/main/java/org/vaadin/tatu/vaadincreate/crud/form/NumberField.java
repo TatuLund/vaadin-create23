@@ -51,7 +51,7 @@ public class NumberField extends CustomField<Integer>
      * @param caption
      *            the caption to set
      */
-    public NumberField(String caption) {
+    public NumberField(@Nullable String caption) {
         super();
         setRole(AriaRoles.GROUP);
         setCaption(caption);
@@ -71,9 +71,13 @@ public class NumberField extends CustomField<Integer>
                 intValue = value;
                 textField.setComponentError(null);
             });
-            fireEvent(valueChange);
+            var valueChangeEvent = new ValueChangeEvent<Integer>(this, intValue,
+                    valueChange.isUserOriginated());
+            fireEvent(valueChangeEvent);
         });
-        textField.setAriaLabel(caption);
+        if (caption != null) {
+            textField.setAriaLabel(caption);
+        }
     }
 
     @Override

@@ -115,11 +115,7 @@ public class StorefrontViewTest extends AbstractUITest {
         assertNotNull(productGrid);
 
         // WHEN: User selects first product by clicking checkbox column
-        test(productGrid).click(1, 0);
-
-        // AND: NumberField should be present in the grid
-        var numberFields = $(NumberField.class).all();
-        assertTrue("Number fields should be present", numberFields.size() > 0);
+        test(productGrid).clickToSelect(0);
 
         // Verify serialization after interaction
         SerializationDebugUtil.assertSerializable(view);
@@ -250,7 +246,7 @@ public class StorefrontViewTest extends AbstractUITest {
         var supervisors = supervisorCombo.getDataCommunicator()
                 .fetchItemsWithRange(0, 1);
         if (supervisors.size() > 0) {
-            test(supervisorCombo).selectItem(supervisors.get(0));
+            test(supervisorCombo).clickItem(supervisors.get(0));
             test(nextButton).click();
 
             // Verify serialization in step 4

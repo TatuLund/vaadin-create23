@@ -16,6 +16,7 @@ import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 
@@ -128,15 +129,11 @@ public class StorefrontViewTest extends AbstractUITest {
 
         @SuppressWarnings("unchecked")
         var productGrid = (Grid<ProductDto>) $(Grid.class).first();
+        test(productGrid).clickToSelect(0);
 
-        // Select a product
-        test(productGrid).click(1, 0);
-
-        // Set quantity using NumberField
-        var numberField = $(NumberField.class).first();
-        if (numberField != null) {
-            test(numberField).setValue(2);
-        }
+        var numberField = $((HorizontalLayout) test(productGrid).cell(3, 0),
+                NumberField.class).first();
+        test(numberField).setValue(2);
 
         var nextButton = $(Button.class).stream().filter(
                 b -> b.getCaption() != null && b.getCaption().contains("Next"))
@@ -160,12 +157,11 @@ public class StorefrontViewTest extends AbstractUITest {
 
         @SuppressWarnings("unchecked")
         var productGrid = (Grid<ProductDto>) $(Grid.class).first();
-        test(productGrid).click(1, 0);
+        test(productGrid).clickToSelect(0);
 
-        var numberField = $(NumberField.class).first();
-        if (numberField != null) {
-            test(numberField).setValue(1);
-        }
+        var numberField = $((HorizontalLayout) test(productGrid).cell(3, 0),
+                NumberField.class).first();
+        test(numberField).setValue(1);
 
         var nextButton = $(Button.class).stream().filter(
                 b -> b.getCaption() != null && b.getCaption().contains("Next"))
@@ -173,22 +169,14 @@ public class StorefrontViewTest extends AbstractUITest {
         test(nextButton).click();
 
         // Fill address
-        test($(TextField.class).stream()
-                .filter(f -> f.getCaption() != null
-                        && f.getCaption().equals("Street"))
-                .findFirst().get()).setValue("123 Main St");
-        test($(TextField.class).stream()
-                .filter(f -> f.getCaption() != null
-                        && f.getCaption().contains("Postal"))
-                .findFirst().get()).setValue("12345");
-        test($(TextField.class).stream()
-                .filter(f -> f.getCaption() != null
-                        && f.getCaption().equals("City"))
-                .findFirst().get()).setValue("TestCity");
-        test($(TextField.class).stream()
-                .filter(f -> f.getCaption() != null
-                        && f.getCaption().equals("Country"))
-                .findFirst().get()).setValue("TestCountry");
+        test($(TextField.class).caption("Street").first())
+                .setValue("123 Main St");
+        test($(TextField.class).caption("Postal Code").first())
+                .setValue("12345");
+        test($(TextField.class).caption("City").first()).setValue("TestCity");
+        test($(TextField.class).caption("Country").first())
+                .setValue("TestCountry");
+
         test(nextButton).click();
 
         // Verify serialization in step 3
@@ -208,12 +196,11 @@ public class StorefrontViewTest extends AbstractUITest {
 
         @SuppressWarnings("unchecked")
         var productGrid = (Grid<ProductDto>) $(Grid.class).first();
-        test(productGrid).click(1, 0);
+        test(productGrid).clickToSelect(0);
 
-        var numberField = $(NumberField.class).first();
-        if (numberField != null) {
-            test(numberField).setValue(2);
-        }
+        var numberField = $((HorizontalLayout) test(productGrid).cell(3, 0),
+                NumberField.class).first();
+        test(numberField).setValue(2);
 
         var nextButton = $(Button.class).stream().filter(
                 b -> b.getCaption() != null && b.getCaption().contains("Next"))
@@ -221,22 +208,13 @@ public class StorefrontViewTest extends AbstractUITest {
         test(nextButton).click();
 
         // Fill address
-        test($(TextField.class).stream()
-                .filter(f -> f.getCaption() != null
-                        && f.getCaption().equals("Street"))
-                .findFirst().get()).setValue("123 Main St");
-        test($(TextField.class).stream()
-                .filter(f -> f.getCaption() != null
-                        && f.getCaption().contains("Postal"))
-                .findFirst().get()).setValue("12345");
-        test($(TextField.class).stream()
-                .filter(f -> f.getCaption() != null
-                        && f.getCaption().equals("City"))
-                .findFirst().get()).setValue("TestCity");
-        test($(TextField.class).stream()
-                .filter(f -> f.getCaption() != null
-                        && f.getCaption().equals("Country"))
-                .findFirst().get()).setValue("TestCountry");
+        test($(TextField.class).caption("Street").first())
+                .setValue("123 Main St");
+        test($(TextField.class).caption("Postal Code").first())
+                .setValue("12345");
+        test($(TextField.class).caption("City").first()).setValue("TestCity");
+        test($(TextField.class).caption("Country").first())
+                .setValue("TestCountry");
         test(nextButton).click();
 
         // Select supervisor
@@ -245,28 +223,26 @@ public class StorefrontViewTest extends AbstractUITest {
         assertNotNull("Supervisor combobox should be present", supervisorCombo);
         var supervisors = supervisorCombo.getDataCommunicator()
                 .fetchItemsWithRange(0, 1);
-        if (supervisors.size() > 0) {
-            test(supervisorCombo).clickItem(supervisors.get(0));
-            test(nextButton).click();
+        test(supervisorCombo).clickItem(supervisors.get(0));
+        test(nextButton).click();
 
-            // Verify serialization in step 4
-            SerializationDebugUtil.assertSerializable(view);
+        // Verify serialization in step 4
+        SerializationDebugUtil.assertSerializable(view);
 
-            // Submit
-            var submitButton = $(Button.class).stream()
-                    .filter(b -> b.getCaption() != null
-                            && b.getCaption().contains("Submit"))
-                    .findFirst().get();
+        // Submit
+        var submitButton = $(Button.class).stream()
+                .filter(b -> b.getCaption() != null
+                        && b.getCaption().contains("Submit"))
+                .findFirst().get();
 
-            // WHEN: User submits the purchase
-            test(submitButton).click();
+        // WHEN: User submits the purchase
+        test(submitButton).click();
 
-            // THEN: Success notification should be shown
-            var hasSuccessNotification = $(com.vaadin.ui.Notification.class)
-                    .stream().filter(n -> n.getCaption() != null)
-                    .anyMatch(n -> n.getCaption().contains("created"));
-            assertTrue("Success notification should contain 'created'",
-                    hasSuccessNotification);
-        }
+        // THEN: Success notification should be shown
+        var hasSuccessNotification = $(com.vaadin.ui.Notification.class)
+                .stream().filter(n -> n.getCaption() != null)
+                .anyMatch(n -> n.getCaption().contains("created"));
+        assertTrue("Success notification should contain 'created'",
+                hasSuccessNotification);
     }
 }

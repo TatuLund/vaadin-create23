@@ -1,6 +1,10 @@
 package org.vaadin.tatu.vaadincreate.storefront;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -9,15 +13,15 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
-import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.Address;
 import org.vaadin.tatu.vaadincreate.backend.data.Cart;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
-import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.crud.EuroConverter;
+import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
@@ -28,6 +32,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.SelectionMode;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
@@ -58,13 +64,12 @@ public class PurchaseWizard extends Composite implements HasI18N {
     private final Button nextButton;
     private final Button prevButton;
 
+    private final StorefrontPresenter presenter = new StorefrontPresenter();
+
     // Step 1 components
     @Nullable
-    private Grid<Product> productGrid;
-    @Nullable
-    private TextField quantityField;
-    @Nullable
-    private Label cartItemsLabel;
+    private Grid<ProductDto> productGrid;
+    private final Map<Integer, NumberField> quantityFields = new HashMap<>();
 
     // Step 2 components
     @Nullable
@@ -86,8 +91,6 @@ public class PurchaseWizard extends Composite implements HasI18N {
     @Nullable
     private Label reviewLabel;
 
-    private final ProductDataService productService = VaadinCreateUI.get()
-            .getProductService();
     private final UserService userService = VaadinCreateUI.get()
             .getUserService();
     private final PurchaseService purchaseService = PurchaseService.get();
@@ -101,6 +104,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
         stepTitle = new Label();
         stepTitle.addStyleName(ValoTheme.LABEL_H2);
+        stepTitle.setId("wizard-step-title");
 
         stepContent = new VerticalLayout();
         stepContent.setSpacing(true);
@@ -114,7 +118,11 @@ public class PurchaseWizard extends Composite implements HasI18N {
         prevButton.addClickListener(e -> handlePrevious());
         prevButton.setEnabled(false);
 
-        root.addComponents(stepTitle, stepContent, prevButton, nextButton);
+        var buttonLayout = new HorizontalLayout(prevButton, nextButton);
+        buttonLayout.setSpacing(true);
+        buttonLayout.setWidth("100%");
+
+        root.addComponents(stepTitle, stepContent, buttonLayout);
         root.setExpandRatio(stepContent, 1.0f);
 
         setCompositionRoot(root);
@@ -124,6 +132,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
     private void showStep(int step) {
         currentStep = step;
         stepContent.removeAllComponents();
+        quantityFields.clear();
 
         switch (step) {
         case 1:
@@ -150,69 +159,75 @@ public class PurchaseWizard extends Composite implements HasI18N {
     private void showStep1() {
         stepTitle.setValue(getTranslation(I18n.Storefront.STEP1_TITLE));
 
-        productGrid = new Grid<>(Product.class);
-        productGrid.setColumns("productName", "price", "stockCount");
+        productGrid = new Grid<>(ProductDto.class);
         productGrid.setSizeFull();
+        productGrid.setSelectionMode(SelectionMode.MULTI);
 
-        // Load orderable products (AVAILABLE and stock > 0)
-        var products = productService.getOrderableProducts();
+        // Configure columns
+        productGrid.removeAllColumns();
+        productGrid.addColumn(ProductDto::getProductName)
+                .setCaption(getTranslation(I18n.PRODUCT_NAME));
+        productGrid.addColumn(ProductDto::getStockCount).setCaption("Stock");
+        productGrid.addColumn(ProductDto::getPrice)
+                .setCaption(getTranslation(I18n.PRICE))
+                .setConverter(new EuroConverter(
+                        getTranslation(I18n.Form.CANNOT_CONVERT)));
+
+        // Add quantity column with NumberField
+        productGrid.addComponentColumn(dto -> {
+            var numberField = new NumberField(
+                    getTranslation(I18n.Storefront.QUANTITY));
+            numberField.setValue(dto.getOrderQuantity());
+            numberField.setWidth("100px");
+            numberField.addValueChangeListener(e -> {
+                dto.setOrderQuantity(e.getValue());
+                updateFooter();
+            });
+            quantityFields.put(dto.getProductId(), numberField);
+            return numberField;
+        }).setCaption(getTranslation(I18n.Storefront.QUANTITY));
+
+        // Load products via presenter
+        var products = presenter.getOrderableProducts();
         productGrid.setItems(products);
 
-        quantityField = new TextField(getTranslation(I18n.Storefront.QUANTITY));
-        quantityField.setValue("1");
+        // Add footer row for totals
+        var footerRow = productGrid.appendFooterRow();
+        footerRow.getCell(productGrid.getColumns().get(0))
+                .setText(getTranslation(I18n.Storefront.ORDER_SUMMARY));
+        footerRow.getCell(productGrid.getColumns().get(2)).setId("total-price");
+        footerRow.getCell(productGrid.getColumns().get(3))
+                .setId("total-quantity");
 
-        var addToCartButton = new Button(
-                getTranslation(I18n.Storefront.ADD_TO_CART));
-        addToCartButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
-        addToCartButton.addClickListener(e -> addToCart());
+        updateFooter();
 
-        cartItemsLabel = new Label(getTranslation(I18n.Storefront.CART_ITEMS)
-                + ": " + cart.size());
-        cartItemsLabel.setId("cart-items-label");
-
-        stepContent.addComponents(productGrid, quantityField, addToCartButton,
-                cartItemsLabel);
+        stepContent.addComponent(productGrid);
+        stepContent.setExpandRatio(productGrid, 1.0f);
     }
 
-    private void addToCart() {
-        if (productGrid == null || quantityField == null) {
-            logger.warn("addToCart called before step 1 initialized");
+    private void updateFooter() {
+        if (productGrid == null) {
             return;
         }
 
-        var selected = productGrid.asSingleSelect().getValue();
-        if (selected == null) {
-            Notification.show(
-                    getTranslation(I18n.Storefront.SELECT_PRODUCT_FIRST),
-                    Notification.Type.WARNING_MESSAGE);
-            return;
+        var totalQuantity = 0;
+        var totalPrice = BigDecimal.ZERO;
+
+        for (var dto : productGrid.getDataProvider()
+                .fetch(new com.vaadin.data.provider.Query<>())
+                .collect(Collectors.toList())) {
+            if (dto.getOrderQuantity() != null && dto.getOrderQuantity() > 0) {
+                totalQuantity += dto.getOrderQuantity();
+                totalPrice = totalPrice.add(dto.getLineTotal());
+            }
         }
 
-        try {
-            var quantity = Integer.parseInt(quantityField.getValue());
-            if (quantity <= 0) {
-                Notification.show(
-                        getTranslation(I18n.Storefront.QUANTITY_POSITIVE),
-                        Notification.Type.WARNING_MESSAGE);
-                return;
-            }
-
-            cart.setQuantity(selected, quantity);
-            Notification.show(
-                    getTranslation(I18n.Storefront.ADDED_TO_CART,
-                            selected.getProductName(), quantity),
-                    Notification.Type.TRAY_NOTIFICATION);
-
-            // Update cart count
-            if (cartItemsLabel != null) {
-                cartItemsLabel
-                        .setValue(getTranslation(I18n.Storefront.CART_ITEMS)
-                                + ": " + cart.size());
-            }
-        } catch (NumberFormatException ex) {
-            Notification.show(getTranslation(I18n.Storefront.INVALID_QUANTITY),
-                    Notification.Type.ERROR_MESSAGE);
-        }
+        var footerRow = productGrid.getFooterRow(0);
+        var euroConverter = new EuroConverter("");
+        footerRow.getCell(productGrid.getColumns().get(2))
+                .setText(euroConverter.convertToPresentation(totalPrice, null));
+        footerRow.getCell(productGrid.getColumns().get(3))
+                .setText(String.valueOf(totalQuantity));
     }
 
     private void showStep2() {
@@ -259,7 +274,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         // Load users with USER or ADMIN roles
         var supervisors = userService.getAllUsers().stream().filter(
                 u -> u.getRole() == Role.USER || u.getRole() == Role.ADMIN)
-                .toList();
+                .collect(Collectors.toList());
         supervisorComboBox.setItems(supervisors);
         supervisorComboBox.setItemCaptionGenerator(User::getName);
 
@@ -317,11 +332,39 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
     private void handleNext() {
         if (currentStep == 1) {
+            // Build cart from selected products with quantities
+            cart.clear();
+            if (productGrid == null) {
+                logger.error("productGrid is null in step 1");
+                return;
+            }
+
+            var selectedProducts = productGrid.getSelectedItems();
+            if (selectedProducts.isEmpty()) {
+                Notification.show(getTranslation(I18n.Storefront.CART_EMPTY),
+                        Notification.Type.WARNING_MESSAGE);
+                return;
+            }
+
+            // Add products to cart
+            for (var dto : selectedProducts) {
+                if (dto.getOrderQuantity() != null
+                        && dto.getOrderQuantity() > 0) {
+                    // We need to get the actual Product entity
+                    var product = new Product();
+                    product.setId(dto.getProductId());
+                    product.setProductName(dto.getProductName());
+                    product.setPrice(dto.getPrice());
+                    cart.setQuantity(product, dto.getOrderQuantity());
+                }
+            }
+
             if (cart.isEmpty()) {
                 Notification.show(getTranslation(I18n.Storefront.CART_EMPTY),
                         Notification.Type.WARNING_MESSAGE);
                 return;
             }
+
             showStep(2);
         } else if (currentStep == 2) {
             if (addressBinder == null) {

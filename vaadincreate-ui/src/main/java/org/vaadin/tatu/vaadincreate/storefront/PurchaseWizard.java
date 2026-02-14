@@ -24,6 +24,7 @@ import org.vaadin.tatu.vaadincreate.crud.EuroConverter;
 import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
@@ -168,10 +169,10 @@ public class PurchaseWizard extends Composite implements HasI18N {
         productGrid.addColumn(ProductDto::getProductName)
                 .setCaption(getTranslation(I18n.PRODUCT_NAME));
         productGrid.addColumn(ProductDto::getStockCount).setCaption("Stock");
-        productGrid.addColumn(ProductDto::getPrice)
-                .setCaption(getTranslation(I18n.PRICE))
-                .setConverter(new EuroConverter(
-                        getTranslation(I18n.Form.CANNOT_CONVERT)));
+        productGrid
+                .addColumn(
+                        product -> String.format("%.2f €", product.getPrice()))
+                .setCaption(getTranslation(I18n.PRICE));
 
         // Add quantity column with NumberField
         productGrid.addComponentColumn(dto -> {
@@ -180,7 +181,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
             numberField.setValue(dto.getOrderQuantity());
             numberField.setWidth("100px");
             numberField.addValueChangeListener(e -> {
-                dto.setOrderQuantity(e.getValue());
+                dto.setOrderQuantity(numberField.getValue());
                 updateFooter();
             });
             quantityFields.put(dto.getProductId(), numberField);
@@ -195,9 +196,6 @@ public class PurchaseWizard extends Composite implements HasI18N {
         var footerRow = productGrid.appendFooterRow();
         footerRow.getCell(productGrid.getColumns().get(0))
                 .setText(getTranslation(I18n.Storefront.ORDER_SUMMARY));
-        footerRow.getCell(productGrid.getColumns().get(2)).setId("total-price");
-        footerRow.getCell(productGrid.getColumns().get(3))
-                .setId("total-quantity");
 
         updateFooter();
 
@@ -224,8 +222,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
         var footerRow = productGrid.getFooterRow(0);
         var euroConverter = new EuroConverter("");
-        footerRow.getCell(productGrid.getColumns().get(2))
-                .setText(euroConverter.convertToPresentation(totalPrice, null));
+        footerRow.getCell(productGrid.getColumns().get(2)).setText(euroConverter
+                .convertToPresentation(totalPrice, Utils.createValueContext()));
         footerRow.getCell(productGrid.getColumns().get(3))
                 .setText(String.valueOf(totalQuantity));
     }
@@ -350,7 +348,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
             for (var dto : selectedProducts) {
                 if (dto.getOrderQuantity() != null
                         && dto.getOrderQuantity() > 0) {
-                    // We need to get the actual Product entity
+                    // We need to get the actual Product
+                    // entity
                     var product = new Product();
                     product.setId(dto.getProductId());
                     product.setProductName(dto.getProductName());

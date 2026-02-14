@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate.admin;
+package org.vaadin.tatu.vaadincreate.common;
 
 import java.lang.reflect.Method;
 

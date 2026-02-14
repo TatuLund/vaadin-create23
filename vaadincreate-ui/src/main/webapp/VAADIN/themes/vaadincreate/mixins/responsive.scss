@@ -89,6 +89,20 @@
         }
       }
     }
+
+    .storefrontview {
+      flex-direction: column;
+      padding: 10px;
+
+      .storefrontview-history {
+        padding: 10px;
+      }
+
+      .storefrontview-wizard {
+        max-width: 100%;
+        min-width: 100%;
+      }
+    }
   }
 
   // hide the logo for a more compact header when the menu is narrow
@@ -174,6 +188,22 @@
     .dashboard-chart-wide {
       width: 95%;
     }
+
+    .storefrontview {
+      padding: 0px;
+
+      #wizard-step-title {
+        padding: 5px;
+      }
+
+      .v-margin-left {
+        padding-left: 0px;
+      }
+
+      .v-margin-right {
+        padding-right: 0px;
+      }
+    }
   }
 
   // Adjust icon to show nicely when menubar is small
@@ -190,18 +220,6 @@
 
     .dashboard-chart-wide {
       width: calc(100% - 20px);
-    }
-  }
-
-  // Storefront responsive layout
-  @media (max-width: 800px) {
-    .storefrontview {
-      flex-direction: column;
-
-      .storefrontview-wizard {
-        max-width: 100%;
-        min-width: 100%;
-      }
     }
   }
 }

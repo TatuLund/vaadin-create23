@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate.crud.form;
+package org.vaadin.tatu.vaadincreate.common;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;

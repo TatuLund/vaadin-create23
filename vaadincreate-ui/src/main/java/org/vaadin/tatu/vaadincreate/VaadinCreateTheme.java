@@ -82,5 +82,7 @@ public final class VaadinCreateTheme {
 
     public static final String STOREFRONTVIEW = "storefrontview";
     public static final String STOREFRONTVIEW_WIZARD = "storefrontview-wizard";
+    public static final String STOREFRONTVIEW_WIZARD_QUANTITYCOLUMN = "storefrontview-wizard-quantitycolumn";
     public static final String STOREFRONTVIEW_HISTORY = "storefrontview-history";
+
 }

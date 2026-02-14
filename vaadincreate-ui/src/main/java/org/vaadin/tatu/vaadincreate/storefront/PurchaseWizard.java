@@ -1,10 +1,6 @@
 package org.vaadin.tatu.vaadincreate.storefront;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -15,8 +11,8 @@ import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Address;
 import org.vaadin.tatu.vaadincreate.backend.data.Cart;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
-import org.vaadin.tatu.vaadincreate.crud.EuroConverter;
-import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
+import org.vaadin.tatu.vaadincreate.common.EuroConverter;
+import org.vaadin.tatu.vaadincreate.common.NumberField;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
@@ -89,8 +85,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
     public PurchaseWizard() {
         root = new VerticalLayout();
-        root.setMargin(true);
-        root.setSpacing(true);
+        root.setMargin(false);
+        root.setSpacing(false);
         root.setSizeFull();
         root.addStyleName(VaadinCreateTheme.STOREFRONTVIEW_WIZARD);
 
@@ -171,28 +167,31 @@ public class PurchaseWizard extends Composite implements HasI18N {
             var layout = new HorizontalLayout();
             layout.setMargin(false);
             layout.setSpacing(false);
+            layout.setWidth("100%");
             if (productGrid.getSelectedItems().contains(dto)) {
                 var numberField = new NumberField(null);
                 numberField
                         .setAriaLabel(getTranslation(I18n.Storefront.QUANTITY));
                 numberField.setValue(dto.getOrderQuantity());
-                numberField.setWidth("100px");
+                numberField.setWidth("100%");
                 numberField.addValueChangeListener(e -> {
                     dto.setOrderQuantity(e.getValue());
                     updateFooter();
                 });
                 layout.addComponent(numberField);
             } else {
-                layout.addComponent(new Label("-"));
+                var label = new Label("-");
+                layout.addComponent(label);
             }
             return layout;
-        }).setCaption(getTranslation(I18n.Storefront.QUANTITY));
+        }).setCaption(getTranslation(I18n.Storefront.QUANTITY))
+                .setStyleGenerator(
+                        product -> VaadinCreateTheme.STOREFRONTVIEW_WIZARD_QUANTITYCOLUMN);
 
         // Update quantities when selection changes
         productGrid.addSelectionListener(e -> {
             for (var dto : productGrid.getDataProvider()
-                    .fetch(new com.vaadin.data.provider.Query<>())
-                    .collect(Collectors.toList())) {
+                    .fetch(new com.vaadin.data.provider.Query<>()).toList()) {
                 if (!e.getAllSelectedItems().contains(dto)) {
                     dto.setOrderQuantity(0);
                 }
@@ -225,9 +224,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
         var totalPrice = BigDecimal.ZERO;
 
         for (var dto : productGrid.getDataProvider()
-                .fetch(new com.vaadin.data.provider.Query<>())
-                .collect(Collectors.toList())) {
-            if (dto.getOrderQuantity() != null && dto.getOrderQuantity() > 0) {
+                .fetch(new com.vaadin.data.provider.Query<>()).toList()) {
+            if (dto.getOrderQuantity() > 0) {
                 totalQuantity += dto.getOrderQuantity();
                 totalPrice = totalPrice.add(dto.getLineTotal());
             }
@@ -336,7 +334,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
                         : "N/A")
                 .append("</p>");
 
-        return sb.toString();
+        return Utils.sanitize(sb.toString());
     }
 
     private void handleNext() {

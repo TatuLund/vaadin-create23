@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate.crud.form;
+package org.vaadin.tatu.vaadincreate.common;
 
 import com.vaadin.server.AbstractErrorMessage;
 import com.vaadin.server.UserError;

@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate.admin;
+package org.vaadin.tatu.vaadincreate.common;
 
 import java.util.Objects;
 
@@ -6,8 +6,8 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vaadin.tatu.vaadincreate.admin.TabView.ViewChangeEvent;
-import org.vaadin.tatu.vaadincreate.admin.TabView.ViewChangeListener;
+import org.vaadin.tatu.vaadincreate.common.TabView.ViewChangeEvent;
+import org.vaadin.tatu.vaadincreate.common.TabView.ViewChangeListener;
 
 import com.vaadin.server.AbstractErrorMessage.ContentMode;
 import com.vaadin.server.Resource;

@@ -2,8 +2,16 @@
   .storefrontview {
     display: flex;
     flex-direction: row;
-    gap: 20px;
+    gap: 10px;
     padding: 20px;
+
+    .storefrontview-wizard-quantitycolumn {
+      padding: 0px;
+
+      .v-label {
+        padding-left: 20px;
+      }
+    }
 
     .storefrontview-wizard {
     }

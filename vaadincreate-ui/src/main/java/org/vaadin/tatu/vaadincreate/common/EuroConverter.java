@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate.crud;
+package org.vaadin.tatu.vaadincreate.common;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;

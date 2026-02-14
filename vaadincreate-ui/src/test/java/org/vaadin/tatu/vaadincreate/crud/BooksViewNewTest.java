@@ -10,9 +10,9 @@ import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
+import org.vaadin.tatu.vaadincreate.common.NumberField;
 import org.vaadin.tatu.vaadincreate.crud.form.AvailabilitySelector;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
-import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;

@@ -14,6 +14,8 @@ import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.common.EuroConverter;
+import org.vaadin.tatu.vaadincreate.common.NumberField;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.components.CharacterCountExtension;
 import org.vaadin.tatu.vaadincreate.components.ConfirmDialog;
@@ -22,7 +24,6 @@ import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.components.ConfirmDialog.Type;
-import org.vaadin.tatu.vaadincreate.crud.EuroConverter;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.observability.Telemetry;

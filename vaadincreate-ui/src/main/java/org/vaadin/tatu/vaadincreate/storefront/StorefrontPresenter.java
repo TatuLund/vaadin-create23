@@ -2,7 +2,6 @@ package org.vaadin.tatu.vaadincreate.storefront;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -37,7 +36,7 @@ public class StorefrontPresenter implements Serializable {
         return getProductService().getOrderableProducts().stream()
                 .map(p -> new ProductDto(p.getId(), p.getProductName(),
                         p.getStockCount(), p.getPrice()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**

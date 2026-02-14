@@ -6,6 +6,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
+import org.vaadin.tatu.vaadincreate.common.TabView;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.components.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.components.Shortcuts;

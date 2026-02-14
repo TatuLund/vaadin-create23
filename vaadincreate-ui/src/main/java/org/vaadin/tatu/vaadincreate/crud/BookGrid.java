@@ -13,6 +13,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.common.EuroConverter;
 import org.vaadin.tatu.vaadincreate.components.Html;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;

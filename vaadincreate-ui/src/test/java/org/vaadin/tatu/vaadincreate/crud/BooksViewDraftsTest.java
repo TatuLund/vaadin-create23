@@ -17,9 +17,9 @@ import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
+import org.vaadin.tatu.vaadincreate.common.NumberField;
 import org.vaadin.tatu.vaadincreate.crud.form.AvailabilitySelector;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
-import org.vaadin.tatu.vaadincreate.crud.form.NumberField;
 
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;

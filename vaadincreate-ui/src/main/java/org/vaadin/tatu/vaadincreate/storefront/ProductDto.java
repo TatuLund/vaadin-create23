@@ -44,9 +44,8 @@ public class ProductDto implements Serializable {
         return price;
     }
 
-    @Nullable
     public Integer getOrderQuantity() {
-        return orderQuantity;
+        return orderQuantity == null ? 0 : orderQuantity;
     }
 
     public void setOrderQuantity(@Nullable Integer orderQuantity) {

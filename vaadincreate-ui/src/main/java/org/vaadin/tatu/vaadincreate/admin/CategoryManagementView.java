@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
+import org.vaadin.tatu.vaadincreate.common.TabView;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;

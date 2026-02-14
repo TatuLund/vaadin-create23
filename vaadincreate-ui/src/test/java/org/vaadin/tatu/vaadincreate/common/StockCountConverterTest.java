@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate.crud.form;
+package org.vaadin.tatu.vaadincreate.common;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

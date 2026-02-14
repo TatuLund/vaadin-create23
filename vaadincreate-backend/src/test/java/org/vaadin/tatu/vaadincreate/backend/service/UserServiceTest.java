@@ -110,4 +110,22 @@ public class UserServiceTest {
         service.removeUser(1000);
     }
 
+    @Test
+    public void getUsersByRole() {
+        var userRoleUsers = service.getUsersByRole(Role.USER);
+        assertFalse(userRoleUsers.isEmpty());
+        assertTrue(
+                userRoleUsers.stream().allMatch(u -> u.getRole() == Role.USER));
+
+        var adminUsers = service.getUsersByRole(Role.ADMIN);
+        assertFalse(adminUsers.isEmpty());
+        assertTrue(
+                adminUsers.stream().allMatch(u -> u.getRole() == Role.ADMIN));
+
+        var customerUsers = service.getUsersByRole(Role.CUSTOMER);
+        assertFalse(customerUsers.isEmpty());
+        assertTrue(customerUsers.stream()
+                .allMatch(u -> u.getRole() == Role.CUSTOMER));
+    }
+
 }

@@ -58,9 +58,11 @@ public class StorefrontPresenter implements Serializable {
      * @return Collection of User objects
      */
     public Collection<User> getSupervisors() {
-        return getUserService().getAllUsers().stream().filter(
-                u -> u.getRole() == Role.USER || u.getRole() == Role.ADMIN)
-                .collect(Collectors.toList());
+        // Fetch users with USER role and combine with ADMIN role users
+        var users = getUserService().getUsersByRole(Role.USER);
+        var admins = getUserService().getUsersByRole(Role.ADMIN);
+        users.addAll(admins);
+        return users;
     }
 
     /**

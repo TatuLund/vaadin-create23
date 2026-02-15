@@ -94,13 +94,11 @@
       flex-direction: column;
       padding: 10px;
 
+      .storefrontview-wizard,
       .storefrontview-history {
-        padding: 10px;
-      }
-
-      .storefrontview-wizard {
         max-width: 100%;
         min-width: 100%;
+        padding: 10px;
       }
     }
   }
@@ -191,6 +189,7 @@
 
     .storefrontview {
       padding: 0px;
+      flex-direction: column;
 
       #wizard-step-title {
         padding: 5px;
@@ -202,6 +201,16 @@
 
       .v-margin-right {
         padding-right: 0px;
+      }
+
+      .storefrontview-wizard,
+      .storefrontview-history {
+        min-width: 100%;
+        max-width: 100%;
+      }
+
+      .storefrontview-history {
+        padding: 10px;
       }
     }
   }

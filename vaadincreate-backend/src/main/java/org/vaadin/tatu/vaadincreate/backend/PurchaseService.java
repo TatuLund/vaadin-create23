@@ -101,8 +101,8 @@ public interface PurchaseService {
     long countPendingForApprover(User approver);
 
     /**
-     * Finds purchases for a user that have been decided (COMPLETED or REJECTED)
-     * since a given timestamp.
+     * Finds purchases for a user that have been decided (COMPLETED, REJECTED,
+     * or CANCELLED) since a given timestamp.
      *
      * @param requester
      *            the user who created the purchases

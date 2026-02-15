@@ -289,17 +289,18 @@ Extend backend and UI so that:
      - `fetch` uses `PurchaseService.findMyPurchases(currentUser, offset, limit)`.
      - `count` uses `PurchaseService.countMyPurchases(currentUser)`.
    - Columns:
-     - ID / reference.
      - `createdAt`.
      - `status`.
      - `totalAmount` (derived).
+    - Since the horizontal space is limited use Grid details to show additional information when clicking the row.
+     - ID / reference.
      - `approver` (may be null for PENDING).
      - `decidedAt` (may be null).
      - `decisionReason`.
    - Grid is **read-only** for the customer.
 
-4. The history panel must be **non-blocking**:
-   - If there are many purchases, paging via callback provider must still work.
+4. The history panel must be **performant**:
+   - If there are many purchases, paging via callback provider improves performance.
    - Sorting (e.g. by date, status) is allowed but not required in this step.
 
 #### 3.2.3 Login-time status-change summary

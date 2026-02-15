@@ -147,6 +147,14 @@ public class PurchaseServiceImpl implements PurchaseService {
                 PurchaseStatus.PENDING);
     }
 
+    @Override
+    public List<@NonNull Purchase> findRecentlyDecidedPurchases(
+            User requester, Instant since) {
+        Objects.requireNonNull(requester, "Requester must not be null");
+        Objects.requireNonNull(since, "Since timestamp must not be null");
+        return purchaseDao.findRecentlyDecidedByRequester(requester, since);
+    }
+
     @SuppressWarnings("null")
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

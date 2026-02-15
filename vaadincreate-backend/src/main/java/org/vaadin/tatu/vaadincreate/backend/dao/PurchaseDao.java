@@ -215,6 +215,38 @@ public class PurchaseDao {
     }
 
     /**
+     * Finds purchases for a requester that have been decided (COMPLETED or
+     * REJECTED) since a given timestamp.
+     *
+     * @param requester
+     *            the user who created the purchases
+     * @param since
+     *            the timestamp to filter from
+     * @return list of decided purchases since the given time
+     */
+    public List<@NonNull Purchase> findRecentlyDecidedByRequester(
+            User requester, java.time.Instant since) {
+        Objects.requireNonNull(requester, "Requester must not be null");
+        Objects.requireNonNull(since, "Since timestamp must not be null");
+        logger.info(
+                "Fetching recently decided Purchases by requester: ({}) since: {}",
+                requester.getId(), since);
+        var result = HibernateUtil.inSession(session -> {
+            return session.createQuery(
+                    "select p from Purchase p where p.requester = :requester and p.status in (:completed, :rejected) and p.decidedAt > :since order by p.decidedAt desc",
+                    Purchase.class).setParameter("requester", requester)
+                    .setParameter("completed", PurchaseStatus.COMPLETED)
+                    .setParameter("rejected", PurchaseStatus.REJECTED)
+                    .setParameter("since", since).list();
+        });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Result of findRecentlyDecidedByRequester is null");
+        }
+        return result;
+    }
+
+    /**
      * Saves or updates a user-supervisor mapping.
      *
      * @param mapping

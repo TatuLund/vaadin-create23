@@ -101,6 +101,19 @@ public interface PurchaseService {
     long countPendingForApprover(User approver);
 
     /**
+     * Finds purchases for a user that have been decided (COMPLETED or REJECTED)
+     * since a given timestamp.
+     *
+     * @param requester
+     *            the user who created the purchases
+     * @param since
+     *            the timestamp to filter from
+     * @return list of decided purchases since the given time
+     */
+    List<@NonNull Purchase> findRecentlyDecidedPurchases(User requester,
+            java.time.Instant since);
+
+    /**
      * Gets the singleton instance of the PurchaseService.
      *
      * @return the PurchaseService instance

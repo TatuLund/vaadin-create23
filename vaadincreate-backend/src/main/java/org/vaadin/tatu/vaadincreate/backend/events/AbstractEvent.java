@@ -12,9 +12,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = UserUpdatedEvent.class, name = "UserUpdatedEvent"),
         @JsonSubTypes.Type(value = ShutdownEvent.class, name = "ShutdownEvent") })
 public sealed interface AbstractEvent
-permits LockingEvent, MessageEvent, BooksChangedEvent, CategoriesUpdatedEvent, UserUpdatedEvent, ShutdownEvent
-{
-        // This interface serves as a marker for all event types in the system.
-        // It can be extended with common methods or properties if needed in the
-        // future.
+        permits LockingEvent, MessageEvent, BooksChangedEvent,
+        CategoriesUpdatedEvent, UserUpdatedEvent, ShutdownEvent {
+    // This interface serves as a marker for all event types in the system.
+    // It can be extended with common methods or properties if needed in the
+    // future.
 }

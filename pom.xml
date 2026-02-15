@@ -45,7 +45,7 @@
 					<configuration>
 						<java>
 							<eclipse>
-								<version>4.29</version>
+								<version>4.30</version>
 								<file>${project.parent.basedir}/VaadinJavaConventions.xml</file>
 							</eclipse>
 						</java>
@@ -72,7 +72,7 @@
 				<configuration>
 					<java>
 						<eclipse>
-							<version>4.29</version>
+							<version>4.30</version>
 							<file>${project.basedir}/VaadinJavaConventions.xml</file>
 						</eclipse>
 					</java>

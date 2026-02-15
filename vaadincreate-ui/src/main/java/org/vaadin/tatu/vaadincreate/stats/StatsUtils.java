@@ -135,14 +135,15 @@ public class StatsUtils {
      */
     record PriceBracket(int max) implements Serializable {
 
-    public boolean isInPriceBracket(BigDecimal price) {
-        BigDecimal upper = BigDecimal.valueOf(max);
-        BigDecimal lower = BigDecimal.valueOf(max - 10L);
-        return price.compareTo(upper) < 0 && price.compareTo(lower) >= 0;
-    }
+        public boolean isInPriceBracket(BigDecimal price) {
+            BigDecimal upper = BigDecimal.valueOf(max);
+            BigDecimal lower = BigDecimal.valueOf(max - 10L);
+            return price.compareTo(upper) < 0 && price.compareTo(lower) >= 0;
+        }
 
-    @Override
-    public String toString() {
-        return (max - 10) + " - " + max + " €";
+        @Override
+        public String toString() {
+            return (max - 10) + " - " + max + " €";
+        }
     }
-}}
+}

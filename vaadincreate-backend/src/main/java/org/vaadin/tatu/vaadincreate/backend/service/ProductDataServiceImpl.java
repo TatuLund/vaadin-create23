@@ -67,14 +67,14 @@ public class ProductDataServiceImpl implements ProductDataService {
     }
 
     @Override
-    public synchronized Product updateProduct(Product product) {
+    public Product updateProduct(Product product) {
         Objects.requireNonNull(product, "product can't be null");
         randomWait(1);
         return productDao.updateProduct(product);
     }
 
     @Override
-    public synchronized void deleteProduct(Integer id) {
+    public void deleteProduct(Integer id) {
         Objects.requireNonNull(id, ID_CANT_BE_NULL);
         randomWait(1);
         productDao.deleteProduct(id);
@@ -82,32 +82,32 @@ public class ProductDataServiceImpl implements ProductDataService {
 
     @Nullable
     @Override
-    public synchronized Product getProductById(Integer id) {
+    public Product getProductById(Integer id) {
         Objects.requireNonNull(id, ID_CANT_BE_NULL);
         randomWait(1);
         return productDao.getProduct(id);
     }
 
     @Override
-    public synchronized Collection<@NonNull Product> getAllProducts() {
+    public Collection<@NonNull Product> getAllProducts() {
         randomWait(6);
         return productDao.getAllProducts();
     }
 
     @Override
-    public synchronized Collection<@NonNull Product> getOrderableProducts() {
+    public Collection<@NonNull Product> getOrderableProducts() {
         randomWait(6);
         return productDao.getOrderableProducts();
     }
 
     @Override
-    public synchronized Collection<@NonNull Category> getAllCategories() {
+    public Collection<@NonNull Category> getAllCategories() {
         randomWait(2);
         return productDao.getAllCategories();
     }
 
     @Override
-    public synchronized void deleteCategory(Integer id) {
+    public void deleteCategory(Integer id) {
         Objects.requireNonNull(id, ID_CANT_BE_NULL);
         randomWait(2);
         var category = productDao.getCategory(id);
@@ -119,7 +119,7 @@ public class ProductDataServiceImpl implements ProductDataService {
     }
 
     @Override
-    public synchronized Set<@NonNull Category> findCategoriesByIds(
+    public Set<@NonNull Category> findCategoriesByIds(
             Set<Integer> ids) {
         Objects.requireNonNull(ids, "ids can't be null");
         randomWait(1);
@@ -127,7 +127,7 @@ public class ProductDataServiceImpl implements ProductDataService {
     }
 
     @Override
-    public synchronized Category updateCategory(Category category) {
+    public Category updateCategory(Category category) {
         Objects.requireNonNull(category, "category can't be null");
         var name = category.getName();
         Objects.requireNonNull(name, "category name can't be null");

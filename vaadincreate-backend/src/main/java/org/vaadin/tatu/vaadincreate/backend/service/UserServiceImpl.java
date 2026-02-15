@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public synchronized User updateUser(User user) {
+    public User updateUser(User user) {
         Objects.requireNonNull(user, "User must not be null");
         randomWait(2);
         var existingUser = userDao.findByName(user.getName());
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public synchronized Optional<User> findByName(String name) {
+    public Optional<User> findByName(String name) {
         Objects.requireNonNull(name, "Name must not be null");
         randomWait(1);
         User user = userDao.findByName(name);
@@ -76,27 +76,27 @@ public class UserServiceImpl implements UserService {
 
     @Nullable
     @Override
-    public synchronized User getUserById(Integer userId) {
+    public User getUserById(Integer userId) {
         Objects.requireNonNull(userId, "User ID must not be null");
         randomWait(1);
         return userDao.getUserById(userId);
     }
 
     @Override
-    public synchronized void removeUser(Integer userId) {
+    public void removeUser(Integer userId) {
         Objects.requireNonNull(userId, "User ID must not be null");
         randomWait(1);
         userDao.removeUser(userId);
     }
 
     @Override
-    public synchronized List<@NonNull User> getAllUsers() {
+    public List<@NonNull User> getAllUsers() {
         randomWait(3);
         return userDao.getAllUsers();
     }
 
     @Override
-    public synchronized List<@NonNull User> getUsersByRole(User.Role role) {
+    public List<@NonNull User> getUsersByRole(User.Role role) {
         Objects.requireNonNull(role, "Role must not be null");
         randomWait(2);
         return userDao.getUsersByRole(role);

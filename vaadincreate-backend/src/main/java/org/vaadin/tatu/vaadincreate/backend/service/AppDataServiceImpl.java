@@ -41,7 +41,7 @@ public class AppDataServiceImpl implements AppDataService {
     }
 
     @Override
-    public synchronized Message updateMessage(String message) {
+    public Message updateMessage(String message) {
         Objects.requireNonNull(message, "Message cannot be null");
         var messageEntity = new Message(message, getNow());
         return messageDao.updateMessage(messageEntity);
@@ -54,7 +54,7 @@ public class AppDataServiceImpl implements AppDataService {
 
     @Nullable
     @Override
-    public synchronized Message getMessage() {
+    public Message getMessage() {
         return messageDao.getLastMessage();
     }
 

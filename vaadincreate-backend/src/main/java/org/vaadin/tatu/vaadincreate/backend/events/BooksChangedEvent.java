@@ -5,8 +5,8 @@ package org.vaadin.tatu.vaadincreate.backend.events;
  * a change made to a book, including the product affected and the type of
  * change.
  */
-public record BooksChangedEvent(Integer productId, BookChange change)
-        implements AbstractEvent {
+public record BooksChangedEvent(Integer productId,
+        BookChange change) implements AbstractEvent {
     public enum BookChange {
         SAVE, DELETE
     }

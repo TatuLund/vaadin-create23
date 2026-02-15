@@ -51,7 +51,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public synchronized Purchase createPendingPurchase(Cart cart,
+    public Purchase createPendingPurchase(Cart cart,
             Address address, User requester,
             @Nullable User defaultApproverOrNull) {
         Objects.requireNonNull(cart, "Cart must not be null");
@@ -110,30 +110,30 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public synchronized List<@NonNull Purchase> findMyPurchases(User requester,
+    public List<@NonNull Purchase> findMyPurchases(User requester,
             int offset, int limit) {
         Objects.requireNonNull(requester, "Requester must not be null");
         return purchaseDao.findByRequester(requester, offset, limit);
     }
 
     @Override
-    public synchronized long countMyPurchases(User requester) {
+    public long countMyPurchases(User requester) {
         Objects.requireNonNull(requester, "Requester must not be null");
         return purchaseDao.countByRequester(requester);
     }
 
     @Override
-    public synchronized List<@NonNull Purchase> findAll(int offset, int limit) {
+    public List<@NonNull Purchase> findAll(int offset, int limit) {
         return purchaseDao.findAll(offset, limit);
     }
 
     @Override
-    public synchronized long countAll() {
+    public long countAll() {
         return purchaseDao.countAll();
     }
 
     @Override
-    public synchronized List<@NonNull Purchase> findPendingForApprover(
+    public List<@NonNull Purchase> findPendingForApprover(
             User approver, int offset, int limit) {
         Objects.requireNonNull(approver, "Approver must not be null");
         return purchaseDao.findByApproverAndStatus(approver,
@@ -141,7 +141,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public synchronized long countPendingForApprover(User approver) {
+    public long countPendingForApprover(User approver) {
         Objects.requireNonNull(approver, "Approver must not be null");
         return purchaseDao.countByApproverAndStatus(approver,
                 PurchaseStatus.PENDING);

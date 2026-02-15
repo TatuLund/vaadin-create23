@@ -312,7 +312,7 @@ Extend backend and UI so that:
      - Else: `since = now - configurable time window` (or simply treat as “no previous checks” and skip).
    - Query purchases for this user where:
      - `requester = currentUser`,
-     - `status IN (COMPLETED, REJECTED)`,
+     - `status IN (COMPLETED, REJECTED, CANCELLED)`,
      - `decidedAt > since`.
 
 6. If any such purchases exist:

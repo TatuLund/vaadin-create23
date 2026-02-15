@@ -1,26 +1,27 @@
 package org.vaadin.tatu.vaadincreate.storefront;
 
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.provider.CallbackDataProvider;
 import com.vaadin.data.provider.DataProvider;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.renderers.NumberRenderer;
 
 /**
@@ -33,7 +34,8 @@ public class PurchaseHistoryGrid extends Grid<Purchase>
         implements HasI18N, HasAttributes<PurchaseHistoryGrid> {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter
-            .ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.systemDefault());
+            .ofPattern("yyyy-MM-dd HH:mm")
+            .withZone(ZoneId.systemDefault());
 
     private final StorefrontPresenter presenter;
     private final User currentUser;
@@ -54,32 +56,49 @@ public class PurchaseHistoryGrid extends Grid<Purchase>
                 "Current user must not be null");
 
         setId("purchase-history-grid");
-        setSizeFull();
+        setWidth("90%");
+        setHeight("100%");
         setAccessibleNavigation(true);
         addStyleNames(VaadinCreateTheme.GRID_ROW_FOCUS);
         setRole(AriaRoles.REGION);
-        setAriaLabel("Purchase History");
+        setAriaLabel(getTranslation(I18n.Storefront.PURCHASE_HISTORY));
+        setSelectionMode(SelectionMode.NONE);
 
         configureColumns();
         configureDataProvider();
         configureDetailsGenerator();
+        addItemClickListener(e -> {
+            if (e.getItem() != null) {
+                // Toggle details visibility on row click
+                if (isDetailsVisible(e.getItem())) {
+                    setDetailsVisible(e.getItem(), false);
+                } else {
+                    setDetailsVisible(e.getItem(), true);
+                }
+            }
+        });
     }
 
     private void configureColumns() {
         // Created At column
         addColumn(purchase -> {
             Instant createdAt = purchase.getCreatedAt();
-            return createdAt != null ? DATE_FORMATTER.format(createdAt) : "";
-        }).setCaption("Created").setId("created-at");
+            return createdAt != null
+                    ? DATE_FORMATTER.format(createdAt)
+                    : "";
+        }).setCaption(getTranslation(I18n.CREATED_AT)).setId("created-at");
 
         // Status column
-        addColumn(Purchase::getStatus).setCaption("Status").setId("status");
+        addColumn(Purchase::getStatus)
+                .setCaption(getTranslation(I18n.STATUS))
+                .setId("status");
 
         // Total Amount column
         NumberFormat euroFormat = new DecimalFormat("#,##0.00 €");
         addColumn(Purchase::getTotalAmount,
-                new NumberRenderer(euroFormat, Locale.getDefault()))
-                .setCaption("Total").setId("total-amount");
+                new NumberRenderer(euroFormat))
+                .setCaption(getTranslation(I18n.TOTAL))
+                .setId("total-amount");
     }
 
     private void configureDataProvider() {
@@ -88,10 +107,14 @@ public class PurchaseHistoryGrid extends Grid<Purchase>
                     int offset = query.getOffset();
                     int limit = query.getLimit();
                     return presenter
-                            .fetchMyPurchases(currentUser, offset, limit)
+                            .fetchMyPurchases(
+                                    currentUser,
+                                    offset,
+                                    limit)
                             .stream();
                 }, query -> {
-                    return (int) presenter.countMyPurchases(currentUser);
+                    return (int) presenter.countMyPurchases(
+                            currentUser);
                 });
 
         setDataProvider(dataProvider);
@@ -101,30 +124,50 @@ public class PurchaseHistoryGrid extends Grid<Purchase>
         setDetailsGenerator(purchase -> {
             StringBuilder details = new StringBuilder();
             details.append("<div style='padding: 10px;'>");
-            details.append("<strong>Purchase ID:</strong> ")
-                    .append(purchase.getId() != null ? purchase.getId() : "N/A")
+            details.append("<strong>")
+                    .append(getTranslation(I18n.Storefront.PURCHASE_ID))
+                    .append(":</strong> ")
+                    .append(purchase.getId() != null
+                            ? purchase.getId()
+                            : getTranslation(
+                                    I18n.Storefront.NOT_AVAILABLE))
                     .append("<br>");
 
             User approver = purchase.getApprover();
-            details.append("<strong>Approver:</strong> ")
-                    .append(approver != null ? approver.getName() : "Pending")
+            details.append("<strong>")
+                    .append(getTranslation(I18n.Storefront.APPROVER))
+                    .append(":</strong> ")
+                    .append(approver != null
+                            ? approver.getName()
+                            : getTranslation(
+                                    I18n.Storefront.PENDING))
                     .append("<br>");
 
             Instant decidedAt = purchase.getDecidedAt();
-            details.append("<strong>Decided At:</strong> ")
-                    .append(decidedAt != null ? DATE_FORMATTER.format(decidedAt)
-                            : "N/A")
+            details.append("<strong>")
+                    .append(getTranslation(I18n.Storefront.DECIDED_AT))
+                    .append(":</strong> ")
+                    .append(decidedAt != null
+                            ? DATE_FORMATTER.format(
+                                    decidedAt)
+                            : getTranslation(
+                                    I18n.Storefront.NOT_AVAILABLE))
                     .append("<br>");
 
             String decisionReason = purchase.getDecisionReason();
-            if (decisionReason != null && !decisionReason.isEmpty()) {
-                details.append("<strong>Decision Reason:</strong> ")
-                        .append(decisionReason).append("<br>");
+            if (decisionReason != null
+                    && !decisionReason.isEmpty()) {
+                details.append("<strong>")
+                        .append(getTranslation(
+                                I18n.Storefront.DECISION_REASON))
+                        .append(":</strong> ")
+                        .append(decisionReason)
+                        .append("<br>");
             }
 
             details.append("</div>");
-            return new com.vaadin.ui.Label(details.toString(),
-                    com.vaadin.shared.ui.ContentMode.HTML);
+            return new Label(Utils.sanitize(details.toString()),
+                    ContentMode.HTML);
         });
     }
 

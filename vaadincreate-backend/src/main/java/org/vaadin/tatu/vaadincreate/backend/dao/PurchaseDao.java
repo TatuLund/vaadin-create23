@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate.backend.dao;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.Hibernate;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -20,6 +21,20 @@ import org.vaadin.tatu.vaadincreate.backend.data.UserSupervisor;
 @NullMarked
 @SuppressWarnings("java:S1602")
 public class PurchaseDao {
+
+    /**
+     * Saves a batch of new purchases in a single transaction.
+     *
+     * @param purchases
+     *            purchases to persist
+     */
+    public void savePurchases(List<Purchase> purchases) {
+        Objects.requireNonNull(purchases, "purchases must not be null");
+        logger.info("Persisting {} purchases.", purchases.size());
+        HibernateUtil.inTransaction(session -> {
+            purchases.forEach(session::save);
+        });
+    }
 
     /**
      * Saves or updates a purchase.
@@ -48,6 +63,9 @@ public class PurchaseDao {
         return HibernateUtil.inSession(session -> {
             @Nullable
             Purchase purchase = session.get(Purchase.class, id);
+            if (purchase != null) {
+                Hibernate.initialize(purchase.getLines());
+            }
             return purchase;
         });
     }
@@ -68,10 +86,15 @@ public class PurchaseDao {
         Objects.requireNonNull(requester, "Requester must not be null");
         logger.info("Fetching Purchases by requester: ({})", requester.getId());
         var result = HibernateUtil.inSession(session -> {
-            return session.createQuery(
+            var purchases = session.createQuery(
                     "select p from Purchase p where p.requester = :requester order by p.createdAt desc",
                     Purchase.class).setParameter("requester", requester)
                     .setFirstResult(offset).setMaxResults(limit).list();
+            if (purchases != null) {
+                // Initialize lazy collections while session is open.
+                purchases.forEach(p -> Hibernate.initialize(p.getLines()));
+            }
+            return purchases;
         });
         if (result == null) {
             throw new IllegalStateException(
@@ -119,11 +142,15 @@ public class PurchaseDao {
         logger.info("Fetching Purchases by approver: ({}) and status: {}",
                 approver.getId(), status);
         var result = HibernateUtil.inSession(session -> {
-            return session.createQuery(
+            var purchases = session.createQuery(
                     "select p from Purchase p where p.approver = :approver and p.status = :status order by p.createdAt desc",
                     Purchase.class).setParameter("approver", approver)
                     .setParameter("status", status).setFirstResult(offset)
                     .setMaxResults(limit).list();
+            if (purchases != null) {
+                purchases.forEach(p -> Hibernate.initialize(p.getLines()));
+            }
+            return purchases;
         });
         if (result == null) {
             throw new IllegalStateException(
@@ -167,10 +194,14 @@ public class PurchaseDao {
     public List<@NonNull Purchase> findAll(int offset, int limit) {
         logger.info("Fetching all Purchases");
         var result = HibernateUtil.inSession(session -> {
-            return session.createQuery(
+            var purchases = session.createQuery(
                     "select p from Purchase p order by p.createdAt desc",
                     Purchase.class).setFirstResult(offset).setMaxResults(limit)
                     .list();
+            if (purchases != null) {
+                purchases.forEach(p -> Hibernate.initialize(p.getLines()));
+            }
+            return purchases;
         });
         if (result == null) {
             throw new IllegalStateException("Result of findAll is null");
@@ -232,13 +263,17 @@ public class PurchaseDao {
                 "Fetching recently decided Purchases by requester: ({}) since: {}",
                 requester.getId(), since);
         var result = HibernateUtil.inSession(session -> {
-            return session.createQuery(
+            var purchases = session.createQuery(
                     "select p from Purchase p where p.requester = :requester and p.status in (:completed, :rejected, :cancelled) and p.decidedAt > :since order by p.decidedAt desc",
                     Purchase.class).setParameter("requester", requester)
                     .setParameter("completed", PurchaseStatus.COMPLETED)
                     .setParameter("rejected", PurchaseStatus.REJECTED)
                     .setParameter("cancelled", PurchaseStatus.CANCELLED)
                     .setParameter("since", since).list();
+            if (purchases != null) {
+                purchases.forEach(p -> Hibernate.initialize(p.getLines()));
+            }
+            return purchases;
         });
         if (result == null) {
             throw new IllegalStateException(

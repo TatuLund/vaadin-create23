@@ -156,7 +156,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
         productGrid.removeAllColumns();
         productGrid.addColumn(ProductDto::getProductName)
                 .setCaption(getTranslation(I18n.PRODUCT_NAME));
-        productGrid.addColumn(ProductDto::getStockCount).setCaption("Stock");
+        productGrid.addColumn(ProductDto::getStockCount)
+                .setCaption(getTranslation(I18n.IN_STOCK));
         productGrid
                 .addColumn(
                         product -> String.format("%.2f €", product.getPrice()))

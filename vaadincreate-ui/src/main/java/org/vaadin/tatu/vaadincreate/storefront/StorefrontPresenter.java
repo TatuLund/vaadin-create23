@@ -114,8 +114,8 @@ public class StorefrontPresenter implements Serializable {
     }
 
     /**
-     * Finds purchases that have been decided (COMPLETED or REJECTED) since the
-     * given timestamp.
+     * Finds purchases that have been decided (COMPLETED, REJECTED, or
+     * CANCELLED) since the given timestamp.
      * 
      * @param requester
      *            the user who created the purchases

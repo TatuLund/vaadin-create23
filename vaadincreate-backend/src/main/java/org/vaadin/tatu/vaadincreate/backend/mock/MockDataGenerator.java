@@ -2,6 +2,9 @@ package org.vaadin.tatu.vaadincreate.backend.mock;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -11,8 +14,12 @@ import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
+import org.vaadin.tatu.vaadincreate.backend.data.Address;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
+import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
+import org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine;
+import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
@@ -143,6 +150,103 @@ public class MockDataGenerator implements Serializable {
     private static String generateName() {
         return word1[random.nextInt(word1.length)] + " "
                 + word2[random.nextInt(word2.length)];
+    }
+
+    /**
+     * Creates fabricated Purchase data for UX testing.
+     * <p>
+     * Generates exactly 1600 purchases, starting from the current date
+     * (inclusive), two purchases per date. Requesters are taken from the
+     * provided {@code customers} list (round-robin). Approvers are randomly
+     * chosen from {@code approvers}. Each purchase gets 1-3 lines with
+     * quantities 1-5.
+     *
+     * @param customers
+     *            requesters (e.g. Customer11..Customer20)
+     * @param approvers
+     *            approvers (e.g. User5/User6)
+     * @param products
+     *            products to pick from
+     * @return list of 1600 transient Purchase entities
+     */
+    public static List<@NonNull Purchase> createMockPurchases(
+            List<@NonNull User> customers,
+            List<@NonNull User> approvers,
+            List<@NonNull Product> products) {
+        if (customers.isEmpty()) {
+            throw new IllegalArgumentException("customers must not be empty");
+        }
+        if (approvers.isEmpty()) {
+            throw new IllegalArgumentException("approvers must not be empty");
+        }
+        if (products.isEmpty()) {
+            throw new IllegalArgumentException("products must not be empty");
+        }
+
+        final int purchasesPerDate = 2;
+        final int totalPurchases = 1600;
+        final int dateCount = totalPurchases / purchasesPerDate;
+
+        List<@NonNull Purchase> purchases = new ArrayList<>(totalPurchases);
+        LocalDate today = LocalDate.now();
+        ZoneId zone = ZoneId.systemDefault();
+
+        for (int dayIndex = 0; dayIndex < dateCount; dayIndex++) {
+            LocalDate date = today.minusDays(dayIndex);
+            for (int i = 0; i < purchasesPerDate; i++) {
+                Purchase purchase = new Purchase();
+
+                var requester = customers.get(
+                        (dayIndex * purchasesPerDate + i)
+                                % customers.size());
+                purchase.setRequester(requester);
+
+                var approver = approvers.get(random.nextInt(approvers.size()));
+                purchase.setApprover(approver);
+
+                PurchaseStatus status = PurchaseStatus
+                        .values()[random
+                                .nextInt(PurchaseStatus.values().length)];
+                purchase.setStatus(status);
+
+                // Two distinct times per day to make ordering stable.
+                LocalDateTime created = date.atTime(i == 0 ? 9 : 15,
+                        random.nextInt(60));
+                var createdAt = created.atZone(zone).toInstant();
+                purchase.setCreatedAt(createdAt);
+
+                if (status != PurchaseStatus.PENDING) {
+                    // For decided purchases, set decision metadata.
+                    var decidedAt = created.plusHours(1 + random.nextInt(72))
+                            .atZone(zone).toInstant();
+                    purchase.setDecidedAt(decidedAt);
+                    purchase.setDecisionReason("Mock decision");
+                }
+
+                purchase.setDeliveryAddress(new Address(
+                        "Mock Street " + (dayIndex + 1),
+                        String.format("%05d", 10000 + (dayIndex % 9000)),
+                        "Mock City",
+                        "Mock Country"));
+
+                int lineCount = 1 + random.nextInt(3);
+                for (int lineIndex = 0; lineIndex < lineCount; lineIndex++) {
+                    Product product = products
+                            .get(random.nextInt(products.size()));
+                    int quantity = 1 + random.nextInt(5);
+
+                    PurchaseLine line = new PurchaseLine();
+                    line.setProduct(product);
+                    line.setQuantity(quantity);
+                    line.setUnitPrice(product.getPrice());
+                    purchase.addLine(line);
+                }
+
+                purchases.add(purchase);
+            }
+        }
+
+        return purchases;
     }
 
 }

@@ -203,6 +203,8 @@ public class PurchaseServiceTest {
         // Verify all purchases belong to the customer
         for (Purchase p : purchases) {
             assertEquals(customerUser.getId(), p.getRequester().getId());
+            // Regression: UI renders totals outside Hibernate session.
+            assertNotNull(p.getTotalAmount());
         }
     }
 

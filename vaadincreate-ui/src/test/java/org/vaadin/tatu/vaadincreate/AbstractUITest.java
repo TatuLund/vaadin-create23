@@ -1,7 +1,7 @@
 package org.vaadin.tatu.vaadincreate;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.stream.Collectors;
@@ -102,8 +102,10 @@ public abstract class AbstractUITest extends UIUnitTest {
     }
 
     protected void assertAssistiveNotification(String notificatioText) {
-        var notification = $(Notification.class).last();
-        assertEquals(notificatioText, notification.getCaption());
-        assertEquals(Position.ASSISTIVE, notification.getPosition());
+        var notification = $(Notification.class).stream()
+                .filter(n -> n.getCaption().equals(notificatioText)
+                        && n.getPosition() == Position.ASSISTIVE)
+                .findAny().orElse(null);
+        assertNotNull(notification);
     }
 }

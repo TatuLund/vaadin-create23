@@ -1,8 +1,11 @@
 package org.vaadin.tatu.vaadincreate.storefront;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
@@ -81,6 +84,62 @@ public class StorefrontPresenter implements Serializable {
             User requester, User supervisor) {
         return getPurchaseService().createPendingPurchase(cart, address,
                 requester, supervisor);
+    }
+
+    /**
+     * Fetches purchases for the given requester with pagination.
+     * 
+     * @param requester
+     *            the user who created the purchases
+     * @param offset
+     *            the starting offset for pagination
+     * @param limit
+     *            the maximum number of results
+     * @return list of purchases
+     */
+    public List<@NonNull Purchase> fetchMyPurchases(User requester, int offset,
+            int limit) {
+        return getPurchaseService().findMyPurchases(requester, offset, limit);
+    }
+
+    /**
+     * Counts purchases for the given requester.
+     * 
+     * @param requester
+     *            the user who created the purchases
+     * @return the count of purchases
+     */
+    public long countMyPurchases(User requester) {
+        return getPurchaseService().countMyPurchases(requester);
+    }
+
+    /**
+     * Finds purchases that have been decided (COMPLETED, REJECTED, or
+     * CANCELLED) since the given timestamp.
+     * 
+     * @param requester
+     *            the user who created the purchases
+     * @param since
+     *            the timestamp to filter from
+     * @return list of decided purchases since the given time
+     */
+    public List<@NonNull Purchase> findRecentlyDecidedPurchases(User requester,
+            Instant since) {
+        return getPurchaseService().findRecentlyDecidedPurchases(requester,
+                since);
+    }
+
+    /**
+     * Updates the lastStatusCheck timestamp for the given user.
+     * 
+     * @param user
+     *            the user to update
+     * @param timestamp
+     *            the timestamp to set
+     */
+    public void updateLastStatusCheck(User user, Instant timestamp) {
+        user.setLastStatusCheck(timestamp);
+        getUserService().updateUser(user);
     }
 
     private ProductDataService getProductService() {

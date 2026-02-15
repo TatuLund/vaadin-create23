@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.backend.data;
 
+import java.time.Instant;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -51,10 +52,15 @@ public class User extends AbstractEntity {
     @Nullable
     private Role role;
 
+    @Column(name = "last_status_check")
+    @Nullable
+    private Instant lastStatusCheck;
+
     public User() {
         this.name = "";
         this.passwd = "";
         this.role = null;
+        this.lastStatusCheck = null;
     }
 
     /**
@@ -118,5 +124,27 @@ public class User extends AbstractEntity {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    /**
+     * Gets the timestamp of the last time the user's purchase status changes
+     * were shown in a notification or summary dialog.
+     *
+     * @return the last status check timestamp, or null if never checked
+     */
+    @Nullable
+    public Instant getLastStatusCheck() {
+        return lastStatusCheck;
+    }
+
+    /**
+     * Sets the timestamp of the last time the user's purchase status changes
+     * were shown.
+     *
+     * @param lastStatusCheck
+     *            the timestamp to set
+     */
+    public void setLastStatusCheck(@Nullable Instant lastStatusCheck) {
+        this.lastStatusCheck = lastStatusCheck;
     }
 }

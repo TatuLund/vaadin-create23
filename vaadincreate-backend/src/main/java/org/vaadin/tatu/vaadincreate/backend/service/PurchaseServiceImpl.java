@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate.backend.service;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 import java.util.Objects;
 
 import org.jspecify.annotations.NonNull;
@@ -11,7 +12,9 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
+import org.vaadin.tatu.vaadincreate.backend.dao.ProductDao;
 import org.vaadin.tatu.vaadincreate.backend.dao.PurchaseDao;
+import org.vaadin.tatu.vaadincreate.backend.dao.UserDao;
 import org.vaadin.tatu.vaadincreate.backend.data.Address;
 import org.vaadin.tatu.vaadincreate.backend.data.Cart;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -19,6 +22,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
+import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 
 /**
  * Implementation of PurchaseService. This is a singleton service managing
@@ -35,6 +39,57 @@ public class PurchaseServiceImpl implements PurchaseService {
     private PurchaseServiceImpl() {
         this.purchaseDao = new PurchaseDao();
         logger.info("PurchaseService initialized");
+
+        // Optional: generate a large Purchase dataset for UX testing.
+        // Disable with: -Dgenerate.data=false
+        var env = System.getProperty("generate.data");
+        if (env == null || env.equals("true")) {
+            generateMockPurchaseDataIfEmpty();
+            logger.info("Generated mock purchase data");
+        }
+    }
+
+    private void generateMockPurchaseDataIfEmpty() {
+        // Avoid duplicating data across restarts.
+        if (purchaseDao.countAll() > 0) {
+            logger.info(
+                    "Skipping UX purchase data generation (purchases already exist)");
+            return;
+        }
+
+        var userDao = new UserDao();
+        var productDao = new ProductDao();
+
+        var customers = IntStream.rangeClosed(11, 20)
+                .mapToObj(i -> "Customer" + i)
+                .map(name -> {
+                    var u = userDao.findByName(name);
+                    if (u == null) {
+                        throw new IllegalStateException(
+                                "Required user not found: " + name);
+                    }
+                    return u;
+                }).toList();
+
+        var approver5 = userDao.findByName("User5");
+        var approver6 = userDao.findByName("User6");
+        if (approver5 == null || approver6 == null) {
+            throw new IllegalStateException(
+                    "Required approvers not found: User5/User6");
+        }
+        var approvers = List.<User> of(approver5, approver6);
+
+        var products = productDao.getAllProducts().stream().toList();
+        if (products.isEmpty()) {
+            throw new IllegalStateException(
+                    "No products found for purchase lines");
+        }
+        var purchases = MockDataGenerator.createMockPurchases(customers,
+                approvers, products);
+
+        purchaseDao.savePurchases(purchases);
+
+        logger.info("Generated {} UX Purchases", purchases.size());
     }
 
     /**
@@ -145,6 +200,14 @@ public class PurchaseServiceImpl implements PurchaseService {
         Objects.requireNonNull(approver, "Approver must not be null");
         return purchaseDao.countByApproverAndStatus(approver,
                 PurchaseStatus.PENDING);
+    }
+
+    @Override
+    public List<@NonNull Purchase> findRecentlyDecidedPurchases(
+            User requester, Instant since) {
+        Objects.requireNonNull(requester, "Requester must not be null");
+        Objects.requireNonNull(since, "Since timestamp must not be null");
+        return purchaseDao.findRecentlyDecidedByRequester(requester, since);
     }
 
     @SuppressWarnings("null")

@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.storefront;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -9,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.common.NumberField;
 
 import com.vaadin.server.ServiceException;
@@ -33,7 +35,7 @@ public class StorefrontViewTest extends AbstractUITest {
         ui = new VaadinCreateUI();
         mockVaadin(ui);
         // Login as CUSTOMER to access storefront
-        login("Customer0", "customer0");
+        login("Customer11", "customer11");
     }
 
     @After
@@ -51,6 +53,7 @@ public class StorefrontViewTest extends AbstractUITest {
 
         // THEN: View should be visible
         assertNotNull(view);
+        assertNotification("Status Updates");
         assertAssistiveNotification("Storefront opened");
 
         // AND: View should be serializable
@@ -72,14 +75,16 @@ public class StorefrontViewTest extends AbstractUITest {
 
         // AND: Next button should be present
         var nextButton = $(Button.class).stream().filter(
-                b -> b.getCaption() != null && b.getCaption().contains("Next"))
+                b -> b.getCaption() != null && b.getCaption()
+                        .contains("Next"))
                 .findFirst().orElse(null);
         assertNotNull("Next button should be present", nextButton);
 
         // AND: Previous button should be disabled on first step
         var prevButton = $(Button.class).stream()
                 .filter(b -> b.getCaption() != null
-                        && b.getCaption().contains("Previous"))
+                        && b.getCaption().contains(
+                                "Previous"))
                 .findFirst().orElse(null);
         assertNotNull("Previous button should be present", prevButton);
         assertFalse("Previous button should be disabled on first step",
@@ -96,7 +101,8 @@ public class StorefrontViewTest extends AbstractUITest {
 
         // WHEN: User tries to proceed without adding items
         var nextButton = $(Button.class).stream().filter(
-                b -> b.getCaption() != null && b.getCaption().contains("Next"))
+                b -> b.getCaption() != null && b.getCaption()
+                        .contains("Next"))
                 .findFirst().orElse(null);
         assertNotNull(nextButton);
         test(nextButton).click();
@@ -131,12 +137,14 @@ public class StorefrontViewTest extends AbstractUITest {
         var productGrid = (Grid<ProductDto>) $(Grid.class).first();
         test(productGrid).clickToSelect(0);
 
-        var numberField = $((HorizontalLayout) test(productGrid).cell(3, 0),
+        var numberField = $(
+                (HorizontalLayout) test(productGrid).cell(3, 0),
                 NumberField.class).first();
         test(numberField).setValue(2);
 
         var nextButton = $(Button.class).stream().filter(
-                b -> b.getCaption() != null && b.getCaption().contains("Next"))
+                b -> b.getCaption() != null && b.getCaption()
+                        .contains("Next"))
                 .findFirst().get();
         test(nextButton).click();
 
@@ -159,12 +167,14 @@ public class StorefrontViewTest extends AbstractUITest {
         var productGrid = (Grid<ProductDto>) $(Grid.class).first();
         test(productGrid).clickToSelect(0);
 
-        var numberField = $((HorizontalLayout) test(productGrid).cell(3, 0),
+        var numberField = $(
+                (HorizontalLayout) test(productGrid).cell(3, 0),
                 NumberField.class).first();
         test(numberField).setValue(1);
 
         var nextButton = $(Button.class).stream().filter(
-                b -> b.getCaption() != null && b.getCaption().contains("Next"))
+                b -> b.getCaption() != null && b.getCaption()
+                        .contains("Next"))
                 .findFirst().get();
         test(nextButton).click();
 
@@ -173,7 +183,8 @@ public class StorefrontViewTest extends AbstractUITest {
                 .setValue("123 Main St");
         test($(TextField.class).caption("Postal Code").first())
                 .setValue("12345");
-        test($(TextField.class).caption("City").first()).setValue("TestCity");
+        test($(TextField.class).caption("City").first())
+                .setValue("TestCity");
         test($(TextField.class).caption("Country").first())
                 .setValue("TestCountry");
 
@@ -198,12 +209,14 @@ public class StorefrontViewTest extends AbstractUITest {
         var productGrid = (Grid<ProductDto>) $(Grid.class).first();
         test(productGrid).clickToSelect(0);
 
-        var numberField = $((HorizontalLayout) test(productGrid).cell(3, 0),
+        var numberField = $(
+                (HorizontalLayout) test(productGrid).cell(3, 0),
                 NumberField.class).first();
         test(numberField).setValue(2);
 
         var nextButton = $(Button.class).stream().filter(
-                b -> b.getCaption() != null && b.getCaption().contains("Next"))
+                b -> b.getCaption() != null && b.getCaption()
+                        .contains("Next"))
                 .findFirst().get();
         test(nextButton).click();
 
@@ -212,15 +225,18 @@ public class StorefrontViewTest extends AbstractUITest {
                 .setValue("123 Main St");
         test($(TextField.class).caption("Postal Code").first())
                 .setValue("12345");
-        test($(TextField.class).caption("City").first()).setValue("TestCity");
+        test($(TextField.class).caption("City").first())
+                .setValue("TestCity");
         test($(TextField.class).caption("Country").first())
                 .setValue("TestCountry");
         test(nextButton).click();
 
         // Select supervisor
         @SuppressWarnings("unchecked")
-        var supervisorCombo = (ComboBox<Object>) $(ComboBox.class).first();
-        assertNotNull("Supervisor combobox should be present", supervisorCombo);
+        var supervisorCombo = (ComboBox<Object>) $(ComboBox.class)
+                .first();
+        assertNotNull("Supervisor combobox should be present",
+                supervisorCombo);
         var supervisors = supervisorCombo.getDataCommunicator()
                 .fetchItemsWithRange(0, 1);
         test(supervisorCombo).clickItem(supervisors.get(0));
@@ -232,7 +248,8 @@ public class StorefrontViewTest extends AbstractUITest {
         // Submit
         var submitButton = $(Button.class).stream()
                 .filter(b -> b.getCaption() != null
-                        && b.getCaption().contains("Submit"))
+                        && b.getCaption().contains(
+                                "Submit"))
                 .findFirst().get();
 
         // WHEN: User submits the purchase
@@ -241,8 +258,29 @@ public class StorefrontViewTest extends AbstractUITest {
         // THEN: Success notification should be shown
         var hasSuccessNotification = $(com.vaadin.ui.Notification.class)
                 .stream().filter(n -> n.getCaption() != null)
-                .anyMatch(n -> n.getCaption().contains("created"));
+                .anyMatch(n -> n.getCaption()
+                        .contains("created"));
         assertTrue("Success notification should contain 'created'",
                 hasSuccessNotification);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void should_ShowPurchaseHistoryGrid_When_ViewIsDisplayed() {
+        // GIVEN: User is logged in as CUSTOMER
+        // WHEN: Navigate to storefront view
+        view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
+
+        // THEN: Purchase history grid should be present
+        var historyGrid = $(Grid.class).id("purchase-history-grid");
+        assertNotNull("Purchase history grid should be present",
+                historyGrid);
+        assertTrue("Purchase history grid should have at least one row",
+                historyGrid.getDataCommunicator()
+                        .getDataProviderSize() > 0);
+        assertEquals(PurchaseStatus.COMPLETED, test(historyGrid).cell(1, 0));
+
+        // AND: Verify serialization
+        SerializationDebugUtil.assertSerializable(view);
     }
 }

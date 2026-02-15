@@ -19,9 +19,12 @@ public final class I18n {
     }
 
     public static final String AVAILABILITY = "availability";
+    public static final String CREATED_AT = "created-at";
     public static final String IN_STOCK = "in-stock";
     public static final String PRICE = "price";
     public static final String PRODUCT_NAME = "product-name";
+    public static final String STATUS = "status";
+    public static final String TOTAL = "total";
     public static final String DELETE = "delete";
     public static final String WILL_DELETE = "will-delete";
     public static final String CATEGORIES = "categories";
@@ -191,6 +194,7 @@ public final class I18n {
     }
 
     public static final class Storefront {
+        public static final String PURCHASE_HISTORY = "purchase-history";
         public static final String NEXT = "next";
         public static final String PREVIOUS = "previous";
         public static final String SUBMIT = "submit";
@@ -222,6 +226,13 @@ public final class I18n {
         public static final String SELECT_SUPERVISOR = "select-supervisor";
         public static final String PURCHASE_CREATED = "purchase-created";
         public static final String PURCHASE_FAILED = "purchase-failed";
+
+        public static final String PURCHASE_ID = "purchase-id";
+        public static final String APPROVER = "approver";
+        public static final String DECIDED_AT = "decided-at";
+        public static final String DECISION_REASON = "decision-reason";
+        public static final String PENDING = "pending";
+        public static final String NOT_AVAILABLE = "not-available";
 
         private Storefront() {
             // private constructor to hide the implicit public one

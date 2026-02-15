@@ -22,7 +22,6 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Window;
 
 /**
  * A view for employees (CUSTOMER role) to create purchase requests using a

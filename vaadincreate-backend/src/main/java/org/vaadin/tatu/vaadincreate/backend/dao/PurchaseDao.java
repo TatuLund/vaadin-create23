@@ -215,8 +215,8 @@ public class PurchaseDao {
     }
 
     /**
-     * Finds purchases for a requester that have been decided (COMPLETED or
-     * REJECTED) since a given timestamp.
+     * Finds purchases for a requester that have been decided (COMPLETED,
+     * REJECTED, or CANCELLED) since a given timestamp.
      *
      * @param requester
      *            the user who created the purchases
@@ -233,10 +233,11 @@ public class PurchaseDao {
                 requester.getId(), since);
         var result = HibernateUtil.inSession(session -> {
             return session.createQuery(
-                    "select p from Purchase p where p.requester = :requester and p.status in (:completed, :rejected) and p.decidedAt > :since order by p.decidedAt desc",
+                    "select p from Purchase p where p.requester = :requester and p.status in (:completed, :rejected, :cancelled) and p.decidedAt > :since order by p.decidedAt desc",
                     Purchase.class).setParameter("requester", requester)
                     .setParameter("completed", PurchaseStatus.COMPLETED)
                     .setParameter("rejected", PurchaseStatus.REJECTED)
+                    .setParameter("cancelled", PurchaseStatus.CANCELLED)
                     .setParameter("since", since).list();
         });
         if (result == null) {

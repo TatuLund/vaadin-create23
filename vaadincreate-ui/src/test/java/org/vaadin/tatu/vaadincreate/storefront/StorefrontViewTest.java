@@ -245,4 +245,18 @@ public class StorefrontViewTest extends AbstractUITest {
         assertTrue("Success notification should contain 'created'",
                 hasSuccessNotification);
     }
+
+    @Test
+    public void should_ShowPurchaseHistoryGrid_When_ViewIsDisplayed() {
+        // GIVEN: User is logged in as CUSTOMER
+        // WHEN: Navigate to storefront view
+        view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
+
+        // THEN: Purchase history grid should be present
+        var historyGrid = $(Grid.class).id("purchase-history-grid");
+        assertNotNull("Purchase history grid should be present", historyGrid);
+
+        // AND: Verify serialization
+        SerializationDebugUtil.assertSerializable(view);
+    }
 }

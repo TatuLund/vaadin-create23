@@ -53,7 +53,7 @@ public class ProductDao {
     @Nullable
     public Product getProduct(Integer id) {
         Objects.requireNonNull(id, "Product ID must not be null");
-        logger.info("Fetching Product: ({})", id);
+        logger.debug("Fetching Product: ({})", id);
         return HibernateUtil.inSession(session -> {
             @Nullable
             Product prod = session.get(Product.class, id);
@@ -95,7 +95,7 @@ public class ProductDao {
         Objects.requireNonNull(category, "Category must not be null");
         Objects.requireNonNull(category.getId(),
                 "Category ID must not be null");
-        logger.info("Fetching Products by Category: ({}) '{}'",
+        logger.debug("Fetching Products by Category: ({}) '{}'",
                 category.getId(), category.getName());
         var result = HibernateUtil.inSession(session -> {
             return session.createQuery(
@@ -119,7 +119,7 @@ public class ProductDao {
      */
     public Collection<@NonNull Product> getAllProducts() {
         // Method returns all products from the database using HibernateUtil
-        logger.info("Fetching all Products");
+        logger.debug("Fetching all Products");
         var result = HibernateUtil.inSession(session -> {
             // Using LEFT JOIN FETCH to eagerly load associated categories
             // to avoid N+1 select problem
@@ -141,7 +141,7 @@ public class ProductDao {
      * @return a collection of orderable Product objects
      */
     public Collection<@NonNull Product> getOrderableProducts() {
-        logger.info("Fetching orderable Products");
+        logger.debug("Fetching orderable Products");
         var result = HibernateUtil.inSession(session -> {
             return session.createQuery(
                     "select distinct p from Product p left join fetch p.category where p.availability = org.vaadin.tatu.vaadincreate.backend.data.Availability.AVAILABLE and p.stockCount > 0",
@@ -166,7 +166,7 @@ public class ProductDao {
     public Category updateCategory(Category category) {
         Objects.requireNonNull(category,
                 "Category to be updated must not be null");
-        logger.info("Persisting Category: ({}) '{}'", category.getId(),
+        logger.debug("Persisting Category: ({}) '{}'", category.getId(),
                 category.getName());
         return HibernateUtil.saveOrUpdate(category);
     }
@@ -182,7 +182,7 @@ public class ProductDao {
     @Nullable
     public Category getCategory(Integer id) {
         Objects.requireNonNull(id, "Category ID must not be null");
-        logger.info("Fetching Category: ({})", id);
+        logger.debug("Fetching Category: ({})", id);
         return HibernateUtil.inSession(session -> {
             @Nullable
             Category category = session.get(Category.class, id);
@@ -196,7 +196,7 @@ public class ProductDao {
      * @return a collection of all categories.
      */
     public Collection<@NonNull Category> getAllCategories() {
-        logger.info("Fetching all Categories");
+        logger.debug("Fetching all Categories");
         var result = HibernateUtil.inSession(session -> {
             return session.createQuery("from Category", Category.class).list();
         });
@@ -216,7 +216,7 @@ public class ProductDao {
      */
     public Set<@NonNull Category> getCategoriesByIds(Set<Integer> ids) {
         Objects.requireNonNull(ids, "Category IDs must not be null");
-        logger.info("Fetching Categories: {}", ids);
+        logger.debug("Fetching Categories: {}", ids);
         var result = HibernateUtil.inSession(session -> {
             return session
                     .createQuery("from Category where id in (:ids)",
@@ -270,7 +270,7 @@ public class ProductDao {
             // Now safe to delete the category itself
             session.delete(category);
 
-            logger.info(
+            logger.debug(
                     "Deleted Category: ({}) '{}', Updated {} products and {} drafts",
                     category.getId(), category.getName(), updatedProducts,
                     updatedDrafts);
@@ -289,7 +289,7 @@ public class ProductDao {
     @Nullable
     public Category getCategoryByName(String name) {
         Objects.requireNonNull(name, "Category name must not be null");
-        logger.info("Fetching Category by name: '{}'", name);
+        logger.debug("Fetching Category by name: '{}'", name);
         return HibernateUtil.inSession(session -> {
             @Nullable
             Category category = session

@@ -26,7 +26,7 @@ public class UserDao {
      */
     @Nullable
     public User findByName(String name) {
-        logger.info("Finding user {}", name);
+        logger.debug("Finding user {}", name);
         return HibernateUtil.inSession(session -> {
             @Nullable
             User user = session
@@ -46,7 +46,8 @@ public class UserDao {
      * @return the updated User object retrieved from the database
      */
     public User updateUser(User user) {
-        logger.info("Persisting User: ({}) '{}'", user.getId(), user.getName());
+        logger.debug("Persisting User: ({}) '{}'", user.getId(),
+                user.getName());
         return HibernateUtil.saveOrUpdate(user);
     }
 
@@ -60,7 +61,7 @@ public class UserDao {
      */
     @Nullable
     public User getUserById(Integer userId) {
-        logger.info("Fetching User: ({})", userId);
+        logger.debug("Fetching User: ({})", userId);
         return HibernateUtil.inSession(session -> {
             @Nullable
             User user = session.get(User.class, userId);
@@ -77,7 +78,7 @@ public class UserDao {
     @SuppressWarnings("unused")
     public void removeUser(Integer userId) {
         Objects.requireNonNull(userId, "User ID must not be null");
-        logger.info("Deleting User: ({})", userId);
+        logger.debug("Deleting User: ({})", userId);
         HibernateUtil.inTransaction(session -> {
             @Nullable
             User user = session.get(User.class, userId);
@@ -95,7 +96,7 @@ public class UserDao {
      * @return a List of User objects representing all users in the database.
      */
     public List<@NonNull User> getAllUsers() {
-        logger.info("Fetching all Users");
+        logger.debug("Fetching all Users");
         List<@NonNull User> users = HibernateUtil.inSession(session -> {
             return session.createQuery("from User", User.class).list();
         });
@@ -115,7 +116,7 @@ public class UserDao {
      */
     public List<@NonNull User> getUsersByRole(User.Role role) {
         Objects.requireNonNull(role, "Role must not be null");
-        logger.info("Fetching Users with role {}", role);
+        logger.debug("Fetching Users with role {}", role);
         List<@NonNull User> users = HibernateUtil.inSession(session -> {
             return session
                     .createQuery("from User where role = :role", User.class)

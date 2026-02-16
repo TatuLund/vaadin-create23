@@ -101,6 +101,33 @@ public interface PurchaseService {
     long countPendingForApprover(User approver);
 
     /**
+     * Fetches purchases for a given history mode with pagination.
+     *
+     * @param mode
+     *            the history mode to use
+     * @param offset
+     *            the starting offset for pagination
+     * @param limit
+     *            the maximum number of results
+     * @param currentUser
+     *            the current user driving the query
+     * @return list of purchases
+     */
+    List<@NonNull Purchase> fetchPurchases(PurchaseHistoryMode mode, int offset,
+            int limit, User currentUser);
+
+    /**
+     * Counts purchases for a given history mode.
+     *
+     * @param mode
+     *            the history mode to use
+     * @param currentUser
+     *            the current user driving the query
+     * @return the count of purchases
+     */
+    long countPurchases(PurchaseHistoryMode mode, User currentUser);
+
+    /**
      * Finds purchases for a user that have been decided (COMPLETED, REJECTED,
      * or CANCELLED) since a given timestamp.
      *

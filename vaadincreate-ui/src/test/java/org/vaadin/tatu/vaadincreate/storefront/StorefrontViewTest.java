@@ -278,7 +278,18 @@ public class StorefrontViewTest extends AbstractUITest {
         assertTrue("Purchase history grid should have at least one row",
                 historyGrid.getDataCommunicator()
                         .getDataProviderSize() > 0);
-        assertEquals(PurchaseStatus.COMPLETED, test(historyGrid).cell(1, 0));
+        int statusColumnIndex = -1;
+        for (int i = 0; i < historyGrid.getColumns().size(); i++) {
+            @SuppressWarnings("rawtypes")
+            Grid.Column column = (Grid.Column) historyGrid.getColumns().get(i);
+            if ("status".equals(column.getId())) {
+                statusColumnIndex = i;
+                break;
+            }
+        }
+        assertTrue("Status column not found", statusColumnIndex >= 0);
+        assertEquals(PurchaseStatus.COMPLETED,
+                test(historyGrid).cell(statusColumnIndex, 0));
 
         // AND: Verify serialization
         SerializationDebugUtil.assertSerializable(view);

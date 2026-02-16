@@ -32,6 +32,7 @@ import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.login.LoginView;
+import org.vaadin.tatu.vaadincreate.purchases.PurchasesView;
 import org.vaadin.tatu.vaadincreate.stats.StatsView;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
@@ -149,6 +150,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                         org.vaadin.tatu.vaadincreate.storefront.StorefrontView.VIEW_NAME),
                 VaadinIcons.SHOP,
                 org.vaadin.tatu.vaadincreate.storefront.StorefrontView.VIEW_NAME);
+        appLayout.addView(PurchasesView.class,
+                getTranslation(PurchasesView.VIEW_NAME),
+                VaadinIcons.CART, PurchasesView.VIEW_NAME);
         appLayout.addView(StatsView.class, getTranslation(StatsView.VIEW_NAME),
                 VaadinIcons.CHART, StatsView.VIEW_NAME);
         appLayout.addView(AdminView.class, getTranslation(AdminView.VIEW_NAME),

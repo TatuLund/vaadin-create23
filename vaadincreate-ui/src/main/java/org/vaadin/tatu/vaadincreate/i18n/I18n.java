@@ -31,6 +31,7 @@ public final class I18n {
     public static final String CANCEL = "cancel";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
+    public static final String REQUESTER = "requester";
     public static final String SAVE = "save";
     public static final String SAVE_CONFLICT = "save-conflict";
     public static final String YES = "yes";
@@ -42,6 +43,8 @@ public final class I18n {
     public static final String CONFIRM = "confirm";
     public static final String CLOSED = "closed";
     public static final String LOGOUT_60S = "logout-60s";
+    public static final String PURCHASES = "purchases";
+    public static final String APPROVALS = "approvals";
     public static final String DATABASE_CONNECTION_ERROR = null;
 
     public static final class Books {

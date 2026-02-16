@@ -15,13 +15,15 @@ import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
+import org.vaadin.tatu.vaadincreate.purchases.PurchaseHistoryGrid;
+import org.vaadin.tatu.vaadincreate.purchases.PurchaseHistoryPresenter;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.UI;
 
 /**
  * A view for employees (CUSTOMER role) to create purchase requests using a
@@ -53,7 +55,8 @@ public class StorefrontView extends CssLayout implements VaadinCreateView {
         wizard = new PurchaseWizard();
 
         // Create purchase history grid on the right
-        historyGrid = new PurchaseHistoryGrid(presenter, currentUser);
+        historyGrid = new PurchaseHistoryGrid(new PurchaseHistoryPresenter(),
+                PurchaseHistoryMode.MY_PURCHASES, currentUser);
         historyGrid.addStyleName(VaadinCreateTheme.STOREFRONTVIEW_HISTORY);
 
         addComponents(wizard, historyGrid);

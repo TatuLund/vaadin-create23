@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.backend.dao;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -84,7 +85,9 @@ public class PurchaseDao {
     public List<@NonNull Purchase> findByRequester(User requester, int offset,
             int limit) {
         Objects.requireNonNull(requester, "Requester must not be null");
-        logger.info("Fetching Purchases by requester: ({})", requester.getId());
+        logger.debug(
+                "Fetching Purchases by requester: ({}) by offset: {} and limit: {}",
+                requester.getId(), offset, limit);
         var result = HibernateUtil.inSession(session -> {
             var purchases = session.createQuery(
                     "select p from Purchase p where p.requester = :requester order by p.createdAt desc",
@@ -139,7 +142,7 @@ public class PurchaseDao {
             PurchaseStatus status, int offset, int limit) {
         Objects.requireNonNull(approver, "Approver must not be null");
         Objects.requireNonNull(status, "Status must not be null");
-        logger.info("Fetching Purchases by approver: ({}) and status: {}",
+        logger.debug("Fetching Purchases by approver: ({}) and status: {}",
                 approver.getId(), status);
         var result = HibernateUtil.inSession(session -> {
             var purchases = session.createQuery(
@@ -192,7 +195,8 @@ public class PurchaseDao {
      * @return list of all purchases
      */
     public List<@NonNull Purchase> findAll(int offset, int limit) {
-        logger.info("Fetching all Purchases");
+        logger.debug("Fetching purchases by offset: {} and limit: {}", offset,
+                limit);
         var result = HibernateUtil.inSession(session -> {
             var purchases = session.createQuery(
                     "select p from Purchase p order by p.createdAt desc",
@@ -215,7 +219,7 @@ public class PurchaseDao {
      * @return the total count of purchases
      */
     public long countAll() {
-        logger.info("Counting all Purchases");
+        logger.debug("Counting all Purchases");
         var result = HibernateUtil.inSession(session -> {
             return session
                     .createQuery("select count(p) from Purchase p", Long.class)
@@ -234,7 +238,8 @@ public class PurchaseDao {
     @Nullable
     public User findSupervisorForEmployee(User employee) {
         Objects.requireNonNull(employee, "Employee must not be null");
-        logger.info("Fetching supervisor for employee: ({})", employee.getId());
+        logger.debug("Fetching supervisor for employee: ({})",
+                employee.getId());
         return HibernateUtil.inSession(session -> {
             @Nullable
             UserSupervisor mapping = session.createQuery(
@@ -256,10 +261,10 @@ public class PurchaseDao {
      * @return list of decided purchases since the given time
      */
     public List<@NonNull Purchase> findRecentlyDecidedByRequester(
-            User requester, java.time.Instant since) {
+            User requester, Instant since) {
         Objects.requireNonNull(requester, "Requester must not be null");
         Objects.requireNonNull(since, "Since timestamp must not be null");
-        logger.info(
+        logger.debug(
                 "Fetching recently decided Purchases by requester: ({}) since: {}",
                 requester.getId(), since);
         var result = HibernateUtil.inSession(session -> {

@@ -11,6 +11,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
 import org.vaadin.tatu.vaadincreate.backend.dao.ProductDao;
 import org.vaadin.tatu.vaadincreate.backend.dao.PurchaseDao;
@@ -200,6 +201,32 @@ public class PurchaseServiceImpl implements PurchaseService {
         Objects.requireNonNull(approver, "Approver must not be null");
         return purchaseDao.countByApproverAndStatus(approver,
                 PurchaseStatus.PENDING);
+    }
+
+    @Override
+    public List<@NonNull Purchase> fetchPurchases(PurchaseHistoryMode mode,
+            int offset, int limit, User currentUser) {
+        Objects.requireNonNull(mode, "Mode must not be null");
+        Objects.requireNonNull(currentUser, "Current user must not be null");
+        return switch (mode) {
+        case MY_PURCHASES ->
+            purchaseDao.findByRequester(currentUser, offset, limit);
+        case ALL -> purchaseDao.findAll(offset, limit);
+        case PENDING_APPROVALS -> purchaseDao.findByApproverAndStatus(
+                currentUser, PurchaseStatus.PENDING, offset, limit);
+        };
+    }
+
+    @Override
+    public long countPurchases(PurchaseHistoryMode mode, User currentUser) {
+        Objects.requireNonNull(mode, "Mode must not be null");
+        Objects.requireNonNull(currentUser, "Current user must not be null");
+        return switch (mode) {
+        case MY_PURCHASES -> purchaseDao.countByRequester(currentUser);
+        case ALL -> purchaseDao.countAll();
+        case PENDING_APPROVALS -> purchaseDao
+                .countByApproverAndStatus(currentUser, PurchaseStatus.PENDING);
+        };
     }
 
     @Override

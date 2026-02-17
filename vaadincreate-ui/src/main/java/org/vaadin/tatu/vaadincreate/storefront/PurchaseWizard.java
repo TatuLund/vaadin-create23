@@ -16,11 +16,14 @@ import org.vaadin.tatu.vaadincreate.common.NumberField;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.components.Html;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
+import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -35,6 +38,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.FooterRow;
 import com.vaadin.ui.themes.ValoTheme;
+
+import elemental.events.KeyboardEvent.KeyCode;
 
 /**
  * Multi-step wizard for creating purchase requests. Guides the user through
@@ -104,10 +109,12 @@ public class PurchaseWizard extends Composite implements HasI18N {
         nextButton = new Button(getTranslation(I18n.Storefront.NEXT));
         nextButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
         nextButton.addClickListener(e -> handleNext());
+        nextButton.setClickShortcut(KeyCode.N, ModifierKey.ALT);
 
         prevButton = new Button(getTranslation(I18n.Storefront.PREVIOUS));
         prevButton.addClickListener(e -> handlePrevious());
         prevButton.setEnabled(false);
+        prevButton.setClickShortcut(KeyCode.P, ModifierKey.ALT);
 
         var buttonLayout = new HorizontalLayout(prevButton, nextButton);
         buttonLayout.setSpacing(true);
@@ -198,6 +205,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
         AttributeExtension.of(formLayout).setAttribute("role", "form");
 
         stepContent.addComponent(formLayout);
+
+        streetField.focus();
     }
 
     private void showStep3() {
@@ -218,6 +227,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         }
 
         stepContent.addComponent(supervisorComboBox);
+        supervisorComboBox.focus();
     }
 
     private void showStep4() {
@@ -227,6 +237,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
         reviewLabel = new Label(reviewHtml, ContentMode.HTML);
 
         stepContent.addComponent(reviewLabel);
+
+        nextButton.focus();
     }
 
     private String buildReviewHtml() {
@@ -259,6 +271,9 @@ public class PurchaseWizard extends Composite implements HasI18N {
                 ? selectedSupervisor.getName()
                 : "N/A";
         div.add(Html.p().text(supervisorName));
+        div.attr(AriaAttributes.LIVE, "assertive");
+        div.attr(AriaAttributes.ROLE, AriaRoles.ALERT);
+        div.attr("aria-atomic", "true");
 
         return div.build();
     }

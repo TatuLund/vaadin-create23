@@ -198,6 +198,8 @@ public final class I18n {
 
     public static final class Storefront {
         public static final String PURCHASE_HISTORY = "purchase-history";
+        public static final String OPEN = "storefront-open";
+        public static final String CLOSE = "storefront-close";
         public static final String NEXT = "next";
         public static final String PREVIOUS = "previous";
         public static final String SUBMIT = "submit";

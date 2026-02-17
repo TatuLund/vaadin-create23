@@ -16,17 +16,21 @@ import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.components.Html;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.data.provider.CallbackDataProvider;
 import com.vaadin.data.provider.DataProvider;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.ContentMode;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.renderers.NumberRenderer;
+import com.vaadin.ui.themes.ValoTheme;
 
 /**
  * Grid component for displaying purchase history. Supports pagination via
@@ -91,16 +95,16 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
     private void setupDetailsToggle() {
         grid.addItemClickListener(e -> {
             if (e.getItem() != null) {
-                if (grid.isDetailsVisible(e.getItem())) {
-                    grid.setDetailsVisible(e.getItem(), false);
-                } else {
-                    grid.setDetailsVisible(e.getItem(), true);
-                }
+                grid.setDetailsVisible(e.getItem(),
+                        !grid.isDetailsVisible(e.getItem()));
+                grid.getDataProvider().refreshItem(e.getItem());
             }
         });
     }
 
     private void configureColumns() {
+        grid.addComponentColumn(ToggleButton::new).setWidth(50);
+
         var idColumn = grid.addColumn(p -> p.getId() != null ? p.getId() : "")
                 .setCaption(getTranslation(I18n.Storefront.PURCHASE_ID))
                 .setSortable(false).setId("purchase-id");
@@ -176,6 +180,8 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
             } else {
                 htmlDiv = buildPurchaseLinesHtml(purchase);
             }
+            htmlDiv.attr(AriaAttributes.LIVE, "assertive");
+            htmlDiv.attr(AriaAttributes.ROLE, AriaRoles.ALERT);
             return new Label(htmlDiv.build(), ContentMode.HTML);
         });
     }
@@ -250,5 +256,31 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
      */
     public void refresh() {
         grid.getDataProvider().refreshAll();
+    }
+
+    /**
+     * Button component for toggling the visibility of purchase details.
+     * Displays an appropriate icon and ARIA label based on the current state of
+     * the details visibility.
+     */
+    class ToggleButton extends Button implements HasAttributes<ToggleButton> {
+        public ToggleButton(Purchase purchase) {
+            setIcon(grid.isDetailsVisible(purchase) ? VaadinIcons.ANGLE_DOWN
+                    : VaadinIcons.ANGLE_RIGHT);
+            setAriaLabel(grid.isDetailsVisible(purchase)
+                    ? getTranslation(I18n.Storefront.CLOSE)
+                    : getTranslation(I18n.Storefront.OPEN));
+            addStyleNames(ValoTheme.BUTTON_ICON_ONLY,
+                    ValoTheme.BUTTON_BORDERLESS);
+            addClickListener(e -> {
+                grid.setDetailsVisible(purchase,
+                        !grid.isDetailsVisible(purchase));
+                setIcon(grid.isDetailsVisible(purchase) ? VaadinIcons.ANGLE_DOWN
+                        : VaadinIcons.ANGLE_RIGHT);
+                setAriaLabel(grid.isDetailsVisible(purchase)
+                        ? getTranslation(I18n.Storefront.CLOSE)
+                        : getTranslation(I18n.Storefront.OPEN));
+            });
+        }
     }
 }

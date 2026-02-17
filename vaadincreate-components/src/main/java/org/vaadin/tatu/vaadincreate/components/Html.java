@@ -263,8 +263,32 @@ public abstract class Html<T extends Html<T>> {
         return new H1();
     }
 
+    public static H3 h3() {
+        return new H3();
+    }
+
+    public static H4 h4() {
+        return new H4();
+    }
+
     public static B b() {
         return new B();
+    }
+
+    public static Strong strong() {
+        return new Strong();
+    }
+
+    public static P p() {
+        return new P();
+    }
+
+    public static Ul ul() {
+        return new Ul();
+    }
+
+    public static Li li() {
+        return new Li();
     }
 
     public static Br br() {
@@ -290,9 +314,45 @@ public abstract class Html<T extends Html<T>> {
         }
     }
 
+    public static final class Strong extends Html<Strong> {
+        private Strong() {
+            super("strong");
+        }
+    }
+
     public static final class H1 extends Html<H1> {
         private H1() {
             super("h1");
+        }
+    }
+
+    public static final class H3 extends Html<H3> {
+        private H3() {
+            super("h3");
+        }
+    }
+
+    public static final class H4 extends Html<H4> {
+        private H4() {
+            super("h4");
+        }
+    }
+
+    public static final class P extends Html<P> {
+        private P() {
+            super("p");
+        }
+    }
+
+    public static final class Ul extends Html<Ul> {
+        private Ul() {
+            super("ul");
+        }
+    }
+
+    public static final class Li extends Html<Li> {
+        private Li() {
+            super("li");
         }
     }
 

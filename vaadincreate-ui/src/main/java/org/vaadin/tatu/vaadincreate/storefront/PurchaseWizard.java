@@ -14,6 +14,8 @@ import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.common.EuroConverter;
 import org.vaadin.tatu.vaadincreate.common.NumberField;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
+import org.vaadin.tatu.vaadincreate.components.Html;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
@@ -24,13 +26,14 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Composite;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.components.grid.FooterRow;
 import com.vaadin.ui.themes.ValoTheme;
 
 /**
@@ -61,7 +64,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
     // Step 1 components
     @Nullable
-    private Grid<ProductDto> productGrid;
+    private ProductGrid productGrid;
 
     // Step 2 components
     @Nullable
@@ -148,96 +151,16 @@ public class PurchaseWizard extends Composite implements HasI18N {
     private void showStep1() {
         stepTitle.setValue(getTranslation(I18n.Storefront.STEP1_TITLE));
 
-        productGrid = new Grid<>(ProductDto.class);
-        productGrid.setSizeFull();
-        productGrid.setSelectionMode(SelectionMode.MULTI);
-
-        // Configure columns
-        productGrid.removeAllColumns();
-        productGrid.addColumn(ProductDto::getProductName)
-                .setCaption(getTranslation(I18n.PRODUCT_NAME));
-        productGrid.addColumn(ProductDto::getStockCount)
-                .setCaption(getTranslation(I18n.IN_STOCK));
-        productGrid
-                .addColumn(
-                        product -> String.format("%.2f €", product.getPrice()))
-                .setCaption(getTranslation(I18n.PRICE));
-
-        // Add quantity column with NumberField
-        productGrid.addComponentColumn(dto -> {
-            var layout = new HorizontalLayout();
-            layout.setMargin(false);
-            layout.setSpacing(false);
-            layout.setWidth("100%");
-            if (productGrid.getSelectedItems().contains(dto)) {
-                var numberField = new NumberField(null);
-                numberField
-                        .setAriaLabel(getTranslation(I18n.Storefront.QUANTITY));
-                numberField.setValue(dto.getOrderQuantity());
-                numberField.setWidth("100%");
-                numberField.addValueChangeListener(e -> {
-                    dto.setOrderQuantity(e.getValue());
-                    updateFooter();
-                });
-                layout.addComponent(numberField);
-            } else {
-                var label = new Label("-");
-                layout.addComponent(label);
-            }
-            return layout;
-        }).setCaption(getTranslation(I18n.Storefront.QUANTITY))
-                .setStyleGenerator(
-                        product -> VaadinCreateTheme.STOREFRONTVIEW_WIZARD_QUANTITYCOLUMN);
-
-        // Update quantities when selection changes
-        productGrid.addSelectionListener(e -> {
-            for (var dto : productGrid.getDataProvider()
-                    .fetch(new com.vaadin.data.provider.Query<>()).toList()) {
-                if (!e.getAllSelectedItems().contains(dto)) {
-                    dto.setOrderQuantity(0);
-                }
-            }
-            productGrid.getDataProvider().refreshAll();
-            updateFooter();
-        });
+        productGrid = new ProductGrid();
 
         // Load products via presenter
         var products = presenter.getOrderableProducts();
         productGrid.setItems(products);
 
-        // Add footer row for totals
-        var footerRow = productGrid.appendFooterRow();
-        footerRow.getCell(productGrid.getColumns().get(0))
-                .setText(getTranslation(I18n.Storefront.ORDER_SUMMARY));
-
-        updateFooter();
+        productGrid.updateFooter();
 
         stepContent.addComponent(productGrid);
         stepContent.setExpandRatio(productGrid, 1.0f);
-    }
-
-    private void updateFooter() {
-        if (productGrid == null) {
-            return;
-        }
-
-        var totalQuantity = 0;
-        var totalPrice = BigDecimal.ZERO;
-
-        for (var dto : productGrid.getDataProvider()
-                .fetch(new com.vaadin.data.provider.Query<>()).toList()) {
-            if (dto.getOrderQuantity() > 0) {
-                totalQuantity += dto.getOrderQuantity();
-                totalPrice = totalPrice.add(dto.getLineTotal());
-            }
-        }
-
-        var footerRow = productGrid.getFooterRow(0);
-        var euroConverter = new EuroConverter("");
-        footerRow.getCell(productGrid.getColumns().get(2)).setText(euroConverter
-                .convertToPresentation(totalPrice, Utils.createValueContext()));
-        footerRow.getCell(productGrid.getColumns().get(3))
-                .setText(String.valueOf(totalQuantity));
     }
 
     private void showStep2() {
@@ -270,8 +193,11 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
         addressBinder.setBean(address);
 
-        stepContent.addComponents(streetField, postalCodeField, cityField,
+        var formLayout = new FormLayout(streetField, postalCodeField, cityField,
                 countryField);
+        AttributeExtension.of(formLayout).setAttribute("role", "form");
+
+        stepContent.addComponent(formLayout);
     }
 
     private void showStep3() {
@@ -304,38 +230,37 @@ public class PurchaseWizard extends Composite implements HasI18N {
     }
 
     private String buildReviewHtml() {
-        var sb = new StringBuilder();
-        sb.append("<h3>").append(getTranslation(I18n.Storefront.ORDER_SUMMARY))
-                .append("</h3>");
+        var div = Html.div();
 
-        sb.append("<h4>").append(getTranslation(I18n.Storefront.ITEMS_ORDERED))
-                .append("</h4>");
-        sb.append("<ul>");
+        div.add(Html.h3().text(getTranslation(I18n.Storefront.ORDER_SUMMARY)));
+
+        div.add(Html.h4().text(getTranslation(I18n.Storefront.ITEMS_ORDERED)));
+
+        var list = Html.ul();
         for (var entry : cart.getItems().entrySet()) {
             var product = entry.getKey();
             var quantity = entry.getValue();
             var lineTotal = product.getPrice()
-                    .multiply(new java.math.BigDecimal(quantity));
-            sb.append("<li>").append(product.getProductName()).append(" x ")
-                    .append(quantity).append(" @ ").append(product.getPrice())
-                    .append(" = ").append(lineTotal).append("</li>");
+                    .multiply(new BigDecimal(quantity));
+
+            var itemText = String.format("%s x %d @ %s = %s",
+                    product.getProductName(), quantity, product.getPrice(),
+                    lineTotal);
+            list.add(Html.li().text(itemText));
         }
-        sb.append("</ul>");
+        div.add(list);
 
-        sb.append("<h4>")
-                .append(getTranslation(I18n.Storefront.DELIVERY_ADDRESS))
-                .append("</h4>");
-        sb.append("<p>").append(address.toString()).append("</p>");
+        div.add(Html.h4()
+                .text(getTranslation(I18n.Storefront.DELIVERY_ADDRESS)));
+        div.add(Html.p().text(address.toString()));
 
-        sb.append("<h4>").append(getTranslation(I18n.Storefront.SUPERVISOR))
-                .append("</h4>");
-        sb.append("<p>")
-                .append(selectedSupervisor != null
-                        ? selectedSupervisor.getName()
-                        : "N/A")
-                .append("</p>");
+        div.add(Html.h4().text(getTranslation(I18n.Storefront.SUPERVISOR)));
+        var supervisorName = selectedSupervisor != null
+                ? selectedSupervisor.getName()
+                : "N/A";
+        div.add(Html.p().text(supervisorName));
 
-        return Utils.sanitize(sb.toString());
+        return div.build();
     }
 
     private void handleNext() {
@@ -437,6 +362,90 @@ public class PurchaseWizard extends Composite implements HasI18N {
             logger.error("Failed to create purchase", ex);
             Notification.show(getTranslation(I18n.Storefront.PURCHASE_FAILED),
                     Notification.Type.ERROR_MESSAGE);
+        }
+    }
+
+    static class ProductGrid extends Grid<ProductDto> implements HasI18N {
+
+        private final FooterRow footerRow;
+
+        private ProductGrid() {
+            super(ProductDto.class);
+            setSizeFull();
+            setSelectionMode(SelectionMode.MULTI);
+            setAccessibleNavigation(true);
+
+            // Configure columns
+            removeAllColumns();
+            addColumn(ProductDto::getProductName)
+                    .setCaption(getTranslation(I18n.PRODUCT_NAME));
+            addColumn(ProductDto::getStockCount)
+                    .setCaption(getTranslation(I18n.IN_STOCK));
+            addColumn(product -> String.format("%.2f €", product.getPrice()))
+                    .setCaption(getTranslation(I18n.PRICE));
+
+            // Add quantity column with NumberField
+            addComponentColumn(dto -> {
+                var layout = new HorizontalLayout();
+                layout.setMargin(false);
+                layout.setSpacing(false);
+                layout.setWidth("100%");
+                if (getSelectedItems().contains(dto)) {
+                    var numberField = new NumberField(null);
+                    numberField.setAriaLabel(
+                            getTranslation(I18n.Storefront.QUANTITY));
+                    numberField.setValue(dto.getOrderQuantity());
+                    numberField.setWidth("100%");
+                    numberField.addValueChangeListener(e -> {
+                        dto.setOrderQuantity(e.getValue());
+                        updateFooter();
+                    });
+                    layout.addComponent(numberField);
+                } else {
+                    layout.addComponent(new Label("-"));
+                }
+                return layout;
+            }).setCaption(getTranslation(I18n.Storefront.QUANTITY))
+                    .setStyleGenerator(
+                            product -> VaadinCreateTheme.STOREFRONTVIEW_WIZARD_QUANTITYCOLUMN);
+
+            // Footer row for totals
+            footerRow = appendFooterRow();
+            footerRow.getCell(getColumns().get(0))
+                    .setText(getTranslation(I18n.Storefront.ORDER_SUMMARY));
+
+            // Update quantities when selection changes
+            addSelectionListener(e -> {
+                for (var dto : getDataProvider()
+                        .fetch(new com.vaadin.data.provider.Query<>())
+                        .toList()) {
+                    if (!e.getAllSelectedItems().contains(dto)) {
+                        dto.setOrderQuantity(0);
+                    }
+                }
+                getDataProvider().refreshAll();
+                updateFooter();
+            });
+        }
+
+        private void updateFooter() {
+            var totalQuantity = 0;
+            var totalPrice = BigDecimal.ZERO;
+
+            for (var dto : getDataProvider()
+                    .fetch(new com.vaadin.data.provider.Query<>()).toList()) {
+                if (dto.getOrderQuantity() > 0) {
+                    totalQuantity += dto.getOrderQuantity();
+                    totalPrice = totalPrice.add(dto.getLineTotal());
+                }
+            }
+
+            var euroConverter = new EuroConverter("");
+            footerRow.getCell(getColumns().get(2))
+                    .setText(euroConverter.convertToPresentation(totalPrice,
+                            Utils.createValueContext()));
+            footerRow.getCell(getColumns().get(3))
+                    .setText(String.valueOf(totalQuantity));
         }
     }
 }

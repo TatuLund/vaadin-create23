@@ -50,7 +50,8 @@ public class PurchasesViewTest extends AbstractUITest {
         assertNotNull("Purchase history grid should be present", historyGrid);
         assertTrue("Purchase history grid should have at least one row",
                 historyGrid.getDataCommunicator().getDataProviderSize() > 0);
-        // Assert 9 columns are present: Toggle, Product, Category, Price, Status,
+        // Assert 9 columns are present: Toggle, Product, Category, Price,
+        // Status,
         // Ordered At, Decided At, Supervisor, and Comments
         assertEquals("Purchase history grid should have 9 columns", 9,
                 historyGrid.getColumns().size());

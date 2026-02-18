@@ -86,6 +86,11 @@ public class NumberField extends CustomField<Integer>
     }
 
     @Override
+    public void setAriaLabel(String ariaLabel) {
+        textField.setAriaLabel(ariaLabel);
+    }
+
+    @Override
     public void setValue(@Nullable Integer value) {
         if (value == null) {
             value = 0;

@@ -204,6 +204,7 @@ public final class I18n {
         public static final String PREVIOUS = "previous";
         public static final String SUBMIT = "submit";
         public static final String STEP1_TITLE = "step1-title";
+        public static final String NO_PRODUCTS_AVAILABLE = "no-products-available";
         public static final String STEP2_TITLE = "step2-title";
         public static final String STEP3_TITLE = "step3-title";
         public static final String STEP4_TITLE = "step4-title";

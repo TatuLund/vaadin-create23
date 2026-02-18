@@ -137,6 +137,8 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
         public static final String KEYSHORTCUTS = "aria-keyshortcuts";
         public static final String LIVE = "aria-live";
         public static final String REQUIRED = "aria-required";
+        public static final String EXPANDED = "aria-expanded";
+        public static final String ATOMIC = "aria-atomic";
     }
 
     /**

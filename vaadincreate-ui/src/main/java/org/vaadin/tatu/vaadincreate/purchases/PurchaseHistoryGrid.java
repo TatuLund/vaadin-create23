@@ -270,6 +270,8 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
             setAriaLabel(grid.isDetailsVisible(purchase)
                     ? getTranslation(I18n.Storefront.CLOSE)
                     : getTranslation(I18n.Storefront.OPEN));
+            setAttribute(AriaAttributes.EXPANDED,
+                    String.valueOf(grid.isDetailsVisible(purchase)));
             addStyleNames(ValoTheme.BUTTON_ICON_ONLY,
                     ValoTheme.BUTTON_BORDERLESS);
             addClickListener(e -> {
@@ -280,6 +282,8 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
                 setAriaLabel(grid.isDetailsVisible(purchase)
                         ? getTranslation(I18n.Storefront.CLOSE)
                         : getTranslation(I18n.Storefront.OPEN));
+                setAttribute(AriaAttributes.EXPANDED,
+                        String.valueOf(grid.isDetailsVisible(purchase)));
             });
         }
     }

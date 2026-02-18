@@ -110,11 +110,15 @@ public class PurchaseWizard extends Composite implements HasI18N {
         nextButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
         nextButton.addClickListener(e -> handleNext());
         nextButton.setClickShortcut(KeyCode.N, ModifierKey.ALT);
+        AttributeExtension.of(nextButton)
+                .setAttribute(AriaAttributes.KEYSHORTCUTS, "Alt+N");
 
         prevButton = new Button(getTranslation(I18n.Storefront.PREVIOUS));
         prevButton.addClickListener(e -> handlePrevious());
         prevButton.setEnabled(false);
         prevButton.setClickShortcut(KeyCode.P, ModifierKey.ALT);
+        AttributeExtension.of(prevButton)
+                .setAttribute(AriaAttributes.KEYSHORTCUTS, "Alt+P");
 
         var buttonLayout = new HorizontalLayout(prevButton, nextButton);
         buttonLayout.setSpacing(true);
@@ -158,10 +162,21 @@ public class PurchaseWizard extends Composite implements HasI18N {
     private void showStep1() {
         stepTitle.setValue(getTranslation(I18n.Storefront.STEP1_TITLE));
 
-        productGrid = new ProductGrid();
+        if (productGrid != null) {
+            stepContent.addComponent(productGrid);
+            stepContent.setExpandRatio(productGrid, 1.0f);
+            return;
+        }
 
         // Load products via presenter
         var products = presenter.getOrderableProducts();
+        if (products.isEmpty()) {
+            stepContent.addComponent(new Label(
+                    getTranslation(I18n.Storefront.NO_PRODUCTS_AVAILABLE)));
+            return;
+        }
+
+        productGrid = new ProductGrid();
         productGrid.setItems(products);
 
         productGrid.updateFooter();

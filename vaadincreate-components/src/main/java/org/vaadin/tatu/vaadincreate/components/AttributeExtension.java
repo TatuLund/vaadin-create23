@@ -168,6 +168,7 @@ public class AttributeExtension extends AbstractJavaScriptExtension {
         public static final String FIGURE = "figure";
         public static final String NAVIGATION = "navigation";
         public static final String MAIN = "main";
+        public static final String STATUS = "status";
         public static final String BUTTON = "button"; // Added to support
                                                       // HtmlBuilderTest
     }

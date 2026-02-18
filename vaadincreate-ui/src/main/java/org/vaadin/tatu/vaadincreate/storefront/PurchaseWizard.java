@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.storefront;
 
 import java.math.BigDecimal;
+import org.jsoup.Jsoup;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -253,6 +254,9 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
         stepContent.addComponent(reviewLabel);
 
+        Notification.show(Jsoup.parse(reviewHtml).text(),
+                Notification.Type.ASSISTIVE_NOTIFICATION);
+
         nextButton.focus();
     }
 
@@ -286,9 +290,6 @@ public class PurchaseWizard extends Composite implements HasI18N {
                 ? selectedSupervisor.getName()
                 : "N/A";
         div.add(Html.p().text(supervisorName));
-        div.attr(AriaAttributes.LIVE, "assertive");
-        div.attr(AriaAttributes.ROLE, AriaRoles.ALERT);
-        div.attr("aria-atomic", "true");
 
         return div.build();
     }

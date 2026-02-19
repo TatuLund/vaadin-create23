@@ -141,6 +141,40 @@ public interface PurchaseService {
             java.time.Instant since);
 
     /**
+     * Approves a pending purchase and decrements product stock. If any product
+     * has insufficient stock, the purchase is set to CANCELLED with details.
+     *
+     * @param purchaseId
+     *            the ID of the purchase to approve
+     * @param currentUser
+     *            the user performing the approval (must be the assigned
+     *            approver)
+     * @param decisionCommentOrNull
+     *            optional comment to attach to the decision
+     * @return the updated purchase (status COMPLETED or CANCELLED)
+     * @throws IllegalArgumentException
+     *             if the purchase is not PENDING or currentUser is not the
+     *             approver
+     */
+    Purchase approve(Integer purchaseId, User currentUser,
+            @Nullable String decisionCommentOrNull);
+
+    /**
+     * Rejects a pending purchase with a required reason.
+     *
+     * @param purchaseId
+     *            the ID of the purchase to reject
+     * @param currentUser
+     *            the user performing the rejection
+     * @param reason
+     *            the required reason for rejection
+     * @return the updated purchase (status REJECTED)
+     * @throws IllegalArgumentException
+     *             if the purchase is not PENDING
+     */
+    Purchase reject(Integer purchaseId, User currentUser, String reason);
+
+    /**
      * Gets the singleton instance of the PurchaseService.
      *
      * @return the PurchaseService instance

@@ -68,14 +68,21 @@ public class PurchasesViewTest extends AbstractUITest {
     }
 
     @Test
-    public void should_ShowApprovalsPlaceholder_When_NavigatingToApprovalsTab() {
+    @SuppressWarnings("unchecked")
+    public void should_ShowApprovalsGrid_When_NavigatingToApprovalsTab() {
         view = navigate(
                 PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
                 PurchasesView.class);
 
-        var placeholder = $(Label.class)
-                .id("purchases-approvals-placeholder");
-        assertEquals("Approvals", placeholder.getValue());
+        var approvalsGrid = (Grid<Object>) $(Grid.class)
+                .id("purchase-history-grid");
+        assertNotNull("Approvals grid should be present", approvalsGrid);
+        // Grid has 10 columns: Toggle, ID, Requester, Approver, Created At,
+        // Status, Decided At, Total, Decision Reason, Actions
+        assertEquals("Approvals grid should have 10 columns", 10,
+                approvalsGrid.getColumns().size());
+
+        SerializationDebugUtil.assertSerializable(view);
     }
 
     @Test

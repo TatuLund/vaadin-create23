@@ -24,8 +24,10 @@ import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import com.vaadin.data.provider.CallbackDataProvider;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.server.SerializableFunction;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
@@ -256,6 +258,21 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
      */
     public void refresh() {
         grid.getDataProvider().refreshAll();
+    }
+
+    /**
+     * Adds an action column to the end of the grid. The provided function
+     * produces a component (e.g. buttons) for each row.
+     *
+     * @param actionProvider
+     *            function that creates an action component per purchase row
+     */
+    public void setActionColumn(
+            SerializableFunction<Purchase, Component> actionProvider) {
+        Objects.requireNonNull(actionProvider,
+                "Action provider must not be null");
+        grid.addComponentColumn(actionProvider::apply).setId("actions")
+                .setWidth(200);
     }
 
     /**

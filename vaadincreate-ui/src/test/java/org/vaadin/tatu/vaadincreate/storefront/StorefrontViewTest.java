@@ -408,4 +408,55 @@ public class StorefrontViewTest extends AbstractUITest {
         // AND: Verify serialization
         SerializationDebugUtil.assertSerializable(view);
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void entering_quantities_sorts_products_descending_by_order_quantity() {
+        view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
+
+        var productGrid = (Grid<ProductDto>) $(Grid.class).id("purchase-grid");
+        assertTrue("Expected at least 2 products in purchase grid",
+                test(productGrid).size() >= 2);
+
+        var firstName = test(productGrid).item(0).getProductName();
+        var secondName = test(productGrid).item(1).getProductName();
+
+        // Select two items so that quantity inputs are rendered
+        test(productGrid).clickToSelect(0);
+        test(productGrid).clickToSelect(1);
+
+        // Set the second product quantity higher -> it should bubble to the top
+        int secondRowIndex = -1;
+        for (int i = 0; i < test(productGrid).size(); i++) {
+            if (secondName.equals(test(productGrid).item(i).getProductName())) {
+                secondRowIndex = i;
+                break;
+            }
+        }
+        assertTrue("Second product row not found", secondRowIndex >= 0);
+        var secondQtyField = $((HorizontalLayout) test(productGrid).cell(3,
+                secondRowIndex), NumberField.class).first();
+        test(secondQtyField).setValue(5);
+
+        // Set the first product quantity lower
+        int firstRowIndex = -1;
+        for (int i = 0; i < test(productGrid).size(); i++) {
+            if (firstName.equals(test(productGrid).item(i).getProductName())) {
+                firstRowIndex = i;
+                break;
+            }
+        }
+        assertTrue("First product row not found", firstRowIndex >= 0);
+        var firstQtyField = $((HorizontalLayout) test(productGrid).cell(3,
+                firstRowIndex), NumberField.class).first();
+        test(firstQtyField).setValue(1);
+
+        // THEN: Product with higher order quantity is shown first
+        assertEquals(secondName, test(productGrid).item(0).getProductName());
+        assertEquals(Integer.valueOf(5), test(productGrid).item(0)
+                .getOrderQuantity());
+        assertEquals(firstName, test(productGrid).item(1).getProductName());
+        assertEquals(Integer.valueOf(1), test(productGrid).item(1)
+                .getOrderQuantity());
+    }
 }

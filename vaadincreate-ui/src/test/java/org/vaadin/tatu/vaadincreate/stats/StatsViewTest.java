@@ -23,7 +23,7 @@ import org.vaadin.tatu.vaadincreate.crud.BooksPresenter;
 import org.vaadin.tatu.vaadincreate.crud.BooksView;
 import org.vaadin.tatu.vaadincreate.crud.FakeGrid;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
-import org.vaadin.tatu.vaadincreate.stats.StatsView.CustomChart;
+import org.vaadin.tatu.vaadincreate.common.CustomChart;
 
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.server.ServiceException;

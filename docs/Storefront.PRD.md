@@ -50,7 +50,7 @@ Introduce backend domain model and service interface for purchases, without chan
      - `PENDING` – waiting for supervisor decision.
      - `COMPLETED` – approved, stock decremented; workflow finished.
      - `REJECTED` – explicitly rejected, no stock change.
-     - `CANCELLED` - there were items missing in the invertory at the time of approval
+     - `CANCELLED` - there were items missing in the inventory at the time of approval
    - No “reservation” / “pre-booking” statuses in this epic.
 
 3. **`Purchase`** entity
@@ -105,44 +105,52 @@ Introduce backend domain model and service interface for purchases, without chan
      - approver,
      - status,
      - paging (`offset`, `limit`).
+   - Additional queries used by the UI:
+     - Find default supervisor for an employee (`UserSupervisor` mapping).
+     - Find recently decided purchases for login-time notification.
 
 7. **`PurchaseService` interface** (singleton service)
    - Responsibility: **aggregate boundary** for purchases.
-   - Methods (signatures may be adapted to local style):
+   - Methods (actual implemented signatures):
      - `Purchase createPendingPurchase(Cart cart, Address address, User requester, User defaultApproverOrNull)`
        - Creates a `Purchase` with:
          - `status = PENDING`,
-         - `createdAt = now`,
+         - `createdAt = now` (also defaulted by `Purchase` constructor),
          - `requester` set,
          - `approver` initial value:
            - Either explicitly passed in,
-           - Or resolved from `UserSupervisor` (in a later step).
+           - Or resolved from `UserSupervisor` mapping when `defaultApproverOrNull == null`.
          - `deliveryAddress` snapshot from `address`.
          - `lines` built from `cart`:
            - `unitPrice` from current `Product` price,
            - `quantity` from cart,
            - Derived totals only in getters.
        - **No stock modification** here.
+       - Throws `IllegalArgumentException` if the cart is empty.
      - Simple query methods (paging):
        - `List<Purchase> findMyPurchases(User requester, int offset, int limit)`
        - `long countMyPurchases(User requester)`
        - `List<Purchase> findAll(int offset, int limit)`, `long countAll()`
        - `List<Purchase> findPendingForApprover(User approver, int offset, int limit)`, `long countPendingForApprover(User approver)`
+     - Shared history query API used by the UI component (Step 4):
+       - `List<Purchase> fetchPurchases(PurchaseHistoryMode mode, int offset, int limit, User currentUser)`
+       - `long countPurchases(PurchaseHistoryMode mode, User currentUser)`
+     - Login-time status-change query (Step 3):
+       - `List<Purchase> findRecentlyDecidedPurchases(User requester, Instant since)`
      - Approval/rejection methods will be added in a later step.
 
 8. **`PurchaseServiceImpl`**
    - Singleton with `getInstance()` similar to existing services.
-   - Uses `PurchaseDao` and `HibernateUtil.doInTransaction(SessionFunction)` for all write operations.
+  - Uses `PurchaseDao` and `HibernateUtil` helpers (DAO methods wrap `inSession` / `inTransaction` / `saveOrUpdate`).
    - **No** Vaadin dependencies in backend.
+  - Dev/UX helper: can generate mock purchases on startup if the DB has none (controlled via system property `generate.data`, default enabled).
 
 ### 1.3 Acceptance Criteria
 
-- Unit tests verify:
-  - `Purchase` and `PurchaseLine` persist and load correctly with embedded `Address`.
-  - Derived totals (`getLineTotal`, `getTotalAmount`) work as expected.
-  - `createPendingPurchase`:
-    - Creates `PENDING` purchase with lines, timestamps, and snapshots.
-    - Does **not** modify product stock.
+- Integration tests verify:
+  - `createPendingPurchase` creates a `PENDING` purchase with address + price snapshots and derived totals.
+  - Stock is **not** modified when creating a pending purchase.
+  - Paging queries (`findMyPurchases`, `countMyPurchases`, `findAll`, `findPendingForApprover`) work.
 - No UI changes yet; application runs unchanged.
 
 ---
@@ -155,31 +163,26 @@ Introduce `StorefrontView` for `CUSTOMER` role with a **wizard** that:
 
 - Builds an in-memory cart,
 - Captures delivery address,
-- Captures (or auto-selects) supervisor,
+- Captures supervisor,
 - Creates a **PENDING** `Purchase` via `PurchaseService`.
 
-No approval UI, no stock changes yet. Basic “My purchases” history can be a placeholder.
+No approval UI, no stock changes yet.
 
 ### 2.2 Requirements
 
 #### 2.2.1 StorefrontView layout
 
-1. New `StorefrontView` (Vaadin `Composite`, `View`):
+1. New `StorefrontView` (Vaadin view):
    - Visible for role `CUSTOMER` only.
    - Registered in navigation/menu similarly to `BooksView`.
    - Layout:
-     - Root `HorizontalLayout` (or equivalent, e.g. `CssLayout`) with two child panels:
+     - Root `CssLayout` with two child panels:
        - Left: `PurchaseWizard` component.
-       - Right: placeholder for purchase history (to be fully implemented in Step 3).
+       - Right: purchase history panel.
    - Responsive behavior:
-     - On **wide** screens: wizard and history side-by-side (horizontal).
-     - On **narrow** screens: stacked vertically.
-     - Implementation can be via Vaadin responsive using CSS 
-       - Desktop: both panels visible side-by-side.
-       - Mobile: wizard above, history below.
-       - Add responsive style rules to responsive.scss
-   - Follow similar styling than the rest of the application
-     - Create view specific storefront.scss for the other view specific styles
+     - Wide screens: flex row (wizard left, history right).
+     - Narrow screens: flex column (wizard above history).
+     - Implemented via theme SCSS mixins (storefront + responsive rules).
 
 #### 2.2.2 PurchaseWizard behavior
 
@@ -188,42 +191,38 @@ No approval UI, no stock changes yet. Basic “My purchases” history can be a 
    Steps:
 
    1. **Select books & quantities**
-      - Shows available `Product`s that are *orderable*:
-        - `Availability.AVAILABLE` (or similar field).
-        - `stock > 0`.
-      - Allows the user to:
-        - Select one or more products,
-        - Enter desired quantity per product.
+      - Shows orderable products via backend `ProductDataService.getOrderableProducts()`.
+      - UI is a multi-select grid:
+        - Select one or more products.
+        - Quantity input is shown for selected rows.
+        - Footer shows total price and total quantity.
       - Validations:
-        - Quantity must be positive integer.
-        - Optionally, soft-validate that requested quantity ≤ current stock (for UX; real stock check happens at approval time).
-      - Result: in-memory `Cart` (simple model owned by wizard, not persisted).
+        - Must select at least one product.
+        - Only positive quantities are added to the cart.
+      - Result: in-memory `Cart` owned by the wizard (not persisted).
 
    2. **Delivery address**
-      - Loads **default address** for current user if such exists (Step 1 allowed for that, but if not implemented yet, default can be empty).
       - Shows a form with address fields:
         - Street, Postal code, City, Country – all required.
       - Behavior:
-        - If user has saved default address, pre-fill the form.
-        - User can edit before submitting.
+        - Starts empty (no user default address prefill currently).
+        - User must fill all required fields.
       - Wizard *must not* advance from this step if validation fails.
 
    3. **Supervisor selection**
       - Shows a required `ComboBox<User>` (or similar) listing valid approvers:
         - Users with roles `USER` or `ADMIN`.
-      - Pre-selection:
-        - If `UserSupervisor` mapping exists for `(currentUser, supervisor)`, pre-select that supervisor.
-        - Otherwise, user **must** pick one.
+      - Pre-selection: none (user must pick one).
       - Validation:
         - Cannot proceed without selecting a supervisor.
 
    4. **Review & submit**
       - Shows read-only summary:
-        - Line items with product name, quantity, **unit price snapshot**.
-        - Derived line totals.
+        - Line items with product name, quantity, current unit price, derived line totals.
         - Total amount.
-        - Delivery address snapshot.
+        - Delivery address.
         - Selected supervisor.
+      - Also shows an assistive notification containing the summary text.
       - “Submit” button:
         - Calls `PurchaseService.createPendingPurchase(cart, address, requester, supervisor)`.
         - On success:
@@ -252,7 +251,7 @@ No approval UI, no stock changes yet. Basic “My purchases” history can be a 
 - No stock is modified when submitting.
 - No changes to existing admin (`BooksView`) flows.
 - Application navigates correctly; Storefront is functional.
- - Storefront wizard flow is covered by UI unit tests in the same style as existing view tests.
+- Storefront wizard flow is covered by UI unit tests in the same style as existing view tests.
 
 ---
 
@@ -263,7 +262,7 @@ No approval UI, no stock changes yet. Basic “My purchases” history can be a 
 Extend backend and UI so that:
 
 - Customers see a **paged history** of their own purchases and statuses.
-- On login, customers are informed about **status changes** (completed/rejected) since their last session.
+- On login, customers are informed about **status changes** (completed/rejected/cancelled) since their last session.
 
 ### 3.2 Requirements
 
@@ -283,20 +282,20 @@ Extend backend and UI so that:
 
 #### 3.2.2 StorefrontView – history panel
 
-3. Replace the placeholder history panel in `StorefrontView` with a real `Grid<Purchase>`:
+3. `StorefrontView` shows purchase history using the shared `PurchaseHistoryGrid` component (Step 4) in `PurchaseHistoryMode.MY_PURCHASES`.
 
-   - Must use **callback DataProvider**:
-     - `fetch` uses `PurchaseService.findMyPurchases(currentUser, offset, limit)`.
-     - `count` uses `PurchaseService.countMyPurchases(currentUser)`.
-   - Columns:
-     - `createdAt`.
-     - `status`.
+   - Must use **callback DataProvider** internally in the component.
+   - Visible columns for `MY_PURCHASES` mode:
+     - toggle/details control,
+     - `createdAt`,
+     - `status`,
      - `totalAmount` (derived).
-    - Since the horizontal space is limited use Grid details to show additional information when clicking the row.
-     - ID / reference.
-     - `approver` (may be null for PENDING).
-     - `decidedAt` (may be null).
-     - `decisionReason`.
+   - Row details (toggle by click) show:
+     - ID / reference,
+     - `approver` (or “Pending” if null),
+     - `decidedAt` (may be null),
+     - `decisionReason` (if present),
+     - line items.
    - Grid is **read-only** for the customer.
 
 4. The history panel must be **performant**:
@@ -309,7 +308,7 @@ Extend backend and UI so that:
 
    - Determine `since`:
      - If `lastStatusCheck != null`: `since = lastStatusCheck`.
-     - Else: `since = now - configurable time window` (or simply treat as “no previous checks” and skip).
+     - Else: `since = now - 30 days`.
    - Query purchases for this user where:
      - `requester = currentUser`,
      - `status IN (COMPLETED, REJECTED, CANCELLED)`,
@@ -317,11 +316,10 @@ Extend backend and UI so that:
 
 6. If any such purchases exist:
 
-   - Show a **dialog or notification** summarizing the changes:
+   - Show a **notification** summarizing the changes:
      - At minimum, count per status:
        - e.g. “2 purchases completed, 1 rejected since your last session.”
-     - Optional: list references (ID, total, status).
-   - Provide a button/action to open “My purchases” tab.
+   - No navigation action/button is currently provided; the message prompts the user to check the history grid.
 
 7. After showing the summary:
 
@@ -342,7 +340,7 @@ Extend backend and UI so that:
 ### 3.4 Acceptance Criteria
 
 - Customer can see their own purchase history with correct statuses and amounts.
-- On login, customer gets a summary dialog when there have been new `COMPLETED`/`REJECTED` statuses since last check.
+- On entering Storefront, customer gets a status update tray notification when there have been new `COMPLETED`/`REJECTED`/`CANCELLED` decisions since the last check.
 - Summary updates `lastStatusCheck` correctly.
  - Storefront history and login-time summary behavior are covered by UI unit tests similar to current views.
 
@@ -360,23 +358,24 @@ Introduce reusable history component and a top-level `PurchasesView` (for USER/A
 
 1. Create `PurchaseHistoryGrid` `Composite` with internal `Grid<Purchase>`.
 
-2. It must support multiple **modes** via enum, e.g.:
+2. It must support multiple **modes** via backend enum `PurchaseHistoryMode`:
 
    - `MY_PURCHASES` – for customer:
      - Filter: purchases where `requester = currentUser`.
    - `ALL` – for admin history:
      - No filter (or broader org-based filter if needed).
    - `PENDING_APPROVALS` – for approvals:
-     - Filter: `status = PENDING` and `approver = currentUser` (or `approver IS NULL` but assigned to them by other logic; see next step).
+     - Filter: `status = PENDING` and `approver = currentUser`.
 
 3. The filtering logic is performed in **backend**:
 
-   - `PurchaseService.fetchPurchases(mode, query, currentUser)` and `countPurchases(mode, query, currentUser)` (exact signatures up to implementation).
-   - UI must not construct JPQL or SQL; it only passes mode and paging/sorting info.
+  - `PurchaseService.fetchPurchases(mode, offset, limit, currentUser)` and `countPurchases(mode, currentUser)`.
+  - UI must not construct JPQL or SQL; it only passes mode and paging info.
 
 4. `PurchaseHistoryGrid` must:
 
-   - Configure shared columns: ID, requester, approver, status, createdAt, decidedAt, total amount, decisionReason.
+  - Configure shared columns (when visible): ID, requester, approver, createdAt, status, decidedAt, total amount, decisionReason.
+  - Include a toggle/details control column and row details showing purchase line items.
    - For `PENDING_APPROVALS` mode:
      - Additional column(s) will be added in Step 5 for approve/reject actions.
    - Provide a method `refresh()` to re-run the data provider (for use after actions).
@@ -392,13 +391,13 @@ Introduce reusable history component and a top-level `PurchasesView` (for USER/A
 
    - Uses existing `TabNavigator` (as with other views).
    - Tabs:
-     - `History` – shows all purchases (`PurchaseHistoryGrid` with `Mode.ALL`).
+     - `History` – shows all purchases (`PurchaseHistoryGrid` with `PurchaseHistoryMode.ALL`).
      - `Approvals` – initially placeholder (grid or label), will be implemented in Step 5.
      - `Stats` – placeholder for Step 6.
 
 7. Wire navigation/menu:
 
-   - `PurchasesView` accessible under a logical path (e.g. `/purchases`) for `USER`/`ADMIN`.
+  - `PurchasesView` accessible under `purchases` (Vaadin Navigator fragment path `#!/purchases`) for `USER`/`ADMIN`.
    - `StorefrontView` remains separate for `CUSTOMER`.
 
 ### 4.3 Acceptance Criteria
@@ -430,39 +429,44 @@ Implement approval/rejection workflow:
 
 1. Extend `PurchaseService`:
 
-   - `Purchase approve(long purchaseId, User approver)`
+   - `Purchase approve(long purchaseId, User currentUser, String decisionCommentOrNull)`
      - Behavior:
        - Load `Purchase` in a transaction.
        - Verify:
          - `status == PENDING`.
-         - The given `approver` is allowed:
+         - `currentUser` is allowed:
            - Has role `USER` or `ADMIN`.
-           - If business rules require, matches or is allowed to replace existing `Purchase.approver`.
+           - Must match the assignee: `Purchase.approver == currentUser`.
        - For each `PurchaseLine`:
          - Reload associated `Product` with proper locking (optimistic via version).
          - Check stock:
            - If `product.stock < quantity` for any line:
              - **Do not** update stock.
-             - Throw a **domain exception** (e.g. `InsufficientStockException`) listing offending products.
+             - Set:
+               - `status = CANCELLED`,
+               - `decidedAt = now`,
+               - `decisionReason` to a human-readable summary of missing quantities/products.
+             - Persist and return the updated purchase.
        - If all lines have sufficient stock:
          - Decrement stock for each `Product` by `quantity`.
          - Persist updated products.
          - Set:
            - `status = COMPLETED`,
-           - `approver = approver` (snapshot),
+           - `approver` remains as-is (assignee),
            - `decidedAt = now`,
-           - `decisionReason = null` (or leave as-is).
+           - `decisionReason`:
+             - `decisionCommentOrNull` (nullable).
        - Commit transaction.
-       - Handle `OptimisticLockException` / `ObjectOptimisticLockingFailureException`:
-         - Wrap as domain exception (e.g. `ConcurrentModificationException` with details).
+       - Concurrency conflicts:
+         - Let `OptimisticLockException` bubble out (do not wrap into a domain exception), consistent with existing services.
 
-   - `Purchase reject(long purchaseId, User approver, String reason)`
+   - `Purchase reject(long purchaseId, User currentUser, String reason)`
      - Behavior:
        - Load `Purchase` in transaction.
        - Verify `status == PENDING`.
        - Set:
          - `status = REJECTED`,
-         - `approver = approver`,
+         - `approver` remains as-is (assignee),
          - `decidedAt = now`,
          - `decisionReason = reason` (required).
        - **No stock change**.
@@ -473,15 +477,18 @@ Implement approval/rejection workflow:
    - Allowed:
      - `PENDING → COMPLETED` via `approve`.
      - `PENDING → REJECTED` via `reject`.
-   - Disallowed (must throw domain exception):
+     - `PENDING → CANCELLED` via `approve` when there is insufficient stock at approval time.
+   - Disallowed (must throw an exception):
      - Approving or rejecting a non-PENDING purchase.
+
+   For this epic, use `IllegalArgumentException` (or equivalent) for invalid transitions.
 
 3. **Concurrency edge cases**
 
    - **Admin modifying Product while approval happens (direction A)**:
      - Approval may encounter optimistic lock conflict when updating stock.
      - In this case:
-       - Approval must **fail** with a clear domain exception.
+       - Approval must **fail** (surface `OptimisticLockException` to UI/presenter).
        - `Purchase` remains `PENDING`.
        - No partial stock changes.
    - **Purchase approval changing Product before admin saves (direction B)**:
@@ -498,19 +505,27 @@ Implement approval/rejection workflow:
    - Uses `PurchaseHistoryGrid` in `PENDING_APPROVALS` mode.
    - Filter in backend:
      - `status = PENDING`,
-     - `approver = currentUser` **or**
-     - (If `approver` is null and logic assigns default approver on the fly; define in service.)
+     - `approver = currentUser`.
    - Add columns/controls for actions:
-     - Either:
-       - A component column with “Approve” and “Reject” buttons per row, **or**
-       - A checkbox column for approve + a separate “Approve selected” button.
+     - Use a component column (`grid.addComponentColumn(...)`) with “Approve” and “Reject” buttons per row.
+       - Render buttons only when the state is `PENDING`.
+       - Wrap the buttons in `HorizontalLayout`.
+       - Use disable-on-click on both buttons to prevent double submits.
+     - Decision comment modal:
+       - Clicking either button opens a modal sub-window (placed in the `purchases` package).
+       - The window contains:
+         - a text field/area for decision comment,
+         - `Cancel` button,
+         - `Approve` or `Reject` confirmation button.
+       - `Reject` requires a non-empty reason (trimmed); `Approve` comment is optional.
    - On approve:
-     - Call `PurchaseService.approve(purchaseId, currentUser)`.
-     - Catch:
-       - `InsufficientStockException`:
-         - Show message detailing which products failed due to lack of stock.
-         - Purchase remains `PENDING`.
-       - `ConcurrentModificationException` (optimistic lock conflict):
+     - Call `PurchaseService.approve(purchaseId, currentUser, decisionCommentOrNull)`.
+     - If the result is `CANCELLED`:
+       - Show a message detailing which products failed due to lack of stock (based on `decisionReason`).
+     - Catch `OptimisticLockException` (optimistic lock conflict):
+       - Retry by calling `PurchaseService.approve(purchaseId, currentUser, decisionCommentOrNull)` again.
+         - Use the same `decisionCommentOrNull` value for the retry.
+       - If the retry still fails with `OptimisticLockException`:
          - Show message that products changed during approval.
          - Prompt user to reload the grid and try again, or reject with reason.
      - On success:
@@ -519,7 +534,7 @@ Implement approval/rejection workflow:
 
    - On reject:
      - Ask for decision reason (simple dialog with text field).
-     - Call `PurchaseService.reject(purchaseId, currentUser, reason)`.
+    - Call `PurchaseService.reject(purchaseId, currentUser, reason)`.
      - Refresh grid.
      - Customer will see rejection reason in history (Step 3).
 
@@ -546,33 +561,68 @@ Implement approval/rejection workflow:
 
 ### 6.1 Scope
 
-Add a simple statistics tab for purchases, similar in spirit to existing `StatsView` for products.
+Replace the placeholder “Stats” tab in `PurchasesView` with real purchase statistics charts, similar in spirit to existing product `StatsView` (Vaadin Charts + async loading).
 
 ### 6.2 Requirements
 
 1. **Backend queries**
 
-   - Implement in `PurchaseService` (or dedicated `PurchaseStatsService`):
-     - Aggregations such as:
-       - Total purchases per requester.
-       - Total amount per product category.
-       - Totals per month.
+   Implement in `PurchaseService` (or dedicated `PurchaseStatsService`) the aggregations required by the charts below.
 
-2. **PurchaseStatsView**
+   Definitions:
+   - Only **COMPLETED** purchases are included.
+   - Use `Purchase.decidedAt` for time bucketing.
+   - “Quantity” means sum of `PurchaseLine.quantity` across included purchases.
+   - “Amount” means sum of `PurchaseLine.unitPrice * PurchaseLine.quantity` across included purchases.
 
-   - Added as the “Stats” tab in `PurchasesView`.
-   - Reuse existing patterns from `StatsView`:
-     - Asynchronous loading (if existing infra is used).
-     - Simple charts or grids; scope can be modest (a few key tables/charts).
-   - Must be read-only and support at least:
-     - Filter by time range (e.g. last 30 days vs all time) OR
-     - Filter by requester.
+   Required aggregation APIs (exact class/DTO names can vary, but returned data must support these):
+   - **Top purchased products by quantity** (descending):
+     - Return the **top 10** products by purchased quantity.
+     - Each item must include at least: product id, product name, quantity.
+   - **Least purchased products by quantity** (ascending):
+     - Return the **bottom 10** products by purchased quantity.
+     - To keep the chart meaningful, exclude products with **zero** purchased quantity (i.e. only consider products that appear in at least one completed purchase line).
+     - Each item must include at least: product id, product name, quantity.
+   - **Completed purchase totals per month (money)**:
+     - Return monthly totals ordered by month ascending.
+     - Include months with no purchases as **0** so the line chart is continuous.
+     - Range: last **12 months** (including current month) by default.
+
+2. **PurchasesStatsTab**
+
+   Implement the “Stats” tab content (e.g. `PurchasesStatsTab`) using **Vaadin Charts**.
+
+   Charts to display (read-only):
+   - **Pie chart:** “Top 10 most purchased products (by quantity)”
+     - Data source: COMPLETED purchase lines aggregated by product, descending, limit 10.
+     - Chart type: `ChartType.PIE`.
+     - Stable component id: `purchases-top-products-chart`.
+   - **Pie chart:** “Top 10 least purchased products (by quantity)”
+     - Data source: COMPLETED purchase lines aggregated by product, ascending, limit 10, excluding zero-quantity products.
+     - Chart type: `ChartType.PIE`.
+     - Stable component id: `purchases-least-products-chart`.
+   - **Line chart:** “Completed purchases per month (total amount)”
+     - Data source: monthly totals from COMPLETED purchases over last 12 months.
+     - Chart type: `ChartType.LINE`.
+     - X-axis: month (e.g. `YYYY-MM`).
+     - Y-axis: total amount (money).
+     - Stable component id: `purchases-per-month-chart`.
+
+   Loading & updates:
+   - Reuse existing `StatsView` patterns:
+     - Load data asynchronously using the existing executor.
+     - Update the UI safely (`UI.access`/existing `Utils.access` helper).
+     - Show a “loading/no data” message until data arrives.
+
+   Accessibility:
+   - Follow the existing chart accessibility approach (aria labels / live region updates) as used in `StatsView`, and thus use CustomChart component from common
+   package.
 
 ### 6.3 Acceptance Criteria
 
-- Stats tab displays aggregate purchase information without blocking the UI.
-- Stats are consistent with data shown in histories and approvals.
- - Purchase statistics UI is covered by UI unit tests similar to existing stats views.
+- Stats tab displays the three charts described above without blocking the UI.
+- Charts are based only on `COMPLETED` purchases and match the underlying data used by history/approvals.
+- UI unit tests verify that the chart components exist (by stable ids) and that the view can load data asynchronously (same testing style as existing view tests).
 
 ---
 

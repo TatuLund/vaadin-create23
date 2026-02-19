@@ -13,6 +13,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.common.NumberField;
 
+import com.vaadin.shared.Position;
 import com.vaadin.server.ServiceException;
 import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
@@ -20,6 +21,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 
 /**
@@ -70,7 +72,7 @@ public class StorefrontViewTest extends AbstractUITest {
         assertNotNull("Step title should be present", stepTitle);
 
         // AND: Product grid should be present
-        var productGrid = $(Grid.class).first();
+        var productGrid = $(Grid.class).id("purchase-grid");
         assertNotNull("Product grid should be present", productGrid);
 
         // AND: Next button should be present
@@ -118,7 +120,7 @@ public class StorefrontViewTest extends AbstractUITest {
         view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
 
         @SuppressWarnings("unchecked")
-        var productGrid = (Grid<ProductDto>) $(Grid.class).first();
+        var productGrid = (Grid<ProductDto>) $(Grid.class).id("purchase-grid");
         assertNotNull(productGrid);
 
         // WHEN: User selects first product by clicking checkbox column
@@ -134,7 +136,7 @@ public class StorefrontViewTest extends AbstractUITest {
         view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
 
         @SuppressWarnings("unchecked")
-        var productGrid = (Grid<ProductDto>) $(Grid.class).first();
+        var productGrid = (Grid<ProductDto>) $(Grid.class).id("purchase-grid");
         test(productGrid).clickToSelect(0);
 
         var numberField = $(
@@ -164,7 +166,7 @@ public class StorefrontViewTest extends AbstractUITest {
         view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
 
         @SuppressWarnings("unchecked")
-        var productGrid = (Grid<ProductDto>) $(Grid.class).first();
+        var productGrid = (Grid<ProductDto>) $(Grid.class).id("purchase-grid");
         test(productGrid).clickToSelect(0);
 
         var numberField = $(
@@ -206,7 +208,7 @@ public class StorefrontViewTest extends AbstractUITest {
         view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
 
         @SuppressWarnings("unchecked")
-        var productGrid = (Grid<ProductDto>) $(Grid.class).first();
+        var productGrid = (Grid<ProductDto>) $(Grid.class).id("purchase-grid");
         test(productGrid).clickToSelect(0);
 
         var numberField = $(
@@ -240,7 +242,23 @@ public class StorefrontViewTest extends AbstractUITest {
         var supervisors = supervisorCombo.getDataCommunicator()
                 .fetchItemsWithRange(0, 1);
         test(supervisorCombo).clickItem(supervisors.get(0));
+
+        long assistiveBeforeReview = $(Notification.class).stream()
+                .filter(n -> n.getPosition() == Position.ASSISTIVE).count();
         test(nextButton).click();
+
+        // THEN: Entering review step shows an assistive notification
+        long assistiveAfterReview = $(Notification.class).stream()
+                .filter(n -> n.getPosition() == Position.ASSISTIVE).count();
+        assertTrue(
+                "Expected an assistive notification when entering review step",
+                assistiveAfterReview > assistiveBeforeReview);
+        assertTrue(
+                "Expected review assistive notification to contain 'Order Summary'",
+                $(Notification.class).stream()
+                        .anyMatch(n -> n.getPosition() == Position.ASSISTIVE
+                                && n.getCaption() != null
+                                && n.getCaption().contains("Order Summary")));
 
         // Verify serialization in step 4
         SerializationDebugUtil.assertSerializable(view);
@@ -262,6 +280,102 @@ public class StorefrontViewTest extends AbstractUITest {
                         .contains("created"));
         assertTrue("Success notification should contain 'created'",
                 hasSuccessNotification);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void clicking_sorting_product_grid_by_price_will_sort_ascending_second_click_descending() {
+        view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
+
+        var productGrid = (Grid<ProductDto>) $(Grid.class).id("purchase-grid");
+
+        int size = test(productGrid).size();
+
+        // WHEN: Clicking price column sorting toggle
+        test(productGrid).toggleColumnSorting(2);
+
+        // THEN: Grid is sorted by price in ascending order
+        for (int i = 1; i < size; i++) {
+            var result = test(productGrid).item(i - 1).getPrice()
+                    .compareTo(test(productGrid).item(i).getPrice());
+            assertTrue(result <= 0);
+        }
+
+        // WHEN: Clicking price column sorting toggle again
+        test(productGrid).toggleColumnSorting(2);
+
+        // THEN: Grid is sorted by price in descending order
+        for (int i = 1; i < size; i++) {
+            var result = test(productGrid).item(i - 1).getPrice()
+                    .compareTo(test(productGrid).item(i).getPrice());
+            assertTrue(result >= 0);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void clicking_sorting_product_grid_by_name_will_sort_ascending_second_click_descending() {
+        view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
+
+        var productGrid = (Grid<ProductDto>) $(Grid.class).id("purchase-grid");
+
+        int size = test(productGrid).size();
+
+        // WHEN: Clicking name column sorting toggle
+        test(productGrid).toggleColumnSorting(0);
+
+        // THEN: Grid is sorted by name in alphabetically ascending order
+        for (int i = 1; i < size; i++) {
+            var result = test(productGrid).item(i - 1).getProductName()
+                    .compareToIgnoreCase(
+                            test(productGrid).item(i).getProductName());
+            assertTrue(result <= 0);
+        }
+
+        // WHEN: Clicking name column sorting toggle again
+        test(productGrid).toggleColumnSorting(0);
+
+        // THEN: Grid is sorted by name in alphabetically descending order
+        for (int i = 1; i < size; i++) {
+            var result = test(productGrid).item(i - 1).getProductName()
+                    .compareToIgnoreCase(
+                            test(productGrid).item(i).getProductName());
+            assertTrue(result >= 0);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void clicking_sorting_product_grid_by_stock_will_sort_ascending_second_click_descending() {
+        view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
+
+        var productGrid = (Grid<ProductDto>) $(Grid.class).id("purchase-grid");
+
+        int size = test(productGrid).size();
+
+        // WHEN: Clicking stock column sorting toggle
+        test(productGrid).toggleColumnSorting(1);
+
+        // THEN: Grid is sorted by stock in ascending order
+        for (int i = 1; i < size; i++) {
+            var result = Integer.compare(test(productGrid).item(i - 1)
+                    .getStockCount(),
+                    test(productGrid).item(i)
+                            .getStockCount());
+            assertTrue(result <= 0);
+        }
+
+        // WHEN: Clicking stock column sorting toggle again
+        test(productGrid).toggleColumnSorting(1);
+
+        // THEN: Grid is sorted by stock in descending order
+        for (int i = 1; i < size; i++) {
+            var result = Integer.compare(test(productGrid).item(i - 1)
+                    .getStockCount(),
+                    test(productGrid).item(i)
+                            .getStockCount());
+            assertTrue(result >= 0);
+        }
     }
 
     @Test

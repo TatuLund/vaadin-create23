@@ -18,13 +18,13 @@ import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.components.Html;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
-import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.event.ShortcutAction.ModifierKey;
+import com.vaadin.shared.data.sort.SortDirection;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -33,6 +33,7 @@ import com.vaadin.ui.Composite;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
@@ -402,6 +403,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
         private ProductGrid() {
             super(ProductDto.class);
+            setId("purchase-grid");
             setSizeFull();
             setSelectionMode(SelectionMode.MULTI);
             setAccessibleNavigation(true);
@@ -409,11 +411,18 @@ public class PurchaseWizard extends Composite implements HasI18N {
             // Configure columns
             removeAllColumns();
             addColumn(ProductDto::getProductName)
-                    .setCaption(getTranslation(I18n.PRODUCT_NAME));
+                    .setCaption(getTranslation(I18n.PRODUCT_NAME))
+                    .setComparator((p1, p2) -> p1.getProductName()
+                            .compareToIgnoreCase(p2.getProductName()));
             addColumn(ProductDto::getStockCount)
-                    .setCaption(getTranslation(I18n.IN_STOCK));
+                    .setCaption(getTranslation(I18n.IN_STOCK))
+                    .setComparator(
+                            (p1, p2) -> Integer.compare(p1.getStockCount(),
+                                    p2.getStockCount()));
             addColumn(product -> String.format("%.2f €", product.getPrice()))
-                    .setCaption(getTranslation(I18n.PRICE));
+                    .setCaption(getTranslation(I18n.PRICE))
+                    .setComparator(
+                            (p1, p2) -> p1.getPrice().compareTo(p2.getPrice()));
 
             // Add quantity column with NumberField
             addComponentColumn(dto -> {
@@ -430,13 +439,17 @@ public class PurchaseWizard extends Composite implements HasI18N {
                     numberField.addValueChangeListener(e -> {
                         dto.setOrderQuantity(e.getValue());
                         updateFooter();
+                        sort("quantity-column", SortDirection.DESCENDING);
                     });
                     layout.addComponent(numberField);
                 } else {
                     layout.addComponent(new Label("-"));
                 }
                 return layout;
-            }).setCaption(getTranslation(I18n.Storefront.QUANTITY))
+            }).setComparator((p1, p2) -> Integer.compare(p1.getOrderQuantity(),
+                    p2.getOrderQuantity()))
+                    .setCaption(getTranslation(I18n.Storefront.QUANTITY))
+                    .setId("quantity-column")
                     .setStyleGenerator(
                             product -> VaadinCreateTheme.STOREFRONTVIEW_WIZARD_QUANTITYCOLUMN);
 
@@ -477,6 +490,76 @@ public class PurchaseWizard extends Composite implements HasI18N {
                             Utils.createValueContext()));
             footerRow.getCell(getColumns().get(3))
                     .setText(String.valueOf(totalQuantity));
+        }
+
+        @Override
+        public void attach() {
+            super.attach();
+            patchQuantityColumnFocus();
+        }
+
+        private void patchQuantityColumnFocus() {
+            // Grid re-renders (e.g., refreshAll()) regenerate cell DOM. This
+            // patch is
+            // therefore both (1) installed once and (2) re-applicable to newly
+            // generated cells/inputs without stacking listeners.
+            JavaScript.getCurrent().execute(
+                    """
+                            (function() {
+                                window.__vaadincreateQuantityPatch = window.__vaadincreateQuantityPatch || {};
+                                var state = window.__vaadincreateQuantityPatch;
+
+                                function isQuantityCellElement(el) {
+                                    return el && el.closest && el.closest('td.storefrontview-wizard-quantitycolumn');
+                                }
+
+                                function applyPatch() {
+                                    // Patch any newly created inputs in quantity cells.
+                                    document.querySelectorAll('td.storefrontview-wizard-quantitycolumn input').forEach(function(input) {
+                                        if (input.__vaadincreateQuantityPatched) {
+                                            return;
+                                        }
+                                        input.__vaadincreateQuantityPatched = true;
+                                        input.addEventListener('keydown', function(e) {
+                                            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                                                e.preventDefault();
+                                            }
+                                        }, true);
+                                    });
+                                }
+
+                                // Expose so Java can re-apply after refreshAll().
+                                state.apply = applyPatch;
+
+                                if (!state.installed) {
+                                    state.installed = true;
+
+                                    // When a quantity cell receives focus, forward focus to its input.
+                                    document.addEventListener('focusin', function(e) {
+                                        var cell = isQuantityCellElement(e.target);
+                                        if (!cell) {
+                                            return;
+                                        }
+                                        var input = cell.querySelector('input');
+                                        if (input && e.target !== input) {
+                                            input.focus();
+                                        }
+                                    }, true);
+
+                                    // Observe DOM changes so newly generated cells also get patched.
+                                    // (Still safe to call state.apply() from Java after refreshAll().)
+                                    state.observer = new MutationObserver(function() {
+                                        applyPatch();
+                                    });
+                                    if (document.body) {
+                                        state.observer.observe(document.body, { childList: true, subtree: true });
+                                    }
+                                }
+
+                                // Apply immediately for current DOM.
+                                state.apply();
+                            })();
+                            """);
         }
     }
 }

@@ -19,11 +19,15 @@ import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.purchases.PurchaseHistoryGrid;
 import org.vaadin.tatu.vaadincreate.purchases.PurchaseHistoryPresenter;
 import org.vaadin.tatu.vaadincreate.util.Utils;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 
 /**
  * A view for employees (CUSTOMER role) to create purchase requests using a
@@ -57,9 +61,22 @@ public class StorefrontView extends CssLayout implements VaadinCreateView {
         // Create purchase history grid on the right
         historyGrid = new PurchaseHistoryGrid(new PurchaseHistoryPresenter(),
                 PurchaseHistoryMode.MY_PURCHASES, currentUser);
-        historyGrid.addStyleName(VaadinCreateTheme.STOREFRONTVIEW_HISTORY);
 
-        addComponents(wizard, historyGrid);
+        var historyTitle = new Label(
+                getTranslation(I18n.Storefront.PURCHASE_HISTORY));
+        historyTitle.addStyleNames(ValoTheme.LABEL_H2, "v-margin-left");
+
+        var historyLayout = new VerticalLayout(historyTitle, historyGrid);
+        historyLayout.setMargin(false);
+        historyLayout.setSpacing(true);
+        historyLayout.setSizeFull();
+        historyLayout.setExpandRatio(historyGrid, 1);
+        historyLayout.addStyleNames(VaadinCreateTheme.STOREFRONTVIEW_HISTORY,
+                ValoTheme.LAYOUT_WELL);
+
+        historyGrid.setSizeFull();
+
+        addComponents(wizard, historyLayout);
     }
 
     @Override

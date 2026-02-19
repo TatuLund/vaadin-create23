@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.purchases;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -9,15 +10,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
+import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.purchases.PurchaseHistoryGrid.ToggleButton;
-import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.ServiceException;
 import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
-import com.vaadin.icons.VaadinIcons;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Window;
 
 /**
  * UI unit tests for PurchasesView.
@@ -140,6 +145,159 @@ public class PurchasesViewTest extends AbstractUITest {
         assertEquals("false", toggle
                 .getAttribute(AriaAttributes.EXPANDED));
         assertEquals(VaadinIcons.ANGLE_RIGHT, toggle.getIcon());
+
+        SerializationDebugUtil.assertSerializable(view);
+    }
+
+    /**
+     * Tests the full approval workflow: click Approve → DecisionWindow opens →
+     * enter optional comment → click Approve in window → success notification
+     * appears and the approved purchase is removed from the pending grid.
+     */
+    @Test
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void approving_pending_purchase_shows_decision_window_and_updates_status_to_completed()
+            throws ServiceException {
+        // GIVEN: Login as User5 who is a designated approver in the mock data
+        logout();
+        tearDown();
+        ui = new VaadinCreateUI();
+        mockVaadin(ui);
+        login("User5", "user5");
+
+        view = navigate(
+                PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
+                PurchasesView.class);
+
+        var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
+                .id("purchase-history-grid");
+        assertNotNull("Approvals grid should be present", approvalsGrid);
+        int pendingCountBefore = test(approvalsGrid).size();
+        assertTrue("There must be at least one pending purchase to approve",
+                pendingCountBefore > 0);
+
+        // Get first pending purchase and its ID for the button lookup
+        Purchase pendingPurchase = test(approvalsGrid).item(0);
+        assertNotNull(pendingPurchase);
+        assertNotNull(pendingPurchase.getId());
+        assertEquals(PurchaseStatus.PENDING, pendingPurchase.getStatus());
+
+        // WHEN: Clicking the Approve button on the first pending purchase
+        test($(Button.class).id("approve-button-" + pendingPurchase.getId()))
+                .click();
+
+        // THEN: DecisionWindow opens
+        var decisionWindow = $(Window.class)
+                .id(DecisionWindow.DECISION_WINDOW_ID);
+        assertNotNull("Decision window should be open", decisionWindow);
+        assertTrue(decisionWindow.isAttached());
+
+        // WHEN: Entering an optional comment and confirming
+        var commentField = $(decisionWindow, TextArea.class)
+                .id(DecisionWindow.DECISION_COMMENT_ID);
+        assertNotNull("Comment field should be present", commentField);
+        test(commentField).setValue("Approved by supervisor");
+
+        test($(decisionWindow, Button.class)
+                .id(DecisionWindow.CONFIRM_BUTTON_ID))
+                .click();
+
+        // THEN: Window is closed
+        assertFalse("Decision window should be closed after confirm",
+                decisionWindow.isAttached());
+
+        // THEN: Success notification is shown
+        assertNotification(
+                "Purchase #" + pendingPurchase.getId()
+                        + " approved successfully");
+
+        // THEN: Approved purchase no longer appears in the pending approvals
+        // grid (status changed to COMPLETED)
+        int pendingCountAfter = test(approvalsGrid).size();
+        assertEquals(
+                "Approved purchase should be removed from the pending approvals grid",
+                pendingCountBefore - 1, pendingCountAfter);
+
+        SerializationDebugUtil.assertSerializable(view);
+    }
+
+    /**
+     * Tests the full rejection workflow: click Reject → DecisionWindow opens →
+     * Confirm button is initially disabled → enter required reason → click
+     * Reject in window → success notification appears and the rejected purchase
+     * is removed from the pending grid.
+     */
+    @Test
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void rejecting_pending_purchase_shows_decision_window_requires_reason_and_updates_status_to_rejected()
+            throws ServiceException {
+        // GIVEN: Login as User5 who is a designated approver in the mock data
+        logout();
+        tearDown();
+        ui = new VaadinCreateUI();
+        mockVaadin(ui);
+        login("User5", "user5");
+
+        view = navigate(
+                PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
+                PurchasesView.class);
+
+        var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
+                .id("purchase-history-grid");
+        assertNotNull("Approvals grid should be present", approvalsGrid);
+        int pendingCountBefore = test(approvalsGrid).size();
+        assertTrue("There must be at least one pending purchase to reject",
+                pendingCountBefore > 0);
+
+        // Get first pending purchase
+        Purchase pendingPurchase = test(approvalsGrid).item(0);
+        assertNotNull(pendingPurchase);
+        assertNotNull(pendingPurchase.getId());
+        assertEquals(PurchaseStatus.PENDING, pendingPurchase.getStatus());
+
+        // WHEN: Clicking the Reject button on the first pending purchase
+        test($(Button.class).id("reject-button-" + pendingPurchase.getId()))
+                .click();
+
+        // THEN: DecisionWindow opens
+        var decisionWindow = $(Window.class)
+                .id(DecisionWindow.DECISION_WINDOW_ID);
+        assertNotNull("Decision window should be open", decisionWindow);
+        assertTrue(decisionWindow.isAttached());
+
+        // THEN: Confirm (reject) button is initially disabled – reason required
+        var confirmButton = $(decisionWindow, Button.class)
+                .id(DecisionWindow.CONFIRM_BUTTON_ID);
+        assertFalse("Confirm button should be disabled until reason is entered",
+                confirmButton.isEnabled());
+
+        // WHEN: Entering a rejection reason
+        var commentField = $(decisionWindow, TextArea.class)
+                .id(DecisionWindow.DECISION_COMMENT_ID);
+        assertNotNull("Comment field should be present", commentField);
+        test(commentField).setValue("Budget exceeded this quarter");
+
+        // THEN: Confirm button is now enabled
+        assertTrue("Confirm button should be enabled after reason is entered",
+                confirmButton.isEnabled());
+
+        // WHEN: Confirming the rejection
+        test(confirmButton).click();
+
+        // THEN: Window is closed
+        assertFalse("Decision window should be closed after confirm",
+                decisionWindow.isAttached());
+
+        // THEN: Success notification is shown
+        assertNotification(
+                "Purchase #" + pendingPurchase.getId() + " rejected");
+
+        // THEN: Rejected purchase no longer appears in the pending approvals
+        // grid (status changed to REJECTED)
+        int pendingCountAfter = test(approvalsGrid).size();
+        assertEquals(
+                "Rejected purchase should be removed from the pending approvals grid",
+                pendingCountBefore - 1, pendingCountAfter);
 
         SerializationDebugUtil.assertSerializable(view);
     }

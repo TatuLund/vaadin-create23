@@ -24,6 +24,8 @@ import com.vaadin.ui.themes.ValoTheme;
 @SuppressWarnings({ "serial", "java:S2160" })
 public class DecisionWindow extends Window implements HasI18N {
 
+    /** Identifies the decision window. */
+    public static final String DECISION_WINDOW_ID = "decision-window";
     /** Identifies the decision comment text area. */
     public static final String DECISION_COMMENT_ID = "decision-comment-field";
     /** Identifies the confirm (approve/reject) action button. */
@@ -67,6 +69,7 @@ public class DecisionWindow extends Window implements HasI18N {
         setClosable(true);
         setResizable(false);
         setWidth("400px");
+        setId(DECISION_WINDOW_ID);
         setCaption(isApprove ? getTranslation(I18n.Storefront.APPROVE)
                 : getTranslation(I18n.Storefront.REJECT));
 

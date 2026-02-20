@@ -50,6 +50,7 @@ public class DecisionWindow extends Window implements HasI18N {
     private final boolean isApprove;
     private final TextArea commentField;
     private final Button confirmButton;
+    private boolean confirmed = false;
 
     /**
      * Creates a new {@code DecisionWindow}.
@@ -106,6 +107,7 @@ public class DecisionWindow extends Window implements HasI18N {
         var label = isApprove ? getTranslation(I18n.Storefront.APPROVE)
                 : getTranslation(I18n.Storefront.REJECT);
         var button = new Button(label, e -> {
+            confirmed = true;
             var comment = commentField.getValue().trim();
             close();
             listener.onConfirmed(comment.isEmpty() ? null : comment);
@@ -130,5 +132,16 @@ public class DecisionWindow extends Window implements HasI18N {
 
     private void updateConfirmButtonState(TextArea field) {
         confirmButton.setEnabled(!field.getValue().trim().isEmpty());
+    }
+
+    /**
+     * Returns {@code true} if the user confirmed the decision (clicked the
+     * confirm button), {@code false} if the window was closed via cancel or the
+     * X button.
+     *
+     * @return whether the decision was confirmed
+     */
+    public boolean isConfirmed() {
+        return confirmed;
     }
 }

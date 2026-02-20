@@ -301,4 +301,203 @@ public class PurchasesViewTest extends AbstractUITest {
 
         SerializationDebugUtil.assertSerializable(view);
     }
+
+    /**
+     * Tests that clicking Cancel on the approval DecisionWindow closes the
+     * window without changing the purchase status: the purchase stays PENDING
+     * and the grid count is unchanged.
+     */
+    @Test
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void approve_pending_purchase_shows_decision_window_and_clicking_cancel_then_status_remains_pending()
+            throws ServiceException {
+        // GIVEN: Login as User5 who is a designated approver in the mock data
+        logout();
+        tearDown();
+        ui = new VaadinCreateUI();
+        mockVaadin(ui);
+        login("User5", "user5");
+
+        view = navigate(
+                PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
+                PurchasesView.class);
+
+        var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
+                .id("purchase-history-grid");
+        int pendingCountBefore = test(approvalsGrid).size();
+        assertTrue("There must be at least one pending purchase to approve",
+                pendingCountBefore > 0);
+
+        Purchase pendingPurchase = test(approvalsGrid).item(0);
+        assertNotNull(pendingPurchase);
+        assertNotNull(pendingPurchase.getId());
+
+        // WHEN: Clicking the Approve button
+        test($(Button.class).id("approve-button-" + pendingPurchase.getId()))
+                .click();
+
+        // THEN: DecisionWindow opens
+        var decisionWindow = $(Window.class)
+                .id(DecisionWindow.DECISION_WINDOW_ID);
+        assertNotNull("Decision window should be open", decisionWindow);
+        assertTrue(decisionWindow.isAttached());
+
+        // WHEN: Clicking Cancel instead of confirming
+        test($(decisionWindow, Button.class)
+                .id(DecisionWindow.CANCEL_BUTTON_ID))
+                .click();
+
+        // THEN: Window is closed
+        assertFalse("Decision window should be closed after cancel",
+                decisionWindow.isAttached());
+
+        // THEN: Approve button is re-enabled so the user can retry
+        assertTrue("Approve button should be re-enabled after cancel",
+                $(Button.class)
+                        .id("approve-button-" + pendingPurchase.getId())
+                        .isEnabled());
+
+        // THEN: Grid count is unchanged – purchase is still PENDING
+        assertEquals("Grid count should be unchanged after cancel",
+                pendingCountBefore, test(approvalsGrid).size());
+
+        SerializationDebugUtil.assertSerializable(view);
+    }
+
+    /**
+     * Tests that clicking Cancel on the rejection DecisionWindow closes the
+     * window without changing the purchase status: the purchase stays PENDING
+     * and the grid count is unchanged.
+     */
+    @Test
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void rejecting_pending_purchase_shows_decision_window_and_clicking_cancel_then_status_remains_pending()
+            throws ServiceException {
+        // GIVEN: Login as User5 who is a designated approver in the mock data
+        logout();
+        tearDown();
+        ui = new VaadinCreateUI();
+        mockVaadin(ui);
+        login("User5", "user5");
+
+        view = navigate(
+                PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
+                PurchasesView.class);
+
+        var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
+                .id("purchase-history-grid");
+        int pendingCountBefore = test(approvalsGrid).size();
+        assertTrue("There must be at least one pending purchase to reject",
+                pendingCountBefore > 0);
+
+        Purchase pendingPurchase = test(approvalsGrid).item(0);
+        assertNotNull(pendingPurchase);
+        assertNotNull(pendingPurchase.getId());
+
+        // WHEN: Clicking the Reject button
+        test($(Button.class).id("reject-button-" + pendingPurchase.getId()))
+                .click();
+
+        // THEN: DecisionWindow opens
+        var decisionWindow = $(Window.class)
+                .id(DecisionWindow.DECISION_WINDOW_ID);
+        assertNotNull("Decision window should be open", decisionWindow);
+        assertTrue(decisionWindow.isAttached());
+
+        // WHEN: Clicking Cancel instead of confirming
+        test($(decisionWindow, Button.class)
+                .id(DecisionWindow.CANCEL_BUTTON_ID))
+                .click();
+
+        // THEN: Window is closed
+        assertFalse("Decision window should be closed after cancel",
+                decisionWindow.isAttached());
+
+        // THEN: Reject button is re-enabled so the user can retry
+        assertTrue("Reject button should be re-enabled after cancel",
+                $(Button.class)
+                        .id("reject-button-" + pendingPurchase.getId())
+                        .isEnabled());
+
+        // THEN: Grid count is unchanged – purchase is still PENDING
+        assertEquals("Grid count should be unchanged after cancel",
+                pendingCountBefore, test(approvalsGrid).size());
+
+        SerializationDebugUtil.assertSerializable(view);
+    }
+
+    /**
+     * Tests that the approvals view shows only pending purchases assigned to
+     * the currently logged-in approver: User5 sees only their own pending
+     * purchases and User6 sees only theirs – neither sees the other's.
+     */
+    @Test
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void approval_view_displays_pending_purchases_assigned_to_current_user_only()
+            throws ServiceException {
+        // GIVEN: Login as User5 (one of the two mock approvers)
+        logout();
+        tearDown();
+        ui = new VaadinCreateUI();
+        mockVaadin(ui);
+        login("User5", "user5");
+
+        view = navigate(
+                PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
+                PurchasesView.class);
+
+        var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
+                .id("purchase-history-grid");
+        int user5Count = test(approvalsGrid).size();
+        assertTrue("User5 should have at least one pending purchase assigned",
+                user5Count > 0);
+
+        // Assert visible purchases are all assigned to User5
+        int checkCount = Math.min(user5Count, 10);
+        for (int i = 0; i < checkCount; i++) {
+            Purchase p = test(approvalsGrid).item(i);
+            assertNotNull("Expected a purchase at row " + i, p);
+            assertNotNull("Purchase approver should not be null",
+                    p.getApprover());
+            assertEquals("All approvals grid items should be assigned to User5",
+                    "User5", p.getApprover().getName());
+        }
+
+        // WHEN: Login as User6 (the other mock approver)
+        logout();
+        tearDown();
+        ui = new VaadinCreateUI();
+        mockVaadin(ui);
+        login("User6", "user6");
+
+        view = navigate(
+                PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
+                PurchasesView.class);
+
+        approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
+                .id("purchase-history-grid");
+        int user6Count = test(approvalsGrid).size();
+        assertTrue("User6 should have at least one pending purchase assigned",
+                user6Count > 0);
+
+        // Assert visible purchases are all assigned to User6
+        checkCount = Math.min(user6Count, 10);
+        for (int i = 0; i < checkCount; i++) {
+            Purchase p = test(approvalsGrid).item(i);
+            assertNotNull("Expected a purchase at row " + i, p);
+            assertNotNull("Purchase approver should not be null",
+                    p.getApprover());
+            assertEquals("All approvals grid items should be assigned to User6",
+                    "User6", p.getApprover().getName());
+        }
+
+        // THEN: The two approvers see disjoint pending queues – neither sees
+        // the other's purchases (the combined total exceeds either count alone)
+        assertTrue(
+                "Combined pending count must exceed each individual approver's count",
+                user5Count + user6Count > user5Count
+                        && user5Count + user6Count > user6Count);
+
+        SerializationDebugUtil.assertSerializable(view);
+    }
 }

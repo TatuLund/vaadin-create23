@@ -64,7 +64,8 @@ public class PurchasesApprovalsTab extends VerticalLayout
         button.setId("approve-button-" + purchase.getId());
         button.addStyleName(ValoTheme.BUTTON_PRIMARY);
         button.setDisableOnClick(true);
-        button.addClickListener(e -> openDecisionWindow(purchase, true));
+        button.addClickListener(
+                e -> openDecisionWindow(purchase, true, button));
         return button;
     }
 
@@ -73,17 +74,26 @@ public class PurchasesApprovalsTab extends VerticalLayout
         button.setId("reject-button-" + purchase.getId());
         button.addStyleName(ValoTheme.BUTTON_DANGER);
         button.setDisableOnClick(true);
-        button.addClickListener(e -> openDecisionWindow(purchase, false));
+        button.addClickListener(
+                e -> openDecisionWindow(purchase, false, button));
         return button;
     }
 
-    private void openDecisionWindow(Purchase purchase, boolean isApprove) {
+    private void openDecisionWindow(Purchase purchase, boolean isApprove,
+            Button sourceButton) {
         var purchaseId = purchase.getId();
         if (purchaseId == null) {
             return;
         }
         var window = new DecisionWindow(isApprove,
                 comment -> handleDecision(purchaseId, isApprove, comment));
+        // Re-enable the source button only if the window was closed without
+        // confirming (i.e. user cancelled), so they can try again.
+        window.addCloseListener(e -> {
+            if (!window.isConfirmed()) {
+                sourceButton.setEnabled(true);
+            }
+        });
         getUI().addWindow(window);
         window.center();
     }

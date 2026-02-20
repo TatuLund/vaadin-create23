@@ -12,15 +12,17 @@ import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
+import org.vaadin.tatu.vaadincreate.common.CustomChart;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.purchases.PurchaseHistoryGrid.ToggleButton;
 
+import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.ServiceException;
 import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
@@ -97,13 +99,50 @@ public class PurchasesViewTest extends AbstractUITest {
     }
 
     @Test
-    public void should_ShowStatsPlaceholder_When_NavigatingToStatsTab() {
+    public void should_ShowCharts_When_NavigatingToStatsTab() {
         view = navigate(
                 PurchasesView.VIEW_NAME + "/" + PurchasesStatsTab.VIEW_NAME,
                 PurchasesView.class);
 
-        var placeholder = $(Label.class).id("purchases-stats-placeholder");
-        assertEquals("Statistics", placeholder.getValue());
+        // Wait for async loading to finish (same pattern as StatsViewTest)
+        var dashboard = $(CssLayout.class)
+                .styleName("dashboard").first();
+        assertNotNull("Dashboard layout should be present", dashboard);
+        waitForCharts(dashboard);
+
+        // Verify all three chart components exist with stable IDs
+        var topChart = $(CustomChart.class)
+                .id("purchases-top-products-chart");
+        assertNotNull("Top products chart should be present", topChart);
+
+        var leastChart = $(CustomChart.class)
+                .id("purchases-least-products-chart");
+        assertNotNull("Least products chart should be present", leastChart);
+
+        var monthlyChart = $(CustomChart.class)
+                .id("purchases-per-month-chart");
+        assertNotNull("Monthly totals chart should be present", monthlyChart);
+
+        // Verify data was loaded: top-products chart must have at least one
+        // series with data points
+        var topSeries = topChart.getConfiguration().getSeries();
+        assertFalse("Top products chart should have at least one series",
+                topSeries.isEmpty());
+        var topDataSeries = (DataSeries) topSeries.get(0);
+        assertFalse("Top products series should have data points",
+                topDataSeries.getData().isEmpty());
+        // Each data point in a completed purchase stats series must have a
+        // positive quantity
+        topDataSeries.getData().forEach(item -> assertTrue(
+                "Top product quantity should be positive",
+                item.getY().doubleValue() > 0));
+
+        // Monthly chart should have 12 x-axis categories (one per month)
+        assertEquals("Monthly chart should have 12 months on x-axis", 12,
+                monthlyChart.getConfiguration().getxAxis()
+                        .getCategories().length);
+
+        SerializationDebugUtil.assertSerializable(view);
     }
 
     @Test

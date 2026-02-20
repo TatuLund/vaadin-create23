@@ -434,6 +434,104 @@ public class PurchaseDao {
         return result;
     }
 
+    /**
+     * Returns the top N products by total purchased quantity (COMPLETED
+     * purchases only), ordered descending.
+     *
+     * <p>
+     * Each row in the result is an {@code Object[3]}: {@code [productId,
+     * productName, sumQuantity]}.
+     *
+     * @param limit
+     *            maximum number of rows to return
+     * @return list of Object arrays
+     */
+    public List<Object[]> getTopProductsByQuantity(int limit) {
+        logger.debug("Fetching top {} products by quantity", limit);
+        var result = HibernateUtil.inSession(session -> {
+            return session.createQuery(
+                    "select pl.product.id, pl.product.productName, sum(pl.quantity)"
+                            + " from PurchaseLine pl"
+                            + " where pl.purchase.status = :status"
+                            + " group by pl.product.id, pl.product.productName"
+                            + " order by sum(pl.quantity) desc",
+                    Object[].class)
+                    .setParameter("status", PurchaseStatus.COMPLETED)
+                    .setMaxResults(limit).list();
+        });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Result of getTopProductsByQuantity is null");
+        }
+        return result;
+    }
+
+    /**
+     * Returns the bottom N products by total purchased quantity (COMPLETED
+     * purchases only), ordered ascending. Products with zero quantity are
+     * excluded.
+     *
+     * <p>
+     * Each row in the result is an {@code Object[3]}: {@code [productId,
+     * productName, sumQuantity]}.
+     *
+     * @param limit
+     *            maximum number of rows to return
+     * @return list of Object arrays
+     */
+    public List<Object[]> getLeastProductsByQuantity(int limit) {
+        logger.debug("Fetching least {} products by quantity", limit);
+        var result = HibernateUtil.inSession(session -> {
+            return session.createQuery(
+                    "select pl.product.id, pl.product.productName, sum(pl.quantity)"
+                            + " from PurchaseLine pl"
+                            + " where pl.purchase.status = :status"
+                            + " group by pl.product.id, pl.product.productName"
+                            + " having sum(pl.quantity) > 0"
+                            + " order by sum(pl.quantity) asc",
+                    Object[].class)
+                    .setParameter("status", PurchaseStatus.COMPLETED)
+                    .setMaxResults(limit).list();
+        });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Result of getLeastProductsByQuantity is null");
+        }
+        return result;
+    }
+
+    /**
+     * Returns all COMPLETED purchase lines decided on or after {@code since},
+     * as raw data for monthly aggregation.
+     *
+     * <p>
+     * Each row is an {@code Object[3]}: {@code [quantity (Integer), unitPrice
+     * (BigDecimal), decidedAt (Instant)]}.
+     *
+     * @param since
+     *            earliest {@code decidedAt} to include
+     * @return list of Object arrays
+     */
+    public List<Object[]> getCompletedPurchaseLinesLastMonths(Instant since) {
+        Objects.requireNonNull(since, "Since must not be null");
+        logger.debug("Fetching completed purchase lines since {}", since);
+        var result = HibernateUtil.inSession(session -> {
+            return session.createQuery(
+                    "select pl.quantity, pl.unitPrice, pl.purchase.decidedAt"
+                            + " from PurchaseLine pl"
+                            + " where pl.purchase.status = :status"
+                            + " and pl.purchase.decidedAt >= :since",
+                    Object[].class)
+                    .setParameter("status", PurchaseStatus.COMPLETED)
+                    .setParameter("since", since).list();
+        });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Result of getCompletedPurchaseLinesLastMonths is null");
+        }
+        return result;
+    }
+
     @SuppressWarnings("null")
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

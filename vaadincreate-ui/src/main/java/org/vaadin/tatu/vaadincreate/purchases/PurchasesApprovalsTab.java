@@ -89,11 +89,15 @@ public class PurchasesApprovalsTab extends VerticalLayout
                 comment -> handleDecision(purchaseId, isApprove, comment));
         // Re-enable the source button only if the window was closed without
         // confirming (i.e. user cancelled), so they can try again.
-        window.addCloseListener(e -> {
-            if (!window.isConfirmed()) {
-                sourceButton.setEnabled(true);
-            }
-        });
+        // The cast to Serializable is required because Window.CloseListener
+        // does not extend Serializable and lambdas must be serializable in
+        // Vaadin 8 sessions.
+        window.addCloseListener(
+                (com.vaadin.ui.Window.CloseListener & java.io.Serializable) e -> {
+                    if (!window.isConfirmed()) {
+                        sourceButton.setEnabled(true);
+                    }
+                });
         getUI().addWindow(window);
         window.center();
     }

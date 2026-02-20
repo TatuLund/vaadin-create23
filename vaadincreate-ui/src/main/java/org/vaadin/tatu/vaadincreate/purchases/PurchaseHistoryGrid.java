@@ -73,7 +73,9 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
     }
 
     private void configureGrid() {
-        grid.setId("purchase-history-grid");
+        grid.setId(mode == PurchaseHistoryMode.PENDING_APPROVALS
+                ? "purchase-approvals-grid"
+                : "purchase-history-grid");
         if (mode == PurchaseHistoryMode.MY_PURCHASES) {
             grid.setWidth("90%");
         } else {

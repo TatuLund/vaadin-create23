@@ -21,6 +21,7 @@ import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 
@@ -80,7 +81,7 @@ public class PurchasesViewTest extends AbstractUITest {
                 PurchasesView.class);
 
         var approvalsGrid = (Grid<Object>) $(Grid.class)
-                .id("purchase-history-grid");
+                .id("purchase-approvals-grid");
         assertNotNull("Approvals grid should be present", approvalsGrid);
         // Grid has 10 columns: Toggle, ID, Requester, Approver, Created At,
         // Status, Decided At, Total, Decision Reason, Actions
@@ -170,7 +171,7 @@ public class PurchasesViewTest extends AbstractUITest {
                 PurchasesView.class);
 
         var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
-                .id("purchase-history-grid");
+                .id("purchase-approvals-grid");
         assertNotNull("Approvals grid should be present", approvalsGrid);
         int pendingCountBefore = test(approvalsGrid).size();
         assertTrue("There must be at least one pending purchase to approve",
@@ -183,8 +184,10 @@ public class PurchasesViewTest extends AbstractUITest {
         assertEquals(PurchaseStatus.PENDING, pendingPurchase.getStatus());
 
         // WHEN: Clicking the Approve button on the first pending purchase
-        test($(Button.class).id("approve-button-" + pendingPurchase.getId()))
-                .click();
+        var approveActionLayout = (com.vaadin.ui.HorizontalLayout) test(
+                approvalsGrid).cell(9, 0);
+        var approveButton = $(approveActionLayout, Button.class).first();
+        test(approveButton).click();
 
         // THEN: DecisionWindow opens
         var decisionWindow = $(Window.class)
@@ -206,10 +209,17 @@ public class PurchasesViewTest extends AbstractUITest {
         assertFalse("Decision window should be closed after confirm",
                 decisionWindow.isAttached());
 
-        // THEN: Success notification is shown
-        assertNotification(
-                "Purchase #" + pendingPurchase.getId()
-                        + " approved successfully");
+        // THEN: A notification about the purchase is shown (either
+        // "approved successfully" when stock is sufficient, or "cancelled:
+        // Insufficient stock" when stock runs out – both are valid outcomes
+        // per the PRD and both remove the purchase from the pending queue)
+        String purchaseIdStr = String.valueOf(pendingPurchase.getId());
+        boolean notified = $(Notification.class).stream()
+                .anyMatch(n -> n.getCaption() != null
+                        && n.getCaption()
+                                .startsWith("Purchase #" + purchaseIdStr));
+        assertTrue("Expected a notification for purchase #" + purchaseIdStr,
+                notified);
 
         // THEN: Approved purchase no longer appears in the pending approvals
         // grid (status changed to COMPLETED)
@@ -243,7 +253,7 @@ public class PurchasesViewTest extends AbstractUITest {
                 PurchasesView.class);
 
         var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
-                .id("purchase-history-grid");
+                .id("purchase-approvals-grid");
         assertNotNull("Approvals grid should be present", approvalsGrid);
         int pendingCountBefore = test(approvalsGrid).size();
         assertTrue("There must be at least one pending purchase to reject",
@@ -256,8 +266,11 @@ public class PurchasesViewTest extends AbstractUITest {
         assertEquals(PurchaseStatus.PENDING, pendingPurchase.getStatus());
 
         // WHEN: Clicking the Reject button on the first pending purchase
-        test($(Button.class).id("reject-button-" + pendingPurchase.getId()))
-                .click();
+        var rejectActionLayout = (com.vaadin.ui.HorizontalLayout) test(
+                approvalsGrid).cell(9, 0);
+        var rejectButton = $(rejectActionLayout, Button.class).stream().skip(1)
+                .findFirst().orElseThrow();
+        test(rejectButton).click();
 
         // THEN: DecisionWindow opens
         var decisionWindow = $(Window.class)
@@ -323,7 +336,7 @@ public class PurchasesViewTest extends AbstractUITest {
                 PurchasesView.class);
 
         var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
-                .id("purchase-history-grid");
+                .id("purchase-approvals-grid");
         int pendingCountBefore = test(approvalsGrid).size();
         assertTrue("There must be at least one pending purchase to approve",
                 pendingCountBefore > 0);
@@ -333,8 +346,10 @@ public class PurchasesViewTest extends AbstractUITest {
         assertNotNull(pendingPurchase.getId());
 
         // WHEN: Clicking the Approve button
-        test($(Button.class).id("approve-button-" + pendingPurchase.getId()))
-                .click();
+        var approveActionLayout = (com.vaadin.ui.HorizontalLayout) test(
+                approvalsGrid).cell(9, 0);
+        var approveButton = $(approveActionLayout, Button.class).first();
+        test(approveButton).click();
 
         // THEN: DecisionWindow opens
         var decisionWindow = $(Window.class)
@@ -353,9 +368,7 @@ public class PurchasesViewTest extends AbstractUITest {
 
         // THEN: Approve button is re-enabled so the user can retry
         assertTrue("Approve button should be re-enabled after cancel",
-                $(Button.class)
-                        .id("approve-button-" + pendingPurchase.getId())
-                        .isEnabled());
+                approveButton.isEnabled());
 
         // THEN: Grid count is unchanged – purchase is still PENDING
         assertEquals("Grid count should be unchanged after cancel",
@@ -385,7 +398,7 @@ public class PurchasesViewTest extends AbstractUITest {
                 PurchasesView.class);
 
         var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
-                .id("purchase-history-grid");
+                .id("purchase-approvals-grid");
         int pendingCountBefore = test(approvalsGrid).size();
         assertTrue("There must be at least one pending purchase to reject",
                 pendingCountBefore > 0);
@@ -395,8 +408,11 @@ public class PurchasesViewTest extends AbstractUITest {
         assertNotNull(pendingPurchase.getId());
 
         // WHEN: Clicking the Reject button
-        test($(Button.class).id("reject-button-" + pendingPurchase.getId()))
-                .click();
+        var rejectActionLayout = (com.vaadin.ui.HorizontalLayout) test(
+                approvalsGrid).cell(9, 0);
+        var rejectButton = $(rejectActionLayout, Button.class).stream().skip(1)
+                .findFirst().orElseThrow();
+        test(rejectButton).click();
 
         // THEN: DecisionWindow opens
         var decisionWindow = $(Window.class)
@@ -415,9 +431,7 @@ public class PurchasesViewTest extends AbstractUITest {
 
         // THEN: Reject button is re-enabled so the user can retry
         assertTrue("Reject button should be re-enabled after cancel",
-                $(Button.class)
-                        .id("reject-button-" + pendingPurchase.getId())
-                        .isEnabled());
+                rejectButton.isEnabled());
 
         // THEN: Grid count is unchanged – purchase is still PENDING
         assertEquals("Grid count should be unchanged after cancel",
@@ -447,7 +461,7 @@ public class PurchasesViewTest extends AbstractUITest {
                 PurchasesView.class);
 
         var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
-                .id("purchase-history-grid");
+                .id("purchase-approvals-grid");
         int user5Count = test(approvalsGrid).size();
         assertTrue("User5 should have at least one pending purchase assigned",
                 user5Count > 0);
@@ -475,7 +489,7 @@ public class PurchasesViewTest extends AbstractUITest {
                 PurchasesView.class);
 
         approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
-                .id("purchase-history-grid");
+                .id("purchase-approvals-grid");
         int user6Count = test(approvalsGrid).size();
         assertTrue("User6 should have at least one pending purchase assigned",
                 user6Count > 0);

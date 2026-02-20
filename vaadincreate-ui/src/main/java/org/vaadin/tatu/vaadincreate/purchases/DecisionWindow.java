@@ -37,7 +37,7 @@ public class DecisionWindow extends Window implements HasI18N {
      * Functional interface invoked when the user confirms the decision.
      */
     @FunctionalInterface
-    public interface DecisionConfirmedListener {
+    public interface DecisionConfirmedListener extends java.io.Serializable {
         /**
          * Called when the decision is confirmed.
          *

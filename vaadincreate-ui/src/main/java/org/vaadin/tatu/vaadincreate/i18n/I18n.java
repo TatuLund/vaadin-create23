@@ -248,6 +248,11 @@ public final class I18n {
         public static final String APPROVE_CONFLICT = "approve-conflict";
         public static final String REASON_REQUIRED = "reason-required";
 
+        public static final String TOP_PRODUCTS = "top-purchased-products";
+        public static final String LEAST_PRODUCTS = "least-purchased-products";
+        public static final String MONTHLY_TOTALS = "monthly-purchases";
+        public static final String AMOUNT = "amount";
+
         private Storefront() {
             // private constructor to hide the implicit public one
         }

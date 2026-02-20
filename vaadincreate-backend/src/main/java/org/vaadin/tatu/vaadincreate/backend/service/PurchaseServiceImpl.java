@@ -1,6 +1,11 @@
 package org.vaadin.tatu.vaadincreate.backend.service;
 
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -13,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
+import org.vaadin.tatu.vaadincreate.backend.PurchaseService.MonthlyPurchaseStat;
+import org.vaadin.tatu.vaadincreate.backend.PurchaseService.ProductPurchaseStat;
 import org.vaadin.tatu.vaadincreate.backend.dao.ProductDao;
 import org.vaadin.tatu.vaadincreate.backend.dao.PurchaseDao;
 import org.vaadin.tatu.vaadincreate.backend.dao.UserDao;
@@ -257,6 +264,58 @@ public class PurchaseServiceImpl implements PurchaseService {
         logger.info("Rejecting purchase: ({}) by user: '{}'", purchaseId,
                 currentUser.getName());
         return purchaseDao.rejectPurchase(purchaseId, currentUser, reason);
+    }
+
+    @Override
+    public List<@NonNull ProductPurchaseStat> getTopProductsByQuantity(
+            int limit) {
+        var rows = purchaseDao.getTopProductsByQuantity(limit);
+        return rows.stream().map(PurchaseServiceImpl::toProductStat).toList();
+    }
+
+    @Override
+    public List<@NonNull ProductPurchaseStat> getLeastProductsByQuantity(
+            int limit) {
+        var rows = purchaseDao.getLeastProductsByQuantity(limit);
+        return rows.stream().map(PurchaseServiceImpl::toProductStat).toList();
+    }
+
+    @Override
+    public List<@NonNull MonthlyPurchaseStat> getMonthlyTotals(int months) {
+        var now = YearMonth.now();
+        var since = now.minusMonths(months - 1L).atDay(1).atStartOfDay()
+                .atZone(ZoneId.systemDefault()).toInstant();
+
+        // Pre-fill all months with BigDecimal.ZERO so gaps are continuous
+        Map<String, BigDecimal> totals = new LinkedHashMap<>();
+        for (int i = months - 1; i >= 0; i--) {
+            totals.put(now.minusMonths(i).toString(), BigDecimal.ZERO);
+        }
+
+        var rows = purchaseDao.getCompletedPurchaseLinesLastMonths(since);
+        for (Object[] row : rows) {
+            var qty = ((Number) row[0]).longValue();
+            var unitPrice = (BigDecimal) row[1];
+            var decidedAt = (Instant) row[2];
+            var ym = YearMonth
+                    .from(decidedAt.atZone(ZoneId.systemDefault()));
+            var key = ym.toString();
+            totals.computeIfPresent(key,
+                    (k, prev) -> prev
+                            .add(unitPrice.multiply(BigDecimal.valueOf(qty))));
+        }
+
+        var result = new ArrayList<MonthlyPurchaseStat>(totals.size());
+        totals.forEach(
+                (k, v) -> result.add(new MonthlyPurchaseStat(k, v)));
+        return result;
+    }
+
+    private static ProductPurchaseStat toProductStat(Object[] row) {
+        var productId = (Integer) row[0];
+        var productName = (String) row[1];
+        var qty = ((Number) row[2]).longValue();
+        return new ProductPurchaseStat(productId, productName, qty);
     }
 
     @SuppressWarnings("null")

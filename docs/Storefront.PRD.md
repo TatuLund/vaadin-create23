@@ -593,19 +593,24 @@ Replace the placeholder “Stats” tab in `PurchasesView` with real purchase st
    Implement the “Stats” tab content (e.g. `PurchasesStatsTab`) using **Vaadin Charts**.
 
    Charts to display (read-only):
-   - **Pie chart:** “Top 10 most purchased products (by quantity)”
+   - **Column chart:** “Top 10 most purchased products (by quantity)”
      - Data source: COMPLETED purchase lines aggregated by product, descending, limit 10.
-     - Chart type: `ChartType.PIE`.
+     - Chart type: `ChartType.COLUMN`.
      - Stable component id: `purchases-top-products-chart`.
-   - **Pie chart:** “Top 10 least purchased products (by quantity)”
+     - Y-axis name: Count, localized
+     - X-axis categories: 1 to 10
+   - **Column chart:** “Top 10 least purchased products (by quantity)”
      - Data source: COMPLETED purchase lines aggregated by product, ascending, limit 10, excluding zero-quantity products.
-     - Chart type: `ChartType.PIE`.
+     - Chart type: `ChartType.COLUMN`.
      - Stable component id: `purchases-least-products-chart`.
+     - Y-axis name: Count, localized
+     - X-axis categories: 1 to 10
    - **Line chart:** “Completed purchases per month (total amount)”
      - Data source: monthly totals from COMPLETED purchases over last 12 months.
      - Chart type: `ChartType.LINE`.
      - X-axis: month (e.g. `YYYY-MM`).
      - Y-axis: total amount (money).
+     - Y-axis: labels to have currency
      - Stable component id: `purchases-per-month-chart`.
 
    Loading & updates:

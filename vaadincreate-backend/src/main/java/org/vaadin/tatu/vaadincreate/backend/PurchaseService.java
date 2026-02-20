@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.backend;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.jspecify.annotations.NonNull;
@@ -13,10 +14,37 @@ import org.vaadin.tatu.vaadincreate.backend.service.PurchaseServiceImpl;
 
 /**
  * Service interface for managing purchases. Provides operations for creating
- * and querying purchase requests.
+ * and querying purchase requests, and for computing purchase statistics.
  */
 @NullMarked
 public interface PurchaseService {
+
+    /**
+     * Aggregated purchase quantity for a single product (COMPLETED purchases
+     * only).
+     *
+     * @param productId
+     *            the product id
+     * @param productName
+     *            the product name
+     * @param quantity
+     *            total purchased quantity across all COMPLETED purchase lines
+     */
+    record ProductPurchaseStat(Integer productId, String productName,
+            long quantity) {
+    }
+
+    /**
+     * Aggregated purchase amount for a single calendar month.
+     *
+     * @param yearMonth
+     *            the month in {@code YYYY-MM} format
+     * @param totalAmount
+     *            sum of {@code unitPrice * quantity} for all COMPLETED purchase
+     *            lines decided in that month
+     */
+    record MonthlyPurchaseStat(String yearMonth, BigDecimal totalAmount) {
+    }
 
     /**
      * Creates a new pending purchase from a cart. This method: - Creates a
@@ -173,6 +201,38 @@ public interface PurchaseService {
      *             if the purchase is not PENDING
      */
     Purchase reject(Integer purchaseId, User currentUser, String reason);
+
+    /**
+     * Returns the top products by purchased quantity from COMPLETED purchases,
+     * ordered descending.
+     *
+     * @param limit
+     *            maximum number of products to return
+     * @return list of at most {@code limit} products, most purchased first
+     */
+    List<@NonNull ProductPurchaseStat> getTopProductsByQuantity(int limit);
+
+    /**
+     * Returns the least purchased products by quantity from COMPLETED
+     * purchases, ordered ascending. Products with zero purchased quantity are
+     * excluded.
+     *
+     * @param limit
+     *            maximum number of products to return
+     * @return list of at most {@code limit} products, least purchased first
+     */
+    List<@NonNull ProductPurchaseStat> getLeastProductsByQuantity(int limit);
+
+    /**
+     * Returns monthly purchase totals (amount) for COMPLETED purchases over the
+     * last {@code months} calendar months (including the current month). Months
+     * with no purchases are included with a total of {@code 0}.
+     *
+     * @param months
+     *            number of calendar months to include, must be positive
+     * @return list of monthly totals ordered by month ascending
+     */
+    List<@NonNull MonthlyPurchaseStat> getMonthlyTotals(int months);
 
     /**
      * Gets the singleton instance of the PurchaseService.

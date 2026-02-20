@@ -614,6 +614,9 @@ Replace the placeholder “Stats” tab in `PurchasesView` with real purchase st
      - Update the UI safely (`UI.access`/existing `Utils.access` helper).
      - Show a “loading/no data” message until data arrives.
 
+   Styles:
+   - Reuse StatsView styles from dashboard.scss as the layout is the same.
+
    Accessibility:
    - Follow the existing chart accessibility approach (aria labels / live region updates) as used in `StatsView`, and thus use CustomChart component from common
    package.

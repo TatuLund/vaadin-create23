@@ -62,7 +62,7 @@ public class PurchasesApprovalsTab extends VerticalLayout
     private Button buildApproveButton(Purchase purchase) {
         var button = new Button(getTranslation(I18n.Storefront.APPROVE));
         button.setId("approve-button-" + purchase.getId());
-        button.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        button.addStyleNames(ValoTheme.BUTTON_PRIMARY, ValoTheme.BUTTON_SMALL);
         button.setDisableOnClick(true);
         button.addClickListener(
                 e -> openDecisionWindow(purchase, true, button));
@@ -72,7 +72,7 @@ public class PurchasesApprovalsTab extends VerticalLayout
     private Button buildRejectButton(Purchase purchase) {
         var button = new Button(getTranslation(I18n.Storefront.REJECT));
         button.setId("reject-button-" + purchase.getId());
-        button.addStyleName(ValoTheme.BUTTON_DANGER);
+        button.addStyleNames(ValoTheme.BUTTON_DANGER, ValoTheme.BUTTON_SMALL);
         button.setDisableOnClick(true);
         button.addClickListener(
                 e -> openDecisionWindow(purchase, false, button));
@@ -121,14 +121,12 @@ public class PurchasesApprovalsTab extends VerticalLayout
                 var reason = result.purchase().getDecisionReason();
                 Notification.show(
                         getTranslation(I18n.Storefront.INSUFFICIENT_STOCK,
-                                purchaseId,
-                                reason != null ? reason : ""),
+                                purchaseId, reason != null ? reason : ""),
                         Type.WARNING_MESSAGE);
             } else {
-                Notification.show(
-                        getTranslation(I18n.Storefront.APPROVE_SUCCESS,
-                                purchaseId),
-                        Type.HUMANIZED_MESSAGE);
+                Notification
+                        .show(getTranslation(I18n.Storefront.APPROVE_SUCCESS,
+                                purchaseId), Type.HUMANIZED_MESSAGE);
             }
         } catch (Exception e) {
             if (Utils.throwableHasCause(e, OptimisticLockException.class)) {
@@ -145,8 +143,7 @@ public class PurchasesApprovalsTab extends VerticalLayout
     private void handleReject(Integer purchaseId, User currentUser,
             @Nullable String reason) {
         if (reason == null || reason.isBlank()) {
-            Notification.show(
-                    getTranslation(I18n.Storefront.REASON_REQUIRED),
+            Notification.show(getTranslation(I18n.Storefront.REASON_REQUIRED),
                     Type.WARNING_MESSAGE);
             return;
         }

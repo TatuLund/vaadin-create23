@@ -83,10 +83,15 @@ public class PurchasesViewTest extends AbstractUITest {
         var approvalsGrid = (Grid<Object>) $(Grid.class)
                 .id("purchase-approvals-grid");
         assertNotNull("Approvals grid should be present", approvalsGrid);
-        // Grid has 10 columns: Toggle, ID, Requester, Approver, Created At,
-        // Status, Decided At, Total, Decision Reason, Actions
-        assertEquals("Approvals grid should have 10 columns", 10,
+        // Grid has 10 columns total, but 3 are hidden in PENDING_APPROVALS mode
+        // (Approver, Decided At, Decision Reason). Visible: Toggle, ID,
+        // Requester, Created At, Status, Total, Actions = 7 visible columns.
+        assertEquals("Approvals grid should have 10 columns total", 10,
                 approvalsGrid.getColumns().size());
+        long visibleCount = approvalsGrid.getColumns().stream()
+                .filter(c -> !c.isHidden()).count();
+        assertEquals("Approvals grid should have 7 visible columns", 7,
+                visibleCount);
 
         SerializationDebugUtil.assertSerializable(view);
     }

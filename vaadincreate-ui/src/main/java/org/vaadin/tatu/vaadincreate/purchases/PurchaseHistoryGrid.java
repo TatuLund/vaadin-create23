@@ -158,6 +158,10 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
             approverColumn.setHidden(true);
             decidedAtColumn.setHidden(true);
             decisionReasonColumn.setHidden(true);
+        } else if (mode == PurchaseHistoryMode.PENDING_APPROVALS) {
+            approverColumn.setHidden(true);
+            decidedAtColumn.setHidden(true);
+            decisionReasonColumn.setHidden(true);
         }
     }
 

@@ -233,6 +233,16 @@ public final class I18n {
         public static final String PURCHASE_CREATED = "purchase-created";
         public static final String PURCHASE_FAILED = "purchase-failed";
 
+        public static final String STATUS_UPDATES_TITLE = "status-updates-title";
+        public static final String STATUS_UPDATES_HEADER = "status-updates-header";
+        public static final String STATUS_UPDATES_COMPLETED_ONE = "status-updates-completed-one";
+        public static final String STATUS_UPDATES_COMPLETED_MANY = "status-updates-completed-many";
+        public static final String STATUS_UPDATES_REJECTED_ONE = "status-updates-rejected-one";
+        public static final String STATUS_UPDATES_REJECTED_MANY = "status-updates-rejected-many";
+        public static final String STATUS_UPDATES_CANCELLED_ONE = "status-updates-cancelled-one";
+        public static final String STATUS_UPDATES_CANCELLED_MANY = "status-updates-cancelled-many";
+        public static final String STATUS_UPDATES_FOOTER = "status-updates-footer";
+
         public static final String PURCHASE_ID = "purchase-id";
         public static final String APPROVER = "approver";
         public static final String DECIDED_AT = "decided-at";

@@ -238,4 +238,8 @@ $fake-grid-background-color: white;
   .v-tabsheet-tabsheetpanel > .v-scrollable > .v-widget {
     overflow: auto;
   }
+
+  .v-window-header > .v-icon {
+    margin-right: 5px
+  }
 }

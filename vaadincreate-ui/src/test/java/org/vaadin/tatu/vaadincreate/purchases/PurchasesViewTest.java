@@ -204,11 +204,7 @@ public class PurchasesViewTest extends AbstractUITest {
     public void approving_pending_purchase_shows_decision_window_and_updates_status_to_completed()
             throws ServiceException {
         // GIVEN: Login as User5 who is a designated approver in the mock data
-        logout();
-        tearDown();
-        ui = new VaadinCreateUI();
-        mockVaadin(ui);
-        login("User5", "user5");
+        switchToUser("User5", "user5");
 
         view = navigate(
                 PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
@@ -275,6 +271,15 @@ public class PurchasesViewTest extends AbstractUITest {
         SerializationDebugUtil.assertSerializable(view);
     }
 
+    private void switchToUser(String name, String password)
+            throws ServiceException {
+        logout();
+        tearDown();
+        ui = new VaadinCreateUI();
+        mockVaadin(ui);
+        login(name, password);
+    }
+
     /**
      * Tests the full rejection workflow: click Reject → DecisionWindow opens →
      * Confirm button is initially disabled → enter required reason → click
@@ -285,12 +290,7 @@ public class PurchasesViewTest extends AbstractUITest {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void rejecting_pending_purchase_shows_decision_window_requires_reason_and_updates_status_to_rejected()
             throws ServiceException {
-        // GIVEN: Login as User5 who is a designated approver in the mock data
-        logout();
-        tearDown();
-        ui = new VaadinCreateUI();
-        mockVaadin(ui);
-        login("User5", "user5");
+        switchToUser("User5", "user5");
 
         view = navigate(
                 PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
@@ -368,12 +368,7 @@ public class PurchasesViewTest extends AbstractUITest {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void approve_pending_purchase_shows_decision_window_and_clicking_cancel_then_status_remains_pending()
             throws ServiceException {
-        // GIVEN: Login as User5 who is a designated approver in the mock data
-        logout();
-        tearDown();
-        ui = new VaadinCreateUI();
-        mockVaadin(ui);
-        login("User5", "user5");
+        switchToUser("User5", "user5");
 
         view = navigate(
                 PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
@@ -430,12 +425,7 @@ public class PurchasesViewTest extends AbstractUITest {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void rejecting_pending_purchase_shows_decision_window_and_clicking_cancel_then_status_remains_pending()
             throws ServiceException {
-        // GIVEN: Login as User5 who is a designated approver in the mock data
-        logout();
-        tearDown();
-        ui = new VaadinCreateUI();
-        mockVaadin(ui);
-        login("User5", "user5");
+        switchToUser("User5", "user5");
 
         view = navigate(
                 PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
@@ -493,12 +483,7 @@ public class PurchasesViewTest extends AbstractUITest {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void approval_view_displays_pending_purchases_assigned_to_current_user_only()
             throws ServiceException {
-        // GIVEN: Login as User5 (one of the two mock approvers)
-        logout();
-        tearDown();
-        ui = new VaadinCreateUI();
-        mockVaadin(ui);
-        login("User5", "user5");
+        switchToUser("User5", "user5");
 
         view = navigate(
                 PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
@@ -522,11 +507,7 @@ public class PurchasesViewTest extends AbstractUITest {
         }
 
         // WHEN: Login as User6 (the other mock approver)
-        logout();
-        tearDown();
-        ui = new VaadinCreateUI();
-        mockVaadin(ui);
-        login("User6", "user6");
+        switchToUser("User6", "user6");
 
         view = navigate(
                 PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,

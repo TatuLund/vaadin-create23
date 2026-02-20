@@ -21,7 +21,6 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.addon.charts.model.Buttons;
 import com.vaadin.addon.charts.model.ChartType;
-import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.Exporting;
@@ -108,7 +107,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         var conf = priceChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.Stats.PRICES));
         conf.setLang(lang);
-        configureTooltip(conf);
+        Utils.configureChartTooltip(conf);
         priceChartWrapper.addComponent(priceChart);
         return priceChartWrapper;
     }
@@ -122,7 +121,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         var conf = categoryChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.CATEGORIES));
         conf.setLang(lang);
-        configureTooltip(conf);
+        Utils.configureChartTooltip(conf);
         categoryChartWrapper.addComponent(categoryChart);
         categoryChart.addLegendItemClickListener(legendItemClicked -> {
             var series = (DataSeries) legendItemClicked.getSeries();
@@ -147,16 +146,9 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         var conf = availabilityChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.Stats.AVAILABILITIES));
         conf.setLang(lang);
-        configureTooltip(conf);
+        Utils.configureChartTooltip(conf);
         availabilityChartWrapper.addComponent(availabilityChart);
         return availabilityChartWrapper;
-    }
-
-    private static void configureTooltip(Configuration conf) {
-        assert conf != null : "Configuration must not be null";
-        conf.getTooltip()
-                .setBackgroundColor(new SolidColor("rgba(50,50,50,0.9)"));
-        conf.getTooltip().getStyle().setColor(new SolidColor("white"));
     }
 
     /**

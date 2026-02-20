@@ -124,38 +124,60 @@ public class StorefrontView extends CssLayout implements VaadinCreateView {
     private void showStatusChangeNotification(
             List<Purchase> recentlyDecided) {
         long completedCount = recentlyDecided.stream()
-                .filter(p -> p.getStatus() == PurchaseStatus.COMPLETED).count();
+                .filter(purchase -> purchase
+                        .getStatus() == PurchaseStatus.COMPLETED)
+                .count();
         long rejectedCount = recentlyDecided.stream()
-                .filter(p -> p.getStatus() == PurchaseStatus.REJECTED).count();
+                .filter(purchase -> purchase
+                        .getStatus() == PurchaseStatus.REJECTED)
+                .count();
         long cancelledCount = recentlyDecided.stream()
-                .filter(p -> p.getStatus() == PurchaseStatus.CANCELLED).count();
+                .filter(purchase -> purchase
+                        .getStatus() == PurchaseStatus.CANCELLED)
+                .count();
 
-        StringBuilder message = new StringBuilder();
-        message.append("Purchase Status Updates:\n\n");
+        String message = getMessage(completedCount, rejectedCount,
+                cancelledCount);
 
-        if (completedCount > 0) {
-            message.append(completedCount).append(" purchase")
-                    .append(completedCount > 1 ? "s" : "")
-                    .append(" completed\n");
-        }
-        if (rejectedCount > 0) {
-            message.append(rejectedCount).append(" purchase")
-                    .append(rejectedCount > 1 ? "s" : "").append(" rejected\n");
-        }
-        if (cancelledCount > 0) {
-            message.append(cancelledCount).append(" purchase")
-                    .append(cancelledCount > 1 ? "s" : "")
-                    .append(" cancelled\n");
-        }
-
-        message.append("\nCheck your purchase history for details.");
-
-        Notification.show("Status Updates", message.toString(),
-                Type.TRAY_NOTIFICATION);
+        Notification.show(getTranslation(I18n.Storefront.STATUS_UPDATES_TITLE),
+                message, Type.TRAY_NOTIFICATION);
 
         logger.info(
                 "Showed status notification for {} decided purchases (completed: {}, rejected: {}, cancelled: {})",
                 recentlyDecided.size(), completedCount, rejectedCount,
                 cancelledCount);
+    }
+
+    private String getMessage(long completedCount, long rejectedCount,
+            long cancelledCount) {
+        StringBuilder message = new StringBuilder();
+        message.append(getTranslation(I18n.Storefront.STATUS_UPDATES_HEADER))
+                .append("\n\n");
+
+        if (completedCount > 0) {
+            message.append(getTranslation(
+                    completedCount == 1
+                            ? I18n.Storefront.STATUS_UPDATES_COMPLETED_ONE
+                            : I18n.Storefront.STATUS_UPDATES_COMPLETED_MANY,
+                    completedCount)).append("\n");
+        }
+        if (rejectedCount > 0) {
+            message.append(getTranslation(
+                    rejectedCount == 1
+                            ? I18n.Storefront.STATUS_UPDATES_REJECTED_ONE
+                            : I18n.Storefront.STATUS_UPDATES_REJECTED_MANY,
+                    rejectedCount)).append("\n");
+        }
+        if (cancelledCount > 0) {
+            message.append(getTranslation(
+                    cancelledCount == 1
+                            ? I18n.Storefront.STATUS_UPDATES_CANCELLED_ONE
+                            : I18n.Storefront.STATUS_UPDATES_CANCELLED_MANY,
+                    cancelledCount)).append("\n");
+        }
+
+        message.append("\n")
+                .append(getTranslation(I18n.Storefront.STATUS_UPDATES_FOOTER));
+        return message.toString();
     }
 }

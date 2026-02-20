@@ -2,7 +2,9 @@ package org.vaadin.tatu.vaadincreate.purchases;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.VaadinCreateView;
+import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.common.TabNavigator;
@@ -35,6 +37,9 @@ public class PurchasesView extends VerticalLayout implements VaadinCreateView {
     @Nullable
     private PurchasesStatsTab statsTab;
 
+    private AccessControl accessControl = VaadinCreateUI.get()
+            .getAccessControl();
+
     public PurchasesView() {
         setSizeFull();
     }
@@ -60,9 +65,11 @@ public class PurchasesView extends VerticalLayout implements VaadinCreateView {
         approvalsTab = new PurchasesApprovalsTab();
         statsTab = new PurchasesStatsTab();
         tabNavigator = new TabNavigator(VIEW_NAME);
-        tabNavigator.addTabView(historyTab,
-                getTranslation(I18n.Storefront.PURCHASE_HISTORY),
-                VaadinIcons.TIME_BACKWARD);
+        if (accessControl.isUserInRole(Role.ADMIN)) {
+            tabNavigator.addTabView(historyTab,
+                    getTranslation(I18n.Storefront.PURCHASE_HISTORY),
+                    VaadinIcons.TIME_BACKWARD);
+        }
         tabNavigator.addTabView(approvalsTab,
                 getTranslation(I18n.APPROVALS), VaadinIcons.CHECK);
         tabNavigator.addTabView(statsTab,

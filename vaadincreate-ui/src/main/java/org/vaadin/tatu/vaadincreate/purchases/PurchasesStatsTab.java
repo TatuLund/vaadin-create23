@@ -19,13 +19,11 @@ import org.vaadin.tatu.vaadincreate.stats.StatsView;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.addon.charts.model.ChartType;
-import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.Lang;
 import com.vaadin.addon.charts.model.XAxis;
 import com.vaadin.addon.charts.model.YAxis;
-import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.UI;
@@ -107,7 +105,7 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
         var xaxis = conf.getxAxis();
         xaxis.setCategories(IntStream.rangeClosed(1, 10)
                 .mapToObj(String::valueOf).toArray(String[]::new));
-        configureTooltip(conf);
+        Utils.configureChartTooltip(conf);
         wrapper.addComponent(topProductsChart);
         return wrapper;
     }
@@ -126,7 +124,7 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
         var xaxis = conf.getxAxis();
         xaxis.setCategories(IntStream.rangeClosed(1, 10)
                 .mapToObj(String::valueOf).toArray(String[]::new));
-        configureTooltip(conf);
+        Utils.configureChartTooltip(conf);
         wrapper.addComponent(leastProductsChart);
         return wrapper;
     }
@@ -140,17 +138,10 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
         conf.setTitle(getTranslation(I18n.Storefront.MONTHLY_TOTALS));
         conf.setLang(lang);
         conf.getLegend().setEnabled(false);
-        configureTooltip(conf);
+        Utils.configureChartTooltip(conf);
         conf.getTooltip().setValueSuffix("€");
         wrapper.addComponent(monthlyChart);
         return wrapper;
-    }
-
-    private static void configureTooltip(Configuration conf) {
-        assert conf != null : "Configuration must not be null";
-        conf.getTooltip()
-                .setBackgroundColor(new SolidColor("rgba(50,50,50,0.9)"));
-        conf.getTooltip().getStyle().setColor(new SolidColor("white"));
     }
 
     // ---- async update -------------------------------------------------------

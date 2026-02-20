@@ -7,6 +7,7 @@ import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -69,6 +70,7 @@ public class DecisionWindow extends Window implements HasI18N {
         setModal(true);
         setClosable(true);
         setResizable(false);
+        setIcon(VaadinIcons.PENCIL);
         setWidth("400px");
         setId(DECISION_WINDOW_ID);
         setCaption(isApprove ? getTranslation(I18n.Storefront.APPROVE)

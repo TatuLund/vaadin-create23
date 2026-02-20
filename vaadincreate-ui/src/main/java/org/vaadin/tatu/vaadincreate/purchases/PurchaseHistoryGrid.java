@@ -97,11 +97,11 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
     }
 
     private void setupDetailsToggle() {
-        grid.addItemClickListener(e -> {
-            if (e.getItem() != null) {
-                grid.setDetailsVisible(e.getItem(),
-                        !grid.isDetailsVisible(e.getItem()));
-                grid.getDataProvider().refreshItem(e.getItem());
+        grid.addItemClickListener(clickEvent -> {
+            if (clickEvent.getItem() != null) {
+                grid.setDetailsVisible(clickEvent.getItem(),
+                        !grid.isDetailsVisible(clickEvent.getItem()));
+                grid.getDataProvider().refreshItem(clickEvent.getItem());
             }
         });
     }
@@ -173,9 +173,7 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
                     return presenter
                             .fetchPurchases(mode, offset, limit, currentUser)
                             .stream();
-                }, query -> {
-                    return (int) presenter.countPurchases(mode, currentUser);
-                });
+                }, query -> (int) presenter.countPurchases(mode, currentUser));
 
         grid.setDataProvider(dataProvider);
     }
@@ -243,9 +241,7 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
         NumberFormat euroFormat = new DecimalFormat("#,##0.00 €");
 
         for (PurchaseLine line : purchase.getLines()) {
-            var productName = line.getProduct() != null
-                    ? line.getProduct().getProductName()
-                    : "";
+            var productName = line.getProduct().getProductName();
             var unitPrice = euroFormat.format(line.getUnitPrice());
             var quantity = line.getQuantity();
             var lineTotal = euroFormat.format(line.getLineTotal());
@@ -297,7 +293,7 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
                     String.valueOf(grid.isDetailsVisible(purchase)));
             addStyleNames(ValoTheme.BUTTON_ICON_ONLY,
                     ValoTheme.BUTTON_BORDERLESS);
-            addClickListener(e -> {
+            addClickListener(clickEvent -> {
                 grid.setDetailsVisible(purchase,
                         !grid.isDetailsVisible(purchase));
                 setIcon(grid.isDetailsVisible(purchase) ? VaadinIcons.ANGLE_DOWN

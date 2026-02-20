@@ -220,7 +220,17 @@ public class MockDataGenerator implements Serializable {
                     var decidedAt = created.plusHours(1 + random.nextInt(72))
                             .atZone(zone).toInstant();
                     purchase.setDecidedAt(decidedAt);
-                    purchase.setDecisionReason("Mock decision");
+                    switch (status) {
+                    case COMPLETED -> purchase
+                            .setDecisionReason("Within budget");
+                    case REJECTED -> purchase
+                            .setDecisionReason("Too expensive");
+                    case CANCELLED -> purchase
+                            .setDecisionReason("No availability");
+                    default -> {
+                        // NOP
+                    }
+                    }
                 }
 
                 purchase.setDeliveryAddress(new Address(

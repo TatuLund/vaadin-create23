@@ -17,6 +17,8 @@ import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.components.Html;
 import org.vaadin.tatu.vaadincreate.components.Html.Span;
 
+import com.vaadin.addon.charts.model.Configuration;
+import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.data.Converter;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.ValueContext;
@@ -46,6 +48,21 @@ public class Utils {
      */
     public static String sanitize(String unsanitized) {
         return Html.sanitize(unsanitized);
+    }
+
+    /**
+     * Configures the tooltip of a chart with a consistent style. This method
+     * sets a dark semi-transparent background and white text color for the
+     * tooltip.
+     *
+     * @param conf
+     *            the chart configuration to be modified
+     */
+    public static void configureChartTooltip(Configuration conf) {
+        assert conf != null : "Configuration must not be null";
+        conf.getTooltip()
+                .setBackgroundColor(new SolidColor("rgba(50,50,50,0.9)"));
+        conf.getTooltip().getStyle().setColor(new SolidColor("white"));
     }
 
     /**

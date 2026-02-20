@@ -9,7 +9,6 @@ import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.common.TabView;
-import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.purchases.ApprovalsPresenter.ApproveResult;
 import org.vaadin.tatu.vaadincreate.util.Utils;
@@ -29,7 +28,7 @@ import com.vaadin.ui.themes.ValoTheme;
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class PurchasesApprovalsTab extends VerticalLayout
-        implements TabView, HasI18N {
+        implements TabView {
 
     public static final String VIEW_NAME = I18n.APPROVALS;
 
@@ -65,7 +64,7 @@ public class PurchasesApprovalsTab extends VerticalLayout
         button.addStyleNames(ValoTheme.BUTTON_PRIMARY, ValoTheme.BUTTON_SMALL);
         button.setDisableOnClick(true);
         button.addClickListener(
-                e -> openDecisionWindow(purchase, true, button));
+                clickEvent -> openDecisionWindow(purchase, true, button));
         return button;
     }
 
@@ -75,7 +74,7 @@ public class PurchasesApprovalsTab extends VerticalLayout
         button.addStyleNames(ValoTheme.BUTTON_DANGER, ValoTheme.BUTTON_SMALL);
         button.setDisableOnClick(true);
         button.addClickListener(
-                e -> openDecisionWindow(purchase, false, button));
+                clickEvent -> openDecisionWindow(purchase, false, button));
         return button;
     }
 
@@ -89,15 +88,11 @@ public class PurchasesApprovalsTab extends VerticalLayout
                 comment -> handleDecision(purchaseId, isApprove, comment));
         // Re-enable the source button only if the window was closed without
         // confirming (i.e. user cancelled), so they can try again.
-        // The cast to Serializable is required because Window.CloseListener
-        // does not extend Serializable and lambdas must be serializable in
-        // Vaadin 8 sessions.
-        window.addCloseListener(
-                (com.vaadin.ui.Window.CloseListener & java.io.Serializable) e -> {
-                    if (!window.isConfirmed()) {
-                        sourceButton.setEnabled(true);
-                    }
-                });
+        window.addCloseListener(closeEvent -> {
+            if (!window.isConfirmed()) {
+                sourceButton.setEnabled(true);
+            }
+        });
         getUI().addWindow(window);
         window.center();
     }

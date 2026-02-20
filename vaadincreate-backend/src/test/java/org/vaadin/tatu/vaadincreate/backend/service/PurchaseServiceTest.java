@@ -39,9 +39,12 @@ public class PurchaseServiceTest {
 
     @Before
     public void setUp() {
-        purchaseService = PurchaseServiceImpl.getInstance();
+        // Initialize UserService and ProductDataService first so that mock
+        // data (users and products) is available when PurchaseServiceImpl
+        // starts up and calls generateMockPurchaseDataIfEmpty().
         userService = UserServiceImpl.getInstance();
         productService = ProductDataServiceImpl.getInstance();
+        purchaseService = PurchaseServiceImpl.getInstance();
 
         // Use existing users or get first users by role
         // Try to find existing users with CUSTOMER and USER roles
@@ -309,5 +312,125 @@ public class PurchaseServiceTest {
         assertEquals(2, page1.size());
         assertEquals(2, page2.size());
         assertNotEquals(page1.get(0).getId(), page2.get(0).getId());
+    }
+
+    @Test
+    public void should_ApprovePurchase_And_DecrementStock_When_StockIsSufficient() {
+        // Arrange – use a fresh product reference and set known stock
+        var freshProduct = productService.getProductById(testProduct.getId());
+        int orderQty = 2;
+        freshProduct.setStockCount(orderQty + 5);
+        freshProduct = productService.updateProduct(freshProduct);
+
+        Cart cart = new Cart();
+        cart.addItem(freshProduct, orderQty);
+        Address address = new Address("123 Main St", "12345", "Anytown", "USA");
+
+        Purchase purchase = purchaseService.createPendingPurchase(cart, address,
+                customerUser, supervisorUser);
+
+        // Act
+        Purchase approved = purchaseService.approve(purchase.getId(),
+                supervisorUser, "Looks good");
+
+        // Assert
+        assertEquals(PurchaseStatus.COMPLETED, approved.getStatus());
+        assertNotNull(approved.getDecidedAt());
+        assertEquals("Looks good", approved.getDecisionReason());
+
+        // Stock must be decremented
+        Product reloaded = productService.getProductById(testProduct.getId());
+        assertEquals(orderQty + 5 - orderQty,
+                reloaded.getStockCount().intValue());
+    }
+
+    @Test
+    public void should_CancelPurchase_When_StockIsInsufficient() {
+        // Arrange – set stock to 0 so approval will detect insufficiency
+        int savedStock = testProduct.getStockCount();
+        testProduct.setStockCount(0);
+        productService.updateProduct(testProduct);
+
+        Cart cart = new Cart();
+        cart.addItem(testProduct, 1);
+        Address address = new Address("123 Main St", "12345", "Anytown", "USA");
+
+        Purchase purchase = purchaseService.createPendingPurchase(cart, address,
+                customerUser, supervisorUser);
+
+        // Act
+        Purchase cancelled = purchaseService.approve(purchase.getId(),
+                supervisorUser, null);
+
+        // Assert
+        assertEquals(PurchaseStatus.CANCELLED, cancelled.getStatus());
+        assertNotNull(cancelled.getDecisionReason());
+        assertTrue(cancelled.getDecisionReason().contains("Insufficient"));
+
+        // Stock must stay at 0 (no decrement)
+        Product reloaded = productService.getProductById(testProduct.getId());
+        assertEquals(Integer.valueOf(0), reloaded.getStockCount());
+
+        // Restore stock for other tests
+        testProduct.setStockCount(savedStock);
+        productService.updateProduct(testProduct);
+    }
+
+    @Test
+    public void should_RejectPurchase_Without_StockChange_When_ReasonProvided() {
+        // Arrange
+        int originalStock = testProduct.getStockCount();
+        Cart cart = new Cart();
+        cart.addItem(testProduct, 1);
+        Address address = new Address("123 Main St", "12345", "Anytown", "USA");
+
+        Purchase purchase = purchaseService.createPendingPurchase(cart, address,
+                customerUser, supervisorUser);
+
+        // Act
+        Purchase rejected = purchaseService.reject(purchase.getId(),
+                supervisorUser, "Budget exceeded");
+
+        // Assert
+        assertEquals(PurchaseStatus.REJECTED, rejected.getStatus());
+        assertNotNull(rejected.getDecidedAt());
+        assertEquals("Budget exceeded", rejected.getDecisionReason());
+
+        // Stock must not change
+        Product reloaded = productService.getProductById(testProduct.getId());
+        assertEquals(originalStock, reloaded.getStockCount().intValue());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void should_ThrowException_When_ApprovingNonPendingPurchase() {
+        // Arrange
+        Cart cart = new Cart();
+        cart.addItem(testProduct, 1);
+        Address address = new Address("123 Main St", "12345", "Anytown", "USA");
+
+        Purchase purchase = purchaseService.createPendingPurchase(cart, address,
+                customerUser, supervisorUser);
+        purchaseService.reject(purchase.getId(), supervisorUser,
+                "Already decided");
+
+        // Act – approving a REJECTED purchase must throw
+        purchaseService.approve(purchase.getId(), supervisorUser, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void should_ThrowException_When_RejectingNonPendingPurchase() {
+        // Arrange
+        Cart cart = new Cart();
+        cart.addItem(testProduct, 1);
+        Address address = new Address("123 Main St", "12345", "Anytown", "USA");
+
+        Purchase purchase = purchaseService.createPendingPurchase(cart, address,
+                customerUser, supervisorUser);
+        purchaseService.reject(purchase.getId(), supervisorUser,
+                "First rejection");
+
+        // Act – rejecting again must throw
+        purchaseService.reject(purchase.getId(), supervisorUser,
+                "Second rejection");
     }
 }

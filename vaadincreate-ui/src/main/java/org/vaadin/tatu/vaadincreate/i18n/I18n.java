@@ -239,6 +239,14 @@ public final class I18n {
         public static final String DECISION_REASON = "decision-reason";
         public static final String PENDING = "pending";
         public static final String NOT_AVAILABLE = "not-available";
+        public static final String APPROVE = "approve";
+        public static final String REJECT = "reject";
+        public static final String DECISION_COMMENT = "decision-comment";
+        public static final String APPROVE_SUCCESS = "approve-success";
+        public static final String REJECT_SUCCESS = "reject-success";
+        public static final String INSUFFICIENT_STOCK = "insufficient-stock";
+        public static final String APPROVE_CONFLICT = "approve-conflict";
+        public static final String REASON_REQUIRED = "reason-required";
 
         private Storefront() {
             // private constructor to hide the implicit public one

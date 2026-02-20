@@ -237,6 +237,28 @@ public class PurchaseServiceImpl implements PurchaseService {
         return purchaseDao.findRecentlyDecidedByRequester(requester, since);
     }
 
+    @Override
+    public Purchase approve(Integer purchaseId, User currentUser,
+            @Nullable String decisionCommentOrNull) {
+        Objects.requireNonNull(purchaseId, "Purchase ID must not be null");
+        Objects.requireNonNull(currentUser, "Current user must not be null");
+        logger.info("Approving purchase: ({}) by user: '{}'", purchaseId,
+                currentUser.getName());
+        return purchaseDao.approvePurchase(purchaseId, currentUser,
+                decisionCommentOrNull);
+    }
+
+    @Override
+    public Purchase reject(Integer purchaseId, User currentUser,
+            String reason) {
+        Objects.requireNonNull(purchaseId, "Purchase ID must not be null");
+        Objects.requireNonNull(currentUser, "Current user must not be null");
+        Objects.requireNonNull(reason, "Reason must not be null");
+        logger.info("Rejecting purchase: ({}) by user: '{}'", purchaseId,
+                currentUser.getName());
+        return purchaseDao.rejectPurchase(purchaseId, currentUser, reason);
+    }
+
     @SuppressWarnings("null")
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

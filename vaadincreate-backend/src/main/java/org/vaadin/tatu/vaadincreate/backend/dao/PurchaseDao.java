@@ -1,6 +1,8 @@
 package org.vaadin.tatu.vaadincreate.backend.dao;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,6 +12,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
@@ -299,6 +302,136 @@ public class PurchaseDao {
                 "UserSupervisor mapping must not be null");
         logger.info("Persisting UserSupervisor mapping: ({})", mapping.getId());
         return HibernateUtil.saveOrUpdate(mapping);
+    }
+
+    /**
+     * Approves a pending purchase in a single transaction. If all lines have
+     * sufficient stock, decrements product stock and marks the purchase as
+     * COMPLETED. If any product lacks stock, marks the purchase as CANCELLED
+     * with a human-readable reason. Optimistic locking is enforced via the
+     * {@code @Version} field on {@code Product}; an
+     * {@code OptimisticLockException} will propagate out of this method if a
+     * concurrent modification is detected at commit time.
+     *
+     * @param purchaseId
+     *            the purchase to approve
+     * @param currentUser
+     *            the user performing the approval
+     * @param decisionCommentOrNull
+     *            optional comment
+     * @return the updated {@link Purchase}
+     * @throws IllegalArgumentException
+     *             if the purchase is not PENDING or {@code currentUser} is not
+     *             the assigned approver
+     */
+    public Purchase approvePurchase(Integer purchaseId, User currentUser,
+            @Nullable String decisionCommentOrNull) {
+        Objects.requireNonNull(purchaseId, "Purchase ID must not be null");
+        Objects.requireNonNull(currentUser, "Current user must not be null");
+        logger.info("Approving Purchase: ({}) by user: ({})", purchaseId,
+                currentUser.getId());
+        var result = HibernateUtil.inTransaction(session -> {
+            var purchase = session.get(Purchase.class, purchaseId);
+            if (purchase == null) {
+                throw new IllegalArgumentException(
+                        "Purchase not found: " + purchaseId);
+            }
+            if (purchase.getStatus() != PurchaseStatus.PENDING) {
+                throw new IllegalArgumentException(
+                        "Purchase is not PENDING: " + purchaseId);
+            }
+            var storedApprover = purchase.getApprover();
+            if (storedApprover == null
+                    || !storedApprover.getId().equals(currentUser.getId())) {
+                throw new IllegalArgumentException(
+                        "Current user is not the assigned approver");
+            }
+            Hibernate.initialize(purchase.getLines());
+            // Load products within the same session for optimistic locking.
+            var productsById = new HashMap<Integer, Product>();
+            var insufficientItems = new ArrayList<String>();
+            for (var line : purchase.getLines()) {
+                var productId = line.getProduct().getId();
+                var product = session.get(Product.class, productId);
+                productsById.put(productId, product);
+                if (product.getStockCount() < line.getQuantity()) {
+                    insufficientItems.add(
+                            String.format("%s: needs %d, has %d",
+                                    product.getProductName(),
+                                    line.getQuantity(),
+                                    product.getStockCount()));
+                }
+            }
+            if (!insufficientItems.isEmpty()) {
+                purchase.setStatus(PurchaseStatus.CANCELLED);
+                purchase.setDecidedAt(Instant.now());
+                purchase.setDecisionReason("Insufficient stock: "
+                        + String.join(", ", insufficientItems));
+            } else {
+                for (var line : purchase.getLines()) {
+                    var product = productsById.get(line.getProduct().getId());
+                    product.setStockCount(
+                            product.getStockCount() - line.getQuantity());
+                    // product is already managed by the session; dirty
+                    // checking will flush the change on commit.
+                }
+                purchase.setStatus(PurchaseStatus.COMPLETED);
+                purchase.setDecidedAt(Instant.now());
+                purchase.setDecisionReason(decisionCommentOrNull);
+            }
+            // purchase is already managed by the session; no explicit
+            // update call needed – dirty checking handles this.
+            return purchase;
+        });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Result of approvePurchase is null");
+        }
+        return result;
+    }
+
+    /**
+     * Rejects a pending purchase in a single transaction.
+     *
+     * @param purchaseId
+     *            the purchase to reject
+     * @param currentUser
+     *            the user performing the rejection
+     * @param reason
+     *            required non-empty reason for rejection
+     * @return the updated {@link Purchase}
+     * @throws IllegalArgumentException
+     *             if the purchase is not PENDING
+     */
+    public Purchase rejectPurchase(Integer purchaseId, User currentUser,
+            String reason) {
+        Objects.requireNonNull(purchaseId, "Purchase ID must not be null");
+        Objects.requireNonNull(currentUser, "Current user must not be null");
+        Objects.requireNonNull(reason, "Reason must not be null");
+        logger.info("Rejecting Purchase: ({}) by user: ({})", purchaseId,
+                currentUser.getId());
+        var result = HibernateUtil.inTransaction(session -> {
+            var purchase = session.get(Purchase.class, purchaseId);
+            if (purchase == null) {
+                throw new IllegalArgumentException(
+                        "Purchase not found: " + purchaseId);
+            }
+            if (purchase.getStatus() != PurchaseStatus.PENDING) {
+                throw new IllegalArgumentException(
+                        "Purchase is not PENDING: " + purchaseId);
+            }
+            purchase.setStatus(PurchaseStatus.REJECTED);
+            purchase.setDecidedAt(Instant.now());
+            purchase.setDecisionReason(reason);
+            // purchase is already managed by the session; dirty checking
+            // will flush the update on commit.
+            return purchase;
+        });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Result of rejectPurchase is null");
+        }
+        return result;
     }
 
     @SuppressWarnings("null")

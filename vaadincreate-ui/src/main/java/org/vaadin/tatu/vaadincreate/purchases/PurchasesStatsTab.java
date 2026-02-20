@@ -1,8 +1,8 @@
 package org.vaadin.tatu.vaadincreate.purchases;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -35,9 +35,9 @@ import com.vaadin.ui.VerticalLayout;
  * Stats tab for {@link PurchasesView}. Displays three charts based solely on
  * {@code COMPLETED} purchases:
  * <ul>
- * <li>Pie chart – top 10 most purchased products by quantity
+ * <li>Column chart – top 10 most purchased products by quantity
  * ({@code purchases-top-products-chart})</li>
- * <li>Pie chart – top 10 least purchased products by quantity
+ * <li>Column chart – top 10 least purchased products by quantity
  * ({@code purchases-least-products-chart})</li>
  * <li>Line chart – completed purchase amount per month over the last 12 months
  * ({@code purchases-per-month-chart})</li>
@@ -62,9 +62,9 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
     private final Lang lang;
 
     private final CustomChart topProductsChart = new CustomChart(
-            ChartType.PIE);
+            ChartType.COLUMN);
     private final CustomChart leastProductsChart = new CustomChart(
-            ChartType.PIE);
+            ChartType.COLUMN);
     private final CustomChart monthlyChart = new CustomChart(ChartType.LINE);
 
     @Nullable
@@ -83,10 +83,8 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
         dashboard = new CssLayout();
         dashboard.addStyleName(VaadinCreateTheme.DASHBOARD);
 
-        dashboard.addComponents(
-                configureTopProductsChart(),
-                configureLeastProductsChart(),
-                configureMonthlyChart());
+        dashboard.addComponents(configureTopProductsChart(),
+                configureLeastProductsChart(), configureMonthlyChart());
 
         setMargin(false);
         addComponent(dashboard);
@@ -104,6 +102,11 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
         var conf = topProductsChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.Storefront.TOP_PRODUCTS));
         conf.setLang(lang);
+        conf.getLegend().setEnabled(false);
+        conf.getyAxis().setTitle(getTranslation(I18n.Stats.COUNT));
+        var xaxis = conf.getxAxis();
+        xaxis.setCategories(IntStream.rangeClosed(1, 10)
+                .mapToObj(String::valueOf).toArray(String[]::new));
         configureTooltip(conf);
         wrapper.addComponent(topProductsChart);
         return wrapper;
@@ -118,6 +121,11 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
         var conf = leastProductsChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.Storefront.LEAST_PRODUCTS));
         conf.setLang(lang);
+        conf.getLegend().setEnabled(false);
+        conf.getyAxis().setTitle(getTranslation(I18n.Stats.COUNT));
+        var xaxis = conf.getxAxis();
+        xaxis.setCategories(IntStream.rangeClosed(1, 10)
+                .mapToObj(String::valueOf).toArray(String[]::new));
         configureTooltip(conf);
         wrapper.addComponent(leastProductsChart);
         return wrapper;
@@ -131,7 +139,9 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
         var conf = monthlyChart.getConfiguration();
         conf.setTitle(getTranslation(I18n.Storefront.MONTHLY_TOTALS));
         conf.setLang(lang);
+        conf.getLegend().setEnabled(false);
         configureTooltip(conf);
+        conf.getTooltip().setValueSuffix("€");
         wrapper.addComponent(monthlyChart);
         return wrapper;
     }
@@ -183,7 +193,7 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
         var series = buildProductSeries(stats,
                 getTranslation(I18n.Storefront.TOP_PRODUCTS));
         topProductsChart.getConfiguration().setSeries(series);
-        updatePieChartAriaLabel(topProductsChart,
+        updateColumnChartAriaLabel(topProductsChart,
                 getTranslation(I18n.Storefront.TOP_PRODUCTS), series);
     }
 
@@ -191,7 +201,7 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
         var series = buildProductSeries(stats,
                 getTranslation(I18n.Storefront.LEAST_PRODUCTS));
         leastProductsChart.getConfiguration().setSeries(series);
-        updatePieChartAriaLabel(leastProductsChart,
+        updateColumnChartAriaLabel(leastProductsChart,
                 getTranslation(I18n.Storefront.LEAST_PRODUCTS), series);
     }
 
@@ -204,7 +214,7 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
         return series;
     }
 
-    private static void updatePieChartAriaLabel(CustomChart chart,
+    private static void updateColumnChartAriaLabel(CustomChart chart,
             String title, DataSeries series) {
         var alt = String.format("%s: %s", title,
                 series.getData().stream()
@@ -224,6 +234,7 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
 
         var yAxis = new YAxis();
         yAxis.setTitle(getTranslation(I18n.Storefront.AMOUNT));
+        yAxis.getLabels().setFormat("{value:.2f} €");
         conf.removeyAxes();
         conf.addyAxis(yAxis);
 
@@ -236,7 +247,7 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
         var alt = String.format("%s: %s",
                 getTranslation(I18n.Storefront.MONTHLY_TOTALS),
                 stats.stream()
-                        .map(s -> String.format("%s %.2f", s.yearMonth(),
+                        .map(s -> String.format("%s %.2f €", s.yearMonth(),
                                 s.totalAmount()))
                         .collect(Collectors.joining(", ")));
         monthlyChart.setAriaLabel(alt);

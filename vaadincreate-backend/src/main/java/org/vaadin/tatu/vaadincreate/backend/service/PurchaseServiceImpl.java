@@ -115,6 +115,13 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    @Nullable
+    public Purchase fetchPurchaseById(Integer purchaseId) {
+        Objects.requireNonNull(purchaseId, "Purchase ID must not be null");
+        return purchaseDao.getPurchase(purchaseId);
+    }
+
+    @Override
     public Purchase createPendingPurchase(Cart cart,
             Address address, User requester,
             @Nullable User defaultApproverOrNull) {

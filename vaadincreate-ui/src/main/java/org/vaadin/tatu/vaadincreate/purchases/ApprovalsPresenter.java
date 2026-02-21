@@ -13,6 +13,8 @@ import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
+import org.vaadin.tatu.vaadincreate.backend.events.PurchaseStatusChangedEvent;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 /**
@@ -46,6 +48,7 @@ public class ApprovalsPresenter implements Serializable {
         try {
             var purchase = getPurchaseService().approve(purchaseId, currentUser,
                     decisionCommentOrNull);
+            postStatusChangedEvent(purchaseId);
             if (purchase.getStatus() == PurchaseStatus.CANCELLED) {
                 return ApproveResult.cancelled(purchase);
             }
@@ -58,6 +61,7 @@ public class ApprovalsPresenter implements Serializable {
                 // Retry once.
                 var purchase = getPurchaseService().approve(purchaseId,
                         currentUser, decisionCommentOrNull);
+                postStatusChangedEvent(purchaseId);
                 if (purchase.getStatus() == PurchaseStatus.CANCELLED) {
                     return ApproveResult.cancelled(purchase);
                 }
@@ -83,7 +87,14 @@ public class ApprovalsPresenter implements Serializable {
         Objects.requireNonNull(purchaseId, "Purchase ID must not be null");
         Objects.requireNonNull(currentUser, "Current user must not be null");
         Objects.requireNonNull(reason, "Reason must not be null");
-        return getPurchaseService().reject(purchaseId, currentUser, reason);
+        var purchase = getPurchaseService().reject(purchaseId, currentUser,
+                reason);
+        postStatusChangedEvent(purchaseId);
+        return purchase;
+    }
+
+    private void postStatusChangedEvent(Integer purchaseId) {
+        getEventBus().post(new PurchaseStatusChangedEvent(purchaseId));
     }
 
     private PurchaseService getPurchaseService() {
@@ -91,6 +102,10 @@ public class ApprovalsPresenter implements Serializable {
             purchaseService = PurchaseService.get();
         }
         return purchaseService;
+    }
+
+    private EventBus getEventBus() {
+        return EventBus.get();
     }
 
     /**

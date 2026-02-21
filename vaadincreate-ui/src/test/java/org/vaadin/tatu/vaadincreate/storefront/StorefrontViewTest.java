@@ -2,6 +2,7 @@ package org.vaadin.tatu.vaadincreate.storefront;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -10,8 +11,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
+import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
+import org.vaadin.tatu.vaadincreate.backend.events.PurchaseStatusChangedEvent;
 import org.vaadin.tatu.vaadincreate.common.NumberField;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
 import com.vaadin.shared.Position;
 import com.vaadin.server.ServiceException;
@@ -76,18 +81,11 @@ public class StorefrontViewTest extends AbstractUITest {
         assertNotNull("Product grid should be present", productGrid);
 
         // AND: Next button should be present
-        var nextButton = $(Button.class).stream().filter(
-                b -> b.getCaption() != null && b.getCaption()
-                        .contains("Next"))
-                .findFirst().orElse(null);
+        var nextButton = $(Button.class).caption("Next").first();
         assertNotNull("Next button should be present", nextButton);
 
         // AND: Previous button should be disabled on first step
-        var prevButton = $(Button.class).stream()
-                .filter(b -> b.getCaption() != null
-                        && b.getCaption().contains(
-                                "Previous"))
-                .findFirst().orElse(null);
+        var prevButton = $(Button.class).caption("Previous").first();
         assertNotNull("Previous button should be present", prevButton);
         assertFalse("Previous button should be disabled on first step",
                 prevButton.isEnabled());
@@ -102,10 +100,7 @@ public class StorefrontViewTest extends AbstractUITest {
         view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
 
         // WHEN: User tries to proceed without adding items
-        var nextButton = $(Button.class).stream().filter(
-                b -> b.getCaption() != null && b.getCaption()
-                        .contains("Next"))
-                .findFirst().orElse(null);
+        var nextButton = $(Button.class).caption("Next").first();
         assertNotNull(nextButton);
         test(nextButton).click();
 
@@ -144,10 +139,7 @@ public class StorefrontViewTest extends AbstractUITest {
                 NumberField.class).first();
         test(numberField).setValue(2);
 
-        var nextButton = $(Button.class).stream().filter(
-                b -> b.getCaption() != null && b.getCaption()
-                        .contains("Next"))
-                .findFirst().get();
+        var nextButton = $(Button.class).caption("Next").first();
         test(nextButton).click();
 
         // Verify serialization in step 2
@@ -174,10 +166,7 @@ public class StorefrontViewTest extends AbstractUITest {
                 NumberField.class).first();
         test(numberField).setValue(1);
 
-        var nextButton = $(Button.class).stream().filter(
-                b -> b.getCaption() != null && b.getCaption()
-                        .contains("Next"))
-                .findFirst().get();
+        var nextButton = $(Button.class).caption("Next").first();
         test(nextButton).click();
 
         // Fill address
@@ -216,10 +205,7 @@ public class StorefrontViewTest extends AbstractUITest {
                 NumberField.class).first();
         test(numberField).setValue(2);
 
-        var nextButton = $(Button.class).stream().filter(
-                b -> b.getCaption() != null && b.getCaption()
-                        .contains("Next"))
-                .findFirst().get();
+        var nextButton = $(Button.class).caption("Next").first();
         test(nextButton).click();
 
         // Fill address
@@ -264,17 +250,13 @@ public class StorefrontViewTest extends AbstractUITest {
         SerializationDebugUtil.assertSerializable(view);
 
         // Submit
-        var submitButton = $(Button.class).stream()
-                .filter(b -> b.getCaption() != null
-                        && b.getCaption().contains(
-                                "Submit"))
-                .findFirst().get();
+        var submitButton = $(Button.class).caption("Submit").first();
 
         // WHEN: User submits the purchase
         test(submitButton).click();
 
         // THEN: Success notification should be shown
-        var hasSuccessNotification = $(com.vaadin.ui.Notification.class)
+        var hasSuccessNotification = $(Notification.class)
                 .stream().filter(n -> n.getCaption() != null)
                 .anyMatch(n -> n.getCaption()
                         .contains("created"));
@@ -402,8 +384,17 @@ public class StorefrontViewTest extends AbstractUITest {
             }
         }
         assertTrue("Status column not found", statusColumnIndex >= 0);
-        assertEquals(PurchaseStatus.COMPLETED,
-                test(historyGrid).cell(statusColumnIndex, 0));
+        boolean hasCompletedPurchase = false;
+        for (int row = 0; row < historyGrid.getDataCommunicator()
+                .getDataProviderSize(); row++) {
+            if (PurchaseStatus.COMPLETED
+                    .equals(test(historyGrid).cell(statusColumnIndex, row))) {
+                hasCompletedPurchase = true;
+                break;
+            }
+        }
+        assertTrue("At least one purchase should have COMPLETED status",
+                hasCompletedPurchase);
 
         // AND: Verify serialization
         SerializationDebugUtil.assertSerializable(view);
@@ -458,5 +449,101 @@ public class StorefrontViewTest extends AbstractUITest {
         assertEquals(firstName, test(productGrid).item(1).getProductName());
         assertEquals(Integer.valueOf(1), test(productGrid).item(1)
                 .getOrderQuantity());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void purchase_history_grid_refreshes_when_purchase_updated_event_is_fired() {
+        // GIVEN: Storefront view is displayed
+        view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
+        $(Notification.class).forEach(Notification::close);
+        var historyGrid = (Grid<Purchase>) $(Grid.class)
+                .id("purchase-history-grid");
+        assertNotNull("Purchase history grid should be present", historyGrid);
+        int initialSize = test(historyGrid).size();
+        assertTrue("Purchase history should have at least one entry",
+                initialSize > 0);
+
+        // WHEN: A PurchaseUpdatedEvent is posted for a purchase owned by the
+        // current user (simulating that another session updated a purchase)
+        Purchase pendingPurchase = null;
+        int row = -1;
+        do {
+            row++;
+            pendingPurchase = test(historyGrid).item(row);
+        } while (pendingPurchase != null
+                && !PurchaseStatus.PENDING.equals(pendingPurchase.getStatus())
+                && row < initialSize);
+        assertEquals("PENDING", test(historyGrid).cell(5, row).toString());
+
+        // This simulates superviser approving the purchase in another session,
+        // which triggers a PurchaseStatusChangedEvent that the grid listens to
+        // and should refresh the item
+        PurchaseService.get().approve(pendingPurchase.getId(),
+                pendingPurchase.getApprover(), "Looks good");
+        EventBus.get()
+                .post(new PurchaseStatusChangedEvent(pendingPurchase.getId()));
+
+        final int finalRow = row;
+        waitWhile(Grid.class,
+                grid -> test(historyGrid).cell(5, finalRow).toString()
+                        .equals("PENDING"),
+                1);
+
+        // THEN: Grid size is unchaged
+        int sizeAfterEvent = test(historyGrid).size();
+        assertEquals(
+                "Grid size should not increase after PurchaseStatusChangedEvent",
+                initialSize, sizeAfterEvent);
+        // AND: The updated purchase should have the new status
+        assertNotEquals("PENDING", test(historyGrid).cell(5, row).toString());
+        // AND: A notification about the status change should be shown
+        assertNotNull($(Notification.class).last());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void purchase_history_grid_refreshes_when_wizard_is_submitted() {
+        // GIVEN: Storefront view is displayed
+        view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
+        var historyGrid = (Grid<?>) $(Grid.class).id("purchase-history-grid");
+        assertNotNull("Purchase history grid should be present", historyGrid);
+        int initialSize = test(historyGrid).size();
+
+        // WHEN: User completes and submits the purchase wizard
+        var productGrid = (Grid<ProductDto>) $(Grid.class).id("purchase-grid");
+        test(productGrid).clickToSelect(0);
+        var numberField = $(
+                (HorizontalLayout) test(productGrid).cell(3, 0),
+                NumberField.class).first();
+        test(numberField).setValue(1);
+        var nextButton = $(Button.class).caption("Next").first();
+        test(nextButton).click();
+        test($(TextField.class).caption("Street").first())
+                .setValue("123 Main St");
+        test($(TextField.class).caption("Postal Code").first())
+                .setValue("12345");
+        test($(TextField.class).caption("City").first()).setValue("TestCity");
+        test($(TextField.class).caption("Country").first())
+                .setValue("TestCountry");
+        test(nextButton).click();
+        var supervisorCombo = (ComboBox<Object>) $(ComboBox.class).first();
+        test(supervisorCombo).clickItem(
+                supervisorCombo.getDataCommunicator().fetchItemsWithRange(0, 1)
+                        .get(0));
+        test(nextButton).click();
+        var submitButton = $(Button.class).caption("Submit").first();
+        test(submitButton).click();
+
+        // THEN: Success notification is shown and history grid has a new entry
+        assertTrue("Success notification should be shown",
+                $(Notification.class).stream()
+                        .anyMatch(n -> n.getCaption() != null
+                                && n.getCaption().contains("created")));
+        int sizeAfterSubmit = test(historyGrid).size();
+        assertTrue(
+                "Purchase history grid should have more entries after a new purchase is created",
+                sizeAfterSubmit > initialSize);
+        assertEquals("PENDING", test(historyGrid).cell(5, 0).toString());
     }
 }

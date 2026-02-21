@@ -47,6 +47,16 @@ public interface PurchaseService {
     }
 
     /**
+     * Fetches a purchase by its id.
+     *
+     * @param purchaseId
+     *            the id of the purchase to fetch
+     * @return the purchase, or null if not found
+     */
+    @Nullable
+    Purchase fetchPurchaseById(Integer purchaseId);
+
+    /**
      * Creates a new pending purchase from a cart. This method: - Creates a
      * Purchase with status PENDING - Snapshots the delivery address - Creates
      * PurchaseLines with current product prices - Does NOT modify product stock

@@ -634,9 +634,7 @@ Replace the placeholder “Stats” tab in `PurchasesView` with real purchase st
 
 ---
 
-## 7. Step 7 – (Optional, Later) Live UI Notifications via UI EventBus
-
-> This step is **optional** and can be implemented after everything else is stable.
+## 7. Step 7 – Live UI Notifications via UI EventBus
 
 ### 7.1 Scope
 
@@ -647,30 +645,53 @@ When both employee and supervisor are online:
 
 ### 7.2 Requirements
 
-1. Define a UI-level event class in UI module, e.g. `PurchaseStatusChangedEvent`.
+1. Define UI-level event classes in backend module, e.g. `PurchaseStatusChangedEvent` and `PurchaseSavedEvent`. Like the other events, e.g. `BooksChangedEvent`
+these are not data bearers. They should just have Purchase id.
+
+   - The events must be lightweight because they are distributed in the cluster.
+   - When handling an event, the UI presenter must fetch the latest `Purchase`
+     from `PurchaseService` using the id carried by the event.
+   - `PurchaseService` must provide `fetchPurchaseById(purchaseId)` (or equivalent)
+     for looking up the latest `Purchase` instance by id.
 
 2. In `ApprovalsPresenter`:
 
    - After a successful approve/reject (service call succeeds):
-     - Publish `PurchaseStatusChangedEvent` with updated `Purchase` on existing UI EventBus.
+     - Publish `PurchaseStatusChangedEvent` (purchase id only) on existing UI EventBus.
 
-3. In `StorefrontView` (or a `PurchasesModel` used by it):
+3. In `StorefrontPresenter`:
 
-   - Subscribe to `PurchaseStatusChangedEvent`.
-   - If `event.purchase.requester == currentUser`:
-     - Refresh “My purchases” grid.
+   - After a customer submits a purchase for approval (service call succeeds):
+     - Publish `PurchaseSavedEvent` (purchase id only) on existing UI EventBus.
+
+4. In `PurchaseHistoryPresenter` (which is also used in `StorefrontView`):
+
+   - Subscribe to `PurchaseStatusChangedEvent` and `PurchaseSavedEvent`.
+
+   - On `PurchaseStatusChangedEvent`:
+     - Fetch the `Purchase` using the id from the event.
+     - If `purchase.requester == currentUser`:
+       - Refresh the affected purchase item in the Grid.
+     - Implement method to show notification in `PurchaseHistoryGrid` using Utils.access for asynchronous updates.
      - Show a short notification:
        - E.g. “Your purchase #123 was approved” or “rejected: <reason>”.
 
-4. Ensure proper lifecycle:
+   - On `PurchaseSavedEvent`:
+     - Fetch the `Purchase` using the id from the event.
+     - If the current user has admin role OR the current user is the purchase approver OR the current user is requester:
+       - Refresh the Grid using `DataProvider.refreshAll()` (items were added).
 
-   - Subscriptions are added on attach and removed on detach.
-   - No memory leaks or cross-session notifications.
+5. Ensure proper lifecycle:
+
+   - Subscriptions are added in constructor and removed on detach.
 
 ### 7.3 Acceptance Criteria
 
 - While both are online:
   - Employee sees history updated and notification shortly after supervisor action.
+- Desired side effect
+  - When customer submits a purchase the purchase history is automatically refreshed
+  - Assert this in StorefrontTest
 - When offline:
   - Behavior remains as in Step 3 (login-time summary).
  - Live notification behavior (when implemented) is covered by UI unit tests similar to current views.

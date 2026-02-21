@@ -18,8 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
-import org.vaadin.tatu.vaadincreate.backend.PurchaseService.MonthlyPurchaseStat;
-import org.vaadin.tatu.vaadincreate.backend.PurchaseService.ProductPurchaseStat;
 import org.vaadin.tatu.vaadincreate.backend.dao.ProductDao;
 import org.vaadin.tatu.vaadincreate.backend.dao.PurchaseDao;
 import org.vaadin.tatu.vaadincreate.backend.dao.UserDao;
@@ -40,6 +38,8 @@ import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 @SuppressWarnings("java:S6548")
 public class PurchaseServiceImpl implements PurchaseService {
 
+    private static final String CURRENT_USER_MUST_NOT_BE_NULL = "Current user must not be null";
+    private static final String REQUESTER_MUST_NOT_BE_NULL = "Requester must not be null";
     @Nullable
     private static PurchaseServiceImpl instance;
     private final PurchaseDao purchaseDao;
@@ -57,6 +57,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
     }
 
+    @SuppressWarnings("null")
     private void generateMockPurchaseDataIfEmpty() {
         // Avoid duplicating data across restarts.
         if (purchaseDao.countAll() > 0) {
@@ -119,7 +120,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             @Nullable User defaultApproverOrNull) {
         Objects.requireNonNull(cart, "Cart must not be null");
         Objects.requireNonNull(address, "Address must not be null");
-        Objects.requireNonNull(requester, "Requester must not be null");
+        Objects.requireNonNull(requester, REQUESTER_MUST_NOT_BE_NULL);
 
         if (cart.isEmpty()) {
             throw new IllegalArgumentException("Cart cannot be empty");
@@ -148,6 +149,19 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
         purchase.setApprover(approver);
 
+        populatePurchaseLines(cart, purchase);
+
+        // Persist the purchase (with cascading to lines)
+        Purchase savedPurchase = purchaseDao.updatePurchase(purchase);
+
+        logger.info("Created pending purchase with ID: {} for requester: '{}'",
+                savedPurchase.getId(), requester.getName());
+
+        return savedPurchase;
+    }
+
+    @SuppressWarnings("null")
+    private void populatePurchaseLines(Cart cart, Purchase purchase) {
         // Create purchase lines from cart
         for (Map.Entry<Product, Integer> entry : cart.getItems().entrySet()) {
             Product product = entry.getKey();
@@ -162,26 +176,18 @@ public class PurchaseServiceImpl implements PurchaseService {
 
             purchase.addLine(line);
         }
-
-        // Persist the purchase (with cascading to lines)
-        Purchase savedPurchase = purchaseDao.updatePurchase(purchase);
-
-        logger.info("Created pending purchase with ID: {} for requester: '{}'",
-                savedPurchase.getId(), requester.getName());
-
-        return savedPurchase;
     }
 
     @Override
     public List<@NonNull Purchase> findMyPurchases(User requester,
             int offset, int limit) {
-        Objects.requireNonNull(requester, "Requester must not be null");
+        Objects.requireNonNull(requester, REQUESTER_MUST_NOT_BE_NULL);
         return purchaseDao.findByRequester(requester, offset, limit);
     }
 
     @Override
     public long countMyPurchases(User requester) {
-        Objects.requireNonNull(requester, "Requester must not be null");
+        Objects.requireNonNull(requester, REQUESTER_MUST_NOT_BE_NULL);
         return purchaseDao.countByRequester(requester);
     }
 
@@ -214,10 +220,10 @@ public class PurchaseServiceImpl implements PurchaseService {
     public List<@NonNull Purchase> fetchPurchases(PurchaseHistoryMode mode,
             int offset, int limit, User currentUser) {
         Objects.requireNonNull(mode, "Mode must not be null");
-        Objects.requireNonNull(currentUser, "Current user must not be null");
+        Objects.requireNonNull(currentUser, CURRENT_USER_MUST_NOT_BE_NULL);
         return switch (mode) {
-        case MY_PURCHASES ->
-            purchaseDao.findByRequester(currentUser, offset, limit);
+        case MY_PURCHASES -> purchaseDao.findByRequester(currentUser, offset,
+                limit);
         case ALL -> purchaseDao.findAll(offset, limit);
         case PENDING_APPROVALS -> purchaseDao.findByApproverAndStatus(
                 currentUser, PurchaseStatus.PENDING, offset, limit);
@@ -227,7 +233,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     public long countPurchases(PurchaseHistoryMode mode, User currentUser) {
         Objects.requireNonNull(mode, "Mode must not be null");
-        Objects.requireNonNull(currentUser, "Current user must not be null");
+        Objects.requireNonNull(currentUser, CURRENT_USER_MUST_NOT_BE_NULL);
         return switch (mode) {
         case MY_PURCHASES -> purchaseDao.countByRequester(currentUser);
         case ALL -> purchaseDao.countAll();
@@ -239,7 +245,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     public List<@NonNull Purchase> findRecentlyDecidedPurchases(
             User requester, Instant since) {
-        Objects.requireNonNull(requester, "Requester must not be null");
+        Objects.requireNonNull(requester, REQUESTER_MUST_NOT_BE_NULL);
         Objects.requireNonNull(since, "Since timestamp must not be null");
         return purchaseDao.findRecentlyDecidedByRequester(requester, since);
     }
@@ -248,7 +254,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     public Purchase approve(Integer purchaseId, User currentUser,
             @Nullable String decisionCommentOrNull) {
         Objects.requireNonNull(purchaseId, "Purchase ID must not be null");
-        Objects.requireNonNull(currentUser, "Current user must not be null");
+        Objects.requireNonNull(currentUser, CURRENT_USER_MUST_NOT_BE_NULL);
         logger.info("Approving purchase: ({}) by user: '{}'", purchaseId,
                 currentUser.getName());
         return purchaseDao.approvePurchase(purchaseId, currentUser,
@@ -259,7 +265,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     public Purchase reject(Integer purchaseId, User currentUser,
             String reason) {
         Objects.requireNonNull(purchaseId, "Purchase ID must not be null");
-        Objects.requireNonNull(currentUser, "Current user must not be null");
+        Objects.requireNonNull(currentUser, CURRENT_USER_MUST_NOT_BE_NULL);
         Objects.requireNonNull(reason, "Reason must not be null");
         logger.info("Rejecting purchase: ({}) by user: '{}'", purchaseId,
                 currentUser.getName());
@@ -267,6 +273,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    @SuppressWarnings("null")
     public List<@NonNull ProductPurchaseStat> getTopProductsByQuantity(
             int limit) {
         var rows = purchaseDao.getTopProductsByQuantity(limit);
@@ -274,6 +281,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    @SuppressWarnings("null")
     public List<@NonNull ProductPurchaseStat> getLeastProductsByQuantity(
             int limit) {
         var rows = purchaseDao.getLeastProductsByQuantity(limit);
@@ -281,6 +289,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    @SuppressWarnings("null")
     public List<@NonNull MonthlyPurchaseStat> getMonthlyTotals(int months) {
         var now = YearMonth.now();
         var since = now.minusMonths(months - 1L).atDay(1).atStartOfDay()
@@ -293,6 +302,17 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         var rows = purchaseDao.getCompletedPurchaseLinesLastMonths(since);
+        updateMonthlyTotals(totals, rows);
+
+        var result = new ArrayList<MonthlyPurchaseStat>(totals.size());
+        totals.forEach(
+                (month, sum) -> result
+                        .add(new MonthlyPurchaseStat(month, sum)));
+        return result;
+    }
+
+    private void updateMonthlyTotals(Map<String, BigDecimal> totals,
+            List<Object[]> rows) {
         for (Object[] row : rows) {
             var qty = ((Number) row[0]).longValue();
             var unitPrice = (BigDecimal) row[1];
@@ -304,13 +324,9 @@ public class PurchaseServiceImpl implements PurchaseService {
                     (k, prev) -> prev
                             .add(unitPrice.multiply(BigDecimal.valueOf(qty))));
         }
-
-        var result = new ArrayList<MonthlyPurchaseStat>(totals.size());
-        totals.forEach(
-                (k, v) -> result.add(new MonthlyPurchaseStat(k, v)));
-        return result;
     }
 
+    @SuppressWarnings("null")
     private static ProductPurchaseStat toProductStat(Object[] row) {
         var productId = (Integer) row[0];
         var productName = (String) row[1];

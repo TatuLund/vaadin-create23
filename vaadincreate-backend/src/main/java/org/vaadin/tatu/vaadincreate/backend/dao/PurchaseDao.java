@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.hibernate.Hibernate;
+import org.hibernate.Session;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -26,6 +27,12 @@ import org.vaadin.tatu.vaadincreate.backend.data.UserSupervisor;
 @SuppressWarnings("java:S1602")
 public class PurchaseDao {
 
+    private static final String PURCHASE_REQUESTER_PARAM = "requester";
+    private static final String PURCHASE_STATUS_PARAM = "status";
+    private static final String REQUESTER_MUST_NOT_BE_NULL = "Requester must not be null";
+    private static final String PURCHASE_ID_MUST_NOT_BE_NULL = "Purchase ID must not be null";
+    private static final String APPROVER_MUST_NOT_BE_NULL = "Approver must not be null";
+
     /**
      * Saves a batch of new purchases in a single transaction.
      *
@@ -33,7 +40,7 @@ public class PurchaseDao {
      *            purchases to persist
      */
     public void savePurchases(List<Purchase> purchases) {
-        Objects.requireNonNull(purchases, "purchases must not be null");
+        Objects.requireNonNull(purchases, "Purchases must not be null");
         logger.info("Persisting {} purchases.", purchases.size());
         HibernateUtil.inTransaction(session -> {
             purchases.forEach(session::save);
@@ -62,7 +69,7 @@ public class PurchaseDao {
      */
     @Nullable
     public Purchase getPurchase(Integer id) {
-        Objects.requireNonNull(id, "Purchase ID must not be null");
+        Objects.requireNonNull(id, PURCHASE_ID_MUST_NOT_BE_NULL);
         logger.info("Fetching Purchase: ({})", id);
         return HibernateUtil.inSession(session -> {
             @Nullable
@@ -87,14 +94,15 @@ public class PurchaseDao {
      */
     public List<@NonNull Purchase> findByRequester(User requester, int offset,
             int limit) {
-        Objects.requireNonNull(requester, "Requester must not be null");
+        Objects.requireNonNull(requester, REQUESTER_MUST_NOT_BE_NULL);
         logger.debug(
                 "Fetching Purchases by requester: ({}) by offset: {} and limit: {}",
                 requester.getId(), offset, limit);
         var result = HibernateUtil.inSession(session -> {
             var purchases = session.createQuery(
                     "select p from Purchase p where p.requester = :requester order by p.createdAt desc",
-                    Purchase.class).setParameter("requester", requester)
+                    Purchase.class)
+                    .setParameter(PURCHASE_REQUESTER_PARAM, requester)
                     .setFirstResult(offset).setMaxResults(limit).list();
             if (purchases != null) {
                 // Initialize lazy collections while session is open.
@@ -117,13 +125,16 @@ public class PurchaseDao {
      * @return the count of purchases
      */
     public long countByRequester(User requester) {
-        Objects.requireNonNull(requester, "Requester must not be null");
+        Objects.requireNonNull(requester, REQUESTER_MUST_NOT_BE_NULL);
         logger.info("Counting Purchases by requester: ({})", requester.getId());
         var result = HibernateUtil.inSession(session -> {
-            return session.createQuery(
+            @Nullable
+            Long count = session.createQuery(
                     "select count(p) from Purchase p where p.requester = :requester",
-                    Long.class).setParameter("requester", requester)
+                    Long.class)
+                    .setParameter(PURCHASE_REQUESTER_PARAM, requester)
                     .uniqueResult();
+            return count;
         });
         return result != null ? result : 0L;
     }
@@ -143,7 +154,7 @@ public class PurchaseDao {
      */
     public List<@NonNull Purchase> findByApproverAndStatus(User approver,
             PurchaseStatus status, int offset, int limit) {
-        Objects.requireNonNull(approver, "Approver must not be null");
+        Objects.requireNonNull(approver, APPROVER_MUST_NOT_BE_NULL);
         Objects.requireNonNull(status, "Status must not be null");
         logger.debug("Fetching Purchases by approver: ({}) and status: {}",
                 approver.getId(), status);
@@ -151,7 +162,8 @@ public class PurchaseDao {
             var purchases = session.createQuery(
                     "select p from Purchase p where p.approver = :approver and p.status = :status order by p.createdAt desc",
                     Purchase.class).setParameter("approver", approver)
-                    .setParameter("status", status).setFirstResult(offset)
+                    .setParameter(PURCHASE_STATUS_PARAM, status)
+                    .setFirstResult(offset)
                     .setMaxResults(limit).list();
             if (purchases != null) {
                 purchases.forEach(p -> Hibernate.initialize(p.getLines()));
@@ -175,15 +187,17 @@ public class PurchaseDao {
      * @return the count of purchases
      */
     public long countByApproverAndStatus(User approver, PurchaseStatus status) {
-        Objects.requireNonNull(approver, "Approver must not be null");
+        Objects.requireNonNull(approver, APPROVER_MUST_NOT_BE_NULL);
         Objects.requireNonNull(status, "Status must not be null");
         logger.info("Counting Purchases by approver: ({}) and status: {}",
                 approver.getId(), status);
         var result = HibernateUtil.inSession(session -> {
-            return session.createQuery(
+            @Nullable
+            Long count = session.createQuery(
                     "select count(p) from Purchase p where p.approver = :approver and p.status = :status",
                     Long.class).setParameter("approver", approver)
-                    .setParameter("status", status).uniqueResult();
+                    .setParameter(PURCHASE_STATUS_PARAM, status).uniqueResult();
+            return count;
         });
         return result != null ? result : 0L;
     }
@@ -224,9 +238,11 @@ public class PurchaseDao {
     public long countAll() {
         logger.debug("Counting all Purchases");
         var result = HibernateUtil.inSession(session -> {
-            return session
+            @Nullable
+            Long count = session
                     .createQuery("select count(p) from Purchase p", Long.class)
                     .uniqueResult();
+            return count;
         });
         return result != null ? result : 0L;
     }
@@ -249,7 +265,9 @@ public class PurchaseDao {
                     "select us from UserSupervisor us where us.employee = :employee",
                     UserSupervisor.class).setParameter("employee", employee)
                     .uniqueResult();
-            return mapping != null ? mapping.getSupervisor() : null;
+            @Nullable
+            User user = mapping != null ? mapping.getSupervisor() : null;
+            return user;
         });
     }
 
@@ -265,7 +283,7 @@ public class PurchaseDao {
      */
     public List<@NonNull Purchase> findRecentlyDecidedByRequester(
             User requester, Instant since) {
-        Objects.requireNonNull(requester, "Requester must not be null");
+        Objects.requireNonNull(requester, REQUESTER_MUST_NOT_BE_NULL);
         Objects.requireNonNull(since, "Since timestamp must not be null");
         logger.debug(
                 "Fetching recently decided Purchases by requester: ({}) since: {}",
@@ -273,7 +291,8 @@ public class PurchaseDao {
         var result = HibernateUtil.inSession(session -> {
             var purchases = session.createQuery(
                     "select p from Purchase p where p.requester = :requester and p.status in (:completed, :rejected, :cancelled) and p.decidedAt > :since order by p.decidedAt desc",
-                    Purchase.class).setParameter("requester", requester)
+                    Purchase.class)
+                    .setParameter(PURCHASE_REQUESTER_PARAM, requester)
                     .setParameter("completed", PurchaseStatus.COMPLETED)
                     .setParameter("rejected", PurchaseStatus.REJECTED)
                     .setParameter("cancelled", PurchaseStatus.CANCELLED)
@@ -326,12 +345,14 @@ public class PurchaseDao {
      */
     public Purchase approvePurchase(Integer purchaseId, User currentUser,
             @Nullable String decisionCommentOrNull) {
-        Objects.requireNonNull(purchaseId, "Purchase ID must not be null");
+        Objects.requireNonNull(purchaseId, PURCHASE_ID_MUST_NOT_BE_NULL);
         Objects.requireNonNull(currentUser, "Current user must not be null");
         logger.info("Approving Purchase: ({}) by user: ({})", purchaseId,
                 currentUser.getId());
+        @SuppressWarnings("unused")
         var result = HibernateUtil.inTransaction(session -> {
-            var purchase = session.get(Purchase.class, purchaseId);
+            @Nullable
+            Purchase purchase = session.get(Purchase.class, purchaseId);
             if (purchase == null) {
                 throw new IllegalArgumentException(
                         "Purchase not found: " + purchaseId);
@@ -342,39 +363,23 @@ public class PurchaseDao {
             }
             var storedApprover = purchase.getApprover();
             if (storedApprover == null
-                    || !storedApprover.getId().equals(currentUser.getId())) {
+                    || !Objects.equals(storedApprover.getId(),
+                            currentUser.getId())) {
                 throw new IllegalArgumentException(
                         "Current user is not the assigned approver");
             }
             Hibernate.initialize(purchase.getLines());
             // Load products within the same session for optimistic locking.
             var productsById = new HashMap<Integer, Product>();
-            var insufficientItems = new ArrayList<String>();
-            for (var line : purchase.getLines()) {
-                var productId = line.getProduct().getId();
-                var product = session.get(Product.class, productId);
-                productsById.put(productId, product);
-                if (product.getStockCount() < line.getQuantity()) {
-                    insufficientItems.add(
-                            String.format("%s: needs %d, has %d",
-                                    product.getProductName(),
-                                    line.getQuantity(),
-                                    product.getStockCount()));
-                }
-            }
+            var insufficientItems = retrieveLowStockItems(session, purchase,
+                    productsById);
             if (!insufficientItems.isEmpty()) {
                 purchase.setStatus(PurchaseStatus.CANCELLED);
                 purchase.setDecidedAt(Instant.now());
                 purchase.setDecisionReason("Insufficient stock: "
                         + String.join(", ", insufficientItems));
             } else {
-                for (var line : purchase.getLines()) {
-                    var product = productsById.get(line.getProduct().getId());
-                    product.setStockCount(
-                            product.getStockCount() - line.getQuantity());
-                    // product is already managed by the session; dirty
-                    // checking will flush the change on commit.
-                }
+                updateProductStock(purchase, productsById);
                 purchase.setStatus(PurchaseStatus.COMPLETED);
                 purchase.setDecidedAt(Instant.now());
                 purchase.setDecisionReason(decisionCommentOrNull);
@@ -388,6 +393,38 @@ public class PurchaseDao {
                     "Result of approvePurchase is null");
         }
         return result;
+    }
+
+    // Must be called within a transaction with products loaded in the session
+    private void updateProductStock(Purchase purchase,
+            HashMap<Integer, Product> productsById) {
+        for (var line : purchase.getLines()) {
+            var product = productsById.get(line.getProduct().getId());
+            product.setStockCount(
+                    product.getStockCount() - line.getQuantity());
+            // product is already managed by the session; dirty
+            // checking will flush the change on commit.
+        }
+    }
+
+    private ArrayList<String> retrieveLowStockItems(
+            Session session, Purchase purchase,
+            HashMap<Integer, Product> productsById) {
+        var insufficientItems = new ArrayList<String>();
+        for (var line : purchase.getLines()) {
+            var productId = line.getProduct().getId();
+            @Nullable
+            Product product = session.get(Product.class, productId);
+            productsById.put(productId, product);
+            if (product.getStockCount() < line.getQuantity()) {
+                insufficientItems.add(
+                        String.format("%s: needs %d, has %d",
+                                product.getProductName(),
+                                line.getQuantity(),
+                                product.getStockCount()));
+            }
+        }
+        return insufficientItems;
     }
 
     /**
@@ -405,13 +442,15 @@ public class PurchaseDao {
      */
     public Purchase rejectPurchase(Integer purchaseId, User currentUser,
             String reason) {
-        Objects.requireNonNull(purchaseId, "Purchase ID must not be null");
+        Objects.requireNonNull(purchaseId, PURCHASE_ID_MUST_NOT_BE_NULL);
         Objects.requireNonNull(currentUser, "Current user must not be null");
         Objects.requireNonNull(reason, "Reason must not be null");
         logger.info("Rejecting Purchase: ({}) by user: ({})", purchaseId,
                 currentUser.getId());
+        @SuppressWarnings("unused")
         var result = HibernateUtil.inTransaction(session -> {
-            var purchase = session.get(Purchase.class, purchaseId);
+            @Nullable
+            Purchase purchase = session.get(Purchase.class, purchaseId);
             if (purchase == null) {
                 throw new IllegalArgumentException(
                         "Purchase not found: " + purchaseId);
@@ -439,7 +478,7 @@ public class PurchaseDao {
      * purchases only), ordered descending.
      *
      * <p>
-     * Each row in the result is an {@code Object[3]}: {@code [productId,
+     * Each row in the result is an {@code Object[]}: {@code [productId,
      * productName, sumQuantity]}.
      *
      * @param limit
@@ -448,15 +487,18 @@ public class PurchaseDao {
      */
     public List<Object[]> getTopProductsByQuantity(int limit) {
         logger.debug("Fetching top {} products by quantity", limit);
+        final String topProductsByQuantityQuery = """
+                select pl.product.id, pl.product.productName, sum(pl.quantity)
+                from PurchaseLine pl
+                where pl.purchase.status = :status
+                group by pl.product.id, pl.product.productName
+                order by sum(pl.quantity) desc
+                """;
         var result = HibernateUtil.inSession(session -> {
-            return session.createQuery(
-                    "select pl.product.id, pl.product.productName, sum(pl.quantity)"
-                            + " from PurchaseLine pl"
-                            + " where pl.purchase.status = :status"
-                            + " group by pl.product.id, pl.product.productName"
-                            + " order by sum(pl.quantity) desc",
-                    Object[].class)
-                    .setParameter("status", PurchaseStatus.COMPLETED)
+            return session
+                    .createQuery(topProductsByQuantityQuery, Object[].class)
+                    .setParameter(PURCHASE_STATUS_PARAM,
+                            PurchaseStatus.COMPLETED)
                     .setMaxResults(limit).list();
         });
         if (result == null) {
@@ -472,7 +514,7 @@ public class PurchaseDao {
      * excluded.
      *
      * <p>
-     * Each row in the result is an {@code Object[3]}: {@code [productId,
+     * Each row in the result is an {@code Object[]}: {@code [productId,
      * productName, sumQuantity]}.
      *
      * @param limit
@@ -481,17 +523,22 @@ public class PurchaseDao {
      */
     public List<Object[]> getLeastProductsByQuantity(int limit) {
         logger.debug("Fetching least {} products by quantity", limit);
+        final String leastProductsByQuantityQuery = """
+                select pl.product.id, pl.product.productName, sum(pl.quantity)
+                from PurchaseLine pl
+                where pl.purchase.status = :status
+                group by pl.product.id, pl.product.productName
+                having sum(pl.quantity) > 0
+                order by sum(pl.quantity) asc
+                """;
         var result = HibernateUtil.inSession(session -> {
-            return session.createQuery(
-                    "select pl.product.id, pl.product.productName, sum(pl.quantity)"
-                            + " from PurchaseLine pl"
-                            + " where pl.purchase.status = :status"
-                            + " group by pl.product.id, pl.product.productName"
-                            + " having sum(pl.quantity) > 0"
-                            + " order by sum(pl.quantity) asc",
-                    Object[].class)
-                    .setParameter("status", PurchaseStatus.COMPLETED)
-                    .setMaxResults(limit).list();
+            return session
+                    .createQuery(leastProductsByQuantityQuery,
+                            Object[].class)
+                    .setParameter(PURCHASE_STATUS_PARAM,
+                            PurchaseStatus.COMPLETED)
+                    .setMaxResults(limit)
+                    .list();
         });
         if (result == null) {
             throw new IllegalStateException(
@@ -505,24 +552,28 @@ public class PurchaseDao {
      * as raw data for monthly aggregation.
      *
      * <p>
-     * Each row is an {@code Object[3]}: {@code [quantity (Integer), unitPrice
-     * (BigDecimal), decidedAt (Instant)]}.
+     * Each row is an {@code Object[3]}:
+     * {@code [quantity (Integer), unitPrice (BigDecimal), decidedAt (Instant)]}.
      *
      * @param since
      *            earliest {@code decidedAt} to include
      * @return list of Object arrays
      */
-    public List<Object[]> getCompletedPurchaseLinesLastMonths(Instant since) {
+    public List<Object[]> getCompletedPurchaseLinesLastMonths(
+            Instant since) {
         Objects.requireNonNull(since, "Since must not be null");
         logger.debug("Fetching completed purchase lines since {}", since);
+        final String completedPurchaseLinesQuery = """
+                select pl.quantity, pl.unitPrice, pl.purchase.decidedAt
+                from PurchaseLine pl
+                where pl.purchase.status = :status
+                and pl.purchase.decidedAt >= :since
+                """;
         var result = HibernateUtil.inSession(session -> {
-            return session.createQuery(
-                    "select pl.quantity, pl.unitPrice, pl.purchase.decidedAt"
-                            + " from PurchaseLine pl"
-                            + " where pl.purchase.status = :status"
-                            + " and pl.purchase.decidedAt >= :since",
+            return session.createQuery(completedPurchaseLinesQuery,
                     Object[].class)
-                    .setParameter("status", PurchaseStatus.COMPLETED)
+                    .setParameter(PURCHASE_STATUS_PARAM,
+                            PurchaseStatus.COMPLETED)
                     .setParameter("since", since).list();
         });
         if (result == null) {

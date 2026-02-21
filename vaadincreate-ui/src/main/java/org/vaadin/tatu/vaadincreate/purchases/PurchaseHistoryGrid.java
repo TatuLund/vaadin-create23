@@ -8,10 +8,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
-import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
@@ -35,6 +35,7 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -53,6 +54,9 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
     private final PurchaseHistoryPresenter presenter;
     private final PurchaseHistoryMode mode;
     private final User currentUser;
+
+    @Nullable
+    private UI ui;
 
     /**
      * Creates a new PurchaseHistoryGrid.
@@ -269,12 +273,22 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
         grid.getDataProvider().refreshAll();
     }
 
+    @Override
+    public void attach() {
+        super.attach();
+        ui = getUI();
+    }
+
     /**
      * Refreshes all grid data asynchronously using {@link Utils#access}. Safe
      * to call from non-UI threads (e.g. EventBus callbacks).
      */
     public void refreshAsync() {
-        Utils.access(getUI(), () -> grid.getDataProvider().refreshAll());
+        Utils.access(ui, this::refresh);
+    }
+
+    public void refreshItemAsync(Purchase purchase) {
+        Utils.access(ui, () -> grid.getDataProvider().refreshItem(purchase));
     }
 
     /**
@@ -285,12 +299,10 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
      *            the purchase whose status changed
      */
     public void showStatusNotificationAsync(Purchase purchase) {
-        String message = buildStatusMessage(purchase);
-        if (message.isEmpty()) {
-            return;
-        }
-        Utils.access(getUI(),
-                () -> Notification.show(message, Type.TRAY_NOTIFICATION));
+        Utils.access(ui, () -> {
+            String message = buildStatusMessage(purchase);
+            Notification.show(message, Type.TRAY_NOTIFICATION);
+        });
     }
 
     private String buildStatusMessage(Purchase purchase) {
@@ -299,14 +311,14 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
                 ? purchase.getDecisionReason()
                 : "";
         return switch (purchase.getStatus()) {
-        case COMPLETED ->
-            getTranslation(I18n.Storefront.PURCHASE_STATUS_APPROVED, id);
-        case REJECTED ->
-            getTranslation(I18n.Storefront.PURCHASE_STATUS_REJECTED, id,
-                    reason);
-        case CANCELLED ->
-            getTranslation(I18n.Storefront.PURCHASE_STATUS_CANCELLED, id,
-                    reason);
+        case COMPLETED -> getTranslation(
+                I18n.Storefront.PURCHASE_STATUS_APPROVED, id);
+        case REJECTED -> getTranslation(
+                I18n.Storefront.PURCHASE_STATUS_REJECTED, id,
+                reason);
+        case CANCELLED -> getTranslation(
+                I18n.Storefront.PURCHASE_STATUS_CANCELLED, id,
+                reason);
         default -> "";
         };
     }

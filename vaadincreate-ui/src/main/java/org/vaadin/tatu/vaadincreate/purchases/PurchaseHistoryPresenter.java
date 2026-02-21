@@ -133,7 +133,7 @@ public class PurchaseHistoryPresenter
                 "PurchaseStatusChangedEvent received for purchase {}, refreshing grid",
                 purchaseId);
         capturedGrid.showStatusNotificationAsync(purchase);
-        capturedGrid.refreshAsync();
+        capturedGrid.refreshItemAsync(purchase);
     }
 
     private void handlePurchaseSaved(Integer purchaseId) {

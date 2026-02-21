@@ -11,6 +11,7 @@ import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
+import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
@@ -20,6 +21,7 @@ import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.components.Html;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.provider.CallbackDataProvider;
 import com.vaadin.data.provider.DataProvider;
@@ -31,6 +33,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -70,6 +74,9 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
 
         configureGrid();
         setCompositionRoot(grid);
+
+        presenter.register(this, currentUser);
+        addDetachListener(e -> presenter.unregister());
     }
 
     private void configureGrid() {
@@ -260,6 +267,48 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
      */
     public void refresh() {
         grid.getDataProvider().refreshAll();
+    }
+
+    /**
+     * Refreshes all grid data asynchronously using {@link Utils#access}. Safe
+     * to call from non-UI threads (e.g. EventBus callbacks).
+     */
+    public void refreshAsync() {
+        Utils.access(getUI(), () -> grid.getDataProvider().refreshAll());
+    }
+
+    /**
+     * Shows a tray notification with the purchase status change message. Uses
+     * {@link Utils#access} so it is safe to call from non-UI threads.
+     *
+     * @param purchase
+     *            the purchase whose status changed
+     */
+    public void showStatusNotificationAsync(Purchase purchase) {
+        String message = buildStatusMessage(purchase);
+        if (message.isEmpty()) {
+            return;
+        }
+        Utils.access(getUI(),
+                () -> Notification.show(message, Type.TRAY_NOTIFICATION));
+    }
+
+    private String buildStatusMessage(Purchase purchase) {
+        var id = purchase.getId() != null ? purchase.getId() : "";
+        var reason = purchase.getDecisionReason() != null
+                ? purchase.getDecisionReason()
+                : "";
+        return switch (purchase.getStatus()) {
+        case COMPLETED ->
+            getTranslation(I18n.Storefront.PURCHASE_STATUS_APPROVED, id);
+        case REJECTED ->
+            getTranslation(I18n.Storefront.PURCHASE_STATUS_REJECTED, id,
+                    reason);
+        case CANCELLED ->
+            getTranslation(I18n.Storefront.PURCHASE_STATUS_CANCELLED, id,
+                    reason);
+        default -> "";
+        };
     }
 
     /**

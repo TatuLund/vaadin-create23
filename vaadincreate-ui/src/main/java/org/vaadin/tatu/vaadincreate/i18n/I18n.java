@@ -258,6 +258,10 @@ public final class I18n {
         public static final String APPROVE_CONFLICT = "approve-conflict";
         public static final String REASON_REQUIRED = "reason-required";
 
+        public static final String PURCHASE_STATUS_APPROVED = "purchase-status-approved";
+        public static final String PURCHASE_STATUS_REJECTED = "purchase-status-rejected";
+        public static final String PURCHASE_STATUS_CANCELLED = "purchase-status-cancelled";
+
         public static final String TOP_PRODUCTS = "top-purchased-products";
         public static final String LEAST_PRODUCTS = "least-purchased-products";
         public static final String MONTHLY_TOTALS = "monthly-purchases";

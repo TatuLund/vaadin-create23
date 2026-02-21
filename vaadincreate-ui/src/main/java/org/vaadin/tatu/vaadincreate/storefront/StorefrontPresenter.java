@@ -18,6 +18,8 @@ import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+import org.vaadin.tatu.vaadincreate.backend.events.PurchaseSavedEvent;
+import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
 /**
  * Presenter for StorefrontView. Separates backend access from the view layer.
@@ -82,8 +84,12 @@ public class StorefrontPresenter implements Serializable {
      */
     public Purchase createPendingPurchase(Cart cart, Address address,
             User requester, User supervisor) {
-        return getPurchaseService().createPendingPurchase(cart, address,
+        var purchase = getPurchaseService().createPendingPurchase(cart, address,
                 requester, supervisor);
+        var id = purchase.getId();
+        assert id != null : "Purchase ID should not be null after creation";
+        getEventBus().post(new PurchaseSavedEvent(id));
+        return purchase;
     }
 
     /**
@@ -161,5 +167,9 @@ public class StorefrontPresenter implements Serializable {
             purchaseService = PurchaseService.get();
         }
         return purchaseService;
+    }
+
+    private EventBus getEventBus() {
+        return EventBus.get();
     }
 }

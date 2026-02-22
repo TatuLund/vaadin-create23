@@ -6,6 +6,10 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
+import org.jsoup.Jsoup;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +20,8 @@ import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.events.PurchaseStatusChangedEvent;
 import org.vaadin.tatu.vaadincreate.common.NumberField;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 
 import com.vaadin.shared.Position;
@@ -134,9 +140,7 @@ public class StorefrontViewTest extends AbstractUITest {
         var productGrid = (Grid<ProductDto>) $(Grid.class).id("purchase-grid");
         test(productGrid).clickToSelect(0);
 
-        var numberField = $(
-                (HorizontalLayout) test(productGrid).cell(3, 0),
-                NumberField.class).first();
+        var numberField = getNumberField(productGrid);
         test(numberField).setValue(2);
 
         var nextButton = $(Button.class).caption("Next").first();
@@ -152,6 +156,12 @@ public class StorefrontViewTest extends AbstractUITest {
         assertNotification("Please fill all required fields");
     }
 
+    private NumberField getNumberField(Grid<ProductDto> productGrid) {
+        return $(
+                (HorizontalLayout) test(productGrid).cell(3, 0),
+                NumberField.class).first();
+    }
+
     @Test
     public void should_RequireSupervisor_When_ProceedingFromStep3() {
         // GIVEN: User navigates to step 3
@@ -161,9 +171,7 @@ public class StorefrontViewTest extends AbstractUITest {
         var productGrid = (Grid<ProductDto>) $(Grid.class).id("purchase-grid");
         test(productGrid).clickToSelect(0);
 
-        var numberField = $(
-                (HorizontalLayout) test(productGrid).cell(3, 0),
-                NumberField.class).first();
+        var numberField = getNumberField(productGrid);
         test(numberField).setValue(1);
 
         var nextButton = $(Button.class).caption("Next").first();
@@ -200,9 +208,7 @@ public class StorefrontViewTest extends AbstractUITest {
         var productGrid = (Grid<ProductDto>) $(Grid.class).id("purchase-grid");
         test(productGrid).clickToSelect(0);
 
-        var numberField = $(
-                (HorizontalLayout) test(productGrid).cell(3, 0),
-                NumberField.class).first();
+        var numberField = getNumberField(productGrid);
         test(numberField).setValue(2);
 
         var nextButton = $(Button.class).caption("Next").first();
@@ -234,17 +240,7 @@ public class StorefrontViewTest extends AbstractUITest {
         test(nextButton).click();
 
         // THEN: Entering review step shows an assistive notification
-        long assistiveAfterReview = $(Notification.class).stream()
-                .filter(n -> n.getPosition() == Position.ASSISTIVE).count();
-        assertTrue(
-                "Expected an assistive notification when entering review step",
-                assistiveAfterReview > assistiveBeforeReview);
-        assertTrue(
-                "Expected review assistive notification to contain 'Order Summary'",
-                $(Notification.class).stream()
-                        .anyMatch(n -> n.getPosition() == Position.ASSISTIVE
-                                && n.getCaption() != null
-                                && n.getCaption().contains("Order Summary")));
+        assertAssistiveNotificationOnReview(assistiveBeforeReview);
 
         // Verify serialization in step 4
         SerializationDebugUtil.assertSerializable(view);
@@ -262,6 +258,21 @@ public class StorefrontViewTest extends AbstractUITest {
                         .contains("created"));
         assertTrue("Success notification should contain 'created'",
                 hasSuccessNotification);
+    }
+
+    private void assertAssistiveNotificationOnReview(
+            long assistiveBeforeReview) {
+        long assistiveAfterReview = $(Notification.class).stream()
+                .filter(n -> n.getPosition() == Position.ASSISTIVE).count();
+        assertTrue(
+                "Expected an assistive notification when entering review step",
+                assistiveAfterReview > assistiveBeforeReview);
+        assertTrue(
+                "Expected review assistive notification to contain 'Order Summary'",
+                $(Notification.class).stream()
+                        .anyMatch(n -> n.getPosition() == Position.ASSISTIVE
+                                && n.getCaption() != null
+                                && n.getCaption().contains("Order Summary")));
     }
 
     @Test
@@ -372,21 +383,11 @@ public class StorefrontViewTest extends AbstractUITest {
         assertNotNull("Purchase history grid should be present",
                 historyGrid);
         assertTrue("Purchase history grid should have at least one row",
-                historyGrid.getDataCommunicator()
-                        .getDataProviderSize() > 0);
-        int statusColumnIndex = -1;
-        for (int i = 0; i < historyGrid.getColumns().size(); i++) {
-            @SuppressWarnings("rawtypes")
-            Grid.Column column = (Grid.Column) historyGrid.getColumns().get(i);
-            if ("status".equals(column.getId())) {
-                statusColumnIndex = i;
-                break;
-            }
-        }
+                test(historyGrid).size() > 0);
+        int statusColumnIndex = getStatusColumnIndex(historyGrid);
         assertTrue("Status column not found", statusColumnIndex >= 0);
         boolean hasCompletedPurchase = false;
-        for (int row = 0; row < historyGrid.getDataCommunicator()
-                .getDataProviderSize(); row++) {
+        for (int row = 0; row < test(historyGrid).size(); row++) {
             if (PurchaseStatus.COMPLETED
                     .equals(test(historyGrid).cell(statusColumnIndex, row))) {
                 hasCompletedPurchase = true;
@@ -398,6 +399,19 @@ public class StorefrontViewTest extends AbstractUITest {
 
         // AND: Verify serialization
         SerializationDebugUtil.assertSerializable(view);
+    }
+
+    private int getStatusColumnIndex(Grid historyGrid) {
+        int statusColumnIndex = -1;
+        for (int i = 0; i < historyGrid.getColumns().size(); i++) {
+            @SuppressWarnings("rawtypes")
+            Grid.Column column = (Grid.Column) historyGrid.getColumns().get(i);
+            if ("status".equals(column.getId())) {
+                statusColumnIndex = i;
+                break;
+            }
+        }
+        return statusColumnIndex;
     }
 
     @Test
@@ -513,9 +527,7 @@ public class StorefrontViewTest extends AbstractUITest {
         // WHEN: User completes and submits the purchase wizard
         var productGrid = (Grid<ProductDto>) $(Grid.class).id("purchase-grid");
         test(productGrid).clickToSelect(0);
-        var numberField = $(
-                (HorizontalLayout) test(productGrid).cell(3, 0),
-                NumberField.class).first();
+        var numberField = getNumberField(productGrid);
         test(numberField).setValue(1);
         var nextButton = $(Button.class).caption("Next").first();
         test(nextButton).click();
@@ -546,4 +558,75 @@ public class StorefrontViewTest extends AbstractUITest {
                 sizeAfterSubmit > initialSize);
         assertEquals("PENDING", test(historyGrid).cell(5, 0).toString());
     }
+
+    @Test
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void clicking_grid_row_toggles_details_visibility() {
+        view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
+
+        var historyGrid = (Grid<Purchase>) (Grid) $(Grid.class)
+                .id("purchase-history-grid");
+        assertTrue("Purchase history grid should have at least one row",
+                test(historyGrid).size() > 0);
+
+        var purchase = test(historyGrid).item(1);
+        assertNotNull("Expected a purchase item at row 0", purchase);
+        assertFalse("Details should be hidden initially",
+                historyGrid.isDetailsVisible(purchase));
+
+        // WHEN: Clicking toggle button
+        test(historyGrid).click(0, 1);
+
+        // THEN: Details are visible
+        assertTrue(historyGrid.isDetailsVisible(purchase));
+
+        // AND: Details component contains the purchase line items with correct
+        // ARIA attributes
+        var details = (Label) test(historyGrid).details(1);
+        assertPurchaseLineItems(purchase, details);
+
+        // WHEN: Clicking toggle button again
+        test(historyGrid).click(0, 1);
+
+        // THEN: Details are hidden
+        assertFalse(historyGrid.isDetailsVisible(purchase));
+
+        SerializationDebugUtil.assertSerializable(view);
+    }
+
+    private void assertPurchaseLineItems(Purchase purchase, Label details) {
+        assertNotNull("Details component should be present", details);
+        var html = details.getValue();
+
+        // Decompose details HTML and verify ARIA + purchase line rendering
+        assertNotNull("Details HTML should not be null", html);
+        var doc = Jsoup.parse(html);
+        var root = doc.getElementsByTag("div").get(0);
+        assertEquals("assertive", root.attr(AriaAttributes.LIVE));
+        assertEquals(AriaRoles.ALERT, root.attr(AriaAttributes.ROLE));
+
+        assertFalse("Purchase should have at least one line item",
+                purchase.getLines().isEmpty());
+        NumberFormat euroFormat = new DecimalFormat("#,##0.00 €");
+        var children = root.getElementsByTag("span");
+
+        assertEquals(": " + purchase.getId(), children.get(0).text());
+        assertEquals(": " + purchase.getApprover().getName(),
+                children.get(1).text());
+        assertEquals(": " + purchase.getDecisionReason(),
+                children.get(3).text());
+
+        int index = 4;
+        for (var line : purchase.getLines()) {
+            var productName = line.getProduct().getProductName();
+            var unitPrice = euroFormat.format(line.getUnitPrice());
+            var quantity = line.getQuantity();
+            var lineTotal = euroFormat.format(line.getLineTotal());
+            var expectedLine = String.format("%s: %s x %d = %s", productName,
+                    unitPrice, quantity, lineTotal);
+            assertEquals(expectedLine, children.get(index).text());
+            index++;
+        }
+    }
+
 }

@@ -5,15 +5,20 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.jsoup.Jsoup;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.common.CustomChart;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.purchases.PurchaseHistoryGrid.ToggleButton;
 
 import com.vaadin.addon.charts.model.DataSeries;
@@ -23,6 +28,7 @@ import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
@@ -155,10 +161,10 @@ public class PurchasesViewTest extends AbstractUITest {
         assertTrue("Purchase history grid should have at least one row",
                 test(historyGrid).size() > 0);
 
-        Purchase purchase = test(historyGrid).item(0);
+        var purchase = test(historyGrid).item(0);
         assertNotNull("Expected a purchase item at row 0", purchase);
-        assertTrue("Details should be hidden initially",
-                !historyGrid.isDetailsVisible(purchase));
+        assertFalse("Details should be hidden initially",
+                historyGrid.isDetailsVisible(purchase));
 
         var toggle = (ToggleButton) test(historyGrid).cell(0, 0);
         assertNotNull("Toggle button should be present in first column",
@@ -180,6 +186,11 @@ public class PurchasesViewTest extends AbstractUITest {
                 .getAttribute(AriaAttributes.EXPANDED));
         assertEquals(VaadinIcons.ANGLE_DOWN, toggle.getIcon());
 
+        // AND: Details component contains the purchase line items with correct
+        // ARIA attributes
+        var details = (Label) test(historyGrid).details(0);
+        assertPurchaseLineItems(purchase, details);
+
         // WHEN: Clicking toggle button again
         test(toggle).click();
 
@@ -192,6 +203,34 @@ public class PurchasesViewTest extends AbstractUITest {
         assertEquals(VaadinIcons.ANGLE_RIGHT, toggle.getIcon());
 
         SerializationDebugUtil.assertSerializable(view);
+    }
+
+    private void assertPurchaseLineItems(Purchase purchase, Label details) {
+        assertNotNull("Details component should be present", details);
+        var html = details.getValue();
+
+        // Decompose details HTML and verify ARIA + purchase line rendering
+        assertNotNull("Details HTML should not be null", html);
+        var doc = Jsoup.parse(html);
+        var root = doc.getElementsByTag("div").get(0);
+        assertEquals("assertive", root.attr(AriaAttributes.LIVE));
+        assertEquals(AriaRoles.ALERT, root.attr(AriaAttributes.ROLE));
+
+        assertFalse("Purchase should have at least one line item",
+                purchase.getLines().isEmpty());
+        NumberFormat euroFormat = new DecimalFormat("#,##0.00 €");
+        int index = 0;
+        var children = root.getElementsByTag("span");
+        for (var line : purchase.getLines()) {
+            var productName = line.getProduct().getProductName();
+            var unitPrice = euroFormat.format(line.getUnitPrice());
+            var quantity = line.getQuantity();
+            var lineTotal = euroFormat.format(line.getLineTotal());
+            var expectedLine = String.format("%s: %s x %d = %s", productName,
+                    unitPrice, quantity, lineTotal);
+            assertEquals(expectedLine, children.get(index).text());
+            index++;
+        }
     }
 
     /**

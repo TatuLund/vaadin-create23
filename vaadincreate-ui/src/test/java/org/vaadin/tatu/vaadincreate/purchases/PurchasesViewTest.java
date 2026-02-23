@@ -17,6 +17,7 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.common.CustomChart;
+import org.vaadin.tatu.vaadincreate.common.EuroConverter;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.purchases.PurchaseHistoryGrid.ToggleButton;
@@ -218,7 +219,7 @@ public class PurchasesViewTest extends AbstractUITest {
 
         assertFalse("Purchase should have at least one line item",
                 purchase.getLines().isEmpty());
-        NumberFormat euroFormat = new DecimalFormat("#,##0.00 €");
+        NumberFormat euroFormat = EuroConverter.createEuroFormat();
         int index = 0;
         var children = root.getElementsByTag("span");
         for (var line : purchase.getLines()) {

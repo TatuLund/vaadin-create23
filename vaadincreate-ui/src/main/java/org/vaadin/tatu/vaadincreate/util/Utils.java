@@ -1,9 +1,12 @@
 package org.vaadin.tatu.vaadincreate.util;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -92,6 +95,24 @@ public class Utils {
         var formatter = DateTimeFormatter
                 .ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(locale);
         return dateTime.format(formatter);
+    }
+
+    /**
+     * Formats the given Instant into a locale-specific date-time string using
+     * the current UI locale and system default time zone.
+     *
+     * @param instant
+     *            the Instant to format, must not be null
+     * @return the formatted date-time string
+     */
+    public static String formatDateTime(Instant instant) {
+        Objects.requireNonNull(instant, "instant must not be null");
+        UI currentUi = UI.getCurrent();
+        Locale locale = currentUi != null ? currentUi.getLocale()
+                : Locale.getDefault();
+        LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        return formatDate(localDateTime, locale);
     }
 
     /**

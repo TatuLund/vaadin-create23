@@ -19,6 +19,7 @@ import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.events.PurchaseStatusChangedEvent;
+import org.vaadin.tatu.vaadincreate.common.EuroConverter;
 import org.vaadin.tatu.vaadincreate.common.NumberField;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
@@ -157,8 +158,7 @@ public class StorefrontViewTest extends AbstractUITest {
     }
 
     private NumberField getNumberField(Grid<ProductDto> productGrid) {
-        return $(
-                (HorizontalLayout) test(productGrid).cell(3, 0),
+        return $((HorizontalLayout) test(productGrid).cell(3, 0),
                 NumberField.class).first();
     }
 
@@ -182,8 +182,7 @@ public class StorefrontViewTest extends AbstractUITest {
                 .setValue("123 Main St");
         test($(TextField.class).caption("Postal Code").first())
                 .setValue("12345");
-        test($(TextField.class).caption("City").first())
-                .setValue("TestCity");
+        test($(TextField.class).caption("City").first()).setValue("TestCity");
         test($(TextField.class).caption("Country").first())
                 .setValue("TestCountry");
 
@@ -219,18 +218,15 @@ public class StorefrontViewTest extends AbstractUITest {
                 .setValue("123 Main St");
         test($(TextField.class).caption("Postal Code").first())
                 .setValue("12345");
-        test($(TextField.class).caption("City").first())
-                .setValue("TestCity");
+        test($(TextField.class).caption("City").first()).setValue("TestCity");
         test($(TextField.class).caption("Country").first())
                 .setValue("TestCountry");
         test(nextButton).click();
 
         // Select supervisor
         @SuppressWarnings("unchecked")
-        var supervisorCombo = (ComboBox<Object>) $(ComboBox.class)
-                .first();
-        assertNotNull("Supervisor combobox should be present",
-                supervisorCombo);
+        var supervisorCombo = (ComboBox<Object>) $(ComboBox.class).first();
+        assertNotNull("Supervisor combobox should be present", supervisorCombo);
         var supervisors = supervisorCombo.getDataCommunicator()
                 .fetchItemsWithRange(0, 1);
         test(supervisorCombo).clickItem(supervisors.get(0));
@@ -252,12 +248,18 @@ public class StorefrontViewTest extends AbstractUITest {
         test(submitButton).click();
 
         // THEN: Success notification should be shown
-        var hasSuccessNotification = $(Notification.class)
-                .stream().filter(n -> n.getCaption() != null)
-                .anyMatch(n -> n.getCaption()
-                        .contains("created"));
+        var hasSuccessNotification = $(Notification.class).stream()
+                .filter(n -> n.getCaption() != null)
+                .anyMatch(n -> n.getCaption().contains("created"));
         assertTrue("Success notification should contain 'created'",
                 hasSuccessNotification);
+
+        // THEN: Step 1 should be shown again and previous selections cleared
+        var stepTitle = $(Label.class).id("wizard-step-title");
+        assertNotNull("Step title should be present", stepTitle);
+        assertEquals("Step 1: Select Products", stepTitle.getValue());
+        var grid = $(Grid.class).id("purchase-grid");
+        assertEquals(0, grid.getSelectedItems().size());
     }
 
     private void assertAssistiveNotificationOnReview(
@@ -351,10 +353,9 @@ public class StorefrontViewTest extends AbstractUITest {
 
         // THEN: Grid is sorted by stock in ascending order
         for (int i = 1; i < size; i++) {
-            var result = Integer.compare(test(productGrid).item(i - 1)
-                    .getStockCount(),
-                    test(productGrid).item(i)
-                            .getStockCount());
+            var result = Integer.compare(
+                    test(productGrid).item(i - 1).getStockCount(),
+                    test(productGrid).item(i).getStockCount());
             assertTrue(result <= 0);
         }
 
@@ -363,10 +364,9 @@ public class StorefrontViewTest extends AbstractUITest {
 
         // THEN: Grid is sorted by stock in descending order
         for (int i = 1; i < size; i++) {
-            var result = Integer.compare(test(productGrid).item(i - 1)
-                    .getStockCount(),
-                    test(productGrid).item(i)
-                            .getStockCount());
+            var result = Integer.compare(
+                    test(productGrid).item(i - 1).getStockCount(),
+                    test(productGrid).item(i).getStockCount());
             assertTrue(result >= 0);
         }
     }
@@ -380,8 +380,7 @@ public class StorefrontViewTest extends AbstractUITest {
 
         // THEN: Purchase history grid should be present
         var historyGrid = $(Grid.class).id("purchase-history-grid");
-        assertNotNull("Purchase history grid should be present",
-                historyGrid);
+        assertNotNull("Purchase history grid should be present", historyGrid);
         assertTrue("Purchase history grid should have at least one row",
                 test(historyGrid).size() > 0);
         int statusColumnIndex = getStatusColumnIndex(historyGrid);
@@ -439,8 +438,9 @@ public class StorefrontViewTest extends AbstractUITest {
             }
         }
         assertTrue("Second product row not found", secondRowIndex >= 0);
-        var secondQtyField = $((HorizontalLayout) test(productGrid).cell(3,
-                secondRowIndex), NumberField.class).first();
+        var secondQtyField = $(
+                (HorizontalLayout) test(productGrid).cell(3, secondRowIndex),
+                NumberField.class).first();
         test(secondQtyField).setValue(5);
 
         // Set the first product quantity lower
@@ -452,17 +452,18 @@ public class StorefrontViewTest extends AbstractUITest {
             }
         }
         assertTrue("First product row not found", firstRowIndex >= 0);
-        var firstQtyField = $((HorizontalLayout) test(productGrid).cell(3,
-                firstRowIndex), NumberField.class).first();
+        var firstQtyField = $(
+                (HorizontalLayout) test(productGrid).cell(3, firstRowIndex),
+                NumberField.class).first();
         test(firstQtyField).setValue(1);
 
         // THEN: Product with higher order quantity is shown first
         assertEquals(secondName, test(productGrid).item(0).getProductName());
-        assertEquals(Integer.valueOf(5), test(productGrid).item(0)
-                .getOrderQuantity());
+        assertEquals(Integer.valueOf(5),
+                test(productGrid).item(0).getOrderQuantity());
         assertEquals(firstName, test(productGrid).item(1).getProductName());
-        assertEquals(Integer.valueOf(1), test(productGrid).item(1)
-                .getOrderQuantity());
+        assertEquals(Integer.valueOf(1),
+                test(productGrid).item(1).getOrderQuantity());
     }
 
     @Test
@@ -499,10 +500,8 @@ public class StorefrontViewTest extends AbstractUITest {
                 .post(new PurchaseStatusChangedEvent(pendingPurchase.getId()));
 
         final int finalRow = row;
-        waitWhile(Grid.class,
-                grid -> test(historyGrid).cell(5, finalRow).toString()
-                        .equals("PENDING"),
-                1);
+        waitWhile(Grid.class, grid -> test(historyGrid).cell(5, finalRow)
+                .toString().equals("PENDING"), 1);
 
         // THEN: Grid size is unchaged
         int sizeAfterEvent = test(historyGrid).size();
@@ -540,9 +539,8 @@ public class StorefrontViewTest extends AbstractUITest {
                 .setValue("TestCountry");
         test(nextButton).click();
         var supervisorCombo = (ComboBox<Object>) $(ComboBox.class).first();
-        test(supervisorCombo).clickItem(
-                supervisorCombo.getDataCommunicator().fetchItemsWithRange(0, 1)
-                        .get(0));
+        test(supervisorCombo).clickItem(supervisorCombo.getDataCommunicator()
+                .fetchItemsWithRange(0, 1).get(0));
         test(nextButton).click();
         var submitButton = $(Button.class).caption("Submit").first();
         test(submitButton).click();
@@ -607,7 +605,7 @@ public class StorefrontViewTest extends AbstractUITest {
 
         assertFalse("Purchase should have at least one line item",
                 purchase.getLines().isEmpty());
-        NumberFormat euroFormat = new DecimalFormat("#,##0.00 €");
+        NumberFormat euroFormat = EuroConverter.createEuroFormat();
         var children = root.getElementsByTag("span");
 
         assertEquals(": " + purchase.getId(), children.get(0).text());

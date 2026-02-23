@@ -357,8 +357,7 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, Button.class).id("save-button")).click();
 
         // THEN: Notification is shown with the book name, form is
-        // closed and
-        // grid is focused
+        // closed and grid is focused
         assertFalse(form.isShown());
         assertTrue(test(grid).isFocused());
         assertNotification("\"Filter book\" updated");
@@ -378,8 +377,7 @@ public class BooksViewTest extends AbstractUITest {
         test($(FilterField.class).id("filter-field")).setValue("Filter book");
 
         // THEN: The book is found at the first row and the row contains
-        // the new
-        // book
+        // the new book
         assertEquals(1, test(grid).size());
         assertEquals("Filter book", test(grid).cell(1, 0));
         assertEquals("10.00 €", test(grid).cell(2, 0));

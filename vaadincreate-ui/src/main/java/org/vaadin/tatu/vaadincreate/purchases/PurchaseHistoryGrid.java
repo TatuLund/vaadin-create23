@@ -1,10 +1,7 @@
 package org.vaadin.tatu.vaadincreate.purchases;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
@@ -14,6 +11,8 @@ import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
+import org.vaadin.tatu.vaadincreate.common.EuroConverter;
+import org.vaadin.tatu.vaadincreate.common.EuroRenderer;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
@@ -36,7 +35,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.renderers.NumberRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
 /**
@@ -46,10 +44,6 @@ import com.vaadin.ui.themes.ValoTheme;
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class PurchaseHistoryGrid extends Composite implements HasI18N {
-
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter
-            .ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.systemDefault());
-
     private final Grid<Purchase> grid = new Grid<>();
     private final PurchaseHistoryPresenter presenter;
     private final PurchaseHistoryMode mode;
@@ -138,7 +132,7 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
 
         grid.addColumn(purchase -> {
             Instant createdAt = purchase.getCreatedAt();
-            return createdAt != null ? DATE_FORMATTER.format(createdAt) : "";
+            return createdAt != null ? Utils.formatDateTime(createdAt) : "";
         }).setCaption(getTranslation(I18n.CREATED_AT)).setId("created-at")
                 .setSortable(false);
 
@@ -148,12 +142,11 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
 
         var decidedAtColumn = grid.addColumn(purchase -> {
             Instant decidedAt = purchase.getDecidedAt();
-            return decidedAt != null ? DATE_FORMATTER.format(decidedAt) : "";
+            return decidedAt != null ? Utils.formatDateTime(decidedAt) : "";
         }).setCaption(getTranslation(I18n.Storefront.DECIDED_AT))
                 .setId("decided-at").setSortable(false);
 
-        NumberFormat euroFormat = new DecimalFormat("#,##0.00 €");
-        grid.addColumn(Purchase::getTotalAmount, new NumberRenderer(euroFormat))
+        grid.addColumn(Purchase::getTotalAmount, new EuroRenderer())
                 .setCaption(getTranslation(I18n.TOTAL)).setId("total-amount")
                 .setSortable(false);
 
@@ -219,8 +212,7 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
                 .add(Html.span().text(": " + approverValue)).add(Html.br());
 
         Instant decidedAt = purchase.getDecidedAt();
-        var decidedAtValue = decidedAt != null
-                ? DATE_FORMATTER.format(decidedAt)
+        var decidedAtValue = decidedAt != null ? Utils.formatDateTime(decidedAt)
                 : getTranslation(I18n.Storefront.NOT_AVAILABLE);
         root.add(Html.strong().text(getTranslation(I18n.Storefront.DECIDED_AT)))
                 .add(Html.span().text(": " + decidedAtValue)).add(Html.br());
@@ -249,7 +241,7 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
      */
     private Html.Div buildPurchaseLinesHtml(Purchase purchase) {
         var container = Html.div();
-        NumberFormat euroFormat = new DecimalFormat("#,##0.00 €");
+        NumberFormat euroFormat = EuroConverter.createEuroFormat();
 
         for (PurchaseLine line : purchase.getLines()) {
             var productName = line.getProduct().getProductName();
@@ -314,11 +306,9 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
         case COMPLETED -> getTranslation(
                 I18n.Storefront.PURCHASE_STATUS_APPROVED, id);
         case REJECTED -> getTranslation(
-                I18n.Storefront.PURCHASE_STATUS_REJECTED, id,
-                reason);
+                I18n.Storefront.PURCHASE_STATUS_REJECTED, id, reason);
         case CANCELLED -> getTranslation(
-                I18n.Storefront.PURCHASE_STATUS_CANCELLED, id,
-                reason);
+                I18n.Storefront.PURCHASE_STATUS_CANCELLED, id, reason);
         default -> "";
         };
     }

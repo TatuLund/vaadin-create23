@@ -97,9 +97,10 @@ public class BookGrid extends Grid<Product>
         // Format and add " €" to price
         var priceCol = addColumn(
                 product -> String.format("%.2f €", product.getPrice()))
-                .setCaption(getTranslation(I18n.PRICE)).setResizable(true)
-                .setComparator((product1, product2) -> product1.getPrice()
-                        .compareTo(product2.getPrice()))
+                .setCaption(getTranslation(I18n.PRICE))
+                .setResizable(true)
+                .setComparator((product1, product2) -> product1
+                        .getPrice().compareTo(product2.getPrice()))
                 .setStyleGenerator(
                         product -> VaadinCreateTheme.BOOKVIEW_GRID_ALIGNRIGHT)
                 .setId(PRICE_ID);

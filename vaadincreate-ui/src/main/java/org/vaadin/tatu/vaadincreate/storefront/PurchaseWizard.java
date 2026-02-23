@@ -13,6 +13,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Address;
 import org.vaadin.tatu.vaadincreate.backend.data.Cart;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.common.EuroConverter;
+import org.vaadin.tatu.vaadincreate.common.EuroRenderer;
 import org.vaadin.tatu.vaadincreate.common.NumberField;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
@@ -262,6 +263,8 @@ public class PurchaseWizard extends Composite implements HasI18N {
     }
 
     private String buildReviewHtml() {
+        var euroFormat = EuroConverter.createEuroFormat();
+
         var div = Html.div();
 
         div.add(Html.h3().text(getTranslation(I18n.Storefront.ORDER_SUMMARY)));
@@ -276,8 +279,9 @@ public class PurchaseWizard extends Composite implements HasI18N {
                     .multiply(new BigDecimal(quantity));
 
             var itemText = String.format("%s x %d @ %s = %s",
-                    product.getProductName(), quantity, product.getPrice(),
-                    lineTotal);
+                    product.getProductName(), quantity,
+                    euroFormat.format(product.getPrice()),
+                    euroFormat.format(lineTotal));
             list.add(Html.li().text(itemText));
         }
         div.add(list);
@@ -387,6 +391,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
             // Reset wizard
             cart.clear();
+            productGrid.setItems(presenter.getOrderableProducts());
             selectedSupervisor = null;
             showStep(1);
 
@@ -416,12 +421,10 @@ public class PurchaseWizard extends Composite implements HasI18N {
                             .compareToIgnoreCase(p2.getProductName()));
             addColumn(ProductDto::getStockCount)
                     .setCaption(getTranslation(I18n.IN_STOCK))
-                    .setComparator(
-                            (p1, p2) -> Integer.compare(p1.getStockCount(),
-                                    p2.getStockCount()));
-            addColumn(product -> String.format("%.2f €", product.getPrice()))
-                    .setCaption(getTranslation(I18n.PRICE))
-                    .setComparator(
+                    .setComparator((p1, p2) -> Integer
+                            .compare(p1.getStockCount(), p2.getStockCount()));
+            addColumn(ProductDto::getPrice, new EuroRenderer())
+                    .setCaption(getTranslation(I18n.PRICE)).setComparator(
                             (p1, p2) -> p1.getPrice().compareTo(p2.getPrice()));
 
             // Add quantity column with NumberField
@@ -449,8 +452,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
             }).setComparator((p1, p2) -> Integer.compare(p1.getOrderQuantity(),
                     p2.getOrderQuantity()))
                     .setCaption(getTranslation(I18n.Storefront.QUANTITY))
-                    .setId("quantity-column")
-                    .setStyleGenerator(
+                    .setId("quantity-column").setStyleGenerator(
                             product -> VaadinCreateTheme.STOREFRONTVIEW_WIZARD_QUANTITYCOLUMN);
 
             // Footer row for totals

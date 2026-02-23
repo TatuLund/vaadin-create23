@@ -29,17 +29,12 @@ public class PurchasesView extends VerticalLayout implements VaadinCreateView {
     private TabNavigator tabNavigator;
 
     @Nullable
-    private PurchasesHistoryTab historyTab;
-
-    @Nullable
-    private PurchasesApprovalsTab approvalsTab;
-
-    @Nullable
-    private PurchasesStatsTab statsTab;
+    private PurchasesHistoryView historyTab;
 
     private AccessControl accessControl = VaadinCreateUI.get()
             .getAccessControl();
 
+    @SuppressWarnings("java:S2637")
     public PurchasesView() {
         setSizeFull();
     }
@@ -61,9 +56,9 @@ public class PurchasesView extends VerticalLayout implements VaadinCreateView {
     }
 
     private void setupTabNavigator() {
-        historyTab = new PurchasesHistoryTab();
-        approvalsTab = new PurchasesApprovalsTab();
-        statsTab = new PurchasesStatsTab();
+        historyTab = new PurchasesHistoryView();
+        var approvalsTab = new PurchasesApprovalsView();
+        var statsTab = new PurchasesStatsView();
         tabNavigator = new TabNavigator(VIEW_NAME);
         if (accessControl.isUserInRole(Role.ADMIN)) {
             tabNavigator.addTabView(historyTab,

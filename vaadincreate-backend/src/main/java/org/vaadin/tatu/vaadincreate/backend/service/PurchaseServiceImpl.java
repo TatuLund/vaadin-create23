@@ -315,6 +315,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         totals.forEach(
                 (month, sum) -> result
                         .add(new MonthlyPurchaseStat(month, sum)));
+        logger.info("Loaded {} rows of monthly purchase stats over {} months.",
+                rows.size(), months);
         return result;
     }
 

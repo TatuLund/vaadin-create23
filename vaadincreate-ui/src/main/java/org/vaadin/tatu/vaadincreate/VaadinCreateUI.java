@@ -21,6 +21,7 @@ import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
+import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
 import org.vaadin.tatu.vaadincreate.backend.events.MessageEvent;
 import org.vaadin.tatu.vaadincreate.backend.events.ShutdownEvent;
@@ -93,12 +94,21 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             MDC.clear();
             showLoginView();
         } else {
-            var id = Utils.getCurrentUserOrThrow().getId();
+            var user = Utils.getCurrentUserOrThrow();
+            if (user.getRole() == Role.CUSTOMER
+                    && getSession().getUIs().size() == 1) {
+                Notification.show(
+                        getTranslation(I18n.App.OPEN_IN_ANOTHER_TAB),
+                        Type.WARNING_MESSAGE);
+                close();
+                return;
+            }
+            var id = user.getId();
             assert id != null : "User id must not be null";
             // Fetch user details again to have the latest info
             // This is needed e.g. if user info was changed
             // while user had closed the browser tab
-            var user = getUserService().getUserById(id);
+            user = getUserService().getUserById(id);
             CurrentUser.set(user);
             target = getInitialTarget();
             showAppLayout();
@@ -252,13 +262,13 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     @Override
     public void eventFired(AbstractEvent event) {
         switch (event) {
-        case MessageEvent(String message, LocalDateTime timeStamp) ->
-            access(() -> {
-                var note = new Notification(
-                        Utils.formatDate(timeStamp, getLocale()), message,
-                        Type.TRAY_NOTIFICATION, true);
-                note.show(getPage());
-            });
+        case MessageEvent(String message, LocalDateTime timeStamp) -> access(
+                () -> {
+                    var note = new Notification(
+                            Utils.formatDate(timeStamp, getLocale()), message,
+                            Type.TRAY_NOTIFICATION, true);
+                    note.show(getPage());
+                });
         case UserUpdatedEvent(Integer userId) -> {
             var user = (User) getSession().getSession().getAttribute(
                     CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY);

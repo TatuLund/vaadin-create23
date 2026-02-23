@@ -10,7 +10,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.common.TabView;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
-import org.vaadin.tatu.vaadincreate.purchases.ApprovalsPresenter.ApproveResult;
+import org.vaadin.tatu.vaadincreate.purchases.PurchasesApprovalsPresenter.ApproveResult;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.ui.Button;
@@ -27,18 +27,18 @@ import com.vaadin.ui.themes.ValoTheme;
  */
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
-public class PurchasesApprovalsTab extends VerticalLayout
+public class PurchasesApprovalsView extends VerticalLayout
         implements TabView {
 
     public static final String VIEW_NAME = I18n.APPROVALS;
 
     private final PurchaseHistoryGrid approvalsGrid;
-    private final ApprovalsPresenter presenter;
+    private final PurchasesApprovalsPresenter presenter;
 
-    public PurchasesApprovalsTab() {
+    public PurchasesApprovalsView() {
         setSizeFull();
         setMargin(false);
-        presenter = new ApprovalsPresenter();
+        presenter = new PurchasesApprovalsPresenter();
         approvalsGrid = new PurchaseHistoryGrid(new PurchaseHistoryPresenter(),
                 PurchaseHistoryMode.PENDING_APPROVALS,
                 Utils.getCurrentUserOrThrow());

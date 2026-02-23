@@ -16,7 +16,7 @@ import org.vaadin.tatu.vaadincreate.backend.PurchaseService.ProductPurchaseStat;
 
 /**
  * Presenter responsible for loading purchase statistics asynchronously and
- * pushing the result to {@link PurchasesStatsTab}.
+ * pushing the result to {@link PurchasesStatsView}.
  *
  * <p>
  * Follows the same pattern as {@code StatsPresenter}: data is loaded in a
@@ -37,7 +37,7 @@ public class PurchasesStatsPresenter implements Serializable {
     /** Number of calendar months shown in the monthly line chart. */
     static final int MONTHLY_RANGE = 12;
 
-    private final PurchasesStatsTab view;
+    private final PurchasesStatsView view;
 
     @Nullable
     private transient CompletableFuture<Void> future;
@@ -69,7 +69,7 @@ public class PurchasesStatsPresenter implements Serializable {
      * @param view
      *            the Stats tab to push updates to, must not be null
      */
-    public PurchasesStatsPresenter(PurchasesStatsTab view) {
+    public PurchasesStatsPresenter(PurchasesStatsView view) {
         this.view = view;
     }
 

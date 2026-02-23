@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import org.jsoup.Jsoup;
@@ -400,7 +399,7 @@ public class StorefrontViewTest extends AbstractUITest {
         SerializationDebugUtil.assertSerializable(view);
     }
 
-    private int getStatusColumnIndex(Grid historyGrid) {
+    private int getStatusColumnIndex(Grid<Purchase> historyGrid) {
         int statusColumnIndex = -1;
         for (int i = 0; i < historyGrid.getColumns().size(); i++) {
             @SuppressWarnings("rawtypes")

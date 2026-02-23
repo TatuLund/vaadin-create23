@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import org.junit.After;
@@ -86,7 +85,8 @@ public class PurchasesViewTest extends AbstractUITest {
     @SuppressWarnings("unchecked")
     public void should_ShowApprovalsGrid_When_NavigatingToApprovalsTab() {
         view = navigate(
-                PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
+                PurchasesView.VIEW_NAME + "/"
+                        + PurchasesApprovalsView.VIEW_NAME,
                 PurchasesView.class);
 
         var approvalsGrid = (Grid<Object>) $(Grid.class)
@@ -108,7 +108,7 @@ public class PurchasesViewTest extends AbstractUITest {
     @Test
     public void should_ShowCharts_When_NavigatingToStatsTab() {
         view = navigate(
-                PurchasesView.VIEW_NAME + "/" + PurchasesStatsTab.VIEW_NAME,
+                PurchasesView.VIEW_NAME + "/" + PurchasesStatsView.VIEW_NAME,
                 PurchasesView.class);
 
         // Wait for async loading to finish (same pattern as StatsViewTest)
@@ -247,7 +247,8 @@ public class PurchasesViewTest extends AbstractUITest {
         switchToUser("User5", "user5");
 
         view = navigate(
-                PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
+                PurchasesView.VIEW_NAME + "/"
+                        + PurchasesApprovalsView.VIEW_NAME,
                 PurchasesView.class);
 
         var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
@@ -333,7 +334,8 @@ public class PurchasesViewTest extends AbstractUITest {
         switchToUser("User5", "user5");
 
         view = navigate(
-                PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
+                PurchasesView.VIEW_NAME + "/"
+                        + PurchasesApprovalsView.VIEW_NAME,
                 PurchasesView.class);
 
         var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
@@ -411,7 +413,8 @@ public class PurchasesViewTest extends AbstractUITest {
         switchToUser("User5", "user5");
 
         view = navigate(
-                PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
+                PurchasesView.VIEW_NAME + "/"
+                        + PurchasesApprovalsView.VIEW_NAME,
                 PurchasesView.class);
 
         var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
@@ -468,7 +471,8 @@ public class PurchasesViewTest extends AbstractUITest {
         switchToUser("User5", "user5");
 
         view = navigate(
-                PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
+                PurchasesView.VIEW_NAME + "/"
+                        + PurchasesApprovalsView.VIEW_NAME,
                 PurchasesView.class);
 
         var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
@@ -526,7 +530,8 @@ public class PurchasesViewTest extends AbstractUITest {
         switchToUser("User5", "user5");
 
         view = navigate(
-                PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
+                PurchasesView.VIEW_NAME + "/"
+                        + PurchasesApprovalsView.VIEW_NAME,
                 PurchasesView.class);
 
         var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
@@ -550,7 +555,8 @@ public class PurchasesViewTest extends AbstractUITest {
         switchToUser("User6", "user6");
 
         view = navigate(
-                PurchasesView.VIEW_NAME + "/" + PurchasesApprovalsTab.VIEW_NAME,
+                PurchasesView.VIEW_NAME + "/"
+                        + PurchasesApprovalsView.VIEW_NAME,
                 PurchasesView.class);
 
         approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)

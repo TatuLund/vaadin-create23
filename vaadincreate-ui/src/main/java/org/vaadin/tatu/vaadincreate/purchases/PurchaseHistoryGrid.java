@@ -114,7 +114,7 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
     private void configureColumns() {
         grid.addComponentColumn(ToggleButton::new).setWidth(50);
 
-        var idColumn = grid.addColumn(p -> p.getId() != null ? p.getId() : "")
+        var idColumn = grid.addColumn(Purchase::getId)
                 .setCaption(getTranslation(I18n.Storefront.PURCHASE_ID))
                 .setSortable(false).setId("purchase-id");
 

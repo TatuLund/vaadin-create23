@@ -48,10 +48,10 @@ import com.vaadin.ui.VerticalLayout;
  */
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
-public class PurchasesStatsTab extends VerticalLayout implements TabView {
+public class PurchasesStatsView extends VerticalLayout implements TabView {
 
     private static final Logger logger = LoggerFactory
-            .getLogger(PurchasesStatsTab.class);
+            .getLogger(PurchasesStatsView.class);
 
     public static final String VIEW_NAME = StatsView.VIEW_NAME;
 
@@ -71,7 +71,7 @@ public class PurchasesStatsTab extends VerticalLayout implements TabView {
     /**
      * Constructs the Stats tab and wires up all three charts.
      */
-    public PurchasesStatsTab() {
+    public PurchasesStatsView() {
         setSizeFull();
         presenter = new PurchasesStatsPresenter(this);
 

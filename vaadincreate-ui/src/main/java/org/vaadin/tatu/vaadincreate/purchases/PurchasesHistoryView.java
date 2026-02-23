@@ -13,13 +13,13 @@ import com.vaadin.ui.VerticalLayout;
  */
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
-public class PurchasesHistoryTab extends VerticalLayout implements TabView {
+public class PurchasesHistoryView extends VerticalLayout implements TabView {
 
     public static final String VIEW_NAME = I18n.Storefront.PURCHASE_HISTORY;
 
     private final PurchaseHistoryGrid historyGrid;
 
-    public PurchasesHistoryTab() {
+    public PurchasesHistoryView() {
         setSizeFull();
         setMargin(false);
         historyGrid = new PurchaseHistoryGrid(new PurchaseHistoryPresenter(),

@@ -11,7 +11,6 @@ import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
-import org.vaadin.tatu.vaadincreate.backend.data.UserSupervisor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -21,6 +20,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.time.YearMonth;
 
 /**
  * Test class for {@link PurchaseService}.
@@ -432,5 +432,31 @@ public class PurchaseServiceTest {
         // Act – rejecting again must throw
         purchaseService.reject(purchase.getId(), supervisorUser,
                 "Second rejection");
+    }
+
+    @Test
+    public void should_ReturnMonthlyTotals_InChronologicalOrder_OldestToNewest() {
+        int months = 12;
+
+        var stats = purchaseService.getMonthlyTotals(months);
+
+        assertNotNull(stats);
+        assertEquals(months, stats.size());
+
+        var now = YearMonth.now();
+        assertEquals(now.minusMonths(months - 1L).toString(),
+                stats.get(0).yearMonth());
+        assertEquals(now.toString(), stats.get(stats.size() - 1).yearMonth());
+
+        for (int i = 1; i < stats.size(); i++) {
+            var prev = YearMonth.parse(stats.get(i - 1).yearMonth());
+            var curr = YearMonth.parse(stats.get(i).yearMonth());
+            assertTrue("Expected months to be strictly increasing, but got "
+                    + prev + " then " + curr, prev.isBefore(curr));
+            assertNotNull("Monthly total amount should not be null",
+                    stats.get(i).totalAmount());
+        }
+        assertNotNull("Monthly total amount should not be null",
+                stats.get(0).totalAmount());
     }
 }

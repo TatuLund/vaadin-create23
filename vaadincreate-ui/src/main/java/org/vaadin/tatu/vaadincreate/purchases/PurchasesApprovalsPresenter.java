@@ -23,7 +23,7 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
  */
 @NullMarked
 @SuppressWarnings("serial")
-public class ApprovalsPresenter implements Serializable {
+public class PurchasesApprovalsPresenter implements Serializable {
 
     @Nullable
     private transient PurchaseService purchaseService;
@@ -170,5 +170,5 @@ public class ApprovalsPresenter implements Serializable {
 
     @SuppressWarnings("null")
     private static final Logger logger = LoggerFactory
-            .getLogger(ApprovalsPresenter.class);
+            .getLogger(PurchasesApprovalsPresenter.class);
 }

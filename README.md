@@ -1,125 +1,43 @@
 # Vaadin Create '23 demo app (Vaadin 8)
 
-This is show case application for advanced Vaadin 8 topics. The application focuses on UI design and architecture of the UI code. These techniques help to keep old Vaadin 8 applications up to date. The application is built with Vaadin 8.30.0, which is fully compatible with Java 11 and 21.
+This is a showcase application for advanced Vaadin 8 topics. The application focuses on UI design and the architecture of the UI code. These techniques help to keep existing Vaadin 8 applications up to date. The application is built with Vaadin 8.30.1, which is fully compatible with Java 11 and 21.
 
-This project is my dogfooding test application for legacy Vaadin 8 as we are still maintaining it under our commercial extended maintenance program. Thus, even it is a bit fabricated, I have added there are many details that you would find in real production application.
+This project is my dogfooding test application for legacy Vaadin 8, as we are still maintaining it under our commercial extended maintenance program. Although it is somewhat fabricated, I have included many details that you would find in a real production application.
 
-Despite the application using the old Vaadin 8, many of the examples featured by this application are applicable for more current Vaadin versions.
+Despite the application using the old Vaadin 8, many of the examples featured here are applicable to more current Vaadin versions.
 
 ## Covered topics
 
-Despite being somewhat artificial this demo app covers various use cases you may encounter in real life application. Source of the demonstrated cases has been actual customer questions I have seen during my career as a software consultant.
+Despite being a somewhat artificial internal purchase tool, this demo app covers various use cases you may encounter in a real-life application. The demonstrated cases are based on actual customer questions I have seen during my career as a software consultant.
 
-- Multi-module project setup (backend, components and ui)
-- AppLayout uses ValoMenu to create responsive application shell
-	- Setup also navigator and combine building of the menu and registrations of the views.
-	- Implements per view role based access control.
-- The main application views have been implemented using Model View Presenter pattern
-	- VaadinCreateUI acts as a proxy for services and services are used only in the Presenters. This pattern allows to extend and override VaadinCreateUI for alternate set of services for testing.	
-- StatsView and BooksView load data from backend asynchronously and use push to update the view
-	- BooksView uses FakeGrid component as placeholder while loading.
-- StatsView
-	- Responsive dashboard layout of Charts using Vaadin responsive CSS.
-	- Async loading and showing no data label during loading.
-	- Multi-axis Chart example.
-	- Automatically update the charts when someone saves or deletes book, as well as adds, removes or updates a category.
-	- Enabled Chart export menu
-- BooksView
-	- Responsive Grid using BrowserResizeListener, 
-	- Responsive CSS in Grid column
-	- Responsive CRUD editor design
-	- Highlight last edited item
-	- Implement beforeLeave to confirm unsaved changes
-	- Highlight changed fields
-	- Bean level validation example
-	- Display no matches label on Grid when search did not find matches
-	- Bookmarkable editor
-	- Description generator showing details in compact mode
-	- Pessimistic locking preventing concurrent edits
-- BookForm
-	- Use event based decoupling with BooksView
-	- Demo of how to implement "dirty" state for the fields
-	- So previous value of the field when "dirty"
-	- Use change tracking in Binder, i.e. when user edits the value back to original Binder state is back hasChanges = false
-	- Demo of how to use bean level validation
-	- Custom field demo, NumberField
-	- Side panel design example, see SidePanel
-	- Auto save draft if the browser is closed while form is open
-- Simplified example of access control
-- AdminView
-	- Example of nested sub-navigation using url-parameters and TabSheet component,
-	- Category management view, use Grid as list editor
-	- User management view, use FormLayout light variant
-	- Optimistic locking used for handling concurrent edits
-	- Event based decoupling demo in UserForm
-	- Indicator in Tab when UserForm has un-saved changes
-	- Do not let session end when there is un-saved changes in UserForm
-- AboutView
-	- Demo how to correctly sanitize user input with Jsoup in order to avoid XSS,
-	- CustomLayout example
-- How to use logger in UI module
-- How to create and use application scoped EventBus
-	- Implementation shows how to avoid common caveats of memory leaks, see unit test for proof
-	- This EventBus is used in many ways in the application
-	- The EventBus uses RedisPubSubService to share the events within the cluster
-- The custom theme is using BEM (Block Element Modifier) naming scheme to avoid class name conflicts in CSS
-- Example of how to localize / provide translations for texts used in UI
-- Observability
-    - Simple utility class using OpenTelemetry adds events and attributes of the user actions to trace spans.
+As a result, the project has a wiki that collects practical notes, examples, and best practices derived from the vaadin-create23 demo project. While new articles will be added over time, the current content reflects the main focus of the wiki: documenting Vaadin 8 patterns and techniques that tend to be underrepresented or only briefly mentioned in the official documentation. The emphasis is on real‑world usage, maintainability, and architectural clarity, with each article grounded in concrete code from the demo project rather than isolated snippets or theoretical examples.
 
-### Backend
+### Vaadin 8 Howtos
 
-The backend module features data access layer using Hibernate with a concise utility class for running queries in session and transaction, which is used by DAOs. There are couple of Service classes that are using by the presenters in the UI module. The backend also has RedisPubSubService, which is used by EventBus.  There is a set of unit tests verifying the main functionalities.
+- [How to Use OpenTelemetry in a Vaadin 8 Application](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Use-OpenTelemetry-in-a-Vaadin-8-Application)
+- [How to Improve Accessibility (a11y) in a Vaadin 8 Application](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Improve-Accessibility-(a11y)-in-a-Vaadin-8-Application)
+- [How to Localize a Vaadin 8 Application](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Localize-a-Vaadin-8-Application)
+- [How to Validate a Vaadin 8 Project with GitHub Actions](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Validate-a-Vaadin-8-Project-with-GitHub-Actions)
+- [How to Create an Accessible Application Shell with Vaadin 8](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Create-an-Accessible-Application-Shell-with-Vaadin-8)
+- [How to Write Browserless UI Tests with Vaadin 8](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Write-Browserless-UI-Tests-with-Vaadin-8)
+- [How to Use Asynchronous Updates in Vaadin 8](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Use-Asynchronous-Updates-in-Vaadin-8)
+- [How to Customize the Valo Theme in Vaadin 8](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Customize-the-Valo-Theme-in-Vaadin-8)
+- [How to Test Vaadin 8 Charts with TestBench](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Test-Vaadin-8-Charts-with-TestBench)
+- [How to Test Vaadin 8 Components in Isolation with TestBench](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Test-Vaadin-8-Components-in-Isolation-with-TestBench)
+- [How to Use the Vaadin 8 Component Event Bus](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Use-the-Vaadin-8-Component-Event-Bus)
+- [How To Use the Latest Vaadin 8 Binder Features](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Use-the-Latest-Vaadin-8-Binder-Features)
+- [How to Implement an Application Event Bus for a Typical Vaadin Business App](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Implement-an-Application-Event-Bus-for-a-Typical-Vaadin-Business-App)
+- [How To Reduce Flaky Tests in Vaadin 8 TestBench ](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Reduce-Flaky-Tests-in-Vaadin-8-TestBench)
+- [How To Show Non-Interactive, Accessible Details in a Vaadin 8 Grid](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Show-Non%E2%80%90Interactive,-Accessible-Details-in-a-Vaadin-8-Grid)
+- [How To Compose HTML Content in Vaadin 8 Safely](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Compose-HTML-Content-in-Vaadin-8-Safely-(Without-XSS-Surprises))
+- [How to implement hierarchical navigation in Vaadin 8](https://github.com/TatuLund/vaadin-create23/wiki/How-to-implement-hierarchical-navigation-in-Vaadin-8)
+- [How to Build a Test Pyramid for Vaadin 8 Apps](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Build-a-Test-Pyramid-for-Vaadin-8-Apps)
 
-### Automated testing
+## Backend
 
-The test suite of the application follows the principles that I think are the best practise for a Vaadin application. 
+The backend module features a data access layer using Hibernate with a concise utility class for running queries in a session and transaction, which is used by the DAOs. There are a couple of service classes that are used by the presenters in the UI module. The backend also has a RedisPubSubService, which is used by the EventBus. There is a set of unit tests verifying the main functionality.
 
-- Comprehensive set of unit, component, integration and end to end tests
-    - The project demonstrates testing approach I would recommend for typical Vaadin application:
-    - Test custom components in isolation
-    - Test as much as possible with unit tests
-    - Prefer UI Unit Testing for testing UI logic including non-happy paths
-    - Use UI Unit Testing for verifying various concurrent user actions scenarios
-	- ArchUnit tests guarding selected architecure conventions
-    - Verify the most important parts with end to end tests using TestBench
-    - Include few Screenshot tests to verify visuals
-
-### Accessibility
-
-Vaadin 8 is not fully upto date with modern accessibility, but with some relatively simple workarounds acceptable accessibility can be still achieved and those are being demonstrated in this application.
-
-- Accessibility
-    - In most of the views some additional attributes are set for better accessibility, AttributeExtension and HasAttributes mixin are used to extend the components
-    - In StatsView Charts are having role "figure" and "aria-label" set for audible version of data
-	- Using ChatAccessibilityExtension to patch Chart's legends and context menus to be accesible
-    - In BooksView the BookGrid using Grid's accessible navigation mode for better situational awareness
-    - The loading indicator in BooksView has audible alert
-    - The label that appears when there is no books matching filter is audible
-    - Using assistive Notification, which used e.g. when view is opened or form is opened
-    - AppLayout menu has role "navigation" and the navigation buttons role "link". The buttons also have "aria-label" set according to whether the view is a current view or not.
-    - In some places tooltips are used as audible hints
-    - Keyboard navigation has been adjusted for better usability with assistive technologies
-    - Tabindex and visual focus ring is used to improve situational awareness
-    - Using focus color in focused fields labels
-
-### General use components
-
-The general use components have been isolated in their own module. This is to emphasize separation of concern, and also making it possible to have end-to-end tests of the components in isolation against test UIs.
-
-- Components module has examples of GWT and JavaScript extensions
-	- Reset button for text field extension with client side GWT,
-	- Character counter for TextArea and TextField showing remaining characters extension with GWT,
-	- Attribute extension using JavaScript. It used in form's number input, and is an essential instrument to adjust the accessibility attributes in various places. The component has HasAttributes mixin that makes it convenient to use when more attributes are needed to be set.
-	- Java 11 code used in widgets,
-	- ConfirmDialog server side composition component,
-	- ChartAccessibilityExtension patches Chart legend and context menu as well as adss API to localize context menu texts, as those are not in Lang object.
-	- Suite of unit and integration tests for the components and standalone test UI for them
-
-### Notes
-
-- Backend module has in memory data service built with H2 database and Hibernate and has simulated latency on service layer.
-- Dependency injection framework such as CDI or Spring is not being used, the demo has neutral stance on purpose and demonstrates that especially small applications can be built without them.
+Dependency injection frameworks such as CDI or Spring are not used. The demo is intentionally framework-neutral and demonstrates that, especially for small applications, you can build a clean architecture without them.
 
 ## This project uses commercial Vaadin products
 
@@ -127,15 +45,16 @@ This is intentional to demonstrate the current state of Vaadin 8 extended mainte
 
 The following commercial products are used.
 
-- Vaadin 8.30.0. The application uses some features it provides. (The latest free version 8.14.3)
+- Vaadin 8.30.1. The application uses some features it provides. (The latest free version 8.14.3)
   - Eager UI cleanup
   - Binder: change tracking
   - Binder: draft saving
   - Grid: read only state
   - Grid: accessible navigation mode
   - ValoMenu: improved API
-- Vaadin Charts in stats dashboard view
-- TestBench and TestBench UI Unit Test add-on for testing 
+  - ChartElement: For testing StatsView
+- Vaadin Charts in the stats dashboard view
+- TestBench and TestBench UI Unit Test add-on for testing
 - AppSecKit for SBOM vulnerability analysis
 
 ## Building and running the application
@@ -146,15 +65,15 @@ git clone <url of the repository>
 mvn clean install
 ```
 
-    (or use "mvn clean install -Pit" to run also the TestBench tests)
+  (or use "mvn clean install -Pit" to run also the TestBench tests)
 
 ```
 cd vaadincreate-ui
-```
 
 mvn jetty:run
+```
 
-Alternatively run application with AppSecKit
+Alternatively, run the application with AppSecKit
 
 ```
 mvn jetty:run -Pappsec
@@ -164,7 +83,7 @@ To see the demo, navigate to http://localhost:8080/
 
 ## Building and running the component tests
 
-The components module has test UI of its own for running the integration tests of the components.
+The components module has its own test UI for running the integration tests of the components.
 
 ```
 git clone <url of the repository>
@@ -172,7 +91,7 @@ git clone <url of the repository>
 mvn clean install
 ```
 
-    (or use "mvn clean install -Pit" to run also the TestBench tests)
+(or use "mvn clean install -Pit" to run also the TestBench tests)
 
 ```
 cd vaadincreate-components
@@ -184,7 +103,7 @@ To see the demo, navigate to http://localhost:8080/
 
 ## Development with Eclipse IDE
 
-For further development of this project, the following tool-chain is recommended:
+For further development of this project, the following toolchain is recommended:
 - Eclipse IDE
 - m2e wtp plug-in (install it from Eclipse Marketplace)
 - Vaadin Eclipse plug-in (install it from Eclipse Marketplace)
@@ -195,13 +114,13 @@ For further development of this project, the following tool-chain is recommended
 
 Choose File > Import... > Existing Maven Projects
 
-Note that Eclipse may give "Plugin execution not covered by lifecycle configuration" errors for pom.xml. Use "Permanently mark goal resources in pom.xml as ignored in Eclipse build" quick-fix to mark these errors as permanently ignored in your project. Do not worry, the project still works fine. 
+Note that Eclipse may show "Plugin execution not covered by lifecycle configuration" errors for pom.xml. Use the "Permanently mark goal resources in pom.xml as ignored in Eclipse build" quick-fix to mark these errors as permanently ignored in your project. The project will still work fine.
 
 ### Debugging server-side
 
-If you have not already compiled the widgetset, do it now by running vaadin:install Maven target for vaadincreate-root project.
+If you have not already compiled the widgetset, do it now by running the vaadin:install Maven target for the vaadincreate-root project.
 
-If you have a JRebel license, it makes on the fly code changes faster. Just add JRebel nature to your vaadincreate-ui project by clicking project with right mouse button and choosing JRebel > Add JRebel Nature
+If you have a JRebel license, it makes on-the-fly code changes faster. Just add JRebel nature to your vaadincreate-ui project by right-clicking the project and choosing JRebel > Add JRebel Nature.
 
 To debug project and make code modifications on the fly in the server-side, right-click the vaadincreate-ui project and choose Debug As > Debug on Server. Navigate to http://localhost:8080/ to see the application.
 
@@ -231,9 +150,9 @@ The other Dockerfile.db file is just for Postgres database.
 Then you need to load initial data from the script in this repository, start the database container and use commands:
 ```
 docker-compose up db
-docker exec -it vaadincreate23-db-1 mkdir /backup
-docker cp vaadincreate.sql vaadincreate23-db-1:/backup/vaadincreate.sql
-docker exec -it vaadincreate23-db-1 psql -U creator -d vaadincreate -f /backup/vaadincreate.sql
+docker exec -it vaadin-create23-db-1 mkdir /backup
+docker cp vaadincreate.sql vaadin-create23-db-1:/backup/vaadincreate.sql
+docker exec -it vaadin-create23-db-1 psql -U creator -d vaadincreate -f /backup/vaadincreate.sql
 ```
 
 Then stop the container.

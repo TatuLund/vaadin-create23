@@ -297,6 +297,7 @@ Extend backend and UI so that:
      - `decisionReason` (if present),
      - line items.
    - Grid is **read-only** for the customer.
+   - Use method in Utils class to format Instant to date string.
 
 4. The history panel must be **performant**:
    - If there are many purchases, paging via callback provider improves performance.
@@ -695,5 +696,219 @@ these are not data bearers. They should just have Purchase id.
 - When offline:
   - Behavior remains as in Step 3 (login-time summary).
  - Live notification behavior (when implemented) is covered by UI unit tests similar to current views.
+
+---
+
+## 8. Step 8 – User Deactivation (No Delete) & Pending Approval Reassignment
+
+### 8.1 Context
+
+Users cannot be deleted safely once referenced by `Purchase` (requester/approver). If access must be denied, the user must be **deactivated** instead of deleted.
+
+### 8.2 Scope
+
+- Add a new boolean `active` flag to `User`.
+- Allow admins to set a user inactive/active in `UserManagementView`.
+- Deny login for inactive users.
+- If an inactive user is an approver for any **PENDING** purchases, those purchases must be reassigned to another active approver as part of the deactivation flow.
+
+### 8.3 Requirements
+
+#### 8.3.1 Backend model
+
+1. Extend `User` entity with:
+   - `active` (boolean)
+     - Default: `true` for existing and new users.
+     - Represents whether the user is allowed to authenticate and use the system.
+
+2. Deletion behavior:
+   - Admin UI must not offer “delete user” for users stored in the database.
+   - Deactivation is the supported approach.
+
+#### 8.3.2 Authentication / authorization
+
+3. Login attempts for inactive users:
+   - Authentication must fail if `user.active == false`.
+  - User-facing behavior must be identical to:
+    - wrong password, and
+    - non-existent / deleted user.
+  - No information leak about whether the account exists or is inactive.
+  - Still allow a clear admin-side explanation via logs.
+
+4. Authorization for inactive users (already logged in):
+   - Any authorization mechanism that checks roles (e.g. view annotations / access checks) must also require `currentUser.active == true`.
+   - Deactivation must take effect immediately for an already logged-in user:
+     - The existing “user saved/changed” UI event handling in `VaadinCreateUI` will refresh the current user from the database.
+     - If the current session user becomes inactive, they must no longer be able to access protected views; treat as signed out / access denied according to existing patterns.
+
+4b. Last active admin safeguard:
+  - The system must prevent deactivating the last active `ADMIN` user.
+  - UI behavior: when `ADMIN` is editing the himself, the `active` field must be disabled (similar to how the Role field is disabled in some cases already).
+  - Backend must also enforce this rule (do not rely only on UI), so the operation cannot be performed via direct service calls.
+
+#### 8.3.3 Deactivation & pending approvals reassignment
+
+5. When admin attempts to set a user inactive and that user has role `USER` or `ADMIN`:
+   - Find all `Purchase` rows where:
+     - `status == PENDING`
+     - `approver == targetUser`
+   - If none exist: allow deactivation.
+   - If any exist: the admin must reassign them to another approver.
+
+6. Reassignment constraints:
+   - New approver must be:
+     - `active == true`, and
+     - role `USER` or `ADMIN`.
+   - Reassignment must be performed in the same backend transaction as the deactivation so it is atomic.
+   - After reassignment, the purchases remain `PENDING` (no auto-approval).
+
+7. UI behavior in `UserManagementView` / `UserForm` (simple approach):
+   - Admin can toggle user active status.
+     - The `active` field is presented as a `Checkbox`.
+   - The `UserForm` includes a `ComboBox<User>` “Deputy approver” (or similar):
+     - This is a **transient UI-only input**, not a persisted property on `User`.
+     - Invisible by default.
+     - Items: users with role `USER` or `ADMIN` and `active == true`.
+     - The user being edited must not appear in the items.
+     - Binder validation:
+       - The deputy field must not block normal saves when it is hidden.
+       - When deputy is hidden, its `asRequired` validation (or equivalent) must be disabled.
+       - When deputy becomes visible (pending approvals found), required validation must be enabled.
+   - Save flow is presenter-driven (avoid business logic in views):
+     - Clicking Save delegates to the presenter (e.g. `presenter.saveUser(...)`).
+     - The presenter calls the backend to persist the change.
+       - Backend validates whether deactivation requires reassignment (pending approvals exist) and must return a clear outcome.
+     - If save succeeds: presenter completes normally.
+     - If backend indicates deputy is required:
+       - Presenter instructs the view to:
+         - Disable Save.
+         - Make “Deputy approver” visible.
+         - Show a clear message indicating how many `PENDING` approvals must be reassigned.
+       - Deputy becomes required (Binder required validation enabled) to re-enable Save.
+       - Once a deputy is chosen, admin clicks Save again and the presenter retries save including the deputy parameter.
+   - If no eligible deputy users exist:
+     - Deactivation must be blocked and a clear message shown.
+
+#### 8.3.4 Service API
+
+8. Introduce a backend service method (name may vary) to support atomic update when deactivating an approver:
+   - Rationale: the `User` already contains the new `active` value set by admin in the form, but the deactivation case may require reassignment.
+   - Example: `UserService.updateUser(User editedUser, User deputyApproverOrNull)`
+     - When `editedUser.active == true`: behaves like normal update; ignores `deputyApproverOrNull`.
+     - When `editedUser.active == false`:
+       - If there are `PENDING` purchases assigned to `editedUser` as approver, `deputyApproverOrNull` is required and used to reassign them.
+       - If `deputyApproverOrNull` is missing but reassignment is required, the call must fail without modifying any data and provide the pending count back to the caller (e.g. via a typed exception or result object).
+       - Performs reassignment + user update in one transaction.
+   - Validation (server-side):
+     - If reassignment is required, deputy must be active and have role `USER` or `ADMIN`.
+     - Deputy must not equal the edited user.
+     - Deactivation must be rejected if it would result in zero active `ADMIN` users.
+   - Authorization:
+     - The UI/presenter must ensure only `ADMIN` can invoke this operation (consistent with existing UserManagement flow).
+   - Note: `deputyApproverOrNull` is provided only to perform the reassignment; it is not stored as a “deputy” property on the user.
+
+### 8.4 Edge Cases
+
+- Deactivating a `CUSTOMER`:
+  - Allowed; existing purchases remain visible in history but the customer cannot log in.
+
+### 8.5 Acceptance Criteria
+
+- Admin can set users active/inactive in `UserManagementView`.
+- Inactive users cannot log in.
+- Deactivating an approver with pending approvals requires selecting a new approver, and all impacted purchases are reassigned and remain `PENDING`.
+- Deactivation is blocked if reassignment is required but no eligible replacement approver exists.
+- Deactivation of the last active `ADMIN` is prevented (and the `active` field is disabled in the UI when applicable).
+- UI unit tests cover:
+  - Deactivation toggle exists,
+  - Login denied for inactive user,
+  - Deputy field shown/required when needed and action completes.
+
+---
+
+## 9. Step 9 – Purchase History Retention Purge (GDPR-inspired)
+
+### 9.1 Context
+
+This demo application is a good platform to demonstrate **data retention** behavior (e.g. GDPR-style retention periods) without implying full compliance.
+
+Purchase history must not be retained forever. Admins need a simple way to identify and purge old purchase records.
+
+### 9.2 Scope
+
+- In the admin purchase history view, highlight purchases older than **24 months**.
+- Show an admin-only purge action that deletes purchases older than 24 months after explicit confirmation.
+
+### 9.3 Requirements
+
+#### 9.3.1 Definition: “older than 24 months”
+
+- A purchase is considered purgeable if `Purchase.createdAt < (now - 24 months)`.
+- The cutoff calculation uses the server clock for the purge operation.
+
+#### 9.3.2 Admin UI behavior (Purchases history)
+
+1. When an `ADMIN` views the purchase history (e.g. `PurchasesView` → History tab):
+   - If there are any purchases older than 24 months:
+     - Show a notification stating that old purchases exist.
+     - In the grid, purgeable purchases must be visually highlighted.
+       - Highlighting uses a different background color for the row.
+       - Implemented via `Grid.setStyleGenerator` / `setStyleNameGenerator` (row style name, e.g. `purchase-old`).
+       - Styling must follow the existing theme conventions (do not hard-code new colors inline).
+   - If there are no purchases older than 24 months:
+     - No notification is shown.
+     - No special row styling is applied.
+
+2. Purge button visibility:
+   - If (and only if) purchases older than 24 months exist, a `Purge` button is visible in the view.
+   - If no purgeable purchases exist, the `Purge` button is hidden.
+
+3. Purge action confirmation:
+   - Clicking `Purge` opens a confirmation dialog (`ConfirmDialog` or equivalent) explaining:
+     - Purchases older than 24 months will be permanently deleted.
+     - The action cannot be undone.
+   - If admin cancels: no changes are made.
+   - If admin confirms: the purge is executed.
+
+4. After a successful purge:
+   - Show a success notification with the number of deleted purchases.
+   - Refresh the history grid.
+   - Re-evaluate whether any purchases older than 24 months still exist:
+     - If none exist, hide the `Purge` button and stop highlighting rows.
+
+#### 9.3.3 Presenter responsibility
+
+- Business logic must not leak to views.
+- Note: the purchase history view is `ADMIN` only, but we still require a presenter-side authorization assertion as a defense-in-depth check (consistent with existing presenter patterns such as `UserManagementPresenter`).
+- The presenter for the admin purchase history is responsible for:
+  - Determining whether purgeable purchases exist (via backend query).
+  - Triggering purge (backend call) after user confirmation.
+  - Asserting `ADMIN` privilege before executing purge.
+  - Updating view state (notification, purge button visibility, grid refresh).
+
+#### 9.3.4 Backend API
+
+1. Add backend support for querying and purging old purchases (names may vary):
+   - `long countPurchasesOlderThan(Instant cutoff)`
+   - `long purgePurchasesOlderThan(Instant cutoff)`
+
+2. Purge behavior:
+   - Deletes only purchases older than the cutoff (as defined above).
+   - Deletion must be executed in a single transaction.
+   - Related entities (e.g. purchase lines) must also be removed (consistent with existing cascade/orphan removal rules).
+  - Purge must not delete or modify referenced master data:
+    - Must not cascade delete `User` (requester/approver) records.
+    - Must not cascade delete `Product` records.
+
+### 9.4 Acceptance Criteria
+
+- When old purchases exist, admin sees:
+  - a notification about purchases older than 24 months,
+  - highlighted rows for those purchases,
+  - a visible `Purge` button.
+- When no old purchases exist, admin sees no purge notification and no `Purge` button.
+- Clicking `Purge` requires confirmation.
+- Confirming purge deletes purchases older than 24 months and refreshes the grid; deleted count is shown.
+- Purge removes only purchases + purchase lines; users/customers/products remain intact.
 
 ---

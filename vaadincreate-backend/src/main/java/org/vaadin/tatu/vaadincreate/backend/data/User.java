@@ -56,6 +56,9 @@ public class User extends AbstractEntity {
     @Nullable
     private Instant lastStatusCheck;
 
+    @Column(name = "active")
+    private boolean active = true;
+
     public User() {
         this.name = "";
         this.passwd = "";
@@ -99,6 +102,7 @@ public class User extends AbstractEntity {
         assert user.role != null;
         this.setRole(user.role);
         this.version = user.version;
+        this.active = user.active;
     }
 
     public String getName() {
@@ -146,5 +150,24 @@ public class User extends AbstractEntity {
      */
     public void setLastStatusCheck(@Nullable Instant lastStatusCheck) {
         this.lastStatusCheck = lastStatusCheck;
+    }
+
+    /**
+     * Returns whether this user is active and allowed to authenticate.
+     *
+     * @return {@code true} if the user is active, {@code false} if deactivated
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * Sets whether this user is active.
+     *
+     * @param active
+     *            {@code true} to allow authentication, {@code false} to deny it
+     */
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

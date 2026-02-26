@@ -176,6 +176,11 @@ public final class I18n {
         public static final String NEW_USER = "new-user";
         public static final String EDIT_USERS = "edit-users";
         public static final String CHANGES = "user-changes";
+        public static final String ACTIVE = "user-active";
+        public static final String DEPUTY_APPROVER = "deputy-approver";
+        public static final String DEPUTY_REQUIRED = "deputy-required";
+        public static final String NO_DEPUTY_AVAILABLE = "no-deputy-available";
+        public static final String LAST_ADMIN = "last-admin-cannot-deactivate";
 
         private User() {
             // private constructor to hide the implicit public one

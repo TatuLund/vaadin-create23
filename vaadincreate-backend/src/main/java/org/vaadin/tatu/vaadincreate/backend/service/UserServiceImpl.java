@@ -10,8 +10,11 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.backend.DeputyRequiredException;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
+import org.vaadin.tatu.vaadincreate.backend.dao.PurchaseDao;
 import org.vaadin.tatu.vaadincreate.backend.dao.UserDao;
+import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 
@@ -20,6 +23,7 @@ import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
+    private final PurchaseDao purchaseDao;
     private final Random random;
     private boolean slow = false;
 
@@ -36,6 +40,7 @@ public class UserServiceImpl implements UserService {
 
     private UserServiceImpl() {
         this.userDao = new UserDao();
+        this.purchaseDao = new PurchaseDao();
         this.random = new Random();
         var backendMode = System.getProperty("backend.mode");
         if (backendMode != null && backendMode.equals("slow")) {
@@ -59,6 +64,67 @@ public class UserServiceImpl implements UserService {
                     "User with the same name already exists");
         }
         return userDao.updateUser(user);
+    }
+
+    @Override
+    public User updateUser(User editedUser,
+            @Nullable User deputyApproverOrNull) {
+        Objects.requireNonNull(editedUser, "User must not be null");
+        randomWait(2);
+
+        // When activating or no change in active state, use plain update.
+        if (editedUser.isActive()) {
+            return updateUser(editedUser);
+        }
+
+        // User is being deactivated. Validate last-active-admin constraint.
+        if (editedUser.getRole() == User.Role.ADMIN) {
+            var existingUser = userDao.getUserById(editedUser.getId());
+            if (existingUser != null && existingUser.isActive()
+                    && userDao.countActiveAdmins() <= 1) {
+                throw new IllegalStateException(
+                        "Cannot deactivate the last active admin");
+            }
+        }
+
+        // Check pending purchases, checking for all user types, as Admin
+        // may have changed Role to CUSTOMER.
+        var existingUser = userDao.getUserById(editedUser.getId());
+        if (existingUser != null && existingUser.isActive()) {
+            var pendingCount = purchaseDao.countByApproverAndStatus(
+                    existingUser, PurchaseStatus.PENDING);
+            if (pendingCount > 0) {
+                if (deputyApproverOrNull == null) {
+                    throw new DeputyRequiredException((int) pendingCount);
+                }
+                validateDeputy(editedUser, deputyApproverOrNull);
+                return userDao.deactivateWithReassignment(editedUser,
+                        deputyApproverOrNull);
+            }
+        }
+
+        // No pending approvals; plain update suffices.
+        return updateUser(editedUser);
+    }
+
+    // Validate that the deputy is active, has an approver role, and is not the
+    // same user as the one being deactivated.
+    private void validateDeputy(User editedUser, User deputy) {
+        Objects.requireNonNull(deputy, "Deputy must not be null");
+        var freshDeputy = userDao.getUserById(deputy.getId());
+        if (freshDeputy == null || !freshDeputy.isActive()) {
+            throw new IllegalArgumentException(
+                    "Deputy approver must be active");
+        }
+        if (freshDeputy.getRole() != User.Role.USER
+                && freshDeputy.getRole() != User.Role.ADMIN) {
+            throw new IllegalArgumentException(
+                    "Deputy approver must have USER or ADMIN role");
+        }
+        if (freshDeputy.equals(editedUser)) {
+            throw new IllegalArgumentException(
+                    "Deputy must not be the same as the edited user");
+        }
     }
 
     @Override
@@ -100,6 +166,13 @@ public class UserServiceImpl implements UserService {
         Objects.requireNonNull(role, "Role must not be null");
         randomWait(2);
         return userDao.getUsersByRole(role);
+    }
+
+    @Override
+    public List<@NonNull User> getActiveApprovers(User excludeUser) {
+        Objects.requireNonNull(excludeUser, "ExcludeUser must not be null");
+        randomWait(1);
+        return userDao.getActiveApprovers(excludeUser);
     }
 
     @SuppressWarnings("java:S2142")

@@ -28,8 +28,16 @@ public class BasicAccessControl implements AccessControl {
             logger.warn("User '{}' unknown", username);
             return false;
         } else {
-            if (user.get().getPasswd().equals(password)) {
-                CurrentUser.set(user.get());
+            var found = user.get();
+            if (found.getPasswd().equals(password)) {
+                if (!found.isActive()) {
+                    // Treat inactive the same as wrong password to avoid
+                    // leaking account existence / status.
+                    logger.warn("User '{}' is inactive, login denied",
+                            username);
+                    return false;
+                }
+                CurrentUser.set(found);
                 logger.info("User '{}' logged in", username);
                 return true;
             }
@@ -40,7 +48,7 @@ public class BasicAccessControl implements AccessControl {
 
     @Override
     public boolean isUserSignedIn() {
-        return !CurrentUser.get().isEmpty();
+        return CurrentUser.get().map(User::isActive).orElse(false);
     }
 
     @Override
@@ -48,7 +56,7 @@ public class BasicAccessControl implements AccessControl {
         var optionalUser = CurrentUser.get();
         assert (optionalUser.isPresent());
         var user = optionalUser.get();
-        return user.getRole() == role;
+        return user.isActive() && user.getRole() == role;
     }
 
     @Override

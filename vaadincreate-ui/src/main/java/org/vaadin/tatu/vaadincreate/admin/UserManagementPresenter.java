@@ -5,10 +5,12 @@ import java.io.Serializable;
 import javax.persistence.OptimisticLockException;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
+import org.vaadin.tatu.vaadincreate.backend.DeputyRequiredException;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.events.UserUpdatedEvent;
@@ -90,16 +92,53 @@ public class UserManagementPresenter implements Serializable {
      * @throws IllegalStateException
      *             if the current user is not an admin
      */
-    public void updateUser(User user) {
+    public void updateUser(@Nullable User user) {
+        accessControl.assertAdmin();
+        saveUser(user, null);
+    }
+
+    /**
+     * Saves the given user, handling deactivation-with-reassignment when
+     * needed. Delegates to the backend {@code updateUser(User, User)} method.
+     * <p>
+     * If the backend indicates that a deputy is required
+     * ({@link DeputyRequiredException}), the view is instructed to show the
+     * deputy selector with the count of pending approvals. If no eligible
+     * deputies exist, the view shows a blocking error message. If the operation
+     * would deactivate the last active admin, the view shows an error message.
+     *
+     * @param user
+     *            the user to persist
+     * @param deputyOrNull
+     *            deputy approver to reassign pending purchases to, or
+     *            {@code null}
+     * @throws IllegalStateException
+     *             if the current user is not an admin
+     */
+    public void saveUser(@Nullable User user, @Nullable User deputyOrNull) {
         accessControl.assertAdmin();
         try {
-            var updatedUser = getService().updateUser(user);
+            var updatedUser = getService().updateUser(user, deputyOrNull);
             var id = updatedUser.getId();
             assert id != null : "User ID should not be null";
             getEventBus().post(new UserUpdatedEvent(id));
             view.showUserUpdated();
             requestUpdateUsers();
-            logger.info("User {}/'{}' updated.", user.getId(), user.getName());
+            logger.info("User {}/'{}' saved.",
+                    user != null ? user.getId() : null,
+                    user != null ? user.getName() : null);
+        } catch (DeputyRequiredException e) {
+            // Backend needs a deputy – check if any eligible deputies exist.
+            assert user != null : "User must not be null";
+            var approvers = getService().getActiveApprovers(user);
+            if (approvers.isEmpty()) {
+                view.showNoDeputyAvailable();
+            } else {
+                view.showDeputyRequired(e.getPendingCount(), approvers);
+            }
+        } catch (IllegalStateException e) {
+            // Covers "last active admin" and similar guards.
+            view.showLastAdminError();
         } catch (IllegalArgumentException e) {
             view.showDuplicateError();
         } catch (OptimisticLockException e) {

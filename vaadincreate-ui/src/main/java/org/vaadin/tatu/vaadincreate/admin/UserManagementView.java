@@ -53,6 +53,7 @@ public class UserManagementView extends VerticalLayout
 
     @Nullable
     private Button newUser;
+    private boolean deputySelectionPending = false;
 
     public UserManagementView() {
         addStyleName(VaadinCreateTheme.ADMINVIEW_USERVIEW);
@@ -163,6 +164,7 @@ public class UserManagementView extends VerticalLayout
         form.setEnabled(false);
         disableButtons();
         userSelect.setValue(null);
+        deputySelectionPending = false;
         removeStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES);
     }
 
@@ -200,12 +202,18 @@ public class UserManagementView extends VerticalLayout
             // Commit the form to the user object
             form.commit();
             assert user != null : "User must not be null when saving";
-            // Update the user in the backend
-            presenter.updateUser(user);
-            form.clear();
-            disableButtons();
-            userSelect.setValue(null);
-            Telemetry.saveItem(user);
+            // Reset deputy pending flag before the call so the presenter can
+            // set it back via showDeputyRequired() if needed.
+            deputySelectionPending = false;
+            // Delegate to presenter including any deputy selection
+            presenter.saveUser(user, form.getDeputy());
+            // Only clear the form if the presenter did not ask for deputy input
+            if (!deputySelectionPending) {
+                form.clear();
+                disableButtons();
+                userSelect.setValue(null);
+                Telemetry.saveItem(user);
+            }
         } catch (ValidationException e1) {
             // NOP
         }
@@ -273,6 +281,44 @@ public class UserManagementView extends VerticalLayout
     public void showUserRemoved() {
         Notification
                 .show(getTranslation(I18n.User.USER_DELETED, user.getName()));
+    }
+
+    /**
+     * Instructs the view that deactivating this user requires selecting a
+     * deputy approver because the user has pending purchase approvals. The
+     * deputy ComboBox is made visible with the eligible approvers and Save is
+     * disabled until a deputy is chosen.
+     *
+     * @param pendingCount
+     *            the number of PENDING purchases to be reassigned
+     * @param approvers
+     *            eligible deputy approvers (active USER/ADMIN, excl. the user)
+     */
+    public void showDeputyRequired(int pendingCount, List<User> approvers) {
+        deputySelectionPending = true;
+        save.setEnabled(false);
+        form.setDeputyVisible(true, approvers);
+        Notification.show(
+                getTranslation(I18n.User.DEPUTY_REQUIRED, pendingCount),
+                Type.WARNING_MESSAGE);
+    }
+
+    /**
+     * Shows an error notification when there are no eligible deputy approvers
+     * available and the deactivation cannot proceed.
+     */
+    public void showNoDeputyAvailable() {
+        Notification.show(getTranslation(I18n.User.NO_DEPUTY_AVAILABLE),
+                Type.ERROR_MESSAGE);
+    }
+
+    /**
+     * Shows an error notification when the operation would deactivate the last
+     * active admin.
+     */
+    public void showLastAdminError() {
+        Notification.show(getTranslation(I18n.User.LAST_ADMIN),
+                Type.ERROR_MESSAGE);
     }
 
 }

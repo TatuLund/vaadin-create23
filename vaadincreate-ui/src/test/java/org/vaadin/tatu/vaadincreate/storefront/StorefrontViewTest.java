@@ -23,6 +23,7 @@ import org.vaadin.tatu.vaadincreate.common.NumberField;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
+import org.vaadin.tatu.vaadincreate.purchases.PurchasesViewTest;
 
 import com.vaadin.shared.Position;
 import com.vaadin.server.ServiceException;
@@ -511,6 +512,8 @@ public class StorefrontViewTest extends AbstractUITest {
         assertNotEquals("PENDING", test(historyGrid).cell(5, row).toString());
         // AND: A notification about the status change should be shown
         assertNotNull($(Notification.class).last());
+
+        PurchasesViewTest.restoreProductStockLevels(pendingPurchase);
     }
 
     @Test

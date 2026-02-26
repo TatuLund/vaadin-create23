@@ -8,6 +8,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 
 /**
@@ -127,6 +128,85 @@ public class UserDao {
                     "Users list is null, this should not happen");
         }
         return users;
+    }
+
+    /**
+     * Returns all active users with role {@code USER} or {@code ADMIN},
+     * excluding the given user. Used to populate the deputy-approver selection.
+     *
+     * @param excludeUser
+     *            the user to exclude from the result (the one being edited)
+     * @return list of eligible deputy approvers
+     */
+    public List<@NonNull User> getActiveApprovers(User excludeUser) {
+        Objects.requireNonNull(excludeUser, "ExcludeUser must not be null");
+        logger.debug("Fetching active approvers excluding user ({})",
+                excludeUser.getId());
+        List<@NonNull User> users = HibernateUtil.inSession(session -> {
+            return session.createQuery(
+                    "from User where active = true and role in (:user, :admin) and id != :id",
+                    User.class)
+                    .setParameter("user", User.Role.USER)
+                    .setParameter("admin", User.Role.ADMIN)
+                    .setParameter("id", excludeUser.getId()).list();
+        });
+        if (users == null) {
+            throw new IllegalStateException(
+                    "Users list is null, this should not happen");
+        }
+        return users;
+    }
+
+    /**
+     * Counts the number of currently active users with role {@code ADMIN}.
+     *
+     * @return count of active admins
+     */
+    public long countActiveAdmins() {
+        logger.debug("Counting active admins");
+        var result = HibernateUtil.inSession(session -> {
+            @Nullable
+            Long count = session.createQuery(
+                    "select count(u) from User u where u.role = :role and u.active = true",
+                    Long.class).setParameter("role", User.Role.ADMIN)
+                    .uniqueResult();
+            return count;
+        });
+        return result != null ? result : 0L;
+    }
+
+    /**
+     * Atomically deactivates a user and reassigns all their PENDING purchase
+     * approvals to a deputy approver in a single transaction.
+     *
+     * @param editedUser
+     *            the user to deactivate (must have {@code active == false} set)
+     * @param deputy
+     *            the active approver to reassign pending purchases to
+     * @return the persisted, deactivated {@link User}
+     */
+    public User deactivateWithReassignment(User editedUser, User deputy) {
+        Objects.requireNonNull(editedUser, "Edited user must not be null");
+        Objects.requireNonNull(deputy, "Deputy must not be null");
+        logger.info(
+                "Deactivating user ({}) with reassignment to deputy ({})",
+                editedUser.getId(), deputy.getId());
+        var result = HibernateUtil.inTransaction(session -> {
+            // Reassign pending purchases from the deactivated user to deputy.
+            session.createQuery(
+                    "update Purchase set approver = :deputy where approver.id = :userId and status = :status")
+                    .setParameter("deputy", deputy)
+                    .setParameter("userId", editedUser.getId())
+                    .setParameter("status", PurchaseStatus.PENDING)
+                    .executeUpdate();
+            // Merge the updated (deactivated) user in the same transaction.
+            return (User) session.merge(editedUser);
+        });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Result of deactivateWithReassignment is null");
+        }
+        return result;
     }
 
     @SuppressWarnings("null")

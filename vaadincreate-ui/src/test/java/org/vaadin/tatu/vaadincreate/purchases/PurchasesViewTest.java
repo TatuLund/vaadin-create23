@@ -13,7 +13,9 @@ import org.junit.Test;
 import org.jsoup.Jsoup;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
+import org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.common.CustomChart;
 import org.vaadin.tatu.vaadincreate.common.EuroConverter;
@@ -112,22 +114,19 @@ public class PurchasesViewTest extends AbstractUITest {
                 PurchasesView.class);
 
         // Wait for async loading to finish (same pattern as StatsViewTest)
-        var dashboard = $(CssLayout.class)
-                .styleName("dashboard").first();
+        var dashboard = $(CssLayout.class).styleName("dashboard").first();
         assertNotNull("Dashboard layout should be present", dashboard);
         waitForCharts(dashboard);
 
         // Verify all three chart components exist with stable IDs
-        var topChart = $(CustomChart.class)
-                .id("purchases-top-products-chart");
+        var topChart = $(CustomChart.class).id("purchases-top-products-chart");
         assertNotNull("Top products chart should be present", topChart);
 
         var leastChart = $(CustomChart.class)
                 .id("purchases-least-products-chart");
         assertNotNull("Least products chart should be present", leastChart);
 
-        var monthlyChart = $(CustomChart.class)
-                .id("purchases-per-month-chart");
+        var monthlyChart = $(CustomChart.class).id("purchases-per-month-chart");
         assertNotNull("Monthly totals chart should be present", monthlyChart);
 
         // Verify data was loaded: top-products chart must have at least one
@@ -140,9 +139,10 @@ public class PurchasesViewTest extends AbstractUITest {
                 topDataSeries.getData().isEmpty());
         // Each data point in a completed purchase stats series must have a
         // positive quantity
-        topDataSeries.getData().forEach(item -> assertTrue(
-                "Top product quantity should be positive",
-                item.getY().doubleValue() > 0));
+        topDataSeries.getData()
+                .forEach(item -> assertTrue(
+                        "Top product quantity should be positive",
+                        item.getY().doubleValue() > 0));
 
         // Monthly chart should have 12 x-axis categories (one per month)
         assertEquals("Monthly chart should have 12 months on x-axis", 12,
@@ -171,8 +171,7 @@ public class PurchasesViewTest extends AbstractUITest {
         assertNotNull("Toggle button should be present in first column",
                 toggle);
 
-        assertEquals("Open",
-                toggle.getAttribute(AriaAttributes.LABEL));
+        assertEquals("Open", toggle.getAttribute(AriaAttributes.LABEL));
         assertEquals("false", toggle.getAttribute(AriaAttributes.EXPANDED));
         assertEquals(VaadinIcons.ANGLE_RIGHT, toggle.getIcon());
 
@@ -181,10 +180,8 @@ public class PurchasesViewTest extends AbstractUITest {
 
         // THEN: Details are visible and button state updated
         assertTrue(historyGrid.isDetailsVisible(purchase));
-        assertEquals("Close",
-                toggle.getAttribute(AriaAttributes.LABEL));
-        assertEquals("true", toggle
-                .getAttribute(AriaAttributes.EXPANDED));
+        assertEquals("Close", toggle.getAttribute(AriaAttributes.LABEL));
+        assertEquals("true", toggle.getAttribute(AriaAttributes.EXPANDED));
         assertEquals(VaadinIcons.ANGLE_DOWN, toggle.getIcon());
 
         // AND: Details component contains the purchase line items with correct
@@ -197,10 +194,8 @@ public class PurchasesViewTest extends AbstractUITest {
 
         // THEN: Details are hidden and button state reverted
         assertTrue(!historyGrid.isDetailsVisible(purchase));
-        assertEquals("Open",
-                toggle.getAttribute(AriaAttributes.LABEL));
-        assertEquals("false", toggle
-                .getAttribute(AriaAttributes.EXPANDED));
+        assertEquals("Open", toggle.getAttribute(AriaAttributes.LABEL));
+        assertEquals("false", toggle.getAttribute(AriaAttributes.EXPANDED));
         assertEquals(VaadinIcons.ANGLE_RIGHT, toggle.getIcon());
 
         SerializationDebugUtil.assertSerializable(view);
@@ -283,8 +278,7 @@ public class PurchasesViewTest extends AbstractUITest {
         test(commentField).setValue("Approved by supervisor");
 
         test($(decisionWindow, Button.class)
-                .id(DecisionWindow.CONFIRM_BUTTON_ID))
-                .click();
+                .id(DecisionWindow.CONFIRM_BUTTON_ID)).click();
 
         // THEN: Window is closed
         assertFalse("Decision window should be closed after confirm",
@@ -296,9 +290,8 @@ public class PurchasesViewTest extends AbstractUITest {
         // per the PRD and both remove the purchase from the pending queue)
         String purchaseIdStr = String.valueOf(pendingPurchase.getId());
         boolean notified = $(Notification.class).stream()
-                .anyMatch(n -> n.getCaption() != null
-                        && n.getCaption()
-                                .startsWith("Purchase #" + purchaseIdStr));
+                .anyMatch(n -> n.getCaption() != null && n.getCaption()
+                        .startsWith("Purchase #" + purchaseIdStr));
         assertTrue("Expected a notification for purchase #" + purchaseIdStr,
                 notified);
 
@@ -309,7 +302,23 @@ public class PurchasesViewTest extends AbstractUITest {
                 "Approved purchase should be removed from the pending approvals grid",
                 pendingCountBefore - 1, pendingCountAfter);
 
+        restoreProductStockLevels(pendingPurchase);
+
         SerializationDebugUtil.assertSerializable(view);
+    }
+
+    private void restoreProductStockLevels(Purchase pendingPurchase) {
+        // Restore product stock levels for the approved purchase so that the
+        // test has no statistics side effect
+        if (pendingPurchase.getStatus() == PurchaseStatus.COMPLETED) {
+            pendingPurchase.getLines().forEach(line -> {
+                var product = ProductDataService.get()
+                        .getProductById(line.getProduct().getId());
+                var quantity = line.getQuantity();
+                product.setStockCount(product.getStockCount() + quantity);
+                ProductDataService.get().updateProduct(product);
+            });
+        }
     }
 
     private void switchToUser(String name, String password)
@@ -441,8 +450,7 @@ public class PurchasesViewTest extends AbstractUITest {
 
         // WHEN: Clicking Cancel instead of confirming
         test($(decisionWindow, Button.class)
-                .id(DecisionWindow.CANCEL_BUTTON_ID))
-                .click();
+                .id(DecisionWindow.CANCEL_BUTTON_ID)).click();
 
         // THEN: Window is closed
         assertFalse("Decision window should be closed after cancel",
@@ -500,8 +508,7 @@ public class PurchasesViewTest extends AbstractUITest {
 
         // WHEN: Clicking Cancel instead of confirming
         test($(decisionWindow, Button.class)
-                .id(DecisionWindow.CANCEL_BUTTON_ID))
-                .click();
+                .id(DecisionWindow.CANCEL_BUTTON_ID)).click();
 
         // THEN: Window is closed
         assertFalse("Decision window should be closed after cancel",

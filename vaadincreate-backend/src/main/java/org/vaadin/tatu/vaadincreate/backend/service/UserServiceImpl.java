@@ -87,21 +87,19 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        // For approver roles, check pending purchases.
-        if (editedUser.getRole() == User.Role.USER
-                || editedUser.getRole() == User.Role.ADMIN) {
-            var existingUser = userDao.getUserById(editedUser.getId());
-            if (existingUser != null && existingUser.isActive()) {
-                var pendingCount = purchaseDao.countByApproverAndStatus(
-                        existingUser, PurchaseStatus.PENDING);
-                if (pendingCount > 0) {
-                    if (deputyApproverOrNull == null) {
-                        throw new DeputyRequiredException((int) pendingCount);
-                    }
-                    validateDeputy(editedUser, deputyApproverOrNull);
-                    return userDao.deactivateWithReassignment(editedUser,
-                            deputyApproverOrNull);
+        // Check pending purchases, checking for all user types, as Admin
+        // may have changed Role to CUSTOMER.
+        var existingUser = userDao.getUserById(editedUser.getId());
+        if (existingUser != null && existingUser.isActive()) {
+            var pendingCount = purchaseDao.countByApproverAndStatus(
+                    existingUser, PurchaseStatus.PENDING);
+            if (pendingCount > 0) {
+                if (deputyApproverOrNull == null) {
+                    throw new DeputyRequiredException((int) pendingCount);
                 }
+                validateDeputy(editedUser, deputyApproverOrNull);
+                return userDao.deactivateWithReassignment(editedUser,
+                        deputyApproverOrNull);
             }
         }
 

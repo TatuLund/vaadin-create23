@@ -42,6 +42,15 @@ public class UserManagementViewTest extends AbstractUITest {
         // Initialize PurchaseService so that mock purchase data is generated.
         PurchaseService.get();
 
+        login();
+
+        view = navigate(
+                AdminView.VIEW_NAME + "/" + UserManagementView.VIEW_NAME,
+                AdminView.class);
+        assertAssistiveNotification("Users opened");
+    }
+
+    private void createTestPurchase() {
         // Create a dedicated pending purchase for User8/Customer9 so that the
         // deactivation tests below do not share state with PurchasesViewTest
         // (which relies on User5/User6 as approvers).
@@ -55,13 +64,6 @@ public class UserManagementViewTest extends AbstractUITest {
         var address = new Address("Test St", "00100", "Helsinki", "Finland");
         PurchaseService.get().createPendingPurchase(cart, address, customer9,
                 user8);
-
-        login();
-
-        view = navigate(
-                AdminView.VIEW_NAME + "/" + UserManagementView.VIEW_NAME,
-                AdminView.class);
-        assertAssistiveNotification("Users opened");
     }
 
     @After
@@ -336,7 +338,8 @@ public class UserManagementViewTest extends AbstractUITest {
     @Test
     @SuppressWarnings("unchecked")
     public void deactivating_approver_with_pending_approvals_shows_deputy_combobox() {
-        // User8 has a pending approval created in setUp
+        // GIVEN: User8 is an approver with a pending approval
+        createTestPurchase();
         test($(ComboBox.class).id("user-select")).setInput("User8");
 
         // WHEN: Unchecking Active and clicking Save
@@ -359,9 +362,35 @@ public class UserManagementViewTest extends AbstractUITest {
 
     @Test
     @SuppressWarnings("unchecked")
+    public void changing_role_of_approver_to_customer_with_pending_approvals_shows_deputy_combobox() {
+        // GIVEN: User8 is an approver with a pending approval
+        createTestPurchase();
+        test($(ComboBox.class).id("user-select")).setInput("User8");
+
+        // WHEN: Changing role to Customer and clicking Save
+        test($(ComboBox.class).id("role-field")).clickItem(Role.CUSTOMER);
+        test($(Button.class).id("save-button")).click();
+
+        // THEN: A warning notification is shown and the deputy ComboBox appears
+        assertTrue("Deputy required notification expected",
+                $(Notification.class).stream().anyMatch(
+                        n -> n.getCaption().contains("pending approvals")));
+        assertTrue("Deputy ComboBox should be visible",
+                $(ComboBox.class).id("deputy-approver-field").isVisible());
+        assertFalse("Save should be disabled until deputy is selected",
+                $(Button.class).id("save-button").isEnabled());
+
+        // Cancel to restore state
+        test($(Button.class).id("cancel-button")).click();
+        then_form_is_empty_and_buttons_are_disabled();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     public void deactivating_approver_with_deputy_succeeds_and_reassigns_pending_approvals() {
-        // User8 has a pending approval created in setUp; User7 is a valid
+        // GIVEN: User8 is an approver with a pending approval; User7 is a valid
         // deputy
+        createTestPurchase();
         test($(ComboBox.class).id("user-select")).setInput("User8");
 
         // WHEN: Unchecking Active and clicking Save (no deputy yet)

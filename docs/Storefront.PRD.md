@@ -743,12 +743,16 @@ Users cannot be deleted safely once referenced by `Purchase` (requester/approver
 
 4b. Last active admin safeguard:
   - The system must prevent deactivating the last active `ADMIN` user.
-  - UI behavior: when `ADMIN` is editing the himself, the `active` field must be disabled (similar to how the Role field is disabled in some cases already).
+  - UI behavior: when an admin edits their own account, the `active` field must be disabled (cannot deactivate yourself), similar to how the Role field is disabled in some cases already.
   - Backend must also enforce this rule (do not rely only on UI), so the operation cannot be performed via direct service calls.
 
 #### 8.3.3 Deactivation & pending approvals reassignment
 
-5. When admin attempts to set a user inactive and that user has role `USER` or `ADMIN`:
+5. When admin edits a user who is currently eligible to be an approver (role `USER` or `ADMIN`), and the edit would make them ineligible to approve:
+   - Ineligibility means either:
+     - `active` is set to `false`, or
+     - role is changed away from `USER`/`ADMIN` (e.g. to `CUSTOMER`).
+   - If the user becomes ineligible, any `PENDING` purchases assigned to them must be handled.
    - Find all `Purchase` rows where:
      - `status == PENDING`
      - `approver == targetUser`
@@ -765,6 +769,7 @@ Users cannot be deleted safely once referenced by `Purchase` (requester/approver
 7. UI behavior in `UserManagementView` / `UserForm` (simple approach):
    - Admin can toggle user active status.
      - The `active` field is presented as a `Checkbox`.
+  - When editing your own account, the checkbox is disabled (cannot deactivate yourself).
    - The `UserForm` includes a `ComboBox<User>` “Deputy approver” (or similar):
      - This is a **transient UI-only input**, not a persisted property on `User`.
      - Invisible by default.
@@ -773,7 +778,7 @@ Users cannot be deleted safely once referenced by `Purchase` (requester/approver
      - Binder validation:
        - The deputy field must not block normal saves when it is hidden.
        - When deputy is hidden, its `asRequired` validation (or equivalent) must be disabled.
-       - When deputy becomes visible (pending approvals found), required validation must be enabled.
+       - When deputy becomes visible (pending approvals found), required validation must be enabled and required indicator shown.
    - Save flow is presenter-driven (avoid business logic in views):
      - Clicking Save delegates to the presenter (e.g. `presenter.saveUser(...)`).
      - The presenter calls the backend to persist the change.
@@ -786,6 +791,7 @@ Users cannot be deleted safely once referenced by `Purchase` (requester/approver
          - Show a clear message indicating how many `PENDING` approvals must be reassigned.
        - Deputy becomes required (Binder required validation enabled) to re-enable Save.
        - Once a deputy is chosen, admin clicks Save again and the presenter retries save including the deputy parameter.
+      - After deputy selection, Save must become enabled.
    - If no eligible deputy users exist:
      - Deactivation must be blocked and a clear message shown.
 
@@ -821,8 +827,9 @@ Users cannot be deleted safely once referenced by `Purchase` (requester/approver
 - Deactivation of the last active `ADMIN` is prevented (and the `active` field is disabled in the UI when applicable).
 - UI unit tests cover:
   - Deactivation toggle exists,
+  - Active checkbox is enabled when editing other users and disabled when editing your own account,
   - Login denied for inactive user,
-  - Deputy field shown/required when needed and action completes.
+  - Deputy field shown/required when needed (both for deactivation and role-change away from `USER`/`ADMIN`) and action completes.
 
 ---
 

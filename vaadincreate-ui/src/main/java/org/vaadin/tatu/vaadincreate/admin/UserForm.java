@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.admin;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -19,6 +20,7 @@ import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.event.ConnectorEventListener;
 import com.vaadin.shared.Registration;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
@@ -42,6 +44,9 @@ public class UserForm extends Composite implements HasI18N {
     @Nullable
     private User user;
     private ComboBox<Role> role;
+    private CheckBox active;
+    private ComboBox<User> deputyApprover;
+    private boolean deputyRequired = false;
 
     public UserForm() {
         form.addStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM);
@@ -59,7 +64,19 @@ public class UserForm extends Composite implements HasI18N {
         role.setEmptySelectionAllowed(false);
         role.setTextInputAllowed(false);
         role.setId("role-field");
-        form.addComponents(username, password, password2, role);
+
+        active = new CheckBox(getTranslation(I18n.User.ACTIVE));
+        active.setId("active-field");
+
+        deputyApprover = new ComboBox<>(
+                getTranslation(I18n.User.DEPUTY_APPROVER));
+        deputyApprover.setItemCaptionGenerator(User::getName);
+        deputyApprover.setEmptySelectionAllowed(false);
+        deputyApprover.setId("deputy-approver-field");
+        deputyApprover.setVisible(false);
+
+        form.addComponents(username, password, password2, role, active,
+                deputyApprover);
         form.addStyleName(ValoTheme.FORMLAYOUT_LIGHT);
 
         binder.bind(username, "name");
@@ -76,10 +93,28 @@ public class UserForm extends Composite implements HasI18N {
         password2.setRequiredIndicatorVisible(true);
 
         binder.bind(role, "role");
+        binder.bind(active, "active");
         binder.addValueChangeListener(valueChange -> fireEvent(
-                new FormChangedEvent(this, binder.isValid())));
+                new FormChangedEvent(this, isFormValid())));
+
+        // Deputy selection is outside the User binder (transient UI field).
+        // Notify the view when deputy is selected so Save can be re-enabled.
+        deputyApprover.addValueChangeListener(
+                valueChange -> fireEvent(new FormChangedEvent(this,
+                        isFormValid())));
 
         setCompositionRoot(form);
+    }
+
+    private boolean isFormValid() {
+        if (!binder.isValid()) {
+            return false;
+        }
+        // When deputy is required (visible), a selection is mandatory.
+        if (deputyRequired && deputyApprover.getValue() == null) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -94,8 +129,12 @@ public class UserForm extends Composite implements HasI18N {
         password2.setValue(user.getPasswd());
         setEnabled(true);
         username.focus();
-        // Cannot change own role
-        role.setEnabled(!Utils.getCurrentUserOrThrow().equals(user));
+        // Cannot change own role or active status
+        boolean editingSelf = Utils.getCurrentUserOrThrow().equals(user);
+        role.setEnabled(!editingSelf);
+        active.setEnabled(!editingSelf);
+        // Deputy field is hidden when form is first opened
+        setDeputyVisible(false, List.of());
         Telemetry.openedItem(user);
     }
 
@@ -107,6 +146,7 @@ public class UserForm extends Composite implements HasI18N {
         binder.readBean(null);
         password2.setValue("");
         setEnabled(false);
+        setDeputyVisible(false, List.of());
     }
 
     /**
@@ -118,6 +158,39 @@ public class UserForm extends Composite implements HasI18N {
     public void commit() throws ValidationException {
         assert user != null : "User must not be null when committing";
         binder.writeBean(user);
+    }
+
+    /**
+     * Makes the deputy-approver ComboBox visible (or hidden) and updates its
+     * items. When {@code visible} is {@code true}, the deputy selection becomes
+     * required for the form to be considered valid.
+     *
+     * @param visible
+     *            {@code true} to show the deputy field, {@code false} to hide
+     * @param approvers
+     *            list of eligible deputy approvers (may be empty when hiding)
+     */
+    public void setDeputyVisible(boolean visible, List<User> approvers) {
+        deputyRequired = visible;
+        deputyApprover.setVisible(visible);
+        if (visible) {
+            deputyApprover.setItems(approvers);
+            deputyApprover.setValue(null);
+        }
+    }
+
+    /**
+     * Returns the currently selected deputy approver, or {@code null} if none
+     * is selected or the deputy field is hidden.
+     *
+     * @return the selected deputy, or {@code null}
+     */
+    @Nullable
+    public User getDeputy() {
+        if (!deputyRequired) {
+            return null;
+        }
+        return deputyApprover.getValue();
     }
 
     /**

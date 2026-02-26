@@ -278,9 +278,19 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
             if (userId.equals(userInSessionId)) {
                 logger.debug("User was updated, updating CurrentUser");
                 var updatedUser = getUserService().getUserById(userId);
-                access(() -> getSession().getSession().setAttribute(
-                        CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY,
-                        updatedUser));
+                access(() -> {
+                    getSession().getSession().setAttribute(
+                            CurrentUser.CURRENT_USER_SESSION_ATTRIBUTE_KEY,
+                            updatedUser);
+                    // If the user was deactivated, end the session immediately.
+                    if (updatedUser == null || !updatedUser.isActive()) {
+                        logger.info(
+                                "User '{}' deactivated; forcing logout",
+                                userId);
+                        getSession().close();
+                        getPage().reload();
+                    }
+                });
             }
         }
         case ShutdownEvent shutdownEvent -> {

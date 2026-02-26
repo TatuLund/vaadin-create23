@@ -14,6 +14,7 @@ import org.jsoup.Jsoup;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
+import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
@@ -30,6 +31,7 @@ import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
@@ -260,9 +262,7 @@ public class PurchasesViewTest extends AbstractUITest {
         assertEquals(PurchaseStatus.PENDING, pendingPurchase.getStatus());
 
         // WHEN: Clicking the Approve button on the first pending purchase
-        var approveActionLayout = (com.vaadin.ui.HorizontalLayout) test(
-                approvalsGrid).cell(9, 0);
-        var approveButton = $(approveActionLayout, Button.class).first();
+        var approveButton = getApproveButton(approvalsGrid);
         test(approveButton).click();
 
         // THEN: DecisionWindow opens
@@ -307,11 +307,19 @@ public class PurchasesViewTest extends AbstractUITest {
         SerializationDebugUtil.assertSerializable(view);
     }
 
+    private Button getApproveButton(Grid<Purchase> approvalsGrid) {
+        var approveActionLayout = (HorizontalLayout) test(approvalsGrid).cell(9,
+                0);
+        return $(approveActionLayout, Button.class).first();
+    }
+
     private void restoreProductStockLevels(Purchase pendingPurchase) {
         // Restore product stock levels for the approved purchase so that the
         // test has no statistics side effect
-        if (pendingPurchase.getStatus() == PurchaseStatus.COMPLETED) {
-            pendingPurchase.getLines().forEach(line -> {
+        var purchase = PurchaseService.get()
+                .fetchPurchaseById(pendingPurchase.getId());
+        if (purchase.getStatus() == PurchaseStatus.COMPLETED) {
+            purchase.getLines().forEach(line -> {
                 var product = ProductDataService.get()
                         .getProductById(line.getProduct().getId());
                 var quantity = line.getQuantity();
@@ -361,10 +369,7 @@ public class PurchasesViewTest extends AbstractUITest {
         assertEquals(PurchaseStatus.PENDING, pendingPurchase.getStatus());
 
         // WHEN: Clicking the Reject button on the first pending purchase
-        var rejectActionLayout = (com.vaadin.ui.HorizontalLayout) test(
-                approvalsGrid).cell(9, 0);
-        var rejectButton = $(rejectActionLayout, Button.class).stream().skip(1)
-                .findFirst().orElseThrow();
+        var rejectButton = getRejectButton(approvalsGrid);
         test(rejectButton).click();
 
         // THEN: DecisionWindow opens
@@ -410,6 +415,13 @@ public class PurchasesViewTest extends AbstractUITest {
         SerializationDebugUtil.assertSerializable(view);
     }
 
+    private Button getRejectButton(Grid<Purchase> approvalsGrid) {
+        var rejectActionLayout = (HorizontalLayout) test(approvalsGrid).cell(9,
+                0);
+        return $(rejectActionLayout, Button.class).stream().skip(1).findFirst()
+                .orElseThrow();
+    }
+
     /**
      * Tests that clicking Cancel on the approval DecisionWindow closes the
      * window without changing the purchase status: the purchase stays PENDING
@@ -437,9 +449,7 @@ public class PurchasesViewTest extends AbstractUITest {
         assertNotNull(pendingPurchase.getId());
 
         // WHEN: Clicking the Approve button
-        var approveActionLayout = (com.vaadin.ui.HorizontalLayout) test(
-                approvalsGrid).cell(9, 0);
-        var approveButton = $(approveActionLayout, Button.class).first();
+        var approveButton = getApproveButton(approvalsGrid);
         test(approveButton).click();
 
         // THEN: DecisionWindow opens
@@ -494,10 +504,7 @@ public class PurchasesViewTest extends AbstractUITest {
         assertNotNull(pendingPurchase.getId());
 
         // WHEN: Clicking the Reject button
-        var rejectActionLayout = (com.vaadin.ui.HorizontalLayout) test(
-                approvalsGrid).cell(9, 0);
-        var rejectButton = $(rejectActionLayout, Button.class).stream().skip(1)
-                .findFirst().orElseThrow();
+        var rejectButton = getRejectButton(approvalsGrid);
         test(rejectButton).click();
 
         // THEN: DecisionWindow opens

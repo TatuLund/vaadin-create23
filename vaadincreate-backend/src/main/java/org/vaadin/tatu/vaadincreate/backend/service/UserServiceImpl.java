@@ -16,6 +16,7 @@ import org.vaadin.tatu.vaadincreate.backend.dao.PurchaseDao;
 import org.vaadin.tatu.vaadincreate.backend.dao.UserDao;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
+import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 
 @NullMarked
@@ -73,12 +74,15 @@ public class UserServiceImpl implements UserService {
         randomWait(2);
 
         // When activating or no change in active state, use plain update.
-        if (editedUser.isActive()) {
+        if (editedUser.isActive() && editedUser.getRole() != Role.CUSTOMER) {
             return updateUser(editedUser);
         }
 
         // User is being deactivated. Validate last-active-admin constraint.
-        if (editedUser.getRole() == User.Role.ADMIN) {
+        if (editedUser.getRole() == Role.ADMIN) {
+            logger.warn(
+                    "Attempted to last active admin deactivation: user {} (id={})",
+                    editedUser.getName(), editedUser.getId());
             var existingUser = userDao.getUserById(editedUser.getId());
             if (existingUser != null && existingUser.isActive()
                     && userDao.countActiveAdmins() <= 1) {
@@ -87,20 +91,22 @@ public class UserServiceImpl implements UserService {
             }
         }
 
+        logger.debug(
+                "Counting pending approvals for user {} (id={}) before deactivation",
+                editedUser.getName(), editedUser.getId());
         // Check pending purchases, checking for all user types, as Admin
         // may have changed Role to CUSTOMER.
-        var existingUser = userDao.getUserById(editedUser.getId());
-        if (existingUser != null && existingUser.isActive()) {
-            var pendingCount = purchaseDao.countByApproverAndStatus(
-                    existingUser, PurchaseStatus.PENDING);
-            if (pendingCount > 0) {
-                if (deputyApproverOrNull == null) {
-                    throw new DeputyRequiredException((int) pendingCount);
-                }
-                validateDeputy(editedUser, deputyApproverOrNull);
-                return userDao.deactivateWithReassignment(editedUser,
-                        deputyApproverOrNull);
+        var pendingCount = purchaseDao.countByApproverAndStatus(editedUser,
+                PurchaseStatus.PENDING);
+        if (pendingCount > 0L) {
+            logger.info("{} pending approvals found for user {} (id={})",
+                    pendingCount, editedUser.getName(), editedUser.getId());
+            if (deputyApproverOrNull == null) {
+                throw new DeputyRequiredException((int) pendingCount);
             }
+            validateDeputy(editedUser, deputyApproverOrNull);
+            return userDao.deactivateWithReassignment(editedUser,
+                    deputyApproverOrNull);
         }
 
         // No pending approvals; plain update suffices.
@@ -111,6 +117,10 @@ public class UserServiceImpl implements UserService {
     // same user as the one being deactivated.
     private void validateDeputy(User editedUser, User deputy) {
         Objects.requireNonNull(deputy, "Deputy must not be null");
+        logger.debug(
+                "Validating deputy approver {} (id={}) for user {} (id={})",
+                deputy.getName(), deputy.getId(), editedUser.getName(),
+                editedUser.getId());
         var freshDeputy = userDao.getUserById(deputy.getId());
         if (freshDeputy == null || !freshDeputy.isActive()) {
             throw new IllegalArgumentException(

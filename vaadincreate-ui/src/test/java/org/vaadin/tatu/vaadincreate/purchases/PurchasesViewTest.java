@@ -313,7 +313,7 @@ public class PurchasesViewTest extends AbstractUITest {
         return $(approveActionLayout, Button.class).first();
     }
 
-    private void restoreProductStockLevels(Purchase pendingPurchase) {
+    public static void restoreProductStockLevels(Purchase pendingPurchase) {
         // Restore product stock levels for the approved purchase so that the
         // test has no statistics side effect
         var purchase = PurchaseService.get()

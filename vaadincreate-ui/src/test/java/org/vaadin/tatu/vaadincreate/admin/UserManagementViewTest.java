@@ -10,7 +10,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
+import org.vaadin.tatu.vaadincreate.backend.UserService;
+import org.vaadin.tatu.vaadincreate.backend.data.Address;
+import org.vaadin.tatu.vaadincreate.backend.data.Cart;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
 import com.vaadin.server.ServiceException;
@@ -35,10 +39,23 @@ public class UserManagementViewTest extends AbstractUITest {
     public void setup() throws ServiceException {
         ui = new VaadinCreateUI();
         mockVaadin(ui);
-        // Initialize PurchaseService so that mock purchase data (assigned to
-        // User5/User6) is generated before the tests that depend on pending
-        // approvals.
+        // Initialize PurchaseService so that mock purchase data is generated.
         PurchaseService.get();
+
+        // Create a dedicated pending purchase for User8/Customer9 so that the
+        // deactivation tests below do not share state with PurchasesViewTest
+        // (which relies on User5/User6 as approvers).
+        var userService = UserService.get();
+        var user8 = userService.findByName("User8").orElseThrow();
+        var customer9 = userService.findByName("Customer9").orElseThrow();
+        var product = ProductDataService.get().getAllProducts().iterator()
+                .next();
+        var cart = new Cart();
+        cart.addItem(product, 1);
+        var address = new Address("Test St", "00100", "Helsinki", "Finland");
+        PurchaseService.get().createPendingPurchase(cart, address, customer9,
+                user8);
+
         login();
 
         view = navigate(
@@ -319,8 +336,8 @@ public class UserManagementViewTest extends AbstractUITest {
     @Test
     @SuppressWarnings("unchecked")
     public void deactivating_approver_with_pending_approvals_shows_deputy_combobox() {
-        // User5 has pending approvals from mock data
-        test($(ComboBox.class).id("user-select")).setInput("User5");
+        // User8 has a pending approval created in setUp
+        test($(ComboBox.class).id("user-select")).setInput("User8");
 
         // WHEN: Unchecking Active and clicking Save
         test($(CheckBox.class).id("active-field")).setValue(false);
@@ -343,8 +360,9 @@ public class UserManagementViewTest extends AbstractUITest {
     @Test
     @SuppressWarnings("unchecked")
     public void deactivating_approver_with_deputy_succeeds_and_reassigns_pending_approvals() {
-        // User5 has pending approvals from mock data; User4 is a valid deputy
-        test($(ComboBox.class).id("user-select")).setInput("User5");
+        // User8 has a pending approval created in setUp; User7 is a valid
+        // deputy
+        test($(ComboBox.class).id("user-select")).setInput("User8");
 
         // WHEN: Unchecking Active and clicking Save (no deputy yet)
         test($(CheckBox.class).id("active-field")).setValue(false);
@@ -355,7 +373,7 @@ public class UserManagementViewTest extends AbstractUITest {
                 $(ComboBox.class).id("deputy-approver-field").isVisible());
 
         // WHEN: Selecting a deputy and saving
-        test($(ComboBox.class).id("deputy-approver-field")).setInput("User4");
+        test($(ComboBox.class).id("deputy-approver-field")).setInput("User7");
 
         // THEN: Save becomes enabled
         assertTrue("Save should be enabled after deputy selection",
@@ -365,12 +383,12 @@ public class UserManagementViewTest extends AbstractUITest {
         test($(Button.class).id("save-button")).click();
 
         // THEN: Success notification and form cleared
-        assertEquals("User \"User5\" saved.",
+        assertEquals("User \"User8\" saved.",
                 $(Notification.class).last().getCaption());
         then_form_is_empty_and_buttons_are_disabled();
 
-        // Restore User5 for subsequent tests
-        test($(ComboBox.class).id("user-select")).setInput("User5");
+        // Restore User8 for subsequent tests
+        test($(ComboBox.class).id("user-select")).setInput("User8");
         test($(CheckBox.class).id("active-field")).setValue(true);
         test($(Button.class).id("save-button")).click();
     }

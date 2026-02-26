@@ -73,6 +73,7 @@ public class UserForm extends Composite implements HasI18N {
         deputyApprover.setItemCaptionGenerator(User::getName);
         deputyApprover.setEmptySelectionAllowed(false);
         deputyApprover.setId("deputy-approver-field");
+        deputyApprover.setRequiredIndicatorVisible(true);
         deputyApprover.setVisible(false);
 
         form.addComponents(username, password, password2, role, active,

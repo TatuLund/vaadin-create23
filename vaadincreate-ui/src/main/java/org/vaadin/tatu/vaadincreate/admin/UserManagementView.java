@@ -53,6 +53,7 @@ public class UserManagementView extends VerticalLayout
 
     @Nullable
     private Button newUser;
+    private boolean deputySelectionPending = false;
 
     public UserManagementView() {
         addStyleName(VaadinCreateTheme.ADMINVIEW_USERVIEW);
@@ -163,6 +164,7 @@ public class UserManagementView extends VerticalLayout
         form.setEnabled(false);
         disableButtons();
         userSelect.setValue(null);
+        deputySelectionPending = false;
         removeStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES);
     }
 
@@ -200,12 +202,18 @@ public class UserManagementView extends VerticalLayout
             // Commit the form to the user object
             form.commit();
             assert user != null : "User must not be null when saving";
+            // Reset deputy pending flag before the call so the presenter can
+            // set it back via showDeputyRequired() if needed.
+            deputySelectionPending = false;
             // Delegate to presenter including any deputy selection
             presenter.saveUser(user, form.getDeputy());
-            form.clear();
-            disableButtons();
-            userSelect.setValue(null);
-            Telemetry.saveItem(user);
+            // Only clear the form if the presenter did not ask for deputy input
+            if (!deputySelectionPending) {
+                form.clear();
+                disableButtons();
+                userSelect.setValue(null);
+                Telemetry.saveItem(user);
+            }
         } catch (ValidationException e1) {
             // NOP
         }
@@ -287,6 +295,7 @@ public class UserManagementView extends VerticalLayout
      *            eligible deputy approvers (active USER/ADMIN, excl. the user)
      */
     public void showDeputyRequired(int pendingCount, List<User> approvers) {
+        deputySelectionPending = true;
         save.setEnabled(false);
         form.setDeputyVisible(true, approvers);
         Notification.show(

@@ -15,6 +15,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Address;
 import org.vaadin.tatu.vaadincreate.backend.data.Cart;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
+
 /**
  * Test class for {@link UserService}.
  *
@@ -179,9 +180,11 @@ public class UserServiceTest {
         var cart = new Cart();
         cart.addItem(product, 1);
         var address = new Address("Test St 1", "12345", "TestCity", "Finland");
-        purchaseService.createPendingPurchase(cart, address, customer, approver);
+        purchaseService.createPendingPurchase(cart, address, customer,
+                approver);
 
-        // Deactivate User7 without a deputy – must throw DeputyRequiredException
+        // Deactivate User7 without a deputy – must throw
+        // DeputyRequiredException
         approver.setActive(false);
         service.updateUser(approver, null);
     }
@@ -198,7 +201,8 @@ public class UserServiceTest {
         cart.addItem(product, 1);
         var address = new Address("Deputy St 1", "54321", "DeputyCity",
                 "Finland");
-        purchaseService.createPendingPurchase(cart, address, customer, approver);
+        purchaseService.createPendingPurchase(cart, address, customer,
+                approver);
 
         long pendingBefore = purchaseService.countPendingForApprover(approver);
         assertTrue("Should have pending approvals", pendingBefore > 0);
@@ -211,7 +215,8 @@ public class UserServiceTest {
         assertEquals("Approver should have no more pending after reassignment",
                 0L, purchaseService.countPendingForApprover(updated));
         assertTrue("Deputy should have the reassigned pending approvals",
-                purchaseService.countPendingForApprover(deputy) >= pendingBefore);
+                purchaseService
+                        .countPendingForApprover(deputy) >= pendingBefore);
 
         // Restore
         updated.setActive(true);

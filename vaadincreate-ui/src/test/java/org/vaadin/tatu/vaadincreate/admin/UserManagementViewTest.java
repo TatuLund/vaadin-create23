@@ -10,11 +10,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
+import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
 import com.vaadin.server.ServiceException;
 import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
@@ -33,6 +35,10 @@ public class UserManagementViewTest extends AbstractUITest {
     public void setup() throws ServiceException {
         ui = new VaadinCreateUI();
         mockVaadin(ui);
+        // Initialize PurchaseService so that mock purchase data (assigned to
+        // User5/User6) is generated before the tests that depend on pending
+        // approvals.
+        PurchaseService.get();
         login();
 
         view = navigate(
@@ -258,4 +264,115 @@ public class UserManagementViewTest extends AbstractUITest {
     public void user_management_view_is_serializable() {
         SerializationDebugUtil.assertSerializable(view);
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void active_checkbox_is_checked_and_enabled_when_editing_another_user() {
+        // WHEN: Selecting User1
+        test($(ComboBox.class).id("user-select")).setInput("User1");
+
+        // THEN: Active checkbox is checked (default active=true) and enabled
+        var activeCheckbox = $(CheckBox.class).id("active-field");
+        assertTrue("Active checkbox should be checked",
+                activeCheckbox.getValue());
+        assertTrue("Active checkbox should be enabled",
+                activeCheckbox.isEnabled());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void active_checkbox_is_disabled_when_editing_own_account() {
+        // WHEN: Selecting the Admin user (currently logged in)
+        test($(ComboBox.class).id("user-select")).setInput("Admin");
+
+        // THEN: Active checkbox is disabled (cannot deactivate yourself)
+        assertFalse("Active checkbox should be disabled for own account",
+                $(CheckBox.class).id("active-field").isEnabled());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void deactivating_user_without_pending_approvals_succeeds() {
+        // WHEN: Selecting User1 and unchecking Active
+        test($(ComboBox.class).id("user-select")).setInput("User1");
+        test($(CheckBox.class).id("active-field")).setValue(false);
+
+        // THEN: Save is enabled
+        assertTrue($(Button.class).id("save-button").isEnabled());
+
+        // WHEN: Clicking Save
+        test($(Button.class).id("save-button")).click();
+
+        // THEN: User is saved (deactivated) and form is cleared
+        assertEquals("User \"User1\" saved.",
+                $(Notification.class).last().getCaption());
+        then_form_is_empty_and_buttons_are_disabled();
+
+        // Restore User1 for subsequent tests
+        test($(ComboBox.class).id("user-select")).setInput("User1");
+        test($(CheckBox.class).id("active-field")).setValue(true);
+        test($(Button.class).id("save-button")).click();
+        assertEquals("User \"User1\" saved.",
+                $(Notification.class).last().getCaption());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void deactivating_approver_with_pending_approvals_shows_deputy_combobox() {
+        // User5 has pending approvals from mock data
+        test($(ComboBox.class).id("user-select")).setInput("User5");
+
+        // WHEN: Unchecking Active and clicking Save
+        test($(CheckBox.class).id("active-field")).setValue(false);
+        test($(Button.class).id("save-button")).click();
+
+        // THEN: A warning notification is shown and the deputy ComboBox appears
+        assertTrue("Deputy required notification expected",
+                $(Notification.class).stream().anyMatch(
+                        n -> n.getCaption().contains("pending approvals")));
+        assertTrue("Deputy ComboBox should be visible",
+                $(ComboBox.class).id("deputy-approver-field").isVisible());
+        assertFalse("Save should be disabled until deputy is selected",
+                $(Button.class).id("save-button").isEnabled());
+
+        // Cancel to restore state
+        test($(Button.class).id("cancel-button")).click();
+        then_form_is_empty_and_buttons_are_disabled();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void deactivating_approver_with_deputy_succeeds_and_reassigns_pending_approvals() {
+        // User5 has pending approvals from mock data; User4 is a valid deputy
+        test($(ComboBox.class).id("user-select")).setInput("User5");
+
+        // WHEN: Unchecking Active and clicking Save (no deputy yet)
+        test($(CheckBox.class).id("active-field")).setValue(false);
+        test($(Button.class).id("save-button")).click();
+
+        // THEN: Deputy ComboBox appears
+        assertTrue("Deputy ComboBox should be visible",
+                $(ComboBox.class).id("deputy-approver-field").isVisible());
+
+        // WHEN: Selecting a deputy and saving
+        test($(ComboBox.class).id("deputy-approver-field")).setInput("User4");
+
+        // THEN: Save becomes enabled
+        assertTrue("Save should be enabled after deputy selection",
+                $(Button.class).id("save-button").isEnabled());
+
+        // WHEN: Clicking Save
+        test($(Button.class).id("save-button")).click();
+
+        // THEN: Success notification and form cleared
+        assertEquals("User \"User5\" saved.",
+                $(Notification.class).last().getCaption());
+        then_form_is_empty_and_buttons_are_disabled();
+
+        // Restore User5 for subsequent tests
+        test($(ComboBox.class).id("user-select")).setInput("User5");
+        test($(CheckBox.class).id("active-field")).setValue(true);
+        test($(Button.class).id("save-button")).click();
+    }
+
 }

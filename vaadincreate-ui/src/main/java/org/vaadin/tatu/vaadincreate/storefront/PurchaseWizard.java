@@ -40,6 +40,8 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.FooterRow;
+import com.vaadin.ui.components.grid.MultiSelectionModel;
+import com.vaadin.ui.components.grid.MultiSelectionModel.SelectAllCheckBoxVisibility;
 import com.vaadin.ui.themes.ValoTheme;
 
 import elemental.events.KeyboardEvent.KeyCode;
@@ -417,6 +419,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
             removeAllColumns();
             addColumn(ProductDto::getProductName)
                     .setCaption(getTranslation(I18n.PRODUCT_NAME))
+                    .setMaximumWidth(300)
                     .setComparator((p1, p2) -> p1.getProductName()
                             .compareToIgnoreCase(p2.getProductName()));
             addColumn(ProductDto::getStockCount)
@@ -459,6 +462,10 @@ public class PurchaseWizard extends Composite implements HasI18N {
             footerRow = appendFooterRow();
             footerRow.getCell(getColumns().get(0))
                     .setText(getTranslation(I18n.Storefront.ORDER_SUMMARY));
+
+            ((MultiSelectionModel<ProductDto>) this.getSelectionModel())
+                    .setSelectAllCheckBoxVisibility(
+                            SelectAllCheckBoxVisibility.HIDDEN);
 
             // Update quantities when selection changes
             addSelectionListener(e -> {

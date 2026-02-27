@@ -68,7 +68,7 @@ public class StorefrontView extends CssLayout implements VaadinCreateView {
 
         var historyLayout = new VerticalLayout(historyTitle, historyGrid);
         historyLayout.setMargin(false);
-        historyLayout.setSpacing(true);
+        historyLayout.setSpacing(false);
         historyLayout.setSizeFull();
         historyLayout.setExpandRatio(historyGrid, 1);
         historyLayout.addStyleNames(VaadinCreateTheme.STOREFRONTVIEW_HISTORY,

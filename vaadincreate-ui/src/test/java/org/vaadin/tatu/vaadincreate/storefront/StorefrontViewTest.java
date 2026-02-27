@@ -481,19 +481,13 @@ public class StorefrontViewTest extends AbstractUITest {
 
         // WHEN: A PurchaseUpdatedEvent is posted for a purchase owned by the
         // current user (simulating that another session updated a purchase)
-        Purchase pendingPurchase = null;
-        int row = -1;
-        do {
-            row++;
-            pendingPurchase = test(historyGrid).item(row);
-        } while (pendingPurchase != null
-                && !PurchaseStatus.PENDING.equals(pendingPurchase.getStatus())
-                && row < initialSize);
+        int row = findFirstPurchaseRow(historyGrid, PurchaseStatus.PENDING);
         assertEquals("PENDING", test(historyGrid).cell(5, row).toString());
 
         // This simulates superviser approving the purchase in another session,
         // which triggers a PurchaseStatusChangedEvent that the grid listens to
         // and should refresh the item
+        Purchase pendingPurchase = test(historyGrid).item(row);
         PurchaseService.get().approve(pendingPurchase.getId(),
                 pendingPurchase.getApprover(), "Looks good");
         EventBus.get()
@@ -516,12 +510,25 @@ public class StorefrontViewTest extends AbstractUITest {
         PurchasesViewTest.restoreProductStockLevels(pendingPurchase);
     }
 
+    private int findFirstPurchaseRow(Grid<Purchase> historyGrid,
+            PurchaseStatus status) {
+        int size = test(historyGrid).size();
+        for (int row = 0; row < size; row++) {
+            Purchase purchase = test(historyGrid).item(row);
+            if (purchase != null && status.equals(purchase.getStatus())) {
+                return row;
+            }
+        }
+        return -1;
+    }
+
     @Test
     @SuppressWarnings("unchecked")
     public void purchase_history_grid_refreshes_when_wizard_is_submitted() {
         // GIVEN: Storefront view is displayed
         view = navigate(StorefrontView.VIEW_NAME, StorefrontView.class);
-        var historyGrid = (Grid<?>) $(Grid.class).id("purchase-history-grid");
+        var historyGrid = (Grid<Purchase>) $(Grid.class)
+                .id("purchase-history-grid");
         assertNotNull("Purchase history grid should be present", historyGrid);
         int initialSize = test(historyGrid).size();
 
@@ -553,14 +560,15 @@ public class StorefrontViewTest extends AbstractUITest {
                         .anyMatch(n -> n.getCaption() != null
                                 && n.getCaption().contains("created")));
 
-        waitWhile(Grid.class, grid -> test(historyGrid).cell(5, 0)
-                .toString().equals("PENDING"), 1);
+        waitWhile(Grid.class, grid -> initialSize == test(historyGrid).size(),
+                1);
 
+        int row = findFirstPurchaseRow(historyGrid, PurchaseStatus.PENDING);
         int sizeAfterSubmit = test(historyGrid).size();
         assertTrue(
                 "Purchase history grid should have more entries after a new purchase is created",
                 sizeAfterSubmit > initialSize);
-        assertEquals("PENDING", test(historyGrid).cell(5, 0).toString());
+        assertEquals("PENDING", test(historyGrid).cell(5, row).toString());
     }
 
     @Test
@@ -573,24 +581,26 @@ public class StorefrontViewTest extends AbstractUITest {
         assertTrue("Purchase history grid should have at least one row",
                 test(historyGrid).size() > 0);
 
-        var purchase = test(historyGrid).item(1);
+        int row = findFirstPurchaseRow(historyGrid, PurchaseStatus.COMPLETED);
+
+        var purchase = test(historyGrid).item(row);
         assertNotNull("Expected a purchase item at row 0", purchase);
         assertFalse("Details should be hidden initially",
                 historyGrid.isDetailsVisible(purchase));
 
         // WHEN: Clicking toggle button
-        test(historyGrid).click(0, 1);
+        test(historyGrid).click(0, row);
 
         // THEN: Details are visible
         assertTrue(historyGrid.isDetailsVisible(purchase));
 
         // AND: Details component contains the purchase line items with correct
         // ARIA attributes
-        var details = (Label) test(historyGrid).details(1);
+        var details = (Label) test(historyGrid).details(row);
         assertPurchaseLineItems(purchase, details);
 
         // WHEN: Clicking toggle button again
-        test(historyGrid).click(0, 1);
+        test(historyGrid).click(0, row);
 
         // THEN: Details are hidden
         assertFalse(historyGrid.isDetailsVisible(purchase));

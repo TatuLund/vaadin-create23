@@ -552,6 +552,10 @@ public class StorefrontViewTest extends AbstractUITest {
                 $(Notification.class).stream()
                         .anyMatch(n -> n.getCaption() != null
                                 && n.getCaption().contains("created")));
+
+        waitWhile(Grid.class, grid -> test(historyGrid).cell(5, 0)
+                .toString().equals("PENDING"), 1);
+
         int sizeAfterSubmit = test(historyGrid).size();
         assertTrue(
                 "Purchase history grid should have more entries after a new purchase is created",

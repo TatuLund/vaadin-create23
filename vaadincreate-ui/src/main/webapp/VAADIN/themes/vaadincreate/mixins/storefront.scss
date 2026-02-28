@@ -4,6 +4,7 @@
     flex-direction: row;
     gap: 20px;
     padding: 20px;
+    overflow: auto;
 
     .storefrontview-wizard-quantitycolumn {
       padding: 0px;
@@ -16,6 +17,11 @@
     .storefrontview-wizard {
       flex: 2;
       min-width: 400px;
+      min-height: 450px;
+
+      .v-grid {
+        min-height: 250px;
+      }
     }
 
     .storefrontview-history {
@@ -27,6 +33,7 @@
       .v-grid {
         background-color: white;
         border-radius: 4px;
+        min-height: 250px;
       }
 
       .v-grid-row {

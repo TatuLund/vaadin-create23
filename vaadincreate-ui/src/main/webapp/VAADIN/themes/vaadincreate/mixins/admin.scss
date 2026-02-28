@@ -5,6 +5,8 @@
     background: white;
     border: $v-grid-border;
 
+    // Flip checkbox label to left for better looks
+    // https://github.com/vaadin/framework/issues/891
     .v-checkbox {
       margin-top: 3px;
     }

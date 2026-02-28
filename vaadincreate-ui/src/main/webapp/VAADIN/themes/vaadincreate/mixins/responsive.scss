@@ -105,6 +105,19 @@
         max-width: 100%;
         min-width: 100%;
       }
+
+      .storefrontview-history {
+        .storefrontview-history-label {
+          height: 0px;
+          overflow: hidden;
+          margin: 0px;
+          padding: 0px;
+        }
+
+        .v-slot-storefrontview-history-label {
+          height: 0px;
+        }
+      }
     }
   }
 

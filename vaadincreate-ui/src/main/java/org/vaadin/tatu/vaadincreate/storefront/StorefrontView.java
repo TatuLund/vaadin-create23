@@ -64,7 +64,8 @@ public class StorefrontView extends CssLayout implements VaadinCreateView {
 
         var historyTitle = new Label(
                 getTranslation(I18n.Storefront.PURCHASE_HISTORY));
-        historyTitle.addStyleNames(ValoTheme.LABEL_H2, "v-margin-left");
+        historyTitle.addStyleNames(ValoTheme.LABEL_H2, "v-margin-left",
+                VaadinCreateTheme.STOREFRONTVIEW_HISTORY_LABEL);
 
         var historyLayout = new VerticalLayout(historyTitle, historyGrid);
         historyLayout.setMargin(false);

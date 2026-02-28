@@ -19,6 +19,7 @@ import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.components.Html;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
@@ -98,18 +99,27 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
     public PurchaseWizard() {
         root = new VerticalLayout();
-        root.setMargin(false);
-        root.setSpacing(false);
+        root.setMargin(true);
+        root.setSpacing(true);
         root.setSizeFull();
-        root.addStyleName(VaadinCreateTheme.STOREFRONTVIEW_WIZARD);
+        root.addStyleNames(VaadinCreateTheme.STOREFRONTVIEW_WIZARD,
+                ValoTheme.LAYOUT_WELL);
 
         stepTitle = new Label();
         stepTitle.addStyleName(ValoTheme.LABEL_H2);
         stepTitle.setId("wizard-step-title");
+        AttributeExtension.of(stepTitle).setAttribute(AriaAttributes.LIVE,
+                "polite");
 
         stepContent = new VerticalLayout();
+        stepContent.addStyleName(ValoTheme.LAYOUT_CARD);
         stepContent.setSpacing(true);
+        stepContent.setMargin(false);
         stepContent.setSizeFull();
+        AttributeExtension.of(stepContent).setAttribute(AriaAttributes.ROLE,
+                AriaRoles.REGION);
+        AttributeExtension.of(stepContent)
+                .setAttribute(AriaAttributes.LABELLEDBY, stepTitle.getId());
 
         nextButton = new Button(getTranslation(I18n.Storefront.NEXT));
         nextButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
@@ -168,6 +178,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         stepTitle.setValue(getTranslation(I18n.Storefront.STEP1_TITLE));
 
         if (productGrid != null) {
+            stepContent.setMargin(false);
             stepContent.addComponent(productGrid);
             stepContent.setExpandRatio(productGrid, 1.0f);
             return;
@@ -225,6 +236,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         AttributeExtension.of(formLayout).setAttribute("role", "form");
 
         stepContent.addComponent(formLayout);
+        stepContent.setMargin(true);
 
         streetField.focus();
     }
@@ -247,6 +259,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         }
 
         stepContent.addComponent(supervisorComboBox);
+        stepContent.setMargin(true);
         supervisorComboBox.focus();
     }
 
@@ -257,6 +270,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         reviewLabel = new Label(reviewHtml, ContentMode.HTML);
 
         stepContent.addComponent(reviewLabel);
+        stepContent.setMargin(true);
 
         Notification.show(Jsoup.parse(reviewHtml).text(),
                 Notification.Type.ASSISTIVE_NOTIFICATION);

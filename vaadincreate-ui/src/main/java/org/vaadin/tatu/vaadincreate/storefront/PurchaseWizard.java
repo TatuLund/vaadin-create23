@@ -1,6 +1,8 @@
 package org.vaadin.tatu.vaadincreate.storefront;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+
 import org.jsoup.Jsoup;
 
 import org.jspecify.annotations.NullMarked;
@@ -71,8 +73,6 @@ public class PurchaseWizard extends Composite implements HasI18N {
     private final Button nextButton;
     private final Button prevButton;
 
-    private final StorefrontPresenter presenter = new StorefrontPresenter();
-
     // Step 1 components
     @Nullable
     private ProductGrid productGrid;
@@ -97,7 +97,10 @@ public class PurchaseWizard extends Composite implements HasI18N {
     @Nullable
     private Label reviewLabel;
 
-    public PurchaseWizard() {
+    private StorefrontPresenter presenter;
+
+    public PurchaseWizard(StorefrontPresenter presenter) {
+        this.presenter = presenter;
         root = new VerticalLayout();
         root.setMargin(true);
         root.setSpacing(true);
@@ -184,21 +187,22 @@ public class PurchaseWizard extends Composite implements HasI18N {
             return;
         }
 
-        // Load products via presenter
-        var products = presenter.getOrderableProducts();
-        if (products.isEmpty()) {
-            stepContent.addComponent(new Label(
-                    getTranslation(I18n.Storefront.NO_PRODUCTS_AVAILABLE)));
-            return;
-        }
-
         productGrid = new ProductGrid();
-        productGrid.setItems(products);
 
         productGrid.updateFooter();
 
         stepContent.addComponent(productGrid);
         stepContent.setExpandRatio(productGrid, 1.0f);
+    }
+
+    public void setProducts(Collection<ProductDto> products) {
+        if (products.isEmpty()) {
+            stepContent.addComponent(new Label(
+                    getTranslation(I18n.Storefront.NO_PRODUCTS_AVAILABLE)));
+            return;
+        }
+        productGrid.setItems(products);
+        productGrid.updateFooter();
     }
 
     private void showStep2() {

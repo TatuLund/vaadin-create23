@@ -160,7 +160,7 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
 
     // Return false to disable visual tests
     protected boolean visualTests() {
-        return false;
+        return true;
     }
 
     public void wait(Duration duration) {

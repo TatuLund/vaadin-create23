@@ -56,7 +56,7 @@ public class StorefrontView extends CssLayout implements VaadinCreateView {
         User currentUser = Utils.getCurrentUserOrThrow();
 
         // Create wizard on the left
-        wizard = new PurchaseWizard();
+        wizard = new PurchaseWizard(presenter);
 
         // Create purchase history grid on the right
         historyGrid = new PurchaseHistoryGrid(new PurchaseHistoryPresenter(),
@@ -84,6 +84,10 @@ public class StorefrontView extends CssLayout implements VaadinCreateView {
     public void enter(ViewChangeEvent event) {
         openingView(VIEW_NAME);
         logger.info("Entered StorefrontView");
+
+        // Load products via presenter
+        var products = presenter.getOrderableProducts();
+        wizard.setProducts(products);
 
         // Check for status changes and show notification
         checkForStatusChanges();

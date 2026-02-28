@@ -15,6 +15,7 @@ import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 
 import com.deque.html.axecore.selenium.AxeBuilder;
 import com.vaadin.testbench.elements.ButtonElement;
+import com.vaadin.testbench.elements.CheckBoxElement;
 import com.vaadin.testbench.elements.ComboBoxElement;
 import com.vaadin.testbench.elements.LabelElement;
 import com.vaadin.testbench.elements.NotificationElement;
@@ -160,6 +161,8 @@ public class UserManagementViewIT extends AbstractViewTest {
     public void visual() throws IOException {
         if (visualTests()) {
             waitForElementPresent(By.id("new-button"));
+            $(ComboBoxElement.class).id("user-select").selectByText("User2");
+            $(CheckBoxElement.class).id("active-field").clear();
             wait(Duration.ofMillis(200));
             assertTrue($(UIElement.class).first().compareScreen("user.png"));
         }

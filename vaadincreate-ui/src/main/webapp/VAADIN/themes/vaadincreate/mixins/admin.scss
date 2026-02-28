@@ -4,6 +4,22 @@
     box-shadow: $light-shadow;
     background: white;
     border: $v-grid-border;
+
+    .v-checkbox {
+      margin-top: 3px;
+    }
+
+    .v-checkbox > label {
+      margin-left: -120px;
+      color: #7d7d7d;
+      font-size: 14px;
+    }
+
+    .v-checkbox:focus-within {
+      label {
+        color: #2165a1;
+      }
+    }
   }
 
   .v-slot-adminview-userform {

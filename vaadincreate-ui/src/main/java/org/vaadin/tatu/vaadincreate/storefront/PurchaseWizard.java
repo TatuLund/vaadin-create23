@@ -27,6 +27,7 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
+import com.vaadin.data.provider.Query;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.shared.data.sort.SortDirection;
 import com.vaadin.shared.ui.ContentMode;
@@ -337,8 +338,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
             // Add products to cart - fetch actual Product entities from backend
             for (var dto : selectedProducts) {
-                if (dto.getOrderQuantity() != null
-                        && dto.getOrderQuantity() > 0) {
+                if (dto.getOrderQuantity() > 0) {
                     // Fetch the actual Product entity from backend by ID
                     var product = presenter.getProductById(dto.getProductId());
                     if (product != null) {
@@ -487,8 +487,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
             // Update quantities when selection changes
             addSelectionListener(e -> {
-                for (var dto : getDataProvider()
-                        .fetch(new com.vaadin.data.provider.Query<>())
+                for (var dto : getDataProvider().fetch(new Query<>())
                         .toList()) {
                     if (!e.getAllSelectedItems().contains(dto)) {
                         dto.setOrderQuantity(0);
@@ -503,8 +502,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
             var totalQuantity = 0;
             var totalPrice = BigDecimal.ZERO;
 
-            for (var dto : getDataProvider()
-                    .fetch(new com.vaadin.data.provider.Query<>()).toList()) {
+            for (var dto : getDataProvider().fetch(new Query<>()).toList()) {
                 if (dto.getOrderQuantity() > 0) {
                     totalQuantity += dto.getOrderQuantity();
                     totalPrice = totalPrice.add(dto.getLineTotal());

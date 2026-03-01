@@ -40,7 +40,7 @@ public class UserManagementViewIT extends AbstractViewTest {
 
     @Test
     @SuppressWarnings("java:S5961")
-    public void createAndSaveTestuser() {
+    public void createAndSaveAndDeleteTestuser() {
         waitForElementPresent(By.id("new-button"));
 
         var user = $(TextFieldElement.class).id("user-field");
@@ -85,22 +85,9 @@ public class UserManagementViewIT extends AbstractViewTest {
         assertEquals("", password.getValue());
         assertEquals("", passwordRepeat.getValue());
         assertEquals("", role.getValue());
-    }
-
-    @Test
-    public void deleteUser4() {
-        waitForElementPresent(By.id("new-button"));
-
-        var user = $(TextFieldElement.class).id("user-field");
-        var role = $(ComboBoxElement.class).id("role-field");
-        var delete = $(ButtonElement.class).id("delete-button");
-        var save = $(ButtonElement.class).id("save-button");
-        var password = $(PasswordFieldElement.class).id("password-field");
-        var passwordRepeat = $(PasswordFieldElement.class)
-                .id("password-repeat");
 
         var userSelect = $(ComboBoxElement.class).id("user-select");
-        userSelect.selectByText("User4");
+        userSelect.selectByText("Testuser");
 
         assertFalse(save.isEnabled());
         assertTrue(delete.isEnabled());
@@ -109,10 +96,10 @@ public class UserManagementViewIT extends AbstractViewTest {
 
         var dialog = $(WindowElement.class).id("confirm-dialog");
         assertTrue(dialog.$(LabelElement.class).first().getText()
-                .contains("User4"));
+                .contains("Testuser"));
         dialog.$(ButtonElement.class).id("confirm-button").click();
 
-        assertEquals("Käyttäjä \"User4\" poistettu.",
+        assertEquals("Käyttäjä \"Testuser\" poistettu.",
                 $(NotificationElement.class).last().getText());
 
         assertEquals("", userSelect.getValue());
@@ -124,37 +111,6 @@ public class UserManagementViewIT extends AbstractViewTest {
         assertEquals("", password.getValue());
         assertEquals("", passwordRepeat.getValue());
         assertEquals("", role.getValue());
-    }
-
-    @Test
-    public void findUser2() {
-        waitForElementPresent(By.id("new-button"));
-
-        var user = $(TextFieldElement.class).id("user-field");
-        var role = $(ComboBoxElement.class).id("role-field");
-        var delete = $(ButtonElement.class).id("delete-button");
-        var save = $(ButtonElement.class).id("save-button");
-        var password = $(PasswordFieldElement.class).id("password-field");
-        var passwordRepeat = $(PasswordFieldElement.class)
-                .id("password-repeat");
-
-        assertFalse(delete.isEnabled());
-        assertFalse(save.isEnabled());
-
-        assertEquals("", user.getValue());
-        assertEquals("", password.getValue());
-        assertEquals("", passwordRepeat.getValue());
-        assertEquals("", role.getValue());
-
-        var userSelect = $(ComboBoxElement.class).id("user-select");
-        assertEquals("", userSelect.getValue());
-        userSelect.selectByText("User2");
-
-        assertFalse(save.isEnabled());
-        assertTrue(delete.isEnabled());
-
-        assertEquals("User2", user.getValue());
-        assertEquals("USER", role.getValue());
     }
 
     @Test

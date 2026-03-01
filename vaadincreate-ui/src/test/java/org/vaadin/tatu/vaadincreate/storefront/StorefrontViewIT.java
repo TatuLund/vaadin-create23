@@ -8,13 +8,16 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Test;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 
 import com.deque.html.axecore.selenium.AxeBuilder;
 import com.vaadin.testbench.By;
 import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.GridElement;
+import com.vaadin.testbench.elements.TextFieldElement;
 import com.vaadin.testbench.elements.UIElement;
 
 public class StorefrontViewIT extends AbstractViewTest {
@@ -32,35 +35,52 @@ public class StorefrontViewIT extends AbstractViewTest {
     }
 
     @Test
-    public void visual()
+    public void navigateProductGridByKeyboardAndVerifyVisually()
             throws IOException {
+        var actions = new Actions(getDriver());
+
+        waitForElementPresent(By.id("purchase-history-grid"));
+        var historyGrid = $(GridElement.class).id("purchase-history-grid");
+        var productGrid = $(GridElement.class).id("purchase-grid");
+        var focusedElement = focusedElement();
+        assertEquals(productGrid.getCell(0, 1), focusedElement);
+
+        actions.sendKeys(Keys.ARROW_DOWN, Keys.SPACE).perform();
+        testBench().waitForVaadin();
+        actions.sendKeys(Keys.ARROW_RIGHT, Keys.ARROW_RIGHT, Keys.ARROW_RIGHT)
+                .perform();
+
+        var quantityField = productGrid.getCell(1, 4).$(TextFieldElement.class)
+                .first();
+        focusedElement = focusedElement();
+        assertEquals(quantityField, focusedElement);
+        quantityField.sendKeys("4");
+
+        historyGrid.getCell(1, 0).$(ButtonElement.class).first().click();
+        testBench().waitForVaadin();
+
         if (visualTests()) {
-            waitForElementPresent(By.id("purchase-history-grid"));
-            var historyGrid = $(GridElement.class).id("purchase-history-grid");
-            var productGrid = $(GridElement.class).id("purchase-grid");
-            var focusedElement = focusedElement();
-            assertEquals(productGrid.getCell(0, 1), focusedElement);
-
-            productGrid.getCell(2, 1).click();
-            testBench().waitForVaadin();
-
-            historyGrid.getCell(1, 0).$(ButtonElement.class).first().click();
-            testBench().waitForVaadin();
-
             assertTrue($(UIElement.class).first()
                     .compareScreen("storefront.png"));
         }
-
     }
 
     @Test
     public void accessibility() {
         var axeBuilder = new AxeBuilder();
         // Vaadin tooltip is aria-live and is populated when hovering over
-        // elements.
+        // elements. Thus working differently than Axe assumes, but works on
+        // NVDA properly.
         axeBuilder.exclude(".v-tooltip");
-        // Select all checkbox is hidden on purpose
-        axeBuilder.disableRules(List.of("empty-table-header"));
+        // Select all checkboxes are hidden on purpose
+        axeBuilder.exclude(
+                "table[aria-multiselectable=\"true\"] > thead > tr > th:nth-child(1)");
+        axeBuilder.exclude(
+                "table[aria-rowcount=\"161\"] > thead > tr > th:nth-child(1)");
+
+        // Ensure NumberField is displayed
+        var productGrid = $(GridElement.class).id("purchase-grid");
+        productGrid.getCell(0, 0).click();
 
         var axeResults = axeBuilder.analyze(driver);
         logViolations(axeResults);

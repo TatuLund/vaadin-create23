@@ -4,6 +4,8 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
@@ -139,6 +141,23 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
         // Thus using ChromeOptions argument instead
         // of "testBench().resizeViewPortTo(1280, 900);" here.
         options.addArguments("--window-size=1280,900");
+
+        // Disable password manager to avoid interference with tests
+        // IMHO: Can't understand why this is not the default in headless mode.
+        options.addArguments("--disable-save-password-bubble");
+        options.addArguments(
+                "--disable-features=PasswordManagerOnboarding,PasswordCheck,SafetyCheck");
+
+        Map<String, Object> prefs = new HashMap<>();
+        prefs.put("credentials_enable_service", false);
+        prefs.put("profile.password_manager_enabled", false);
+        // Leak detection / compromised password warnings
+        prefs.put("profile.password_manager_leak_detection", false);
+        prefs.put("profile.password_manager_leak_detection_enabled", false);
+        options.setExperimentalOption("prefs", prefs);
+
+        // Additional arguments for running in CI environments like GitHub
+        // Actions
         if (Boolean.getBoolean("ghActions")) {
             options.addArguments("--no-sandbox");
             options.addArguments("--disable-dev-shm-usage");

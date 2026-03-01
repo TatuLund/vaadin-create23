@@ -164,6 +164,7 @@ $fake-grid-background-color: white;
     box-shadow: 0 1px 0 0 $v-focus-color;
   }
 
+  // Fix for form layout captions not changing color on focus
   .v-formlayout-row:focus-within {
     .v-caption {
       color: $v-focus-color;
@@ -215,6 +216,8 @@ $fake-grid-background-color: white;
     }
   }
 
+  // Different loading indicator stages as spinner animation which
+  // slows down in steps and changes color
   .v-loading-indicator.second.v-loading-indicator-delay {
     width: 48px;
     border: 5px solid $v-error-indicator-level-warning-color;
@@ -235,11 +238,24 @@ $fake-grid-background-color: white;
     transition: unset !important;
   }
 
+  // Allow tabsheet panels to scroll when content overflows
   .v-tabsheet-tabsheetpanel > .v-scrollable > .v-widget {
     overflow: auto;
   }
 
+  // Fix for dialog header icons being too close to the text
   .v-window-header > .v-icon {
     margin-right: 5px
+  }
+
+  // These labels are excessively verbose, thus hidden
+  .v-window-wrap {
+    div[aria-label="Top of dialog"] {
+      display: none;
+    }
+
+    div[aria-label="Bottom of Dialog"] {
+      display: none;
+    }
   }
 }

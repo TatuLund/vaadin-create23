@@ -10,6 +10,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.common.TabView;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 import org.vaadin.tatu.vaadincreate.purchases.PurchasesApprovalsPresenter.ApproveResult;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
@@ -123,6 +124,7 @@ public class PurchasesApprovalsView extends VerticalLayout
                         .show(getTranslation(I18n.Storefront.APPROVE_SUCCESS,
                                 purchaseId), Type.HUMANIZED_MESSAGE);
             }
+            Telemetry.saveItem(result.purchase());
         } catch (Exception e) {
             if (Utils.throwableHasCause(e, OptimisticLockException.class)) {
                 Notification.show(
@@ -142,7 +144,8 @@ public class PurchasesApprovalsView extends VerticalLayout
                     Type.WARNING_MESSAGE);
             return;
         }
-        presenter.reject(purchaseId, currentUser, reason);
+        var purchase = presenter.reject(purchaseId, currentUser, reason);
+        Telemetry.saveItem(purchase);
         Notification.show(
                 getTranslation(I18n.Storefront.REJECT_SUCCESS, purchaseId),
                 Type.HUMANIZED_MESSAGE);

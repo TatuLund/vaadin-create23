@@ -23,6 +23,7 @@ import org.vaadin.tatu.vaadincreate.components.Html;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.Binder;
@@ -401,6 +402,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
             var purchase = presenter.createPendingPurchase(cart, address,
                     currentUser, selectedSupervisor);
+            Telemetry.saveItem(purchase);
 
             logger.info("Purchase created: {}", purchase.getId());
 
@@ -465,6 +467,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
                         updateFooter();
                         sort("quantity-column", SortDirection.DESCENDING);
                     });
+                    numberField.setId("quantity-for-" + dto.getProductId());
                     layout.addComponent(numberField);
                 } else {
                     layout.addComponent(new Label("-"));

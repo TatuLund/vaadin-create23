@@ -100,16 +100,12 @@ public class PurchaseDao {
                 "Fetching Purchases by requester: ({}) by offset: {} and limit: {}",
                 requester.getId(), offset, limit);
         var result = HibernateUtil.inSession(session -> {
-            var purchases = session.createQuery(
-                    "select p from Purchase p where p.requester = :requester order by p.createdAt desc",
-                    Purchase.class)
+            var purchaseIds = session.createQuery(
+                    "select p.id from Purchase p where p.requester = :requester order by p.createdAt desc",
+                    Integer.class)
                     .setParameter(PURCHASE_REQUESTER_PARAM, requester)
                     .setFirstResult(offset).setMaxResults(limit).list();
-            if (purchases != null) {
-                // Initialize lazy collections while session is open.
-                purchases.forEach(p -> Hibernate.initialize(p.getLines()));
-            }
-            return purchases;
+            return fetchPurchasesWithLinesByIds(session, purchaseIds);
         });
         if (result == null) {
             throw new IllegalStateException(
@@ -160,15 +156,12 @@ public class PurchaseDao {
         logger.debug("Fetching Purchases by approver: ({}) and status: {}",
                 approver.getId(), status);
         var result = HibernateUtil.inSession(session -> {
-            var purchases = session.createQuery(
-                    "select p from Purchase p where p.approver = :approver and p.status = :status order by p.createdAt desc",
-                    Purchase.class).setParameter("approver", approver)
+            var purchaseIds = session.createQuery(
+                    "select p.id from Purchase p where p.approver = :approver and p.status = :status order by p.createdAt desc",
+                    Integer.class).setParameter("approver", approver)
                     .setParameter(PURCHASE_STATUS_PARAM, status)
                     .setFirstResult(offset).setMaxResults(limit).list();
-            if (purchases != null) {
-                purchases.forEach(p -> Hibernate.initialize(p.getLines()));
-            }
-            return purchases;
+            return fetchPurchasesWithLinesByIds(session, purchaseIds);
         });
         if (result == null) {
             throw new IllegalStateException(
@@ -218,14 +211,11 @@ public class PurchaseDao {
         logger.debug("Fetching purchases by offset: {} and limit: {}", offset,
                 limit);
         var result = HibernateUtil.inSession(session -> {
-            var purchases = session.createQuery(
-                    "select p from Purchase p order by p.createdAt desc",
-                    Purchase.class).setFirstResult(offset).setMaxResults(limit)
+            var purchaseIds = session.createQuery(
+                    "select p.id from Purchase p order by p.createdAt desc",
+                    Integer.class).setFirstResult(offset).setMaxResults(limit)
                     .list();
-            if (purchases != null) {
-                purchases.forEach(p -> Hibernate.initialize(p.getLines()));
-            }
-            return purchases;
+            return fetchPurchasesWithLinesByIds(session, purchaseIds);
         });
         if (result == null) {
             throw new IllegalStateException("Result of findAll is null");
@@ -291,25 +281,69 @@ public class PurchaseDao {
         logger.debug(
                 "Fetching recently decided Purchases by requester: ({}) since: {}",
                 requester.getId(), since);
+        final String query = """
+                select distinct p
+                from Purchase p
+                left join fetch p.requester
+                left join fetch p.approver
+                left join fetch p.lines l
+                left join fetch l.product
+                where p.requester = :requester
+                and p.status in (:completed, :rejected, :cancelled)
+                and p.decidedAt > :since
+                order by p.decidedAt desc
+                """;
         var result = HibernateUtil.inSession(session -> {
-            var purchases = session.createQuery(
-                    "select p from Purchase p where p.requester = :requester and p.status in (:completed, :rejected, :cancelled) and p.decidedAt > :since order by p.decidedAt desc",
-                    Purchase.class)
+            return session.createQuery(query, Purchase.class)
                     .setParameter(PURCHASE_REQUESTER_PARAM, requester)
                     .setParameter("completed", PurchaseStatus.COMPLETED)
                     .setParameter("rejected", PurchaseStatus.REJECTED)
                     .setParameter("cancelled", PurchaseStatus.CANCELLED)
                     .setParameter("since", since).list();
-            if (purchases != null) {
-                purchases.forEach(p -> Hibernate.initialize(p.getLines()));
-            }
-            return purchases;
         });
         if (result == null) {
             throw new IllegalStateException(
                     "Result of findRecentlyDecidedByRequester is null");
         }
         return result;
+    }
+
+    private List<@NonNull Purchase> fetchPurchasesWithLinesByIds(
+            Session session,
+            List<Integer> purchaseIds) {
+        if (purchaseIds.isEmpty()) {
+            return List.of();
+        }
+        final String fetchQuery = """
+                select distinct p
+                from Purchase p
+                left join fetch p.requester
+                left join fetch p.approver
+                left join fetch p.lines l
+                left join fetch l.product
+                where p.id in (:ids)
+                """;
+        var purchases = session.createQuery(fetchQuery, Purchase.class)
+                .setParameter("ids", purchaseIds).list();
+
+        var purchasesById = HashMap
+                .<Integer, Purchase> newHashMap(purchases.size());
+        for (var purchase : purchases) {
+            @Nullable
+            Integer id = purchase.getId();
+            if (id != null) {
+                purchasesById.put(id, purchase);
+            }
+        }
+
+        var ordered = new ArrayList<@NonNull Purchase>(purchaseIds.size());
+        for (var id : purchaseIds) {
+            var purchase = purchasesById.get(id);
+            if (purchase != null) {
+                ordered.add(purchase);
+            }
+        }
+        return ordered;
     }
 
     /**
@@ -401,13 +435,23 @@ public class PurchaseDao {
     private void updateProductStock(Purchase purchase,
             HashMap<Integer, Product> productsById) {
         for (var line : purchase.getLines()) {
-            var product = productsById.get(line.getProduct().getId());
+            var productId = line.getProduct().getId();
+            var product = productsById.get(productId);
+            if (product == null) {
+                logger.error(
+                        "Product with id {} from purchase {} not found in productsById map",
+                        productId, purchase.getId());
+                throw new IllegalStateException(
+                        "Product not found in productsById map for id: "
+                                + productId);
+            }
             product.setStockCount(product.getStockCount() - line.getQuantity());
             // product is already managed by the session; dirty
             // checking will flush the change on commit.
         }
     }
 
+    @SuppressWarnings("unused")
     private ArrayList<String> retrieveLowStockItems(Session session,
             Purchase purchase, HashMap<Integer, Product> productsById) {
         var insufficientItems = new ArrayList<String>();
@@ -415,6 +459,10 @@ public class PurchaseDao {
             var productId = line.getProduct().getId();
             @Nullable
             Product product = session.get(Product.class, productId);
+            if (product == null) {
+                throw new IllegalArgumentException(
+                        "Product not found: " + productId);
+            }
             productsById.put(productId, product);
             if (product.getStockCount() < line.getQuantity()) {
                 insufficientItems.add(String.format("%s: needs %d, has %d",

@@ -10,7 +10,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -35,10 +34,8 @@ public class Product extends AbstractEntity {
     @SuppressWarnings("null")
     private BigDecimal price = BigDecimal.ZERO;
 
-    // Using Eager as the category is shown in the Grid, Lazy would not help
-    // performance.
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST,
-            CascadeType.MERGE, CascadeType.DETACH })
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH })
     @JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     @SuppressWarnings("null")
     private Set<Category> category = new HashSet<>();

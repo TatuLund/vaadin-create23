@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.Hibernate;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -57,6 +58,9 @@ public class ProductDao {
         return HibernateUtil.inSession(session -> {
             @Nullable
             Product prod = session.get(Product.class, id);
+            if (prod != null) {
+                Hibernate.initialize(prod.getCategory());
+            }
             return prod;
         });
     }

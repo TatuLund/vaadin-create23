@@ -32,6 +32,7 @@ As a result, the project has a wiki that collects practical notes, examples, and
 - [How To Compose HTML Content in Vaadin 8 Safely](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Compose-HTML-Content-in-Vaadin-8-Safely-(Without-XSS-Surprises))
 - [How to implement hierarchical navigation in Vaadin 8](https://github.com/TatuLund/vaadin-create23/wiki/How-to-implement-hierarchical-navigation-in-Vaadin-8)
 - [How to Build a Test Pyramid for Vaadin 8 Apps](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Build-a-Test-Pyramid-for-Vaadin-8-Apps)
+- [How to Optimize Paged Queries for a Vaadin 8 Grid](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Optimize-Paged-Queries-for-a-Vaadin-8-Grid)
 
 ## Backend
 

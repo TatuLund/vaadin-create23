@@ -11,6 +11,8 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.backend.EntityInUseException;
+import org.vaadin.tatu.vaadincreate.backend.PersistenceExceptionUtil;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.dao.DraftDao;
 import org.vaadin.tatu.vaadincreate.backend.dao.ProductDao;
@@ -77,7 +79,15 @@ public class ProductDataServiceImpl implements ProductDataService {
     public void deleteProduct(Integer id) {
         Objects.requireNonNull(id, ID_CANT_BE_NULL);
         randomWait(1);
-        productDao.deleteProduct(id);
+        try {
+            productDao.deleteProduct(id);
+        } catch (RuntimeException e) {
+            if (PersistenceExceptionUtil.isDeleteReferenceViolation(e)) {
+                throw new EntityInUseException("Product", String.valueOf(id),
+                        e);
+            }
+            throw e;
+        }
     }
 
     @Nullable

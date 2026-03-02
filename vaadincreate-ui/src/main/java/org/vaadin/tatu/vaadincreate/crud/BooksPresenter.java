@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
+import org.vaadin.tatu.vaadincreate.backend.EntityInUseException;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -321,12 +322,18 @@ public class BooksPresenter implements Serializable, EventBusListener {
         var id = product.getId();
         Objects.requireNonNull(id, "Product must have an ID to be deleted");
         try {
-            view.showDeleteNotification(product.getProductName());
-            view.clearSelection();
-            view.setNewProductEnabled(true);
             logger.info("Deleting product: {}", product.getId());
             getService().deleteProduct(id);
+
+            view.showDeleteNotification(product.getProductName());
             view.removeProduct(product);
+            view.clearSelection();
+            view.setNewProductEnabled(true);
+        } catch (EntityInUseException e) {
+            logger.info("Delete blocked for product {}: {}", id,
+                    e.getMessage());
+            view.showDeleteBlocked(product.getProductName());
+            return;
         } finally {
             unlockBook();
         }

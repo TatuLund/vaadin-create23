@@ -11,6 +11,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.DeputyRequiredException;
+import org.vaadin.tatu.vaadincreate.backend.EntityInUseException;
+import org.vaadin.tatu.vaadincreate.backend.PersistenceExceptionUtil;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.dao.PurchaseDao;
 import org.vaadin.tatu.vaadincreate.backend.dao.UserDao;
@@ -162,7 +164,15 @@ public class UserServiceImpl implements UserService {
     public void removeUser(Integer userId) {
         Objects.requireNonNull(userId, "User ID must not be null");
         randomWait(1);
-        userDao.removeUser(userId);
+        try {
+            userDao.removeUser(userId);
+        } catch (RuntimeException e) {
+            if (PersistenceExceptionUtil.isDeleteReferenceViolation(e)) {
+                throw new EntityInUseException("User", String.valueOf(userId),
+                        e);
+            }
+            throw e;
+        }
     }
 
     @Override

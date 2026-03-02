@@ -199,6 +199,24 @@ public class UserManagementViewTest extends AbstractUITest {
         then_form_is_empty_and_buttons_are_disabled();
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void clicking_delete_for_user_with_purchase_history_will_show_blocked_message() {
+        test($(ComboBox.class).id("user-select")).setInput("User5");
+        assertTrue($(FormLayout.class).single().isEnabled());
+
+        test($(Button.class).id("delete-button")).click();
+
+        var dialog = $(Window.class).id("confirm-dialog");
+        assertEquals("\"User5\" will be deleted.",
+                $(dialog, Label.class).single().getValue());
+        test($(dialog, Button.class).id("confirm-button")).click();
+
+        assertEquals(
+                "Cannot remove user \"User5\" because they are referenced by purchase history.",
+                $(Notification.class).last().getCaption());
+    }
+
     @Test
     @SuppressWarnings("unchecked")
     public void clicking_cancel_will_clear_the_form() {

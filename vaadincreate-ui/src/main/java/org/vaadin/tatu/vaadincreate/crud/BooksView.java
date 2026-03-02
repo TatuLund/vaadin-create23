@@ -440,6 +440,14 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         Notification.show(message, Type.TRAY_NOTIFICATION);
     }
 
+    public void showDeleteBlocked(@Nullable String book) {
+        if (book != null) {
+            showError(getTranslation(I18n.Books.DELETE_BLOCKED, book));
+        } else {
+            showError(getTranslation(I18n.Books.DELETE_BLOCKED_GENERIC));
+        }
+    }
+
     /**
      * Sets the enabled state of the "New Product" button.
      *

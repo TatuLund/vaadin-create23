@@ -18,6 +18,7 @@ import org.vaadin.tatu.vaadincreate.about.AboutView;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
+import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
@@ -470,6 +471,60 @@ public class BooksViewTest extends AbstractUITest {
         assertEquals(null, ui.getProductService().getProductById(id));
         assertEquals(0, test(grid).size());
         assertTrue($(view, Button.class).id("new-product").isEnabled());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void deleting_product_with_purchase_history_shows_blocked_message() {
+        var purchasedProduct = findProductWithPurchaseHistory();
+        var productId = purchasedProduct.getId();
+        assertNotNull(productId);
+
+        test($(FilterField.class).id("filter-field"))
+                .setValue(purchasedProduct.getProductName());
+
+        var row = findRowByProductId(productId);
+        var book = test(grid).item(row);
+
+        test(grid).click(1, row);
+        assertFalse($(view, Button.class).id("new-product").isEnabled());
+        test($(form, Button.class).id("delete-button")).click();
+
+        var dialog = $(Window.class).id("confirm-dialog");
+        test($(dialog, Button.class).id("confirm-button")).click();
+
+        assertNotification(String.format(
+                "Cannot delete \"%s\" because it is referenced by purchase history.",
+                book.getProductName()));
+        assertNotNull(ui.getProductService().getProductById(productId));
+    }
+
+    private Product findProductWithPurchaseHistory() {
+        var purchases = PurchaseService.get().findAll(0, 500);
+        for (var purchase : purchases) {
+            for (var line : purchase.getLines()) {
+                var lineProduct = line.getProduct();
+                if (lineProduct == null || lineProduct.getId() == null) {
+                    continue;
+                }
+                var existing = ui.getProductService()
+                        .getProductById(lineProduct.getId());
+                if (existing != null) {
+                    return existing;
+                }
+            }
+        }
+        throw new AssertionError(
+                "Expected at least one product referenced by purchase history");
+    }
+
+    private int findRowByProductId(Integer productId) {
+        for (int row = 0; row < test(grid).size(); row++) {
+            if (productId.equals(test(grid).item(row).getId())) {
+                return row;
+            }
+        }
+        throw new AssertionError("Product not found in grid: " + productId);
     }
 
     @SuppressWarnings("unchecked")

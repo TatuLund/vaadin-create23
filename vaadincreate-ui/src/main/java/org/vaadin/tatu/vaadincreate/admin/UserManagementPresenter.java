@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.DeputyRequiredException;
+import org.vaadin.tatu.vaadincreate.backend.EntityInUseException;
 import org.vaadin.tatu.vaadincreate.backend.UserService;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.events.UserUpdatedEvent;
@@ -68,10 +69,15 @@ public class UserManagementPresenter implements Serializable {
      */
     public void removeUser(Integer id) {
         accessControl.assertAdmin();
-        getService().removeUser(id);
-        logger.info("User '{}' removed.", id);
-        view.showUserRemoved();
-        requestUpdateUsers();
+        try {
+            getService().removeUser(id);
+            logger.info("User '{}' removed.", id);
+            view.showUserRemoved();
+            requestUpdateUsers();
+        } catch (EntityInUseException e) {
+            logger.info("Delete blocked for user {}: {}", id, e.getMessage());
+            view.showUserDeleteBlocked();
+        }
     }
 
     /**

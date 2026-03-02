@@ -283,6 +283,12 @@ public class UserManagementView extends VerticalLayout
                 .show(getTranslation(I18n.User.USER_DELETED, user.getName()));
     }
 
+    public void showUserDeleteBlocked() {
+        Notification.show(
+                getTranslation(I18n.User.USER_DELETE_BLOCKED, user.getName()),
+                Type.ERROR_MESSAGE);
+    }
+
     /**
      * Instructs the view that deactivating this user requires selecting a
      * deputy approver because the user has pending purchase approvals. The

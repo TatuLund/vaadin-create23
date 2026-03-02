@@ -63,6 +63,8 @@ public final class I18n {
         public static final String CLEAR_TEXT = "clear-text";
         public static final String PRODUCT_FORM = "product-form";
         public static final String EMPTY = "empty";
+        public static final String DELETE_BLOCKED = "delete-blocked";
+        public static final String DELETE_BLOCKED_GENERIC = "delete-blocked-generic";
 
         private Books() {
             // private constructor to hide the implicit public one
@@ -173,6 +175,7 @@ public final class I18n {
         public static final String USER_DELETED = "user-deleted";
         public static final String USER_SAVED = "user-saved";
         public static final String USER_IS_DUPLICATE = "user-is-duplicate";
+        public static final String USER_DELETE_BLOCKED = "user-delete-blocked";
         public static final String NEW_USER = "new-user";
         public static final String EDIT_USERS = "edit-users";
         public static final String CHANGES = "user-changes";

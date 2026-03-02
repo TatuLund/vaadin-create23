@@ -15,6 +15,7 @@ This document deliberately avoids framework-specific APIs, focusing instead on v
   - Managing categories used to organize the catalog.
   - Viewing statistics about the catalog.
   - Broadcasting and viewing system messages.
+  - Creating and approving internal purchase requests (storefront + approvals).
 - Demonstrate:
   - Proper authentication and role-based access control.
   - Internationalization and localization.
@@ -32,6 +33,11 @@ Non-functional requirements (from tests and conventions):
 
 ## 3. High-Level Architecture
 
+See also:
+
+- [Application architecture](ApplicationArchitecture.md)
+- [Data model](DataModel.md)
+
 - **Application Shell / Layout**
   - A single main layout ("App Layout") wraps all views and provides:
     - A navigation menu with buttons for main sections.
@@ -43,6 +49,8 @@ Non-functional requirements (from tests and conventions):
   - About view (default landing view after login).
   - Inventory (Books) view.
   - Statistics view.
+  - Storefront view (for purchase requests by customers/employees).
+  - Purchases view (for supervisors/admins) with tabs for history, approvals, and purchase statistics.
   - Admin view, containing:
     - User Management sub-view.
     - Category Management sub-view.
@@ -136,6 +144,8 @@ Non-functional requirements (from tests and conventions):
   - About.
   - Inventory (Books).
   - Statistics.
+  - Storefront (visible for customer/employee role).
+  - Purchases (visible for supervisor/admin roles).
   - Admin.
 
 - Selecting a menu entry shall navigate to the associated view and update the visible content accordingly.
@@ -587,6 +597,157 @@ Non-functional requirements (from tests and conventions):
 
 - Core views and components (e.g., About view, Statistics view, User Management view) shall be serializable so that the server can safely serialize UI state between requests if needed.
 - No non-serializable resource (e.g., open streams, threads) shall be stored directly in view instances or other UI state objects.
+
+
+## 17. Storefront (Customer Purchase Requests)
+
+### 17.1 Access and entry behavior
+
+- The application shall provide a Storefront view intended for users acting as customers/employees who create purchase requests.
+- On entering the Storefront view:
+  - A regular notification titled exactly "Status Updates" shall be shown.
+  - An assistive notification announcing "Storefront opened" shall be emitted.
+
+### 17.2 Purchase Wizard
+
+The Storefront view shall include a multi-step purchase wizard with explicit Next/Previous navigation.
+
+- **Step 1: Select Products**
+  - The step title element shall display the exact text "Step 1: Select Products".
+  - The product selection grid shall exist and be addressable with a stable id `purchase-grid`.
+  - Previous shall be disabled on the first step.
+  - Attempting to proceed with an empty cart shall show a warning notification:
+    - "Your cart is empty. Please add items before proceeding."
+
+- **Step 2: Delivery Address**
+  - The wizard shall collect delivery address fields with captions:
+    - Street
+    - Postal Code
+    - City
+    - Country
+  - Attempting to proceed with required address fields missing shall show a notification:
+    - "Please fill all required fields"
+
+- **Step 3: Supervisor selection**
+  - The wizard shall require selecting a supervisor before proceeding.
+  - Attempting to proceed without selecting a supervisor shall show a notification:
+    - "Please select a supervisor"
+
+- **Step 4: Review & Submit**
+  - Entering the review step shall emit an assistive notification whose text contains "Order Summary".
+  - Submitting shall create a new purchase request and show a success notification whose caption contains the word "created".
+  - After a successful submit:
+    - The wizard shall reset back to Step 1.
+    - Any prior product selection in the product grid shall be cleared.
+
+### 17.3 Product grid sorting behaviors
+
+The product grid in Step 1 shall support predictable sorting behaviors:
+
+- Sorting by **Name** toggles ascending on first click and descending on second click.
+- Sorting by **Stock** toggles ascending on first click and descending on second click.
+- Sorting by **Price** toggles ascending on first click and descending on second click.
+
+Additionally, when order quantities are entered for multiple selected products, the grid shall order products by **order quantity descending** (higher quantity first).
+
+### 17.4 Purchase history panel
+
+The Storefront view shall show a purchase history grid with a stable id `purchase-history-grid`.
+
+- The grid shall show existing purchases and include at least one completed purchase in the seeded/demo data.
+- Clicking a row’s toggle control shall show/hide row details.
+- The row details content shall:
+  - Use ARIA live updates with `aria-live="assertive"` and role `alert`.
+  - Render purchase metadata (including purchase id, supervisor/approver name, and decision reason when present).
+  - Render line items in a readable text form with currency formatting, e.g.
+    - `<ProductName>: <UnitPrice> x <Quantity> = <LineTotal>`
+
+### 17.5 Live updates via UI events
+
+- When the customer’s purchase history receives a purchase-status-changed event for a purchase belonging to the current user, the history grid shall refresh the affected purchase and show a notification about the status change.
+- When the wizard submits a new purchase successfully, the purchase history grid shall refresh and show the newly created `PENDING` purchase.
+
+
+## 18. Purchases (Supervisor/Admin History, Approvals, Stats)
+
+### 18.1 Purchases view shell and navigation
+
+- The application shall provide a Purchases view for supervisors/admins.
+- On entering Purchases:
+  - An assistive notification "Purchases opened" shall be emitted.
+  - An assistive notification "Purchase History opened" shall be emitted when the history tab is shown.
+
+### 18.2 Shared purchase history grid behavior
+
+- Purchases history shall be presented using a grid with a stable id `purchase-history-grid`.
+- The history grid shall present 9 columns.
+- Row details shall be toggleable via an explicit toggle button:
+  - Initial state:
+    - `aria-label` is "Open"
+    - `aria-expanded` is "false"
+  - After opening:
+    - `aria-label` is "Close"
+    - `aria-expanded` is "true"
+  - The toggle control’s icon shall change accordingly between a right-pointing and down-pointing indicator.
+- Row details content shall:
+  - Use ARIA live updates with `aria-live="assertive"` and role `alert`.
+  - Render each purchase line item as:
+    - `<ProductName>: <UnitPrice> x <Quantity> = <LineTotal>`
+
+### 18.3 Approvals tab (pending approvals)
+
+The Purchases view shall provide an approvals tab that lists only purchases pending approval for the current approver.
+
+- The approvals grid shall exist with stable id `purchase-approvals-grid`.
+- The approvals grid shall have 10 columns in total, with 7 visible columns in pending-approvals mode.
+- Each pending row shall expose actions to Approve and Reject.
+
+#### 18.3.1 Decision window
+
+- Clicking Approve or Reject opens a decision window (modal) with stable identifiers:
+  - Decision window id: `decision-window`
+  - Comment/reason input id: `decision-comment-field`
+  - Confirm button id: `decision-confirm-button`
+  - Cancel button id: `decision-cancel-button`
+
+- **Approve flow**
+  - The decision comment is optional.
+  - Confirming approval shall close the window.
+  - A notification shall be shown whose caption starts with:
+    - `Purchase #<id>`
+  - After confirmation, the approved purchase shall be removed from the pending approvals grid.
+  - Approval may result in either a completed purchase or a cancelled purchase due to insufficient stock; both outcomes are treated as “decided” and remove the item from the pending queue.
+
+- **Reject flow**
+  - A non-empty reason is required.
+  - The confirm button shall be disabled until a reason is entered.
+  - Confirming rejection shall close the window.
+  - A notification shall be shown with caption:
+    - `Purchase #<id> rejected`
+  - After confirmation, the rejected purchase shall be removed from the pending approvals grid.
+
+- **Cancel behavior**
+  - Clicking Cancel closes the decision window without changing the purchase status.
+  - The relevant action button (Approve/Reject) shall become enabled again so the action can be retried.
+  - The pending approvals grid item count shall remain unchanged.
+
+#### 18.3.2 Approver scoping
+
+- The approvals tab shall only show pending purchases assigned to the currently logged-in approver.
+- Different approvers shall see disjoint pending queues (i.e., approver A does not see approver B’s pending items).
+
+### 18.4 Stats tab (purchase statistics)
+
+The Purchases view shall provide a stats tab that presents three charts with stable ids:
+
+- Top products chart id: `purchases-top-products-chart`
+- Least products chart id: `purchases-least-products-chart`
+- Purchases per month chart id: `purchases-per-month-chart`
+
+Behavioral requirements validated by tests:
+
+- The top-products chart shall contain at least one data series with positive quantities.
+- The monthly totals chart shall contain 12 x-axis categories (one per month).
 
 
 ---

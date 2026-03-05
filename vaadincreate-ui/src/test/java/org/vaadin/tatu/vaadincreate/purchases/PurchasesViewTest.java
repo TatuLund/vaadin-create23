@@ -9,7 +9,9 @@ import java.text.NumberFormat;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.jsoup.Jsoup;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
@@ -40,6 +42,7 @@ import com.vaadin.ui.Window;
 /**
  * UI unit tests for PurchasesView.
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PurchasesViewTest extends AbstractUITest {
 
     private VaadinCreateUI ui;

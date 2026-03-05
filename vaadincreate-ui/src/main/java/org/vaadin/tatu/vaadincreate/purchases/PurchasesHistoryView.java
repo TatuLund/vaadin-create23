@@ -1,7 +1,8 @@
 package org.vaadin.tatu.vaadincreate.purchases;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
@@ -158,6 +159,7 @@ public class PurchasesHistoryView extends VerticalLayout
     }
 
     private static Instant retentionCutoff() {
-        return Instant.now().minus(RETENTION_MONTHS * 30L, ChronoUnit.DAYS);
+        return ZonedDateTime.now(ZoneOffset.UTC).minusMonths(RETENTION_MONTHS)
+                .toInstant();
     }
 }

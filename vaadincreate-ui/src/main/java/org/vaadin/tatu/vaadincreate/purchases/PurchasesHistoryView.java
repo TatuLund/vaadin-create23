@@ -41,6 +41,7 @@ public class PurchasesHistoryView extends VerticalLayout
     private final PurchaseHistoryGrid historyGrid;
     private final PurchaseHistoryPresenter presenter;
     private final Button purgeButton;
+    private long purgeCount;
 
     public PurchasesHistoryView() {
         setSizeFull();
@@ -79,8 +80,8 @@ public class PurchasesHistoryView extends VerticalLayout
      */
     void checkRetentionPolicy() {
         Instant cutoff = retentionCutoff();
-        long oldCount = presenter.countPurchasesOlderThan(cutoff);
-        if (oldCount > 0) {
+        purgeCount = presenter.countPurchasesOlderThan(cutoff);
+        if (purgeCount > 0) {
             Notification.show(
                     getTranslation(
                             I18n.Storefront.PURGE_OLD_PURCHASES_NOTIFICATION),
@@ -106,7 +107,8 @@ public class PurchasesHistoryView extends VerticalLayout
     private void openPurgeConfirmDialog() {
         var dialog = new ConfirmDialog(
                 getTranslation(I18n.Storefront.PURGE_CONFIRM_CAPTION),
-                getTranslation(I18n.Storefront.PURGE_CONFIRM_MESSAGE),
+                getTranslation(I18n.Storefront.PURGE_CONFIRM_MESSAGE,
+                        purgeCount),
                 ConfirmDialog.Type.ALERT);
         dialog.setConfirmText(getTranslation(I18n.Storefront.PURGE));
         dialog.setCancelText(getTranslation(I18n.CANCEL));

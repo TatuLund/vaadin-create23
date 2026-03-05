@@ -7,6 +7,7 @@ import java.time.ZonedDateTime;
 import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.common.TabView;
+import org.vaadin.tatu.vaadincreate.components.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
@@ -15,11 +16,9 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 /**
@@ -33,12 +32,6 @@ public class PurchasesHistoryView extends VerticalLayout
 
     /** Id of the Purge button, used by tests to locate it. */
     public static final String PURGE_BUTTON_ID = "purge-button";
-    /** Id of the purge confirmation window. */
-    public static final String PURGE_WINDOW_ID = "purge-confirm-window";
-    /** Id of the OK/confirm button inside the purge confirmation window. */
-    public static final String PURGE_CONFIRM_OK_ID = "purge-confirm-ok";
-    /** Id of the cancel button inside the purge confirmation window. */
-    public static final String PURGE_CONFIRM_CANCEL_ID = "purge-confirm-cancel";
 
     /** Retention period in months (matching the PRD requirement). */
     static final int RETENTION_MONTHS = 24;
@@ -111,41 +104,14 @@ public class PurchasesHistoryView extends VerticalLayout
     }
 
     private void openPurgeConfirmDialog() {
-        var window = new Window(
-                getTranslation(I18n.Storefront.PURGE_CONFIRM_CAPTION));
-        window.setId(PURGE_WINDOW_ID);
-        window.setModal(true);
-        window.setClosable(true);
-        window.setResizable(false);
-        window.setWidth("450px");
-
-        var message = new Label(
-                getTranslation(I18n.Storefront.PURGE_CONFIRM_MESSAGE));
-
-        var confirmButton = new Button(getTranslation(I18n.Storefront.PURGE),
-                VaadinIcons.TRASH);
-        confirmButton.addClickListener(e -> {
-            window.close();
-            executePurge();
-        });
-        confirmButton.setId(PURGE_CONFIRM_OK_ID);
-        confirmButton.addStyleName(ValoTheme.BUTTON_DANGER);
-        confirmButton.setDisableOnClick(true);
-
-        var cancelButton = new Button(getTranslation(I18n.CANCEL),
-                e -> window.close());
-        cancelButton.setId(PURGE_CONFIRM_CANCEL_ID);
-
-        var buttonBar = new HorizontalLayout(confirmButton, cancelButton);
-        buttonBar.setSpacing(true);
-
-        var content = new VerticalLayout(message, buttonBar);
-        content.setComponentAlignment(buttonBar, Alignment.BOTTOM_RIGHT);
-        content.setMargin(true);
-        content.setSpacing(true);
-
-        window.setContent(content);
-        getUI().addWindow(window);
+        var dialog = new ConfirmDialog(
+                getTranslation(I18n.Storefront.PURGE_CONFIRM_CAPTION),
+                getTranslation(I18n.Storefront.PURGE_CONFIRM_MESSAGE),
+                ConfirmDialog.Type.ALERT);
+        dialog.setConfirmText(getTranslation(I18n.Storefront.PURGE));
+        dialog.setCancelText(getTranslation(I18n.CANCEL));
+        dialog.addConfirmedListener(e -> executePurge());
+        dialog.open();
     }
 
     private void executePurge() {

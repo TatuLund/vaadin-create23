@@ -654,16 +654,15 @@ public class PurchasesViewTest extends AbstractUITest {
         // WHEN: Clicking Purge button
         test(purgeButton).click();
 
-        // THEN: confirmation dialog opens
-        var confirmWindow = $(Window.class)
-                .id(PurchasesHistoryView.PURGE_WINDOW_ID);
+        // THEN: confirmation dialog opens (ConfirmDialog uses "confirm-dialog"
+        // id)
+        var confirmWindow = $(Window.class).id("confirm-dialog");
         assertNotNull("Purge confirmation window should be open",
                 confirmWindow);
         assertTrue(confirmWindow.isAttached());
 
-        // WHEN: Clicking Cancel
-        test($(confirmWindow, Button.class)
-                .id(PurchasesHistoryView.PURGE_CONFIRM_CANCEL_ID)).click();
+        // WHEN: Clicking Cancel (ConfirmDialog uses "cancel-button" id)
+        test($(confirmWindow, Button.class).id("cancel-button")).click();
 
         // THEN: dialog is closed
         assertFalse("Confirmation window should be closed after cancel",
@@ -704,13 +703,13 @@ public class PurchasesViewTest extends AbstractUITest {
         // WHEN: Clicking Purge and confirming
         test(purgeButton).click();
 
-        var confirmWindow = $(Window.class)
-                .id(PurchasesHistoryView.PURGE_WINDOW_ID);
+        // ConfirmDialog uses "confirm-dialog" id for the window
+        var confirmWindow = $(Window.class).id("confirm-dialog");
         assertNotNull("Purge confirmation window should be open",
                 confirmWindow);
 
-        test($(confirmWindow, Button.class)
-                .id(PurchasesHistoryView.PURGE_CONFIRM_OK_ID)).click();
+        // ConfirmDialog uses "confirm-button" id for the confirm button
+        test($(confirmWindow, Button.class).id("confirm-button")).click();
 
         // THEN: dialog is closed
         assertFalse("Confirmation window should be closed after confirm",

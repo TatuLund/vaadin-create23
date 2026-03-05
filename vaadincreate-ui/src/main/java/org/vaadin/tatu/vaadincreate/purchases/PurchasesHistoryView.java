@@ -23,7 +23,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 /**
  * History tab for PurchasesView. Displays all purchases for admin users and
- * provides a GDPR-inspired purge action for purchases older than 24 months.
+ * provides a GDPR-inspired purge action for purchases older than
+ * {@value #RETENTION_MONTHS} months.
  */
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
@@ -84,7 +85,8 @@ public class PurchasesHistoryView extends VerticalLayout
         if (purgeCount > 0) {
             Notification.show(
                     getTranslation(
-                            I18n.Storefront.PURGE_OLD_PURCHASES_NOTIFICATION),
+                            I18n.Storefront.PURGE_OLD_PURCHASES_NOTIFICATION,
+                            RETENTION_MONTHS),
                     Type.WARNING_MESSAGE);
             purgeButton.setVisible(true);
             historyGrid.setOldPurchaseHighlight(cutoff);
@@ -108,7 +110,7 @@ public class PurchasesHistoryView extends VerticalLayout
         var dialog = new ConfirmDialog(
                 getTranslation(I18n.Storefront.PURGE_CONFIRM_CAPTION),
                 getTranslation(I18n.Storefront.PURGE_CONFIRM_MESSAGE,
-                        purgeCount),
+                        purgeCount, RETENTION_MONTHS),
                 ConfirmDialog.Type.ALERT);
         dialog.setConfirmText(getTranslation(I18n.Storefront.PURGE));
         dialog.setCancelText(getTranslation(I18n.CANCEL));
@@ -120,7 +122,8 @@ public class PurchasesHistoryView extends VerticalLayout
         Instant cutoff = retentionCutoff();
         long purged = presenter.purgePurchases(cutoff);
         Notification.show(
-                getTranslation(I18n.Storefront.PURGE_SUCCESS, purged),
+                getTranslation(I18n.Storefront.PURGE_SUCCESS, purged,
+                        RETENTION_MONTHS),
                 Type.HUMANIZED_MESSAGE);
         historyGrid.refresh();
         checkRetentionPolicy();

@@ -343,6 +343,18 @@ public class PurchaseServiceImpl implements PurchaseService {
         return new ProductPurchaseStat(productId, productName, qty);
     }
 
+    @Override
+    public long countPurchasesOlderThan(Instant cutoff) {
+        Objects.requireNonNull(cutoff, "Cutoff must not be null");
+        return purchaseDao.countPurchasesOlderThan(cutoff);
+    }
+
+    @Override
+    public long purgePurchasesOlderThan(Instant cutoff) {
+        Objects.requireNonNull(cutoff, "Cutoff must not be null");
+        return purchaseDao.purgePurchasesOlderThan(cutoff);
+    }
+
     @SuppressWarnings("null")
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

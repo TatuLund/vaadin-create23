@@ -625,6 +625,69 @@ public class PurchaseDao {
         return result;
     }
 
+    /**
+     * Counts purchases whose {@code createdAt} is strictly before the given
+     * cutoff instant.
+     *
+     * @param cutoff
+     *            the exclusive upper bound for {@code createdAt}; must not be
+     *            null
+     * @return number of purgeable purchases
+     */
+    public long countPurchasesOlderThan(Instant cutoff) {
+        Objects.requireNonNull(cutoff, "Cutoff must not be null");
+        logger.debug("Counting purchases older than {}", cutoff);
+        var result = HibernateUtil.inSession(session -> {
+            @Nullable
+            Long count = session
+                    .createQuery(
+                            "select count(p) from Purchase p where p.createdAt < :cutoff",
+                            Long.class)
+                    .setParameter("cutoff", cutoff).uniqueResult();
+            return count;
+        });
+        return result != null ? result : 0L;
+    }
+
+    /**
+     * Deletes all purchases whose {@code createdAt} is strictly before the
+     * given cutoff instant in a single transaction. Associated
+     * {@link org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine} entities
+     * are removed first (JPQL bulk delete bypasses JPA cascade, so lines are
+     * explicitly deleted before purchases). Referenced {@code User} and
+     * {@code Product} master data are not modified.
+     *
+     * @param cutoff
+     *            the exclusive upper bound for {@code createdAt}; must not be
+     *            null
+     * @return number of purchases deleted
+     */
+    public long purgePurchasesOlderThan(Instant cutoff) {
+        Objects.requireNonNull(cutoff, "Cutoff must not be null");
+        logger.info("Purging purchases older than {}", cutoff);
+        var result = HibernateUtil.inTransaction(session -> {
+            @SuppressWarnings("unchecked")
+            var ids = session
+                    .createQuery(
+                            "select p.id from Purchase p where p.createdAt < :cutoff")
+                    .setParameter("cutoff", cutoff).list();
+            if (ids.isEmpty()) {
+                return 0L;
+            }
+            // JPQL bulk delete bypasses JPA cascade; delete child lines first.
+            session.createQuery(
+                    "delete from PurchaseLine pl where pl.purchase.id in (:ids)")
+                    .setParameter("ids", ids).executeUpdate();
+            long deleted = session
+                    .createQuery(
+                            "delete from Purchase p where p.id in (:ids)")
+                    .setParameter("ids", ids).executeUpdate();
+            logger.info("Purged {} purchases older than {}", deleted, cutoff);
+            return deleted;
+        });
+        return result != null ? result : 0L;
+    }
+
     @SuppressWarnings("null")
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

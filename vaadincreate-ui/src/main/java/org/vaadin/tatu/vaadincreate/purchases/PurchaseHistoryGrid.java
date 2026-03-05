@@ -259,6 +259,30 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
     }
 
     /**
+     * Applies or removes the old-purchase row style. Rows whose
+     * {@code createdAt} is before {@code cutoff} receive the CSS class
+     * {@link VaadinCreateTheme#PURCHASE_OLD}. Pass {@code null} to clear the
+     * style generator (no rows highlighted).
+     *
+     * @param cutoff
+     *            the exclusive upper-bound instant; {@code null} clears
+     *            highlighting
+     */
+    @SuppressWarnings("deprecation")
+    public void setOldPurchaseHighlight(@Nullable Instant cutoff) {
+        if (cutoff == null) {
+            grid.setStyleGenerator(p -> null);
+        } else {
+            grid.setStyleGenerator(p -> {
+                Instant createdAt = p.getCreatedAt();
+                return createdAt != null && createdAt.isBefore(cutoff)
+                        ? VaadinCreateTheme.PURCHASE_OLD
+                        : null;
+            });
+        }
+    }
+
+    /**
      * Refreshes the grid data.
      */
     public void refresh() {

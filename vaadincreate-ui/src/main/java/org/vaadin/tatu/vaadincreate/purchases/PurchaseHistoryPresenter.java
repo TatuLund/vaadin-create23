@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.purchases;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -9,6 +10,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
@@ -76,6 +78,39 @@ public class PurchaseHistoryPresenter
         Objects.requireNonNull(mode, "Mode must not be null");
         Objects.requireNonNull(currentUser, "Current user must not be null");
         return getPurchaseService().countPurchases(mode, currentUser);
+    }
+
+    /**
+     * Counts purchases whose {@code createdAt} is strictly before the given
+     * cutoff instant.
+     *
+     * @param cutoff
+     *            the exclusive upper bound; must not be null
+     * @return number of purgeable purchases
+     */
+    public long countPurchasesOlderThan(Instant cutoff) {
+        Objects.requireNonNull(cutoff, "Cutoff must not be null");
+        return getPurchaseService().countPurchasesOlderThan(cutoff);
+    }
+
+    /**
+     * Purges all purchases older than the given cutoff. Asserts that the
+     * current user has {@code ADMIN} role as a defense-in-depth check.
+     *
+     * @param cutoff
+     *            the exclusive upper bound; must not be null
+     * @return number of purchases deleted
+     * @throws IllegalStateException
+     *             if the current user does not have the ADMIN role
+     */
+    public long purgePurchases(Instant cutoff) {
+        Objects.requireNonNull(cutoff, "Cutoff must not be null");
+        AccessControl.get().assertAdmin();
+        logger.info("Admin initiating purge of purchases older than {}",
+                cutoff);
+        long purged = getPurchaseService().purgePurchasesOlderThan(cutoff);
+        logger.info("Purged {} purchases older than {}", purged, cutoff);
+        return purged;
     }
 
     /**

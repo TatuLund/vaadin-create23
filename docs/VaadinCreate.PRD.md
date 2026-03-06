@@ -749,6 +749,46 @@ Behavioral requirements validated by tests:
 - The top-products chart shall contain at least one data series with positive quantities.
 - The monthly totals chart shall contain 12 x-axis categories (one per month).
 
+### 18.5 Purchase history retention purge (admin)
+
+The Purchases history tab shall support an admin-only data-retention purge flow for old purchase records.
+
+#### 18.5.1 Retention definition and admin history behavior
+
+- A purchase is considered purgeable if:
+  - `createdAt < (server now - 24 months)`
+- When an `ADMIN` opens the history tab:
+  - If purgeable purchases exist:
+    - A notification shall be shown indicating old purchases exist.
+    - Purgeable rows shall be highlighted using a theme style name (e.g., `purchase-old`) applied via grid row style generator.
+    - The view shall scroll to the first purgeable purchase.
+    - A `Purge` action shall be visible.
+  - If no purgeable purchases exist:
+    - No old-purchases notification is shown.
+    - No special row highlighting is applied.
+    - The `Purge` action is hidden.
+
+#### 18.5.2 Purge action, authorization, and backend contract
+
+- Clicking `Purge` shall open a confirmation dialog that explains:
+  - Purchases older than 24 months will be permanently deleted.
+  - The action cannot be undone.
+- The purge confirm action shall use disable-on-click behavior.
+- If canceled, no data changes are made.
+- If confirmed:
+  - The system shall delete only purchases older than the cutoff.
+  - A success notification shall show how many purchases were deleted.
+  - The history grid shall refresh and old-purchase detection shall be re-evaluated.
+  - If none remain, row highlighting and the purge action shall be removed.
+- Purge logic shall be executed through presenter/service logic (not view-local business logic) with a presenter-side admin authorization assertion.
+- Backend APIs shall provide support equivalent to:
+  - `long countPurchasesOlderThan(Instant cutoff)`
+  - `long purgePurchasesOlderThan(Instant cutoff)`
+- Purge execution constraints:
+  - Runs in a single transaction.
+  - Deletes purchase rows and related purchase lines according to cascade/orphan rules.
+  - Must not delete or modify referenced `User` or `Product` master data.
+
 
 ---
 

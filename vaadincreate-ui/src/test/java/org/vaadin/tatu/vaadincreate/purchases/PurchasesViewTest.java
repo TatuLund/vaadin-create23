@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.text.NumberFormat;
 
+import javax.persistence.OptimisticLockException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -18,12 +20,13 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
-import org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
+import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.common.CustomChart;
 import org.vaadin.tatu.vaadincreate.common.EuroConverter;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
+import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.purchases.PurchaseHistoryGrid.ToggleButton;
 
 import com.vaadin.addon.charts.model.DataSeries;
@@ -733,5 +736,70 @@ public class PurchasesViewTest extends AbstractUITest {
                 purgeButton.isEnabled());
 
         SerializationDebugUtil.assertSerializable(view);
+    }
+
+    @Test
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void approving_purchase_when_optimistic_lock_conflict_shows_conflict_notification()
+            throws Exception {
+        // GIVEN
+        switchToUser("User5", "user5");
+
+        view = navigate(
+                PurchasesView.VIEW_NAME + "/"
+                        + PurchasesApprovalsView.VIEW_NAME,
+                PurchasesView.class);
+
+        var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
+                .id("purchase-approvals-grid");
+        assertNotNull("Approvals grid should be present", approvalsGrid);
+        assertTrue("There must be at least one pending purchase",
+                test(approvalsGrid).size() > 0);
+
+        // Replace presenter with deterministic failing stub so we hit the
+        // condition reliably
+        var approvalsView = $(PurchasesApprovalsView.class).first();
+        swapApprovalsPresenter(approvalsView,
+                new PurchasesApprovalsPresenter() {
+                    @Override
+                    public ApproveResult approve(Integer purchaseId,
+                            User currentUser,
+                            String decisionCommentOrNull) {
+                        throw new RuntimeException(
+                                new OptimisticLockException(
+                                        "simulated conflict"));
+                    }
+                });
+
+        // WHEN: click approve and confirm in decision window
+        var approveButton = getApproveButton(approvalsGrid);
+        test(approveButton).click();
+
+        var decisionWindow = $(Window.class)
+                .id(DecisionWindow.DECISION_WINDOW_ID);
+        assertNotNull("Decision window should be open", decisionWindow);
+
+        test($(decisionWindow, Button.class)
+                .id(DecisionWindow.CONFIRM_BUTTON_ID))
+                .click();
+
+        // THEN: conflict warning is shown (instead of global technical error
+        // flow)
+        var expected = approvalsView
+                .getTranslation(I18n.Storefront.APPROVE_CONFLICT);
+        boolean hasConflictWarning = $(Notification.class).stream()
+                .map(Notification::getCaption)
+                .anyMatch(expected::equals);
+
+        assertTrue("Expected optimistic lock conflict notification",
+                hasConflictWarning);
+    }
+
+    private static void swapApprovalsPresenter(
+            PurchasesApprovalsView approvalsView,
+            PurchasesApprovalsPresenter replacement) throws Exception {
+        var field = PurchasesApprovalsView.class.getDeclaredField("presenter");
+        field.setAccessible(true);
+        field.set(approvalsView, replacement);
     }
 }

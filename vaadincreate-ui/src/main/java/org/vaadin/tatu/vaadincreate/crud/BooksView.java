@@ -440,12 +440,15 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         Notification.show(message, Type.TRAY_NOTIFICATION);
     }
 
-    public void showDeleteBlocked(@Nullable String book) {
-        if (book != null) {
-            showError(getTranslation(I18n.Books.DELETE_BLOCKED, book));
-        } else {
-            showError(getTranslation(I18n.Books.DELETE_BLOCKED_GENERIC));
-        }
+    /**
+     * Shows an error notification indicating that the deletion of a book is
+     * blocked due to it being in use.
+     * 
+     * @param book
+     *            the name of the book that cannot be deleted
+     */
+    public void showDeleteBlocked(String book) {
+        showError(getTranslation(I18n.Books.DELETE_BLOCKED, book));
     }
 
     /**

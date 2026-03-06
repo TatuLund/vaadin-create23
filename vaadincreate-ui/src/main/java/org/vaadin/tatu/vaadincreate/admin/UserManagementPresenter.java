@@ -121,7 +121,7 @@ public class UserManagementPresenter implements Serializable {
      * @throws IllegalStateException
      *             if the current user is not an admin
      */
-    public void saveUser(@Nullable User user, @Nullable User deputyOrNull) {
+    public void saveUser(User user, @Nullable User deputyOrNull) {
         accessControl.assertAdmin();
         try {
             var updatedUser = getService().updateUser(user, deputyOrNull);
@@ -130,9 +130,7 @@ public class UserManagementPresenter implements Serializable {
             getEventBus().post(new UserUpdatedEvent(id));
             view.showUserUpdated();
             requestUpdateUsers();
-            logger.info("User {}/'{}' saved.",
-                    user != null ? user.getId() : null,
-                    user != null ? user.getName() : null);
+            logger.info("User {}/'{}' saved.", user.getId(), user.getName());
         } catch (DeputyRequiredException e) {
             // Backend needs a deputy – check if any eligible deputies exist.
             assert user != null : "User must not be null";

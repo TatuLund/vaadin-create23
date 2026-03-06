@@ -197,6 +197,7 @@ public class UserManagementView extends VerticalLayout
         removeStyleName(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES);
     }
 
+    @SuppressWarnings("java:S2589")
     private void handleSave() {
         try {
             // Commit the form to the user object

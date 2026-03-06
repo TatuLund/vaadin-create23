@@ -1,5 +1,7 @@
 package org.vaadin.tatu.vaadincreate.purchases;
 
+import java.util.Objects;
+
 import javax.persistence.OptimisticLockException;
 
 import org.jspecify.annotations.NullMarked;
@@ -104,7 +106,9 @@ public class PurchasesApprovalsView extends VerticalLayout
         if (isApprove) {
             handleApprove(purchaseId, currentUser, comment);
         } else {
-            handleReject(purchaseId, currentUser, comment);
+            handleReject(purchaseId, currentUser,
+                    Objects.requireNonNull(comment,
+                            "Rejection reason must not be null"));
         }
     }
 
@@ -138,12 +142,7 @@ public class PurchasesApprovalsView extends VerticalLayout
     }
 
     private void handleReject(Integer purchaseId, User currentUser,
-            @Nullable String reason) {
-        if (reason == null || reason.isBlank()) {
-            Notification.show(getTranslation(I18n.Storefront.REASON_REQUIRED),
-                    Type.WARNING_MESSAGE);
-            return;
-        }
+            String reason) {
         var purchase = presenter.reject(purchaseId, currentUser, reason);
         Telemetry.saveItem(purchase);
         Notification.show(

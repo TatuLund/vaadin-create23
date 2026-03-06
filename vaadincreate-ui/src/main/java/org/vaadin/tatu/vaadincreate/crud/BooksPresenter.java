@@ -329,17 +329,16 @@ public class BooksPresenter implements Serializable, EventBusListener {
             view.removeProduct(product);
             view.clearSelection();
             view.setNewProductEnabled(true);
+            getEventBus().post(new BooksChangedEvent(id,
+                    BooksChangedEvent.BookChange.DELETE));
         } catch (EntityInUseException e) {
             logger.info("Delete blocked for product {}: {}", id,
                     e.getMessage());
             view.showDeleteBlocked(product.getProductName());
-            return;
         } finally {
             unlockBook();
         }
         view.setFragmentParameter("");
-        getEventBus().post(
-                new BooksChangedEvent(id, BooksChangedEvent.BookChange.DELETE));
     }
 
     /**
@@ -461,8 +460,8 @@ public class BooksPresenter implements Serializable, EventBusListener {
     @Override
     public void eventFired(AbstractEvent event) {
         switch (event) {
-        case LockingEvent lockingEvent ->
-            view.refreshProductAsync(lockingEvent.id());
+        case LockingEvent lockingEvent -> view
+                .refreshProductAsync(lockingEvent.id());
         case BooksChangedEvent(Integer productId, BookChange change) -> {
             if (change != BookChange.SAVE) {
                 return;

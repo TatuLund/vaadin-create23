@@ -615,15 +615,14 @@ public class PurchasesViewTest extends AbstractUITest {
         var purgeButton = $(Button.class)
                 .id(PurchasesHistoryView.PURGE_BUTTON_ID);
         assertNotNull("Purge button should be present", purgeButton);
-        assertTrue("Purge button should be visible when old purchases exist",
-                purgeButton.isVisible());
+        assertTrue("Purge button should be enabled when old purchases exist",
+                purgeButton.isEnabled());
 
         // The warning notification about old purchases must be present
         var notifications = $(Notification.class).stream()
-                .map(n -> n.getCaption()).filter(c -> c != null)
-                .toList();
-        boolean hasOldPurchasesNotification = notifications.stream().anyMatch(
-                c -> c.contains("older than 24 months")
+                .map(n -> n.getCaption()).filter(c -> c != null).toList();
+        boolean hasOldPurchasesNotification = notifications.stream()
+                .anyMatch(c -> c.contains("older than 24 months")
                         || c.contains("purchases older"));
         assertTrue(
                 "Expected warning notification about old purchases, but got: "
@@ -645,7 +644,7 @@ public class PurchasesViewTest extends AbstractUITest {
 
         var purgeButton = $(Button.class)
                 .id(PurchasesHistoryView.PURGE_BUTTON_ID);
-        assertTrue("Purge button should be visible", purgeButton.isVisible());
+        assertTrue("Purge button should be enabled", purgeButton.isEnabled());
 
         var historyGrid = (Grid<Object>) $(Grid.class)
                 .id("purchase-history-grid");
@@ -673,9 +672,9 @@ public class PurchasesViewTest extends AbstractUITest {
         assertEquals("Grid count should not change after cancel", countBefore,
                 countAfter);
 
-        // THEN: purge button is still visible (old purchases still exist)
-        assertTrue("Purge button should still be visible after cancel",
-                purgeButton.isVisible());
+        // THEN: purge button is still enabled (old purchases still exist)
+        assertTrue("Purge button should still be enabled after cancel",
+                purgeButton.isEnabled());
 
         SerializationDebugUtil.assertSerializable(view);
     }
@@ -692,8 +691,8 @@ public class PurchasesViewTest extends AbstractUITest {
 
         var purgeButton = $(Button.class)
                 .id(PurchasesHistoryView.PURGE_BUTTON_ID);
-        assertTrue("Purge button should be visible when old purchases exist",
-                purgeButton.isVisible());
+        assertTrue("Purge button should be enabled when old purchases exist",
+                purgeButton.isEnabled());
 
         var historyGrid = (Grid<Object>) $(Grid.class)
                 .id("purchase-history-grid");
@@ -728,10 +727,10 @@ public class PurchasesViewTest extends AbstractUITest {
         assertTrue("Grid should have fewer rows after purging old purchases",
                 countAfter < countBefore);
 
-        // THEN: Purge button is now hidden (no more old purchases)
+        // THEN: Purge button is now disabled (no more old purchases)
         assertFalse(
-                "Purge button should be hidden after all old purchases are removed",
-                purgeButton.isVisible());
+                "Purge button should be disabled after all old purchases are removed",
+                purgeButton.isEnabled());
 
         SerializationDebugUtil.assertSerializable(view);
     }

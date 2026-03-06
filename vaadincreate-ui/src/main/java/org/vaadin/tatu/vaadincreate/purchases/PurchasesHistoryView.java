@@ -49,8 +49,7 @@ public class PurchasesHistoryView extends VerticalLayout
         setMargin(false);
         presenter = new PurchaseHistoryPresenter();
         historyGrid = new PurchaseHistoryGrid(presenter,
-                PurchaseHistoryMode.ALL,
-                Utils.getCurrentUserOrThrow());
+                PurchaseHistoryMode.ALL, Utils.getCurrentUserOrThrow());
         purgeButton = buildPurgeButton();
 
         var toolbar = new HorizontalLayout(purgeButton);
@@ -83,15 +82,14 @@ public class PurchasesHistoryView extends VerticalLayout
         Instant cutoff = retentionCutoff();
         purgeCount = presenter.countPurchasesOlderThan(cutoff);
         if (purgeCount > 0) {
-            Notification.show(
-                    getTranslation(
-                            I18n.Storefront.PURGE_OLD_PURCHASES_NOTIFICATION,
-                            RETENTION_MONTHS),
-                    Type.WARNING_MESSAGE);
-            purgeButton.setVisible(true);
+            Notification.show(getTranslation(
+                    I18n.Storefront.PURGE_OLD_PURCHASES_NOTIFICATION,
+                    RETENTION_MONTHS), Type.WARNING_MESSAGE);
+            purgeButton.setEnabled(true);
             historyGrid.setOldPurchaseHighlight(cutoff);
+            historyGrid.scrollToFromBottom((int) (purgeCount - 1));
         } else {
-            purgeButton.setVisible(false);
+            purgeButton.setEnabled(false);
             historyGrid.setOldPurchaseHighlight(null);
         }
     }
@@ -101,7 +99,8 @@ public class PurchasesHistoryView extends VerticalLayout
                 VaadinIcons.TRASH);
         button.setId(PURGE_BUTTON_ID);
         button.addStyleName(ValoTheme.BUTTON_DANGER);
-        button.setVisible(false);
+        button.setEnabled(false);
+        button.setDisableOnClick(true);
         button.addClickListener(e -> openPurgeConfirmDialog());
         return button;
     }
@@ -115,16 +114,15 @@ public class PurchasesHistoryView extends VerticalLayout
         dialog.setConfirmText(getTranslation(I18n.Storefront.PURGE));
         dialog.setCancelText(getTranslation(I18n.CANCEL));
         dialog.addConfirmedListener(e -> executePurge());
+        dialog.addCancelledListener(e -> purgeButton.setEnabled(true));
         dialog.open();
     }
 
     private void executePurge() {
         Instant cutoff = retentionCutoff();
         long purged = presenter.purgePurchases(cutoff);
-        Notification.show(
-                getTranslation(I18n.Storefront.PURGE_SUCCESS, purged,
-                        RETENTION_MONTHS),
-                Type.HUMANIZED_MESSAGE);
+        Notification.show(getTranslation(I18n.Storefront.PURGE_SUCCESS, purged,
+                RETENTION_MONTHS), Type.HUMANIZED_MESSAGE);
         historyGrid.refresh();
         checkRetentionPolicy();
     }

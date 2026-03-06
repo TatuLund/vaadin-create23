@@ -27,6 +27,7 @@ import com.vaadin.data.provider.DataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.SerializableFunction;
 import com.vaadin.shared.ui.ContentMode;
+import com.vaadin.shared.ui.grid.ScrollDestination;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
@@ -180,6 +181,20 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
                 }, query -> (int) presenter.countPurchases(mode, currentUser));
 
         grid.setDataProvider(dataProvider);
+    }
+
+    /**
+     * Scrolls the grid to the given index from the bottom.
+     *
+     * @param index
+     *            integer index to scroll to from the bottom
+     */
+    @SuppressWarnings("java:S4274")
+    public void scrollToFromBottom(int index) {
+        var targetIndex = grid.getDataCommunicator().getDataProviderSize()
+                - index;
+        assert targetIndex >= 0 : "Target index must be non-negative";
+        grid.scrollTo(targetIndex, ScrollDestination.START);
     }
 
     private void configureDetailsGenerator() {

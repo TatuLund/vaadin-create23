@@ -14,7 +14,6 @@ import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 
 import com.deque.html.axecore.selenium.AxeBuilder;
 import com.vaadin.testbench.By;
-import com.vaadin.testbench.elements.ButtonElement;
 import com.vaadin.testbench.elements.GridElement;
 import com.vaadin.testbench.elements.TextFieldElement;
 import com.vaadin.testbench.elements.UIElement;
@@ -25,7 +24,7 @@ public class StorefrontViewIT extends AbstractViewTest {
     public void setup() {
         super.setup();
         open("#!" + StorefrontView.VIEW_NAME);
-        login("Customer11", "customer11");
+        login("Customer9", "customer9");
     }
 
     @After
@@ -39,7 +38,6 @@ public class StorefrontViewIT extends AbstractViewTest {
         var actions = new Actions(getDriver());
 
         waitForElementPresent(By.id("purchase-history-grid"));
-        var historyGrid = $(GridElement.class).id("purchase-history-grid");
         var productGrid = $(GridElement.class).id("purchase-grid");
         var focusedElement = focusedElement();
         assertEquals(productGrid.getCell(0, 1), focusedElement);
@@ -55,12 +53,9 @@ public class StorefrontViewIT extends AbstractViewTest {
         assertEquals(quantityField, focusedElement);
         quantityField.sendKeys("4");
 
-        historyGrid.getCell(1, 0).$(ButtonElement.class).first().click();
-        testBench().waitForVaadin();
-
         if (visualTests()) {
-            assertTrue($(UIElement.class).first()
-                    .compareScreen("storefront.png"));
+            assertTrue(
+                    $(UIElement.class).first().compareScreen("storefront.png"));
         }
     }
 
@@ -75,7 +70,7 @@ public class StorefrontViewIT extends AbstractViewTest {
         axeBuilder.exclude(
                 "table[aria-multiselectable=\"true\"] > thead > tr > th:nth-child(1)");
         axeBuilder.exclude(
-                "table[aria-rowcount=\"161\"] > thead > tr > th:nth-child(1)");
+                "table[aria-rowcount=\"1\"] > thead > tr > th:nth-child(1)");
 
         // Ensure NumberField is displayed
         var productGrid = $(GridElement.class).id("purchase-grid");

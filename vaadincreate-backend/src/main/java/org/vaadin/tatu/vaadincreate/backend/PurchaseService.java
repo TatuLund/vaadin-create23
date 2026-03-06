@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.backend;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 import org.jspecify.annotations.NonNull;
@@ -243,6 +244,29 @@ public interface PurchaseService {
      * @return list of monthly totals ordered by month ascending
      */
     List<@NonNull MonthlyPurchaseStat> getMonthlyTotals(int months);
+
+    /**
+     * Counts purchases whose {@code createdAt} is strictly before the given
+     * cutoff instant.
+     *
+     * @param cutoff
+     *            the exclusive upper bound for {@code createdAt}; must not be
+     *            null
+     * @return number of purgeable purchases
+     */
+    long countPurchasesOlderThan(Instant cutoff);
+
+    /**
+     * Deletes all purchases (and their lines) whose {@code createdAt} is
+     * strictly before the given cutoff instant in a single transaction.
+     * Referenced {@code User} and {@code Product} master data are not modified.
+     *
+     * @param cutoff
+     *            the exclusive upper bound for {@code createdAt}; must not be
+     *            null
+     * @return number of purchases deleted
+     */
+    long purgePurchasesOlderThan(Instant cutoff);
 
     /**
      * Gets the singleton instance of the PurchaseService.

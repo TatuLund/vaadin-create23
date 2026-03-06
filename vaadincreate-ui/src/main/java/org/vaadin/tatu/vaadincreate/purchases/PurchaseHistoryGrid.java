@@ -27,6 +27,7 @@ import com.vaadin.data.provider.DataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.SerializableFunction;
 import com.vaadin.shared.ui.ContentMode;
+import com.vaadin.shared.ui.grid.ScrollDestination;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
@@ -182,6 +183,20 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
         grid.setDataProvider(dataProvider);
     }
 
+    /**
+     * Scrolls the grid to the given index from the bottom.
+     *
+     * @param index
+     *            integer index to scroll to from the bottom
+     */
+    @SuppressWarnings("java:S4274")
+    public void scrollToFromBottom(int index) {
+        var targetIndex = grid.getDataCommunicator().getDataProviderSize()
+                - index;
+        assert targetIndex >= 0 : "Target index must be non-negative";
+        grid.scrollTo(targetIndex, ScrollDestination.START);
+    }
+
     private void configureDetailsGenerator() {
         grid.setDetailsGenerator(purchase -> {
             Html.Div htmlDiv;
@@ -256,6 +271,30 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
         }
 
         return container;
+    }
+
+    /**
+     * Applies or removes the old-purchase row style. Rows whose
+     * {@code createdAt} is before {@code cutoff} receive the CSS class
+     * {@link VaadinCreateTheme#PURCHASE_OLD}. Pass {@code null} to clear the
+     * style generator (no rows highlighted).
+     *
+     * @param cutoff
+     *            the exclusive upper-bound instant; {@code null} clears
+     *            highlighting
+     */
+    @SuppressWarnings("deprecation")
+    public void setOldPurchaseHighlight(@Nullable Instant cutoff) {
+        if (cutoff == null) {
+            grid.setStyleGenerator(p -> null);
+        } else {
+            grid.setStyleGenerator(p -> {
+                Instant createdAt = p.getCreatedAt();
+                return createdAt != null && createdAt.isBefore(cutoff)
+                        ? VaadinCreateTheme.PURCHASE_OLD
+                        : null;
+            });
+        }
     }
 
     /**

@@ -862,18 +862,20 @@ Purchase history must not be retained forever. Admins need a simple way to ident
        - Highlighting uses a different background color for the row.
        - Implemented via `Grid.setStyleGenerator` / `setStyleNameGenerator` (row style name, e.g. `purchase-old`).
        - Styling must follow the existing theme conventions (do not hard-code new colors inline).
+     - Scroll automatically to first purchase to be purged
    - If there are no purchases older than 24 months:
      - No notification is shown.
      - No special row styling is applied.
 
-2. Purge button visibility:
+2. Purge button enabled state:
    - If (and only if) purchases older than 24 months exist, a `Purge` button is visible in the view.
-   - If no purgeable purchases exist, the `Purge` button is hidden.
+   - If no purgeable purchases exist, the `Purge` button is disabled.
 
 3. Purge action confirmation:
    - Clicking `Purge` opens a confirmation dialog (`ConfirmDialog` or equivalent) explaining:
      - Purchases older than 24 months will be permanently deleted.
      - The action cannot be undone.
+     - Use disableOnClick
    - If admin cancels: no changes are made.
    - If admin confirms: the purge is executed.
 

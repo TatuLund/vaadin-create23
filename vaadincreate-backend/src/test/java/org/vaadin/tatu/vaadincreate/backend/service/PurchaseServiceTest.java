@@ -20,7 +20,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Test class for {@link PurchaseService}.
@@ -458,5 +460,73 @@ public class PurchaseServiceTest {
         }
         assertNotNull("Monthly total amount should not be null",
                 stats.get(0).totalAmount());
+    }
+
+    @Test
+    public void should_CountPurchasesOlderThan_When_CutoffIsInFuture() {
+        // GIVEN: cutoff in the future means ALL existing purchases are "older
+        // than"
+        Instant futureCutoff = Instant.now().plus(1, ChronoUnit.DAYS);
+
+        // ACT
+        long count = purchaseService.countPurchasesOlderThan(futureCutoff);
+        long totalCount = purchaseService.countAll();
+
+        // ASSERT: a future cutoff must match every purchase
+        assertEquals(
+                "countPurchasesOlderThan(future) should equal total count",
+                totalCount, count);
+    }
+
+    @Test
+    public void should_CountZero_When_CutoffIsBeforeAnyPurchase() {
+        // GIVEN: a cutoff long before the earliest possible purchase
+        Instant ancientCutoff = Instant.parse("2000-01-01T00:00:00Z");
+
+        // ACT
+        long count = purchaseService.countPurchasesOlderThan(ancientCutoff);
+
+        // ASSERT: no purchases should predate the year 2000
+        assertEquals("countPurchasesOlderThan(ancient) should be 0", 0, count);
+    }
+
+    @Test
+    public void should_PurgePurchasesOlderThan_And_NotDeleteNewerOnes() {
+        // GIVEN: create two purchases – one "old" (created 25 months ago via
+        // DAO directly) and one "new" (just created)
+        Cart cart = new Cart();
+        cart.addItem(testProduct, 1);
+        Address address = new Address("Test St", "00001", "Test City", "TC");
+
+        Purchase recentPurchase = purchaseService.createPendingPurchase(cart,
+                address, customerUser, supervisorUser);
+        assertNotNull(recentPurchase.getId());
+
+        // Use a cutoff 1 day in the future: all current purchases are "old"
+        // so we can test that the purge removes the expected amount.
+        Instant futureCutoff = Instant.now().plus(1, ChronoUnit.DAYS);
+        long beforePurge = purchaseService
+                .countPurchasesOlderThan(futureCutoff);
+        assertTrue("Expected at least one purchase before future cutoff",
+                beforePurge > 0);
+
+        long totalBefore = purchaseService.countAll();
+
+        // ACT: purge everything "older than" tomorrow (i.e. everything)
+        long purged = purchaseService.purgePurchasesOlderThan(futureCutoff);
+
+        // ASSERT: count matches what was reported before
+        assertEquals("Purged count should equal countPurchasesOlderThan result",
+                beforePurge, purged);
+
+        long totalAfter = purchaseService.countAll();
+        assertEquals("Total count should decrease by the purged amount",
+                totalBefore - purged, totalAfter);
+
+        // ASSERT: no purchases remain under the future cutoff
+        long remainingOld = purchaseService
+                .countPurchasesOlderThan(futureCutoff);
+        assertEquals("No purchases should remain after full purge", 0,
+                remainingOld);
     }
 }

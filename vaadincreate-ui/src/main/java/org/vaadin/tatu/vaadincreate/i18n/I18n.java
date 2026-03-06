@@ -276,6 +276,12 @@ public final class I18n {
         public static final String MONTHLY_TOTALS = "monthly-purchases";
         public static final String AMOUNT = "amount";
 
+        public static final String PURGE = "purge";
+        public static final String PURGE_OLD_PURCHASES_NOTIFICATION = "purge-old-purchases-notification";
+        public static final String PURGE_CONFIRM_CAPTION = "purge-confirm-caption";
+        public static final String PURGE_CONFIRM_MESSAGE = "purge-confirm-message";
+        public static final String PURGE_SUCCESS = "purge-success";
+
         private Storefront() {
             // private constructor to hide the implicit public one
         }

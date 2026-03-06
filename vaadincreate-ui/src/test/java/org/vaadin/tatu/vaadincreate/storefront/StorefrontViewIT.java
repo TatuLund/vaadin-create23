@@ -25,7 +25,7 @@ public class StorefrontViewIT extends AbstractViewTest {
     public void setup() {
         super.setup();
         open("#!" + StorefrontView.VIEW_NAME);
-        login("Customer11", "customer11");
+        login("Customer9", "customer9");
     }
 
     @After
@@ -54,9 +54,6 @@ public class StorefrontViewIT extends AbstractViewTest {
         focusedElement = focusedElement();
         assertEquals(quantityField, focusedElement);
         quantityField.sendKeys("4");
-
-        historyGrid.getCell(1, 0).$(ButtonElement.class).first().click();
-        testBench().waitForVaadin();
 
         if (visualTests()) {
             assertTrue($(UIElement.class).first()

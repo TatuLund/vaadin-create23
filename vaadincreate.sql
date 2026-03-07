@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict kK7ebemqBBvS44XCJMNvGkO9Gwn8J0bGc1IpB31SZQtAdNa9pSlWuzGTWpjdpuA
+\restrict cweHgidzyurSJYdXqzeUwOnPguNc77VuHg0jrdRdZaGbNcDjkTqlIBIucxGOiKV
 
 -- Dumped from database version 13.23 (Debian 13.23-1.pgdg13+1)
 -- Dumped by pg_dump version 13.23 (Debian 13.23-1.pgdg13+1)
@@ -18,12 +18,51 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER TABLE IF EXISTS ONLY public.user_supervisor DROP CONSTRAINT IF EXISTS fksgj761i1f2nk22cdj6q5qegiv;
+ALTER TABLE IF EXISTS ONLY public.product_category DROP CONSTRAINT IF EXISTS fkpcmsq096b3sna4u2p9xnxlmgf;
+ALTER TABLE IF EXISTS ONLY public.user_supervisor DROP CONSTRAINT IF EXISTS fko2hem2api9g5kq9xoo9fs8u2r;
+ALTER TABLE IF EXISTS ONLY public.purchase DROP CONSTRAINT IF EXISTS fkmusayi051hmyr9n7xuc4ds94i;
+ALTER TABLE IF EXISTS ONLY public.draft_category DROP CONSTRAINT IF EXISTS fkjlgxjdy09fd32qlewurq6hbr8;
+ALTER TABLE IF EXISTS ONLY public.product_category DROP CONSTRAINT IF EXISTS fkja2hwfcn4uqknuehnveejoo0v;
+ALTER TABLE IF EXISTS ONLY public.purchase DROP CONSTRAINT IF EXISTS fkgs57qse1tn06weqpd57lo1v6g;
+ALTER TABLE IF EXISTS ONLY public.purchase_line DROP CONSTRAINT IF EXISTS fkf13kjx8dac73h8k13urbl613i;
+ALTER TABLE IF EXISTS ONLY public.draft_category DROP CONSTRAINT IF EXISTS fk4kqo4bt43hu95a1eps91ycsrc;
+ALTER TABLE IF EXISTS ONLY public.purchase_line DROP CONSTRAINT IF EXISTS fk1fg92nu4upappgba6vm6mxp0d;
+ALTER TABLE IF EXISTS ONLY public.draft DROP CONSTRAINT IF EXISTS fk182ehu5bem243kfbbg9m8mjf3;
+DROP INDEX IF EXISTS public.idx_purchase_status_decided_at;
+DROP INDEX IF EXISTS public.idx_purchase_requester_created_at;
+DROP INDEX IF EXISTS public.idx_purchase_line_purchase_id;
+DROP INDEX IF EXISTS public.idx_purchase_created_at;
+DROP INDEX IF EXISTS public.idx_purchase_approver_status_created_at;
+ALTER TABLE IF EXISTS ONLY public.user_supervisor DROP CONSTRAINT IF EXISTS user_supervisor_pkey;
+ALTER TABLE IF EXISTS ONLY public.category DROP CONSTRAINT IF EXISTS uq_category_category_name;
+ALTER TABLE IF EXISTS ONLY public.application_user DROP CONSTRAINT IF EXISTS uq_application_user_user_name;
+ALTER TABLE IF EXISTS ONLY public.purchase DROP CONSTRAINT IF EXISTS purchase_pkey;
+ALTER TABLE IF EXISTS ONLY public.purchase_line DROP CONSTRAINT IF EXISTS purchase_line_pkey;
+ALTER TABLE IF EXISTS ONLY public.product DROP CONSTRAINT IF EXISTS product_pkey;
+ALTER TABLE IF EXISTS ONLY public.product_category DROP CONSTRAINT IF EXISTS product_category_pkey;
+ALTER TABLE IF EXISTS ONLY public.message DROP CONSTRAINT IF EXISTS message_pkey;
+ALTER TABLE IF EXISTS ONLY public.draft DROP CONSTRAINT IF EXISTS draft_pkey;
+ALTER TABLE IF EXISTS ONLY public.draft_category DROP CONSTRAINT IF EXISTS draft_category_pkey;
+ALTER TABLE IF EXISTS ONLY public.category DROP CONSTRAINT IF EXISTS category_pkey;
+ALTER TABLE IF EXISTS ONLY public.application_user DROP CONSTRAINT IF EXISTS application_user_pkey;
+DROP TABLE IF EXISTS public.user_supervisor;
+DROP TABLE IF EXISTS public.purchase_line;
+DROP TABLE IF EXISTS public.purchase;
+DROP TABLE IF EXISTS public.product_category;
+DROP TABLE IF EXISTS public.product;
+DROP TABLE IF EXISTS public.message;
+DROP SEQUENCE IF EXISTS public.idgenerator;
+DROP TABLE IF EXISTS public.draft_category;
+DROP TABLE IF EXISTS public.draft;
+DROP TABLE IF EXISTS public.category;
+DROP TABLE IF EXISTS public.application_user;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- Name: application_user; Type: TABLE; Schema: public; Owner: creator
+-- Name: application_user; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.application_user (
@@ -37,10 +76,8 @@ CREATE TABLE public.application_user (
 );
 
 
-ALTER TABLE public.application_user OWNER TO creator;
-
 --
--- Name: category; Type: TABLE; Schema: public; Owner: creator
+-- Name: category; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.category (
@@ -50,10 +87,8 @@ CREATE TABLE public.category (
 );
 
 
-ALTER TABLE public.category OWNER TO creator;
-
 --
--- Name: draft; Type: TABLE; Schema: public; Owner: creator
+-- Name: draft; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.draft (
@@ -68,10 +103,8 @@ CREATE TABLE public.draft (
 );
 
 
-ALTER TABLE public.draft OWNER TO creator;
-
 --
--- Name: draft_category; Type: TABLE; Schema: public; Owner: creator
+-- Name: draft_category; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.draft_category (
@@ -80,10 +113,8 @@ CREATE TABLE public.draft_category (
 );
 
 
-ALTER TABLE public.draft_category OWNER TO creator;
-
 --
--- Name: idgenerator; Type: SEQUENCE; Schema: public; Owner: creator
+-- Name: idgenerator; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.idgenerator
@@ -94,10 +125,8 @@ CREATE SEQUENCE public.idgenerator
     CACHE 1;
 
 
-ALTER TABLE public.idgenerator OWNER TO creator;
-
 --
--- Name: message; Type: TABLE; Schema: public; Owner: creator
+-- Name: message; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.message (
@@ -108,10 +137,8 @@ CREATE TABLE public.message (
 );
 
 
-ALTER TABLE public.message OWNER TO creator;
-
 --
--- Name: product; Type: TABLE; Schema: public; Owner: creator
+-- Name: product; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.product (
@@ -126,10 +153,8 @@ CREATE TABLE public.product (
 );
 
 
-ALTER TABLE public.product OWNER TO creator;
-
 --
--- Name: product_category; Type: TABLE; Schema: public; Owner: creator
+-- Name: product_category; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.product_category (
@@ -138,10 +163,8 @@ CREATE TABLE public.product_category (
 );
 
 
-ALTER TABLE public.product_category OWNER TO creator;
-
 --
--- Name: purchase; Type: TABLE; Schema: public; Owner: creator
+-- Name: purchase; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.purchase (
@@ -160,10 +183,8 @@ CREATE TABLE public.purchase (
 );
 
 
-ALTER TABLE public.purchase OWNER TO creator;
-
 --
--- Name: purchase_line; Type: TABLE; Schema: public; Owner: creator
+-- Name: purchase_line; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.purchase_line (
@@ -177,10 +198,8 @@ CREATE TABLE public.purchase_line (
 );
 
 
-ALTER TABLE public.purchase_line OWNER TO creator;
-
 --
--- Name: user_supervisor; Type: TABLE; Schema: public; Owner: creator
+-- Name: user_supervisor; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.user_supervisor (
@@ -191,10 +210,8 @@ CREATE TABLE public.user_supervisor (
 );
 
 
-ALTER TABLE public.user_supervisor OWNER TO creator;
-
 --
--- Data for Name: application_user; Type: TABLE DATA; Schema: public; Owner: creator
+-- Data for Name: application_user; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.application_user (id, version, active, last_status_check, user_name, passwd, role) FROM stdin;
@@ -221,9 +238,7 @@ COPY public.application_user (id, version, active, last_status_check, user_name,
 872	0	t	\N	Customer8	customer8	CUSTOMER
 873	0	t	\N	Customer9	customer9	CUSTOMER
 874	0	t	\N	Customer10	customer10	CUSTOMER
-876	0	t	\N	Customer12	customer12	CUSTOMER
 877	0	t	\N	Customer13	customer13	CUSTOMER
-878	0	t	\N	Customer14	customer14	CUSTOMER
 879	0	t	\N	Customer15	customer15	CUSTOMER
 880	0	t	\N	Customer16	customer16	CUSTOMER
 881	0	t	\N	Customer17	customer17	CUSTOMER
@@ -309,12 +324,15 @@ COPY public.application_user (id, version, active, last_status_check, user_name,
 961	0	t	\N	Customer97	customer97	CUSTOMER
 962	0	t	\N	Customer98	customer98	CUSTOMER
 963	0	t	\N	Customer99	customer99	CUSTOMER
-875	2	t	2026-03-01 11:41:23.166813	Customer11	customer11	CUSTOMER
+5902	0	t	\N	Editor	editor	ADMIN
+878	1	t	2026-03-07 14:53:40.027961	Customer14	customer14	CUSTOMER
+876	1	t	2026-03-07 14:51:47.01469	Customer12	customer12	CUSTOMER
+875	5	t	2026-03-07 14:53:26.599473	Customer11	customer11	CUSTOMER
 \.
 
 
 --
--- Data for Name: category; Type: TABLE DATA; Schema: public; Owner: creator
+-- Data for Name: category; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.category (id, version, category_name) FROM stdin;
@@ -326,11 +344,20 @@ COPY public.category (id, version, category_name) FROM stdin;
 8	0	Cookbooks
 352	0	Children's books
 353	0	Best sellers
+5852	0	Software
+5853	0	Crime
+5854	0	Fantasy
+5855	0	Self help
+5856	0	Architecture
+5857	0	Sports
+5858	0	Biology
+5859	0	Music
+5860	0	Business
 \.
 
 
 --
--- Data for Name: draft; Type: TABLE DATA; Schema: public; Owner: creator
+-- Data for Name: draft; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.draft (id, version, availability, price, product_id, product_name, stock_count, user_id) FROM stdin;
@@ -338,7 +365,7 @@ COPY public.draft (id, version, availability, price, product_id, product_name, s
 
 
 --
--- Data for Name: draft_category; Type: TABLE DATA; Schema: public; Owner: creator
+-- Data for Name: draft_category; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.draft_category (draft_id, category_id) FROM stdin;
@@ -346,7 +373,7 @@ COPY public.draft_category (draft_id, category_id) FROM stdin;
 
 
 --
--- Data for Name: message; Type: TABLE DATA; Schema: public; Owner: creator
+-- Data for Name: message; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.message (id, version, date_stamp, message) FROM stdin;
@@ -357,52 +384,40 @@ COPY public.message (id, version, date_stamp, message) FROM stdin;
 
 
 --
--- Data for Name: product; Type: TABLE DATA; Schema: public; Owner: creator
+-- Data for Name: product; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.product (id, version, availability, price, product_name, stock_count) FROM stdin;
 52	0	COMING	14.70	Beginners guide to ice hockey	0
 53	0	AVAILABLE	27.80	Being awesome at feeling down	378
-54	0	DISCONTINUED	28.40	Learning the basics of designing tree houses	0
 55	0	DISCONTINUED	11.00	The secrets of dummies	0
 56	0	DISCONTINUED	23.70	The cheap way to meditation	0
 57	0	COMING	25.50	Encyclopedia of playing the cello	0
 58	0	COMING	27.70	The cheap way to elephants	0
 59	0	DISCONTINUED	5.00	Surviving gardening	0
-60	0	AVAILABLE	8.60	Becoming one with debugging	6
 61	0	COMING	28.60	The life changer: debugging	0
-62	0	DISCONTINUED	16.50	Becoming one with intergalaxy travel	0
 63	0	COMING	13.70	Encyclopedia of winter bathing	0
 64	0	COMING	29.10	The mother of all references: winter bathing	0
 65	0	COMING	11.00	The secrets of debugging	0
 66	0	AVAILABLE	12.50	The complete visual guide to speaking to a big audience	27
 67	0	AVAILABLE	14.40	The life changer: running barefoot	358
 68	0	AVAILABLE	9.70	The life changer: keeping your wife happy	168
-69	0	AVAILABLE	29.50	The Vaadin way: playing the cello	235
-70	0	AVAILABLE	16.60	The secrets of designing tree houses	187
 71	0	DISCONTINUED	7.10	Book of ice hockey	0
 72	0	AVAILABLE	6.60	Becoming one with keeping your wife happy	102
-73	0	AVAILABLE	14.00	The ultimate guide to children's education	509
 74	0	DISCONTINUED	12.30	Becoming one with intergalaxy travel	0
 75	0	DISCONTINUED	15.70	Book of playing the cello	0
 76	0	COMING	19.10	The secrets of designing tree houses	0
-77	0	COMING	8.50	Encyclopedia of intergalaxy travel	0
 78	0	COMING	25.80	Surviving giant needles	0
 79	0	COMING	7.80	The Vaadin way: Vaadin TreeTable	0
 80	0	DISCONTINUED	8.80	The complete visual guide to creating software	0
-81	0	COMING	6.60	Very much meditation	0
 82	0	COMING	28.20	Encyclopedia of rubber bands	0
 83	0	COMING	13.60	Mastering speaking to a big audience	0
 84	0	DISCONTINUED	10.00	Book of dummies	0
-85	0	AVAILABLE	20.00	For fun and profit:  elephants	50
-86	0	AVAILABLE	27.00	How to fail at elephants	261
 87	0	DISCONTINUED	24.10	The art of computer programming	0
 88	0	COMING	26.20	Very much feeling down	0
 89	0	AVAILABLE	14.80	Being awesome at computer programming	293
 90	0	AVAILABLE	21.60	Avoiding elephants	232
-91	0	DISCONTINUED	20.30	Surviving meditation	0
 92	0	DISCONTINUED	20.50	The cheap way to ice hockey	0
-93	0	COMING	12.10	Encyclopedia of gardening	0
 94	0	COMING	19.10	The art of dummies	0
 95	0	AVAILABLE	7.60	How to fail at home security	349
 96	0	DISCONTINUED	21.70	The mother of all references: creating software	0
@@ -411,54 +426,61 @@ COPY public.product (id, version, availability, price, product_name, stock_count
 99	0	COMING	8.10	The art of gardening	0
 100	0	COMING	19.90	Becoming one with children's education	0
 101	0	COMING	28.90	The cheap way to home security	0
-102	0	AVAILABLE	22.30	Being awesome at giant needles	339
 103	0	COMING	11.20	Book of feeling down	0
 104	0	AVAILABLE	24.90	The ultimate guide to Vaadin TreeTable	0
-105	0	AVAILABLE	21.10	Very much giant needles	426
 106	0	COMING	21.90	Becoming one with speaking to a big audience	0
-107	0	DISCONTINUED	22.70	The cheap way to speaking to a big audience	0
 108	0	DISCONTINUED	19.40	The cheap way to home security	0
-109	0	DISCONTINUED	14.70	Book of running barefoot	0
 110	0	DISCONTINUED	8.90	Surviving computer programming	0
-111	0	DISCONTINUED	27.30	10 important facts about speaking to a big audience	0
 112	0	AVAILABLE	15.40	The ultimate guide to computer programming	468
 113	0	COMING	22.30	For fun and profit:  elephants	0
 114	0	DISCONTINUED	29.80	Learning the basics of elephants	0
 115	0	AVAILABLE	11.20	Surviving computer programming	227
 116	0	DISCONTINUED	7.50	The life changer: rubber bands	0
 117	0	COMING	22.30	The art of giant needles	0
-118	0	AVAILABLE	14.60	The secrets of keeping your wife happy	189
-119	0	COMING	19.40	The secrets of home security	0
 120	0	AVAILABLE	7.20	The art of designing tree houses	518
-121	0	COMING	10.10	10 important facts about Vaadin TreeTable	0
-122	0	AVAILABLE	23.30	Avoiding elephants	316
 123	0	COMING	15.00	The Vaadin way: giant needles	0
 124	0	DISCONTINUED	10.40	10 important facts about designing tree houses	0
 125	0	COMING	9.40	The secrets of speaking to a big audience	0
 126	0	COMING	5.70	The secrets of creating software	0
 127	0	COMING	11.50	Learning the basics of elephants	0
 128	0	COMING	15.90	Being awesome at running barefoot	0
-129	0	DISCONTINUED	7.00	How to fail at playing the cello	0
 130	0	COMING	27.60	The art of meditation	0
 131	0	AVAILABLE	10.00	The Vaadin way: children's education	97
-132	0	DISCONTINUED	23.10	The ultimate guide to elephants	0
 133	0	AVAILABLE	25.60	Encyclopedia of children's education	257
 134	0	DISCONTINUED	11.90	The Vaadin way: living a healthy life	0
-135	0	DISCONTINUED	9.40	Beginners guide to speaking to a big audience	0
 136	0	AVAILABLE	20.30	The ultimate guide to ice hockey	299
 137	0	COMING	15.10	The life changer: home security	0
 138	0	AVAILABLE	8.00	The cheap way to living a healthy life	338
-139	0	DISCONTINUED	9.30	Being awesome at elephants	0
+91	1	DISCONTINUED	20.30	Surviving meditation	0
+60	1	AVAILABLE	8.60	Becoming one with debugging	2
+62	1	AVAILABLE	56.50	Becoming one with intergalaxy travel	5
+109	1	DISCONTINUED	14.70	Book of running barefoot	0
+132	1	AVAILABLE	23.10	The ultimate guide to elephants	11
+69	1	AVAILABLE	29.50	The Vaadin way: playing the cello	234
+129	1	AVAILABLE	7.00	How to fail at playing the guitar	312
+81	1	AVAILABLE	6.60	Very much meditation company	66
+77	2	AVAILABLE	38.50	Encyclopedia of intergalaxy travel	21
+107	2	AVAILABLE	32.70	The cheap way to speaking to a small audience	411
+54	1	AVAILABLE	58.40	Learning the basics of designing super cars	423
+139	1	DISCONTINUED	9.30	Being awesome at high places	0
+122	1	AVAILABLE	23.30	Avoiding elephant herds	316
+85	1	AVAILABLE	20.00	For fun and profit:  elephants	49
+86	1	AVAILABLE	27.00	How to fail at elephants	259
+70	2	AVAILABLE	16.60	The secrets of designing tree houses	186
+73	1	AVAILABLE	14.00	The ultimate guide to children's education	504
+118	1	AVAILABLE	14.60	The secrets of keeping your wife happy	186
+119	2	AVAILABLE	59.40	The secrets of home improvement	76
+102	1	AVAILABLE	22.30	Being awesome at giant needles	338
+121	1	COMING	10.10	10 important facts about Vaadin 8	0
+111	1	DISCONTINUED	27.30	10 important facts about singing to a big audience	0
 140	0	COMING	12.50	The ultimate guide to rubber bands	0
 141	0	COMING	6.30	Surviving playing the cello	0
-142	0	DISCONTINUED	14.50	Avoiding rubber bands	0
 143	0	DISCONTINUED	12.20	Becoming one with winter bathing	0
 144	0	COMING	29.70	Avoiding running barefoot	0
 145	0	AVAILABLE	15.80	Learning the basics of playing the cello	72
 146	0	DISCONTINUED	7.30	Becoming one with feeling down	0
 147	0	AVAILABLE	6.00	Becoming one with elephants	464
 148	0	DISCONTINUED	14.80	Avoiding children's education	0
-149	0	DISCONTINUED	18.30	10 important facts about intergalaxy travel	0
 150	0	COMING	22.60	10 important facts about gardening	0
 151	0	DISCONTINUED	5.30	The art of feeling down	0
 402	0	COMING	14.70	Beginners guide to ice hockey	0
@@ -475,31 +497,22 @@ COPY public.product (id, version, availability, price, product_name, stock_count
 413	0	COMING	13.70	Encyclopedia of winter bathing	0
 414	0	COMING	29.10	The mother of all references: winter bathing	0
 415	0	COMING	11.00	The secrets of debugging	0
-416	0	AVAILABLE	12.50	The complete visual guide to speaking to a big audience	27
 417	0	AVAILABLE	14.40	The life changer: running barefoot	358
 418	0	AVAILABLE	9.70	The life changer: keeping your wife happy	168
 419	0	AVAILABLE	29.50	The Vaadin way: playing the cello	235
 420	0	AVAILABLE	16.60	The secrets of designing tree houses	187
 421	0	DISCONTINUED	7.10	Book of ice hockey	0
-422	0	AVAILABLE	6.60	Becoming one with keeping your wife happy	102
 423	0	AVAILABLE	14.00	The ultimate guide to children's education	509
 424	0	DISCONTINUED	12.30	Becoming one with intergalaxy travel	0
 425	0	DISCONTINUED	15.70	Book of playing the cello	0
-426	0	COMING	19.10	The secrets of designing tree houses	0
 427	0	COMING	8.50	Encyclopedia of intergalaxy travel	0
-428	0	COMING	25.80	Surviving giant needles	0
-429	0	COMING	7.80	The Vaadin way: Vaadin TreeTable	0
-430	0	DISCONTINUED	8.80	The complete visual guide to creating software	0
 431	0	COMING	6.60	Very much meditation	0
 432	0	COMING	28.20	Encyclopedia of rubber bands	0
 433	0	COMING	13.60	Mastering speaking to a big audience	0
 434	0	DISCONTINUED	10.00	Book of dummies	0
 435	0	AVAILABLE	20.00	For fun and profit:  elephants	50
-436	0	AVAILABLE	27.00	How to fail at elephants	261
 437	0	DISCONTINUED	24.10	The art of computer programming	0
-438	0	COMING	26.20	Very much feeling down	0
 439	0	AVAILABLE	14.80	Being awesome at computer programming	293
-440	0	AVAILABLE	21.60	Avoiding elephants	232
 441	0	DISCONTINUED	20.30	Surviving meditation	0
 442	0	DISCONTINUED	20.50	The cheap way to ice hockey	0
 443	0	COMING	12.10	Encyclopedia of gardening	0
@@ -507,44 +520,51 @@ COPY public.product (id, version, availability, price, product_name, stock_count
 445	0	AVAILABLE	7.60	How to fail at home security	349
 446	0	DISCONTINUED	21.70	The mother of all references: creating software	0
 447	0	COMING	29.50	The secrets of children's education	0
-448	0	DISCONTINUED	11.60	The cheap way to elephants	0
 449	0	COMING	8.10	The art of gardening	0
 450	0	COMING	19.90	Becoming one with children's education	0
-451	0	COMING	28.90	The cheap way to home security	0
 452	0	AVAILABLE	22.30	Being awesome at giant needles	339
-453	0	COMING	11.20	Book of feeling down	0
 454	0	AVAILABLE	24.90	The ultimate guide to Vaadin TreeTable	0
 455	0	AVAILABLE	21.10	Very much giant needles	426
-456	0	COMING	21.90	Becoming one with speaking to a big audience	0
 457	0	DISCONTINUED	22.70	The cheap way to speaking to a big audience	0
 458	0	DISCONTINUED	19.40	The cheap way to home security	0
 459	0	DISCONTINUED	14.70	Book of running barefoot	0
-460	0	DISCONTINUED	8.90	Surviving computer programming	0
 461	0	DISCONTINUED	27.30	10 important facts about speaking to a big audience	0
 462	0	AVAILABLE	15.40	The ultimate guide to computer programming	468
-463	0	COMING	22.30	For fun and profit:  elephants	0
 464	0	DISCONTINUED	29.80	Learning the basics of elephants	0
-465	0	AVAILABLE	11.20	Surviving computer programming	227
-466	0	DISCONTINUED	7.50	The life changer: rubber bands	0
 467	0	COMING	22.30	The art of giant needles	0
 468	0	AVAILABLE	14.60	The secrets of keeping your wife happy	189
-469	0	COMING	19.40	The secrets of home security	0
-470	0	AVAILABLE	7.20	The art of designing tree houses	518
-471	0	COMING	10.10	10 important facts about Vaadin TreeTable	0
 472	0	AVAILABLE	23.30	Avoiding elephants	316
 473	0	COMING	15.00	The Vaadin way: giant needles	0
-474	0	DISCONTINUED	10.40	10 important facts about designing tree houses	0
 475	0	COMING	9.40	The secrets of speaking to a big audience	0
-476	0	COMING	5.70	The secrets of creating software	0
 477	0	COMING	11.50	Learning the basics of elephants	0
+416	1	AVAILABLE	12.50	The complete visual guide to speaking to a big audience	23
+476	1	AVAILABLE	5.70	The secrets of creating software	11
+440	1	AVAILABLE	21.60	Avoiding snakes	232
+436	1	AVAILABLE	27.00	How to fail at elephants totally	261
+438	1	COMING	26.20	Very much feeling down again	0
+451	2	AVAILABLE	28.90	The cheap way to cleaning home 	242
+453	1	AVAILABLE	11.20	Book of feeling high	50
+456	1	AVAILABLE	21.90	Becoming one with speaking to a big elephant	32
+469	1	AVAILABLE	19.40	The secrets of home security	312
+465	1	AVAILABLE	11.20	Surviving computer programming	227
+142	1	AVAILABLE	14.50	Avoiding rubber ducks	551
+466	1	AVAILABLE	7.50	The life changer: rubber hands	43
+470	2	AVAILABLE	7.20	The art of designing tree houses	513
+149	1	AVAILABLE	48.30	5 important facts about galactic travel	342
+428	2	AVAILABLE	55.80	Surviving giant pine needles with mice	242
+448	2	AVAILABLE	11.60	The cheap way to Tupperware	43
+463	1	COMING	22.30	For fun and profit:  elephants	0
+422	1	AVAILABLE	6.60	Becoming one with keeping your wife happy	97
+430	2	AVAILABLE	28.80	The complete visual guide to creating software	107
+426	2	AVAILABLE	69.10	The secrets of designing big houses	86
+471	1	COMING	10.10	10 important facts about Vaadin TreeGrid	0
+474	1	DISCONTINUED	10.40	5 important facts about designing tree houses	0
 478	0	COMING	15.90	Being awesome at running barefoot	0
 479	0	DISCONTINUED	7.00	How to fail at playing the cello	0
 480	0	COMING	27.60	The art of meditation	0
 481	0	AVAILABLE	10.00	The Vaadin way: children's education	97
 482	0	DISCONTINUED	23.10	The ultimate guide to elephants	0
-483	0	AVAILABLE	25.60	Encyclopedia of children's education	257
 484	0	DISCONTINUED	11.90	The Vaadin way: living a healthy life	0
-485	0	DISCONTINUED	9.40	Beginners guide to speaking to a big audience	0
 486	0	AVAILABLE	20.30	The ultimate guide to ice hockey	299
 487	0	COMING	15.10	The life changer: home security	0
 488	0	AVAILABLE	8.00	The cheap way to living a healthy life	338
@@ -556,26 +576,18 @@ COPY public.product (id, version, availability, price, product_name, stock_count
 494	0	COMING	29.70	Avoiding running barefoot	0
 495	0	AVAILABLE	15.80	Learning the basics of playing the cello	72
 496	0	DISCONTINUED	7.30	Becoming one with feeling down	0
-497	0	AVAILABLE	6.00	Becoming one with elephants	464
-498	0	DISCONTINUED	14.80	Avoiding children's education	0
 499	0	DISCONTINUED	18.30	10 important facts about intergalaxy travel	0
-500	0	COMING	22.60	10 important facts about gardening	0
 501	0	DISCONTINUED	5.30	The art of feeling down	0
 752	0	COMING	14.70	Beginners guide to ice hockey	0
 753	0	AVAILABLE	27.80	Being awesome at feeling down	378
 754	0	DISCONTINUED	28.40	Learning the basics of designing tree houses	0
-755	0	DISCONTINUED	11.00	The secrets of dummies	0
 756	0	DISCONTINUED	23.70	The cheap way to meditation	0
 757	0	COMING	25.50	Encyclopedia of playing the cello	0
-758	0	COMING	27.70	The cheap way to elephants	0
 759	0	DISCONTINUED	5.00	Surviving gardening	0
 760	0	AVAILABLE	8.60	Becoming one with debugging	6
-761	0	COMING	28.60	The life changer: debugging	0
 762	0	DISCONTINUED	16.50	Becoming one with intergalaxy travel	0
 763	0	COMING	13.70	Encyclopedia of winter bathing	0
 764	0	COMING	29.10	The mother of all references: winter bathing	0
-765	0	COMING	11.00	The secrets of debugging	0
-766	0	AVAILABLE	12.50	The complete visual guide to speaking to a big audience	27
 767	0	AVAILABLE	14.40	The life changer: running barefoot	358
 768	0	AVAILABLE	9.70	The life changer: keeping your wife happy	168
 769	0	AVAILABLE	29.50	The Vaadin way: playing the cello	235
@@ -585,61 +597,62 @@ COPY public.product (id, version, availability, price, product_name, stock_count
 773	0	AVAILABLE	14.00	The ultimate guide to children's education	509
 774	0	DISCONTINUED	12.30	Becoming one with intergalaxy travel	0
 775	0	DISCONTINUED	15.70	Book of playing the cello	0
-776	0	COMING	19.10	The secrets of designing tree houses	0
 777	0	COMING	8.50	Encyclopedia of intergalaxy travel	0
 778	0	COMING	25.80	Surviving giant needles	0
 779	0	COMING	7.80	The Vaadin way: Vaadin TreeTable	0
-780	0	DISCONTINUED	8.80	The complete visual guide to creating software	0
 781	0	COMING	6.60	Very much meditation	0
 782	0	COMING	28.20	Encyclopedia of rubber bands	0
-783	0	COMING	13.60	Mastering speaking to a big audience	0
 784	0	DISCONTINUED	10.00	Book of dummies	0
-785	0	AVAILABLE	20.00	For fun and profit:  elephants	50
-786	0	AVAILABLE	27.00	How to fail at elephants	261
 787	0	DISCONTINUED	24.10	The art of computer programming	0
 788	0	COMING	26.20	Very much feeling down	0
 789	0	AVAILABLE	14.80	Being awesome at computer programming	293
-790	0	AVAILABLE	21.60	Avoiding elephants	232
-791	0	DISCONTINUED	20.30	Surviving meditation	0
-792	0	DISCONTINUED	20.50	The cheap way to ice hockey	0
 793	0	COMING	12.10	Encyclopedia of gardening	0
-794	0	COMING	19.10	The art of dummies	0
 795	0	AVAILABLE	7.60	How to fail at home security	349
 796	0	DISCONTINUED	21.70	The mother of all references: creating software	0
 797	0	COMING	29.50	The secrets of children's education	0
-798	0	DISCONTINUED	11.60	The cheap way to elephants	0
 799	0	COMING	8.10	The art of gardening	0
-800	0	COMING	19.90	Becoming one with children's education	0
-801	0	COMING	28.90	The cheap way to home security	0
 802	0	AVAILABLE	22.30	Being awesome at giant needles	339
 803	0	COMING	11.20	Book of feeling down	0
 804	0	AVAILABLE	24.90	The ultimate guide to Vaadin TreeTable	0
-805	0	AVAILABLE	21.10	Very much giant needles	426
-806	0	COMING	21.90	Becoming one with speaking to a big audience	0
-807	0	DISCONTINUED	22.70	The cheap way to speaking to a big audience	0
-808	0	DISCONTINUED	19.40	The cheap way to home security	0
 809	0	DISCONTINUED	14.70	Book of running barefoot	0
 810	0	DISCONTINUED	8.90	Surviving computer programming	0
-811	0	DISCONTINUED	27.30	10 important facts about speaking to a big audience	0
 812	0	AVAILABLE	15.40	The ultimate guide to computer programming	468
 813	0	COMING	22.30	For fun and profit:  elephants	0
-814	0	DISCONTINUED	29.80	Learning the basics of elephants	0
 815	0	AVAILABLE	11.20	Surviving computer programming	227
+780	1	AVAILABLE	48.80	The complete visual guide to creating software	21
+792	1	AVAILABLE	20.50	The cheap way to ice hockey	23
+807	1	AVAILABLE	32.70	The cheap way to speaking to a big audience	125
+785	1	AVAILABLE	20.00	For fun and profit:  elephants	50
+776	1	AVAILABLE	49.10	The secrets of designing city houses	23
+805	1	AVAILABLE	21.10	Very much giant needles	426
+485	1	AVAILABLE	59.40	Advanced guide to speaking to a big audience	231
+806	1	AVAILABLE	21.90	Becoming one with speaking to a disconnected audience	32
+798	1	AVAILABLE	11.60	The cheap way to horses	321
+761	1	AVAILABLE	28.60	The life changer: debugging	33
+791	1	AVAILABLE	20.30	Mastering yoga meditation	633
+786	1	AVAILABLE	27.00	How to fail at agentic coding	261
+765	1	AVAILABLE	11.00	The secrets of debugging Vaadin	562
+808	1	AVAILABLE	59.40	The cheap way to selling houses	32
+755	1	AVAILABLE	61.00	The secrets of experts	332
+758	2	COMING	27.70	The easy way to cows	0
+814	1	AVAILABLE	69.80	Learning the basics of ants	62
+800	1	COMING	19.90	Becoming one with children's education	0
+801	1	AVAILABLE	28.90	The expensive way to home security	32
+483	1	AVAILABLE	25.60	Encyclopedia of children's education	256
+497	1	AVAILABLE	6.00	Becoming one with elephants	459
+790	1	AVAILABLE	21.60	Avoiding elephants	229
+500	1	COMING	22.60	10 important facts about farmin	0
+498	1	DISCONTINUED	14.80	Avoiding children's stories	0
+811	1	DISCONTINUED	27.30	10 important facts about acting in front of a big audience	0
 816	0	DISCONTINUED	7.50	The life changer: rubber bands	0
 817	0	COMING	22.30	The art of giant needles	0
 818	0	AVAILABLE	14.60	The secrets of keeping your wife happy	189
 819	0	COMING	19.40	The secrets of home security	0
-820	0	AVAILABLE	7.20	The art of designing tree houses	518
-821	0	COMING	10.10	10 important facts about Vaadin TreeTable	0
-822	0	AVAILABLE	23.30	Avoiding elephants	316
 823	0	COMING	15.00	The Vaadin way: giant needles	0
-824	0	DISCONTINUED	10.40	10 important facts about designing tree houses	0
-825	0	COMING	9.40	The secrets of speaking to a big audience	0
 826	0	COMING	5.70	The secrets of creating software	0
 827	0	COMING	11.50	Learning the basics of elephants	0
 828	0	COMING	15.90	Being awesome at running barefoot	0
 829	0	DISCONTINUED	7.00	How to fail at playing the cello	0
-830	0	COMING	27.60	The art of meditation	0
 831	0	AVAILABLE	10.00	The Vaadin way: children's education	97
 832	0	DISCONTINUED	23.10	The ultimate guide to elephants	0
 833	0	AVAILABLE	25.60	Encyclopedia of children's education	257
@@ -649,53 +662,78 @@ COPY public.product (id, version, availability, price, product_name, stock_count
 837	0	COMING	15.10	The life changer: home security	0
 838	0	AVAILABLE	8.00	The cheap way to living a healthy life	338
 839	0	DISCONTINUED	9.30	Being awesome at elephants	0
-840	0	COMING	12.50	The ultimate guide to rubber bands	0
 841	0	COMING	6.30	Surviving playing the cello	0
 842	0	DISCONTINUED	14.50	Avoiding rubber bands	0
 843	0	DISCONTINUED	12.20	Becoming one with winter bathing	0
 844	0	COMING	29.70	Avoiding running barefoot	0
-845	0	AVAILABLE	15.80	Learning the basics of playing the cello	72
 846	0	DISCONTINUED	7.30	Becoming one with feeling down	0
 847	0	AVAILABLE	6.00	Becoming one with elephants	464
-848	0	DISCONTINUED	14.80	Avoiding children's education	0
-849	0	DISCONTINUED	18.30	10 important facts about intergalaxy travel	0
-850	0	COMING	22.60	10 important facts about gardening	0
 851	0	DISCONTINUED	5.30	The art of feeling down	0
+794	1	COMING	19.10	The art of dummies	0
+93	1	COMING	12.10	Encyclopedia of gardening	0
+460	1	DISCONTINUED	8.95	Surviving computer programming	0
+821	1	COMING	10.10	10 important facts about Vaadin TreeTable	0
+850	1	AVAILABLE	2.60	10 important facts about gardening	211
+783	1	COMING	13.60	Mastering speaking to a big audience funnily	0
+135	1	AVAILABLE	49.40	Beginners guide to speaking to a small audience	511
+825	2	AVAILABLE	19.40	The secrets of speaking to an expert audience	121
+840	1	AVAILABLE	12.50	The ultimate guide to rubber music bands	67
+429	1	COMING	7.80	The Vaadin way: Vaadin TreeTable	0
+830	1	COMING	27.60	The art of meditation	0
+820	3	AVAILABLE	7.20	The art of planning tree houses	518
+845	2	AVAILABLE	15.80	Learning the basics of playing the cello	67
+105	2	AVAILABLE	21.10	Very much giant needles	417
+766	2	AVAILABLE	12.50	The complete visual guide to speaking to a big audience	21
+822	1	AVAILABLE	23.30	Avoiding cows	316
+848	1	DISCONTINUED	14.80	Avoiding children's mothers	0
+849	1	DISCONTINUED	18.30	5 important facts about intergalaxy travel	0
+824	2	AVAILABLE	10.40	Important facts about designing tree houses	50
 \.
 
 
 --
--- Data for Name: product_category; Type: TABLE DATA; Schema: public; Owner: creator
+-- Data for Name: product_category; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.product_category (product_id, category_id) FROM stdin;
 53	8
-54	4
-54	8
 55	3
 56	5
 56	6
 57	8
 58	7
 59	3
+794	5
 60	3
 61	6
-62	8
+794	5854
+93	6
 63	4
+93	5855
 64	4
+93	7
 66	3
 67	4
 68	3
 68	8
+780	5852
+91	5855
+77	6
 71	5
+77	5854
 73	6
+460	5
+460	5852
 75	3
 75	6
 76	6
 76	7
+430	352
+430	5852
 78	6
+430	7
+476	5852
 80	5
-81	3
 82	5
 83	6
 83	7
@@ -703,71 +741,86 @@ COPY public.product_category (product_id, category_id) FROM stdin;
 84	7
 85	4
 86	5
+470	5856
 87	8
+821	5852
 88	6
 89	6
 89	7
+62	6
 90	7
+792	353
 92	5
 92	6
-93	6
+792	5857
 94	6
+807	5855
 95	3
 96	5
+807	353
 97	3
 98	3
 99	4
 100	7
+109	3
 101	4
 102	6
 103	3
+109	4
 104	7
 105	6
+109	5857
 106	3
-107	7
 108	4
-109	3
-109	4
 110	3
-111	3
+132	3
+132	7
+132	5858
+785	5858
+70	5856
+850	5855
 115	6
 116	3
 117	3
 117	6
 118	5
 118	6
-119	6
-121	7
-122	5
+850	5858
+54	4
+54	8
+54	5857
 123	6
+822	6
 124	4
+498	7
 126	7
+848	3
 127	5
 128	4
+471	4
 130	6
 130	8
 131	5
 131	7
-132	3
-132	7
 133	4
 134	6
-135	3
-135	5
+121	7
 137	6
+111	3
 138	6
-139	3
+811	353
 140	4
 141	4
-142	4
-142	6
 143	6
 144	3
 144	6
+849	8
+474	8
 146	5
 147	3
 148	4
 148	7
+824	5856
 151	5
 151	7
 404	8
@@ -791,102 +844,157 @@ COPY public.product_category (product_id, category_id) FROM stdin;
 424	3
 425	6
 427	3
-430	352
 431	5
 431	6
 432	353
 434	5
 435	8
-436	352
-438	4
 441	3
 442	353
 445	4
 445	5
 446	353
 447	5
-448	6
 449	7
-451	8
-453	5
+776	5856
 454	4
-456	5
+776	7
+783	3
+845	5859
 458	8
 459	5
 459	8
-460	5
 461	6
-463	3
+436	352
+436	5858
+438	4
 464	3
-466	6
+438	7
+426	5856
+426	7
 467	6
 468	353
-471	4
+426	8
+805	5858
+129	5859
+129	5855
 472	3
 472	352
-474	8
+453	5
+453	5855
+453	353
 475	4
+81	3
 477	353
+81	5853
 478	7
 479	4
+135	3
+135	5
+485	353
 481	352
 482	5
-483	8
-485	353
 485	6
+483	8
+825	5
+825	5855
+107	7
+107	5855
+806	5855
 489	6
 490	8
 491	8
+456	5
 492	8
+456	5858
+469	7
 494	6
 495	3
 496	4
 496	352
 497	6
-498	7
+798	5858
 499	3
+761	5852
 501	353
+840	5859
+791	4
+791	5855
+429	5852
 754	6
+465	5855
 757	3
 757	4
+465	5852
 760	352
+465	5856
 762	5
 762	8
 763	353
 763	6
+786	5852
 764	6
+119	6
+119	353
+142	6
 768	353
+142	4
+142	5852
 770	3
+142	5855
+451	8
 773	8
 774	4
+451	5855
+451	7
+765	8
+765	7
 778	7
+765	352
+765	5852
+149	352
 781	4
-783	3
+808	5855
+428	5858
+139	3
 784	353
+448	353
+758	5858
 788	8
+830	4
 789	6
 790	353
 790	3
-791	4
-792	353
+830	7
 793	6
-794	5
+755	4
+755	7
 796	3
 797	4
 797	6
+466	6
+466	352
+814	7
 802	7
 803	4
 804	352
+814	352
+814	5858
+463	3
+463	5860
 809	7
-811	353
+122	5
+122	5858
 813	4
+800	352
+820	352
 817	353
 817	352
+820	5856
 819	353
 819	3
-822	6
+801	5853
 823	8
-825	5
 827	4
 829	8
 832	353
@@ -898,13 +1006,11 @@ COPY public.product_category (product_id, category_id) FROM stdin;
 844	7
 846	5
 847	7
-848	3
-849	8
 \.
 
 
 --
--- Data for Name: purchase; Type: TABLE DATA; Schema: public; Owner: creator
+-- Data for Name: purchase; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.purchase (id, version, created_at, decided_at, decision_reason, city, country, postal_code, street, status, approver_id, requester_id) FROM stdin;
@@ -1984,8 +2090,6 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 4275	0	2024-09-11 15:19:00	2024-09-12 22:19:00	Within budget	Mock City	Mock Country	10536	Mock Street 537	COMPLETED	857	878
 4276	0	2024-09-10 09:22:00	\N	\N	Mock City	Mock Country	10537	Mock Street 538	PENDING	857	879
 4277	0	2024-09-10 15:46:00	2024-09-12 08:46:00	Within budget	Mock City	Mock Country	10537	Mock Street 538	COMPLETED	858	880
-4278	0	2024-09-09 09:06:00	\N	\N	Mock City	Mock Country	10538	Mock Street 539	PENDING	857	881
-4279	0	2024-09-09 15:42:00	\N	\N	Mock City	Mock Country	10538	Mock Street 539	PENDING	857	882
 4280	0	2024-09-08 09:20:00	2024-09-10 03:20:00	No availability	Mock City	Mock Country	10539	Mock Street 540	CANCELLED	857	883
 4281	0	2024-09-08 15:28:00	2024-09-11 02:28:00	Too expensive	Mock City	Mock Country	10539	Mock Street 540	REJECTED	858	884
 4282	0	2024-09-07 09:04:00	2024-09-08 13:04:00	Within budget	Mock City	Mock Country	10540	Mock Street 541	COMPLETED	858	875
@@ -2024,7 +2128,6 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 4415	0	2024-08-22 15:59:00	\N	\N	Mock City	Mock Country	10556	Mock Street 557	PENDING	858	878
 4416	0	2024-08-21 09:55:00	2024-08-24 04:55:00	Within budget	Mock City	Mock Country	10557	Mock Street 558	COMPLETED	857	879
 4417	0	2024-08-21 15:35:00	2024-08-23 16:35:00	No availability	Mock City	Mock Country	10557	Mock Street 558	CANCELLED	858	880
-4418	0	2024-08-20 09:08:00	\N	\N	Mock City	Mock Country	10558	Mock Street 559	PENDING	857	881
 4419	0	2024-08-20 15:39:00	\N	\N	Mock City	Mock Country	10558	Mock Street 559	PENDING	858	882
 4420	0	2024-08-19 09:56:00	2024-08-22 02:56:00	Within budget	Mock City	Mock Country	10559	Mock Street 560	COMPLETED	857	883
 4421	0	2024-08-19 15:49:00	2024-08-21 17:49:00	Too expensive	Mock City	Mock Country	10559	Mock Street 560	REJECTED	857	884
@@ -2044,9 +2147,10 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 4435	0	2024-08-12 15:38:00	2024-08-15 13:38:00	Within budget	Mock City	Mock Country	10566	Mock Street 567	COMPLETED	858	878
 4436	0	2024-08-11 09:01:00	2024-08-12 17:01:00	Too expensive	Mock City	Mock Country	10567	Mock Street 568	REJECTED	858	879
 4437	0	2024-08-11 15:43:00	2024-08-13 04:43:00	No availability	Mock City	Mock Country	10567	Mock Street 568	CANCELLED	858	880
-4438	0	2024-08-10 09:37:00	\N	\N	Mock City	Mock Country	10568	Mock Street 569	PENDING	857	881
 4439	0	2024-08-10 15:07:00	\N	\N	Mock City	Mock Country	10568	Mock Street 569	PENDING	858	882
 4440	0	2024-08-09 09:15:00	\N	\N	Mock City	Mock Country	10569	Mock Street 570	PENDING	858	883
+4418	1	2024-08-20 09:08:00	2026-03-07 14:48:39.677181	Insufficient stock: Encyclopedia of winter bathing: needs 2, has 0, The art of computer programming: needs 4, has 0	Mock City	Mock Country	10558	Mock Street 559	CANCELLED	857	881
+4279	1	2024-09-09 15:42:00	2026-03-07 14:48:43.438196	\N	Mock City	Mock Country	10538	Mock Street 539	COMPLETED	857	882
 4441	0	2024-08-09 15:48:00	2024-08-10 00:48:00	No availability	Mock City	Mock Country	10569	Mock Street 570	CANCELLED	858	884
 4442	0	2024-08-08 09:04:00	2024-08-09 00:04:00	Within budget	Mock City	Mock Country	10570	Mock Street 571	COMPLETED	858	875
 4443	0	2024-08-08 15:21:00	2024-08-09 03:21:00	Too expensive	Mock City	Mock Country	10570	Mock Street 571	REJECTED	858	876
@@ -2059,20 +2163,16 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 4450	0	2024-08-04 09:43:00	2024-08-06 21:43:00	No availability	Mock City	Mock Country	10574	Mock Street 575	CANCELLED	857	883
 4451	0	2024-08-04 15:07:00	2024-08-06 11:07:00	No availability	Mock City	Mock Country	10574	Mock Street 575	CANCELLED	858	884
 4552	0	2024-08-03 09:05:00	2024-08-04 09:05:00	Too expensive	Mock City	Mock Country	10575	Mock Street 576	REJECTED	857	875
-4553	0	2024-08-03 15:08:00	\N	\N	Mock City	Mock Country	10575	Mock Street 576	PENDING	857	876
 4554	0	2024-08-02 09:53:00	2024-08-05 02:53:00	Within budget	Mock City	Mock Country	10576	Mock Street 577	COMPLETED	858	877
 4555	0	2024-08-02 15:48:00	2024-08-04 18:48:00	Too expensive	Mock City	Mock Country	10576	Mock Street 577	REJECTED	858	878
 4556	0	2024-08-01 09:57:00	2024-08-01 13:57:00	No availability	Mock City	Mock Country	10577	Mock Street 578	CANCELLED	858	879
 4557	0	2024-08-01 15:24:00	2024-08-04 15:24:00	Too expensive	Mock City	Mock Country	10577	Mock Street 578	REJECTED	857	880
 4558	0	2024-07-31 09:41:00	2024-08-02 01:41:00	Within budget	Mock City	Mock Country	10578	Mock Street 579	COMPLETED	858	881
-4559	0	2024-07-31 15:13:00	\N	\N	Mock City	Mock Country	10578	Mock Street 579	PENDING	857	882
 4560	0	2024-07-30 09:30:00	2024-08-01 16:30:00	Within budget	Mock City	Mock Country	10579	Mock Street 580	COMPLETED	857	883
 4561	0	2024-07-30 15:58:00	2024-07-31 16:58:00	Too expensive	Mock City	Mock Country	10579	Mock Street 580	REJECTED	857	884
-4562	0	2024-07-29 09:28:00	\N	\N	Mock City	Mock Country	10580	Mock Street 581	PENDING	857	875
 4563	0	2024-07-29 15:43:00	2024-07-30 21:43:00	Too expensive	Mock City	Mock Country	10580	Mock Street 581	REJECTED	857	876
 4564	0	2024-07-28 09:31:00	\N	\N	Mock City	Mock Country	10581	Mock Street 582	PENDING	858	877
 4565	0	2024-07-28 15:42:00	2024-07-31 00:42:00	Within budget	Mock City	Mock Country	10581	Mock Street 582	COMPLETED	858	878
-4566	0	2024-07-27 09:44:00	\N	\N	Mock City	Mock Country	10582	Mock Street 583	PENDING	857	879
 4567	0	2024-07-27 15:04:00	\N	\N	Mock City	Mock Country	10582	Mock Street 583	PENDING	858	880
 4568	0	2024-07-26 09:54:00	2024-07-26 11:54:00	Within budget	Mock City	Mock Country	10583	Mock Street 584	COMPLETED	858	881
 4569	0	2024-07-26 15:40:00	2024-07-28 08:40:00	Too expensive	Mock City	Mock Country	10583	Mock Street 584	REJECTED	857	882
@@ -2095,21 +2195,22 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 4586	0	2024-07-17 09:23:00	2024-07-18 03:23:00	Within budget	Mock City	Mock Country	10592	Mock Street 593	COMPLETED	857	879
 4587	0	2024-07-17 15:53:00	2024-07-18 19:53:00	Too expensive	Mock City	Mock Country	10592	Mock Street 593	REJECTED	858	880
 4588	0	2024-07-16 09:21:00	2024-07-18 19:21:00	Within budget	Mock City	Mock Country	10593	Mock Street 594	COMPLETED	858	881
-4589	0	2024-07-16 15:47:00	\N	\N	Mock City	Mock Country	10593	Mock Street 594	PENDING	857	882
 4590	0	2024-07-15 09:56:00	2024-07-16 08:56:00	No availability	Mock City	Mock Country	10594	Mock Street 595	CANCELLED	857	883
 4591	0	2024-07-15 15:38:00	2024-07-17 22:38:00	Too expensive	Mock City	Mock Country	10594	Mock Street 595	REJECTED	858	884
 4592	0	2024-07-14 09:03:00	2024-07-16 07:03:00	Too expensive	Mock City	Mock Country	10595	Mock Street 596	REJECTED	857	875
 4593	0	2024-07-14 15:59:00	2024-07-15 22:59:00	No availability	Mock City	Mock Country	10595	Mock Street 596	CANCELLED	858	876
-4594	0	2024-07-13 09:54:00	\N	\N	Mock City	Mock Country	10596	Mock Street 597	PENDING	857	877
 4595	0	2024-07-13 15:12:00	2024-07-14 17:12:00	Too expensive	Mock City	Mock Country	10596	Mock Street 597	REJECTED	858	878
 4596	0	2024-07-12 09:18:00	2024-07-12 22:18:00	No availability	Mock City	Mock Country	10597	Mock Street 598	CANCELLED	858	879
 4597	0	2024-07-12 15:00:00	2024-07-14 04:00:00	Within budget	Mock City	Mock Country	10597	Mock Street 598	COMPLETED	858	880
 4598	0	2024-07-11 09:10:00	2024-07-13 18:10:00	Within budget	Mock City	Mock Country	10598	Mock Street 599	COMPLETED	858	881
 4599	0	2024-07-11 15:50:00	2024-07-12 23:50:00	Within budget	Mock City	Mock Country	10598	Mock Street 599	COMPLETED	857	882
-4600	0	2024-07-10 09:10:00	\N	\N	Mock City	Mock Country	10599	Mock Street 600	PENDING	857	883
 4601	0	2024-07-10 15:28:00	\N	\N	Mock City	Mock Country	10599	Mock Street 600	PENDING	858	884
 4702	0	2024-07-09 09:20:00	2024-07-10 06:20:00	No availability	Mock City	Mock Country	10600	Mock Street 601	CANCELLED	857	875
 4703	0	2024-07-09 15:59:00	\N	\N	Mock City	Mock Country	10600	Mock Street 601	PENDING	858	876
+4589	1	2024-07-16 15:47:00	2026-03-07 14:48:06.123904	\N	Mock City	Mock Country	10593	Mock Street 594	COMPLETED	857	882
+4566	1	2024-07-27 09:44:00	2026-03-07 14:48:10.128999	Insufficient stock: Avoiding running barefoot: needs 5, has 0	Mock City	Mock Country	10582	Mock Street 583	CANCELLED	857	879
+4562	1	2024-07-29 09:28:00	2026-03-07 14:48:14.651155	Insufficient stock: Mastering speaking to a big audience funnily: needs 4, has 0	Mock City	Mock Country	10580	Mock Street 581	CANCELLED	857	875
+4553	1	2024-08-03 15:08:00	2026-03-07 14:48:23.803608	\N	Mock City	Mock Country	10575	Mock Street 576	COMPLETED	857	876
 4704	0	2024-07-08 09:37:00	\N	\N	Mock City	Mock Country	10601	Mock Street 602	PENDING	858	877
 4705	0	2024-07-08 15:55:00	2024-07-09 06:55:00	Too expensive	Mock City	Mock Country	10601	Mock Street 602	REJECTED	857	878
 4706	0	2024-07-07 09:43:00	2024-07-09 03:43:00	No availability	Mock City	Mock Country	10602	Mock Street 603	CANCELLED	858	879
@@ -2119,14 +2220,11 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 4710	0	2024-07-05 09:20:00	\N	\N	Mock City	Mock Country	10604	Mock Street 605	PENDING	858	883
 4711	0	2024-07-05 15:34:00	2024-07-08 13:34:00	Too expensive	Mock City	Mock Country	10604	Mock Street 605	REJECTED	858	884
 4712	0	2024-07-04 09:57:00	2024-07-07 03:57:00	Too expensive	Mock City	Mock Country	10605	Mock Street 606	REJECTED	858	875
-4713	0	2024-07-04 15:40:00	\N	\N	Mock City	Mock Country	10605	Mock Street 606	PENDING	857	876
 4714	0	2024-07-03 09:49:00	2024-07-04 16:49:00	Within budget	Mock City	Mock Country	10606	Mock Street 607	COMPLETED	857	877
-4715	0	2024-07-03 15:07:00	\N	\N	Mock City	Mock Country	10606	Mock Street 607	PENDING	857	878
 4716	0	2024-07-02 09:08:00	2024-07-02 23:08:00	Within budget	Mock City	Mock Country	10607	Mock Street 608	COMPLETED	857	879
 4717	0	2024-07-02 15:13:00	\N	\N	Mock City	Mock Country	10607	Mock Street 608	PENDING	858	880
 4718	0	2024-07-01 09:49:00	\N	\N	Mock City	Mock Country	10608	Mock Street 609	PENDING	858	881
 4719	0	2024-07-01 15:27:00	2024-07-04 02:27:00	No availability	Mock City	Mock Country	10608	Mock Street 609	CANCELLED	857	882
-4720	0	2024-06-30 09:37:00	\N	\N	Mock City	Mock Country	10609	Mock Street 610	PENDING	857	883
 4721	0	2024-06-30 15:08:00	2024-07-01 08:08:00	No availability	Mock City	Mock Country	10609	Mock Street 610	CANCELLED	857	884
 4722	0	2024-06-29 09:57:00	2024-07-01 00:57:00	Within budget	Mock City	Mock Country	10610	Mock Street 611	COMPLETED	857	875
 4723	0	2024-06-29 15:27:00	2024-07-02 10:27:00	Within budget	Mock City	Mock Country	10610	Mock Street 611	COMPLETED	858	876
@@ -2137,14 +2235,12 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 4728	0	2024-06-26 09:35:00	2024-06-27 20:35:00	Too expensive	Mock City	Mock Country	10613	Mock Street 614	REJECTED	858	881
 4729	0	2024-06-26 15:29:00	2024-06-28 08:29:00	No availability	Mock City	Mock Country	10613	Mock Street 614	CANCELLED	857	882
 4730	0	2024-06-25 09:41:00	2024-06-26 09:41:00	No availability	Mock City	Mock Country	10614	Mock Street 615	CANCELLED	858	883
-4731	0	2024-06-25 15:50:00	\N	\N	Mock City	Mock Country	10614	Mock Street 615	PENDING	857	884
 4732	0	2024-06-24 09:09:00	2024-06-26 18:09:00	Too expensive	Mock City	Mock Country	10615	Mock Street 616	REJECTED	857	875
 4733	0	2024-06-24 15:23:00	2024-06-25 08:23:00	No availability	Mock City	Mock Country	10615	Mock Street 616	CANCELLED	857	876
 4734	0	2024-06-23 09:44:00	2024-06-24 13:44:00	Too expensive	Mock City	Mock Country	10616	Mock Street 617	REJECTED	858	877
 4735	0	2024-06-23 15:57:00	2024-06-25 19:57:00	No availability	Mock City	Mock Country	10616	Mock Street 617	CANCELLED	857	878
 4736	0	2024-06-22 09:05:00	2024-06-22 22:05:00	No availability	Mock City	Mock Country	10617	Mock Street 618	CANCELLED	857	879
 4737	0	2024-06-22 15:15:00	2024-06-25 14:15:00	Too expensive	Mock City	Mock Country	10617	Mock Street 618	REJECTED	857	880
-4738	0	2024-06-21 09:29:00	\N	\N	Mock City	Mock Country	10618	Mock Street 619	PENDING	857	881
 4739	0	2024-06-21 15:01:00	2024-06-22 21:01:00	Within budget	Mock City	Mock Country	10618	Mock Street 619	COMPLETED	857	882
 4740	0	2024-06-20 09:55:00	\N	\N	Mock City	Mock Country	10619	Mock Street 620	PENDING	858	883
 4741	0	2024-06-20 15:22:00	2024-06-20 23:22:00	Within budget	Mock City	Mock Country	10619	Mock Street 620	COMPLETED	858	884
@@ -2153,11 +2249,9 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 4744	0	2024-06-18 09:43:00	2024-06-19 08:43:00	No availability	Mock City	Mock Country	10621	Mock Street 622	CANCELLED	857	877
 4745	0	2024-06-18 15:18:00	2024-06-19 09:18:00	Within budget	Mock City	Mock Country	10621	Mock Street 622	COMPLETED	857	878
 4746	0	2024-06-17 09:52:00	2024-06-18 11:52:00	Within budget	Mock City	Mock Country	10622	Mock Street 623	COMPLETED	858	879
-4747	0	2024-06-17 15:33:00	\N	\N	Mock City	Mock Country	10622	Mock Street 623	PENDING	857	880
 4748	0	2024-06-16 09:24:00	2024-06-18 10:24:00	Too expensive	Mock City	Mock Country	10623	Mock Street 624	REJECTED	858	881
 4749	0	2024-06-16 15:58:00	2024-06-17 06:58:00	No availability	Mock City	Mock Country	10623	Mock Street 624	CANCELLED	857	882
 4750	0	2024-06-15 09:19:00	2024-06-17 19:19:00	No availability	Mock City	Mock Country	10624	Mock Street 625	CANCELLED	857	883
-4751	0	2024-06-15 15:52:00	\N	\N	Mock City	Mock Country	10624	Mock Street 625	PENDING	857	884
 4852	0	2024-06-14 09:16:00	\N	\N	Mock City	Mock Country	10625	Mock Street 626	PENDING	858	875
 4853	0	2024-06-14 15:44:00	2024-06-16 02:44:00	Within budget	Mock City	Mock Country	10625	Mock Street 626	COMPLETED	857	876
 4854	0	2024-06-13 09:52:00	2024-06-15 04:52:00	No availability	Mock City	Mock Country	10626	Mock Street 627	CANCELLED	858	877
@@ -2170,13 +2264,14 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 4861	0	2024-06-10 15:25:00	2024-06-12 21:25:00	Within budget	Mock City	Mock Country	10629	Mock Street 630	COMPLETED	857	884
 4862	0	2024-06-09 09:15:00	2024-06-12 08:15:00	Too expensive	Mock City	Mock Country	10630	Mock Street 631	REJECTED	857	875
 4863	0	2024-06-09 15:51:00	2024-06-10 01:51:00	Too expensive	Mock City	Mock Country	10630	Mock Street 631	REJECTED	858	876
-4864	0	2024-06-08 09:27:00	\N	\N	Mock City	Mock Country	10631	Mock Street 632	PENDING	857	877
 4865	0	2024-06-08 15:52:00	2024-06-08 23:52:00	Too expensive	Mock City	Mock Country	10631	Mock Street 632	REJECTED	857	878
 4866	0	2024-06-07 09:56:00	2024-06-09 04:56:00	Too expensive	Mock City	Mock Country	10632	Mock Street 633	REJECTED	858	879
-4867	0	2024-06-07 15:10:00	\N	\N	Mock City	Mock Country	10632	Mock Street 633	PENDING	857	880
+4751	1	2024-06-15 15:52:00	2026-03-07 14:47:27.177201	Insufficient stock: Book of ice hockey: needs 1, has 0	Mock City	Mock Country	10624	Mock Street 625	CANCELLED	857	884
+4738	1	2024-06-21 09:29:00	2026-03-07 14:47:32.992964	Insufficient stock: Becoming one with feeling down: needs 1, has 0, Surviving meditation: needs 4, has 0	Mock City	Mock Country	10618	Mock Street 619	CANCELLED	857	881
+4720	1	2024-06-30 09:37:00	2026-03-07 14:47:40.689239	Insufficient stock: The mother of all references: winter bathing: needs 5, has 0, The mother of all references: creating software: needs 2, has 0	Mock City	Mock Country	10609	Mock Street 610	CANCELLED	857	883
+4713	1	2024-07-04 15:40:00	2026-03-07 14:47:46.972802	Insufficient stock: 10 important facts about designing tree houses: needs 1, has 0	Mock City	Mock Country	10605	Mock Street 606	CANCELLED	857	876
 4868	0	2024-06-06 09:20:00	2024-06-07 17:20:00	No availability	Mock City	Mock Country	10633	Mock Street 634	CANCELLED	858	881
 4869	0	2024-06-06 15:52:00	\N	\N	Mock City	Mock Country	10633	Mock Street 634	PENDING	858	882
-4870	0	2024-06-05 09:26:00	\N	\N	Mock City	Mock Country	10634	Mock Street 635	PENDING	858	883
 4871	0	2024-06-05 15:41:00	2024-06-07 13:41:00	No availability	Mock City	Mock Country	10634	Mock Street 635	CANCELLED	858	884
 4872	0	2024-06-04 09:10:00	2024-06-05 16:10:00	Too expensive	Mock City	Mock Country	10635	Mock Street 636	REJECTED	858	875
 4873	0	2024-06-04 15:19:00	2024-06-05 23:19:00	No availability	Mock City	Mock Country	10635	Mock Street 636	CANCELLED	857	876
@@ -2186,9 +2281,7 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 4877	0	2024-06-02 15:19:00	2024-06-02 16:19:00	Within budget	Mock City	Mock Country	10637	Mock Street 638	COMPLETED	857	880
 4878	0	2024-06-01 09:47:00	2024-06-03 20:47:00	Too expensive	Mock City	Mock Country	10638	Mock Street 639	REJECTED	858	881
 4879	0	2024-06-01 15:20:00	2024-06-04 12:20:00	Within budget	Mock City	Mock Country	10638	Mock Street 639	COMPLETED	857	882
-4880	0	2024-05-31 09:26:00	\N	\N	Mock City	Mock Country	10639	Mock Street 640	PENDING	857	883
 4881	0	2024-05-31 15:09:00	2024-06-02 13:09:00	Within budget	Mock City	Mock Country	10639	Mock Street 640	COMPLETED	857	884
-4882	0	2024-05-30 09:53:00	\N	\N	Mock City	Mock Country	10640	Mock Street 641	PENDING	857	875
 4883	0	2024-05-30 15:32:00	2024-05-31 21:32:00	No availability	Mock City	Mock Country	10640	Mock Street 641	CANCELLED	858	876
 4884	0	2024-05-29 09:59:00	2024-05-31 02:59:00	Within budget	Mock City	Mock Country	10641	Mock Street 642	COMPLETED	858	877
 4885	0	2024-05-29 15:51:00	2024-05-29 17:51:00	No availability	Mock City	Mock Country	10641	Mock Street 642	CANCELLED	857	878
@@ -2198,17 +2291,12 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 4889	0	2024-05-27 15:37:00	2024-05-28 16:37:00	No availability	Mock City	Mock Country	10643	Mock Street 644	CANCELLED	858	882
 4890	0	2024-05-26 09:31:00	2024-05-28 03:31:00	Within budget	Mock City	Mock Country	10644	Mock Street 645	COMPLETED	858	883
 4891	0	2024-05-26 15:52:00	2024-05-29 13:52:00	Within budget	Mock City	Mock Country	10644	Mock Street 645	COMPLETED	857	884
-4892	0	2024-05-25 09:41:00	\N	\N	Mock City	Mock Country	10645	Mock Street 646	PENDING	858	875
-4893	0	2024-05-25 15:01:00	\N	\N	Mock City	Mock Country	10645	Mock Street 646	PENDING	857	876
-4894	0	2024-05-24 09:37:00	\N	\N	Mock City	Mock Country	10646	Mock Street 647	PENDING	857	877
 4895	0	2024-05-24 15:02:00	2024-05-27 03:02:00	Within budget	Mock City	Mock Country	10646	Mock Street 647	COMPLETED	858	878
 4896	0	2024-05-23 09:55:00	2024-05-23 16:55:00	Too expensive	Mock City	Mock Country	10647	Mock Street 648	REJECTED	858	879
 4897	0	2024-05-23 15:41:00	2024-05-24 06:41:00	Within budget	Mock City	Mock Country	10647	Mock Street 648	COMPLETED	857	880
 4898	0	2024-05-22 09:30:00	2024-05-22 23:30:00	No availability	Mock City	Mock Country	10648	Mock Street 649	CANCELLED	857	881
 4899	0	2024-05-22 15:20:00	2024-05-23 01:20:00	Too expensive	Mock City	Mock Country	10648	Mock Street 649	REJECTED	857	882
 4900	0	2024-05-21 09:33:00	2024-05-23 09:33:00	Within budget	Mock City	Mock Country	10649	Mock Street 650	COMPLETED	858	883
-4901	0	2024-05-21 15:48:00	\N	\N	Mock City	Mock Country	10649	Mock Street 650	PENDING	858	884
-5002	0	2024-05-20 09:22:00	\N	\N	Mock City	Mock Country	10650	Mock Street 651	PENDING	858	875
 5003	0	2024-05-20 15:49:00	2024-05-21 18:49:00	No availability	Mock City	Mock Country	10650	Mock Street 651	CANCELLED	857	876
 5004	0	2024-05-19 09:59:00	2024-05-22 09:59:00	Within budget	Mock City	Mock Country	10651	Mock Street 652	COMPLETED	858	877
 5005	0	2024-05-19 15:39:00	2024-05-19 21:39:00	Too expensive	Mock City	Mock Country	10651	Mock Street 652	REJECTED	858	878
@@ -2220,33 +2308,35 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 5011	0	2024-05-16 15:01:00	2024-05-18 04:01:00	Within budget	Mock City	Mock Country	10654	Mock Street 655	COMPLETED	858	884
 5012	0	2024-05-15 09:37:00	2024-05-17 08:37:00	No availability	Mock City	Mock Country	10655	Mock Street 656	CANCELLED	858	875
 5013	0	2024-05-15 15:21:00	2024-05-18 08:21:00	No availability	Mock City	Mock Country	10655	Mock Street 656	CANCELLED	857	876
-5014	0	2024-05-14 09:53:00	\N	\N	Mock City	Mock Country	10656	Mock Street 657	PENDING	857	877
 5015	0	2024-05-14 15:56:00	2024-05-16 10:56:00	Within budget	Mock City	Mock Country	10656	Mock Street 657	COMPLETED	857	878
 5016	0	2024-05-13 09:26:00	2024-05-14 16:26:00	No availability	Mock City	Mock Country	10657	Mock Street 658	CANCELLED	858	879
 5017	0	2024-05-13 15:11:00	2024-05-14 17:11:00	Within budget	Mock City	Mock Country	10657	Mock Street 658	COMPLETED	857	880
 5018	0	2024-05-12 09:13:00	2024-05-13 04:13:00	Too expensive	Mock City	Mock Country	10658	Mock Street 659	REJECTED	857	881
 5019	0	2024-05-12 15:32:00	2024-05-14 23:32:00	Within budget	Mock City	Mock Country	10658	Mock Street 659	COMPLETED	858	882
 5020	0	2024-05-11 09:55:00	2024-05-13 06:55:00	Too expensive	Mock City	Mock Country	10659	Mock Street 660	REJECTED	858	883
-5021	0	2024-05-11 15:35:00	\N	\N	Mock City	Mock Country	10659	Mock Street 660	PENDING	857	884
 5022	0	2024-05-10 09:49:00	2024-05-12 18:49:00	No availability	Mock City	Mock Country	10660	Mock Street 661	CANCELLED	858	875
-5023	0	2024-05-10 15:32:00	\N	\N	Mock City	Mock Country	10660	Mock Street 661	PENDING	858	876
 5024	0	2024-05-09 09:02:00	2024-05-11 11:02:00	No availability	Mock City	Mock Country	10661	Mock Street 662	CANCELLED	857	877
 5025	0	2024-05-09 15:16:00	2024-05-11 09:16:00	No availability	Mock City	Mock Country	10661	Mock Street 662	CANCELLED	857	878
 5026	0	2024-05-08 09:36:00	2024-05-11 01:36:00	Too expensive	Mock City	Mock Country	10662	Mock Street 663	REJECTED	858	879
-5027	0	2024-05-08 15:42:00	\N	\N	Mock City	Mock Country	10662	Mock Street 663	PENDING	857	880
 5028	0	2024-05-07 09:11:00	2024-05-10 03:11:00	No availability	Mock City	Mock Country	10663	Mock Street 664	CANCELLED	858	881
 5029	0	2024-05-07 15:55:00	2024-05-10 01:55:00	Too expensive	Mock City	Mock Country	10663	Mock Street 664	REJECTED	857	882
+5021	1	2024-05-11 15:35:00	2026-03-07 14:46:43.580078	Insufficient stock: The cheap way to meditation: needs 3, has 0	Mock City	Mock Country	10659	Mock Street 660	CANCELLED	857	884
+4893	1	2024-05-25 15:01:00	2026-03-07 14:47:05.617414	Insufficient stock: The Vaadin way: giant needles: needs 1, has 0	Mock City	Mock Country	10645	Mock Street 646	CANCELLED	857	876
+4882	1	2024-05-30 09:53:00	2026-03-07 14:47:10.541518	Insufficient stock: The art of computer programming: needs 3, has 0, 10 important facts about designing tree houses: needs 5, has 0	Mock City	Mock Country	10640	Mock Street 641	CANCELLED	857	875
+4880	1	2024-05-31 09:26:00	2026-03-07 14:47:17.451368	\N	Mock City	Mock Country	10639	Mock Street 640	COMPLETED	857	883
+5023	1	2024-05-10 15:32:00	2026-03-07 14:50:19.142373	Insufficient stock: Book of dummies: needs 1, has 0	Mock City	Mock Country	10660	Mock Street 661	CANCELLED	858	876
+5002	1	2024-05-20 09:22:00	2026-03-07 14:50:23.053071	\N	Mock City	Mock Country	10650	Mock Street 651	COMPLETED	858	875
+4892	1	2024-05-25 09:41:00	2026-03-07 14:50:29.791943	\N	Mock City	Mock Country	10645	Mock Street 646	COMPLETED	858	875
+4870	1	2024-06-05 09:26:00	2026-03-07 14:50:37.085932	\N	Mock City	Mock Country	10634	Mock Street 635	COMPLETED	858	883
 5030	0	2024-05-06 09:05:00	2024-05-08 09:05:00	Within budget	Mock City	Mock Country	10664	Mock Street 665	COMPLETED	857	883
 5031	0	2024-05-06 15:11:00	2024-05-08 12:11:00	Within budget	Mock City	Mock Country	10664	Mock Street 665	COMPLETED	857	884
 5032	0	2024-05-05 09:05:00	2024-05-08 07:05:00	Within budget	Mock City	Mock Country	10665	Mock Street 666	COMPLETED	857	875
 5033	0	2024-05-05 15:03:00	2024-05-07 05:03:00	Too expensive	Mock City	Mock Country	10665	Mock Street 666	REJECTED	858	876
 5034	0	2024-05-04 09:26:00	2024-05-06 02:26:00	Too expensive	Mock City	Mock Country	10666	Mock Street 667	REJECTED	858	877
-5035	0	2024-05-04 15:28:00	\N	\N	Mock City	Mock Country	10666	Mock Street 667	PENDING	857	878
 5036	0	2024-05-03 09:26:00	2024-05-03 13:26:00	No availability	Mock City	Mock Country	10667	Mock Street 668	CANCELLED	857	879
 5037	0	2024-05-03 15:17:00	2024-05-04 07:17:00	No availability	Mock City	Mock Country	10667	Mock Street 668	CANCELLED	857	880
 5038	0	2024-05-02 09:56:00	2024-05-04 04:56:00	Too expensive	Mock City	Mock Country	10668	Mock Street 669	REJECTED	857	881
 5039	0	2024-05-02 15:52:00	2024-05-02 19:52:00	No availability	Mock City	Mock Country	10668	Mock Street 669	CANCELLED	857	882
-5040	0	2024-05-01 09:47:00	\N	\N	Mock City	Mock Country	10669	Mock Street 670	PENDING	857	883
 5041	0	2024-05-01 15:37:00	2024-05-03 03:37:00	Too expensive	Mock City	Mock Country	10669	Mock Street 670	REJECTED	858	884
 5042	0	2024-04-30 09:34:00	2024-04-30 17:34:00	No availability	Mock City	Mock Country	10670	Mock Street 671	CANCELLED	858	875
 5043	0	2024-04-30 15:01:00	2024-05-03 00:01:00	Within budget	Mock City	Mock Country	10670	Mock Street 671	COMPLETED	857	876
@@ -2255,12 +2345,9 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 5046	0	2024-04-28 09:53:00	2024-04-29 06:53:00	Too expensive	Mock City	Mock Country	10672	Mock Street 673	REJECTED	857	879
 5047	0	2024-04-28 15:27:00	2024-04-30 19:27:00	Too expensive	Mock City	Mock Country	10672	Mock Street 673	REJECTED	858	880
 5048	0	2024-04-27 09:13:00	2024-04-27 18:13:00	Too expensive	Mock City	Mock Country	10673	Mock Street 674	REJECTED	857	881
-5049	0	2024-04-27 15:19:00	\N	\N	Mock City	Mock Country	10673	Mock Street 674	PENDING	858	882
 5050	0	2024-04-26 09:15:00	2024-04-27 11:15:00	No availability	Mock City	Mock Country	10674	Mock Street 675	CANCELLED	857	883
 5051	0	2024-04-26 15:35:00	2024-04-26 23:35:00	Within budget	Mock City	Mock Country	10674	Mock Street 675	COMPLETED	857	884
-5152	0	2024-04-25 09:19:00	\N	\N	Mock City	Mock Country	10675	Mock Street 676	PENDING	857	875
 5153	0	2024-04-25 15:52:00	2024-04-25 17:52:00	Too expensive	Mock City	Mock Country	10675	Mock Street 676	REJECTED	857	876
-5154	0	2024-04-24 09:54:00	\N	\N	Mock City	Mock Country	10676	Mock Street 677	PENDING	858	877
 5155	0	2024-04-24 15:17:00	2024-04-24 18:17:00	Too expensive	Mock City	Mock Country	10676	Mock Street 677	REJECTED	858	878
 5156	0	2024-04-23 09:23:00	2024-04-24 17:23:00	Within budget	Mock City	Mock Country	10677	Mock Street 678	COMPLETED	858	879
 5157	0	2024-04-23 15:23:00	2024-04-26 12:23:00	Within budget	Mock City	Mock Country	10677	Mock Street 678	COMPLETED	857	880
@@ -2269,13 +2356,9 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 5160	0	2024-04-21 09:31:00	2024-04-24 06:31:00	Within budget	Mock City	Mock Country	10679	Mock Street 680	COMPLETED	857	883
 5161	0	2024-04-21 15:20:00	2024-04-23 06:20:00	Too expensive	Mock City	Mock Country	10679	Mock Street 680	REJECTED	858	884
 5162	0	2024-04-20 09:24:00	2024-04-23 04:24:00	No availability	Mock City	Mock Country	10680	Mock Street 681	CANCELLED	857	875
-5163	0	2024-04-20 15:26:00	\N	\N	Mock City	Mock Country	10680	Mock Street 681	PENDING	857	876
-5164	0	2024-04-19 09:48:00	\N	\N	Mock City	Mock Country	10681	Mock Street 682	PENDING	858	877
-5165	0	2024-04-19 15:56:00	\N	\N	Mock City	Mock Country	10681	Mock Street 682	PENDING	857	878
 5166	0	2024-04-18 09:06:00	2024-04-19 21:06:00	Within budget	Mock City	Mock Country	10682	Mock Street 683	COMPLETED	857	879
 5167	0	2024-04-18 15:34:00	2024-04-21 09:34:00	No availability	Mock City	Mock Country	10682	Mock Street 683	CANCELLED	857	880
 5168	0	2024-04-17 09:49:00	2024-04-18 03:49:00	No availability	Mock City	Mock Country	10683	Mock Street 684	CANCELLED	857	881
-5169	0	2024-04-17 15:58:00	\N	\N	Mock City	Mock Country	10683	Mock Street 684	PENDING	858	882
 5170	0	2024-04-16 09:07:00	2024-04-19 02:07:00	Within budget	Mock City	Mock Country	10684	Mock Street 685	COMPLETED	857	883
 5171	0	2024-04-16 15:07:00	2024-04-17 07:07:00	Too expensive	Mock City	Mock Country	10684	Mock Street 685	REJECTED	858	884
 5172	0	2024-04-15 09:39:00	2024-04-15 10:39:00	Too expensive	Mock City	Mock Country	10685	Mock Street 686	REJECTED	858	875
@@ -2284,30 +2367,29 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 5175	0	2024-04-14 15:45:00	2024-04-14 21:45:00	Within budget	Mock City	Mock Country	10686	Mock Street 687	COMPLETED	857	878
 5176	0	2024-04-13 09:34:00	2024-04-15 17:34:00	No availability	Mock City	Mock Country	10687	Mock Street 688	CANCELLED	858	879
 5177	0	2024-04-13 15:51:00	2024-04-15 11:51:00	No availability	Mock City	Mock Country	10687	Mock Street 688	CANCELLED	858	880
-5178	0	2024-04-12 09:44:00	\N	\N	Mock City	Mock Country	10688	Mock Street 689	PENDING	858	881
 5179	0	2024-04-12 15:26:00	2024-04-13 02:26:00	Too expensive	Mock City	Mock Country	10688	Mock Street 689	REJECTED	857	882
 5180	0	2024-04-11 09:57:00	2024-04-12 02:57:00	Too expensive	Mock City	Mock Country	10689	Mock Street 690	REJECTED	857	883
-5181	0	2024-04-11 15:39:00	\N	\N	Mock City	Mock Country	10689	Mock Street 690	PENDING	857	884
 5182	0	2024-04-10 09:47:00	2024-04-11 20:47:00	Too expensive	Mock City	Mock Country	10690	Mock Street 691	REJECTED	858	875
 5183	0	2024-04-10 15:22:00	2024-04-12 03:22:00	No availability	Mock City	Mock Country	10690	Mock Street 691	CANCELLED	858	876
-5184	0	2024-04-09 09:03:00	\N	\N	Mock City	Mock Country	10691	Mock Street 692	PENDING	858	877
 5185	0	2024-04-09 15:57:00	2024-04-10 05:57:00	Within budget	Mock City	Mock Country	10691	Mock Street 692	COMPLETED	858	878
 5186	0	2024-04-08 09:52:00	2024-04-09 21:52:00	Within budget	Mock City	Mock Country	10692	Mock Street 693	COMPLETED	857	879
 5187	0	2024-04-08 15:34:00	2024-04-09 12:34:00	Within budget	Mock City	Mock Country	10692	Mock Street 693	COMPLETED	857	880
-5188	0	2024-04-07 09:30:00	\N	\N	Mock City	Mock Country	10693	Mock Street 694	PENDING	858	881
 5189	0	2024-04-07 15:07:00	2024-04-08 06:07:00	Too expensive	Mock City	Mock Country	10693	Mock Street 694	REJECTED	857	882
 5190	0	2024-04-06 09:40:00	2024-04-06 12:40:00	Within budget	Mock City	Mock Country	10694	Mock Street 695	COMPLETED	857	883
 5191	0	2024-04-06 15:38:00	2024-04-08 03:38:00	Within budget	Mock City	Mock Country	10694	Mock Street 695	COMPLETED	858	884
 5192	0	2024-04-05 09:01:00	2024-04-07 20:01:00	Within budget	Mock City	Mock Country	10695	Mock Street 696	COMPLETED	857	875
+5165	1	2024-04-19 15:56:00	2026-03-07 14:46:18.902848	Insufficient stock: The easy way to cows: needs 4, has 0	Mock City	Mock Country	10681	Mock Street 682	CANCELLED	857	878
+5152	1	2024-04-25 09:19:00	2026-03-07 14:46:31.624869	Insufficient stock: The secrets of dummies: needs 1, has 0	Mock City	Mock Country	10675	Mock Street 676	CANCELLED	857	875
+5035	1	2024-05-04 15:28:00	2026-03-07 14:46:37.424622	Insufficient stock: Being awesome at running barefoot: needs 2, has 0	Mock City	Mock Country	10666	Mock Street 667	CANCELLED	857	878
+5184	1	2024-04-09 09:03:00	2026-03-07 14:49:52.396377	Insufficient stock: Encyclopedia of playing the cello: needs 1, has 0	Mock City	Mock Country	10691	Mock Street 692	CANCELLED	858	877
+5178	1	2024-04-12 09:44:00	2026-03-07 14:50:03.264403	\N	Mock City	Mock Country	10688	Mock Street 689	COMPLETED	858	881
+5169	1	2024-04-17 15:58:00	2026-03-07 14:50:06.498825	Insufficient stock: Mastering speaking to a big audience: needs 5, has 0	Mock City	Mock Country	10683	Mock Street 684	CANCELLED	858	882
+5154	1	2024-04-24 09:54:00	2026-03-07 14:50:12.809699	Insufficient stock: The art of meditation: needs 5, has 0	Mock City	Mock Country	10676	Mock Street 677	CANCELLED	858	877
 5193	0	2024-04-05 15:45:00	2024-04-08 04:45:00	Within budget	Mock City	Mock Country	10695	Mock Street 696	COMPLETED	858	876
 5194	0	2024-04-04 09:40:00	2024-04-07 02:40:00	Within budget	Mock City	Mock Country	10696	Mock Street 697	COMPLETED	857	877
 5195	0	2024-04-04 15:08:00	2024-04-06 17:08:00	Within budget	Mock City	Mock Country	10696	Mock Street 697	COMPLETED	857	878
-5196	0	2024-04-03 09:35:00	\N	\N	Mock City	Mock Country	10697	Mock Street 698	PENDING	858	879
 5197	0	2024-04-03 15:53:00	2024-04-04 20:53:00	No availability	Mock City	Mock Country	10697	Mock Street 698	CANCELLED	858	880
 5198	0	2024-04-02 09:21:00	2024-04-03 17:21:00	Too expensive	Mock City	Mock Country	10698	Mock Street 699	REJECTED	858	881
-5199	0	2024-04-02 15:56:00	\N	\N	Mock City	Mock Country	10698	Mock Street 699	PENDING	857	882
-5200	0	2024-04-01 09:51:00	\N	\N	Mock City	Mock Country	10699	Mock Street 700	PENDING	858	883
-5201	0	2024-04-01 15:43:00	\N	\N	Mock City	Mock Country	10699	Mock Street 700	PENDING	857	884
 5252	0	2024-03-31 09:20:00	2024-04-03 01:20:00	Too expensive	Mock City	Mock Country	10700	Mock Street 701	REJECTED	858	875
 5253	0	2024-03-31 15:10:00	2024-04-01 10:10:00	Too expensive	Mock City	Mock Country	10700	Mock Street 701	REJECTED	858	876
 5254	0	2024-03-30 09:33:00	2024-04-02 06:33:00	Too expensive	Mock City	Mock Country	10701	Mock Street 702	REJECTED	857	877
@@ -2315,35 +2397,25 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 5256	0	2024-03-29 09:23:00	2024-03-31 22:23:00	No availability	Mock City	Mock Country	10702	Mock Street 703	CANCELLED	858	879
 5257	0	2024-03-29 15:57:00	2024-03-30 00:57:00	Too expensive	Mock City	Mock Country	10702	Mock Street 703	REJECTED	857	880
 5258	0	2024-03-28 09:38:00	2024-03-30 02:38:00	Too expensive	Mock City	Mock Country	10703	Mock Street 704	REJECTED	857	881
-5259	0	2024-03-28 15:38:00	\N	\N	Mock City	Mock Country	10703	Mock Street 704	PENDING	857	882
 5260	0	2024-03-27 09:39:00	2024-03-29 17:39:00	Within budget	Mock City	Mock Country	10704	Mock Street 705	COMPLETED	858	883
-5261	0	2024-03-27 15:44:00	\N	\N	Mock City	Mock Country	10704	Mock Street 705	PENDING	857	884
 5262	0	2024-03-26 09:01:00	2024-03-27 08:01:00	No availability	Mock City	Mock Country	10705	Mock Street 706	CANCELLED	858	875
 5263	0	2024-03-26 15:20:00	2024-03-29 07:20:00	No availability	Mock City	Mock Country	10705	Mock Street 706	CANCELLED	858	876
 5264	0	2024-03-25 09:25:00	2024-03-26 11:25:00	No availability	Mock City	Mock Country	10706	Mock Street 707	CANCELLED	857	877
-5265	0	2024-03-25 15:38:00	\N	\N	Mock City	Mock Country	10706	Mock Street 707	PENDING	858	878
 5266	0	2024-03-24 09:00:00	2024-03-25 00:00:00	No availability	Mock City	Mock Country	10707	Mock Street 708	CANCELLED	857	879
 5267	0	2024-03-24 15:57:00	2024-03-24 20:57:00	Within budget	Mock City	Mock Country	10707	Mock Street 708	COMPLETED	858	880
-5268	0	2024-03-23 09:22:00	\N	\N	Mock City	Mock Country	10708	Mock Street 709	PENDING	858	881
 5269	0	2024-03-23 15:43:00	2024-03-26 13:43:00	No availability	Mock City	Mock Country	10708	Mock Street 709	CANCELLED	857	882
-5270	0	2024-03-22 09:12:00	\N	\N	Mock City	Mock Country	10709	Mock Street 710	PENDING	858	883
-5271	0	2024-03-22 15:34:00	\N	\N	Mock City	Mock Country	10709	Mock Street 710	PENDING	858	884
 5272	0	2024-03-21 09:09:00	2024-03-24 00:09:00	Within budget	Mock City	Mock Country	10710	Mock Street 711	COMPLETED	858	875
 5273	0	2024-03-21 15:08:00	2024-03-23 14:08:00	No availability	Mock City	Mock Country	10710	Mock Street 711	CANCELLED	857	876
 5274	0	2024-03-20 09:55:00	2024-03-21 00:55:00	No availability	Mock City	Mock Country	10711	Mock Street 712	CANCELLED	857	877
 5275	0	2024-03-20 15:12:00	2024-03-21 07:12:00	No availability	Mock City	Mock Country	10711	Mock Street 712	CANCELLED	857	878
 5276	0	2024-03-19 09:47:00	2024-03-19 16:47:00	No availability	Mock City	Mock Country	10712	Mock Street 713	CANCELLED	858	879
 5277	0	2024-03-19 15:07:00	2024-03-21 19:07:00	Within budget	Mock City	Mock Country	10712	Mock Street 713	COMPLETED	858	880
-5278	0	2024-03-18 09:46:00	\N	\N	Mock City	Mock Country	10713	Mock Street 714	PENDING	857	881
-5279	0	2024-03-18 15:48:00	\N	\N	Mock City	Mock Country	10713	Mock Street 714	PENDING	857	882
 5280	0	2024-03-17 09:39:00	2024-03-18 11:39:00	Within budget	Mock City	Mock Country	10714	Mock Street 715	COMPLETED	857	883
 5281	0	2024-03-17 15:44:00	2024-03-18 03:44:00	Too expensive	Mock City	Mock Country	10714	Mock Street 715	REJECTED	857	884
 5282	0	2024-03-16 09:49:00	2024-03-18 17:49:00	No availability	Mock City	Mock Country	10715	Mock Street 716	CANCELLED	858	875
 5283	0	2024-03-16 15:40:00	2024-03-19 00:40:00	Within budget	Mock City	Mock Country	10715	Mock Street 716	COMPLETED	858	876
 5284	0	2024-03-15 09:36:00	2024-03-17 14:36:00	Within budget	Mock City	Mock Country	10716	Mock Street 717	COMPLETED	858	877
 5285	0	2024-03-15 15:27:00	2024-03-16 02:27:00	No availability	Mock City	Mock Country	10716	Mock Street 717	CANCELLED	858	878
-5286	0	2024-03-14 09:06:00	\N	\N	Mock City	Mock Country	10717	Mock Street 718	PENDING	858	879
-5287	0	2024-03-14 15:13:00	\N	\N	Mock City	Mock Country	10717	Mock Street 718	PENDING	858	880
 5288	0	2024-03-13 09:03:00	2024-03-14 04:03:00	Too expensive	Mock City	Mock Country	10718	Mock Street 719	REJECTED	857	881
 5289	0	2024-03-13 15:27:00	2024-03-16 03:27:00	Within budget	Mock City	Mock Country	10718	Mock Street 719	COMPLETED	857	882
 5290	0	2024-03-12 09:28:00	2024-03-13 13:28:00	Within budget	Mock City	Mock Country	10719	Mock Street 720	COMPLETED	858	883
@@ -2351,168 +2423,51 @@ COPY public.purchase (id, version, created_at, decided_at, decision_reason, city
 5292	0	2024-03-11 09:47:00	2024-03-13 10:47:00	Too expensive	Mock City	Mock Country	10720	Mock Street 721	REJECTED	858	875
 5293	0	2024-03-11 15:55:00	2024-03-12 05:55:00	No availability	Mock City	Mock Country	10720	Mock Street 721	CANCELLED	857	876
 5294	0	2024-03-10 09:19:00	2024-03-12 09:19:00	Within budget	Mock City	Mock Country	10721	Mock Street 722	COMPLETED	858	877
-5295	0	2024-03-10 15:58:00	\N	\N	Mock City	Mock Country	10721	Mock Street 722	PENDING	857	878
 5296	0	2024-03-09 09:19:00	2024-03-10 00:19:00	Within budget	Mock City	Mock Country	10722	Mock Street 723	COMPLETED	857	879
-5297	0	2024-03-09 15:46:00	\N	\N	Mock City	Mock Country	10722	Mock Street 723	PENDING	858	880
 5298	0	2024-03-08 09:17:00	2024-03-08 16:17:00	Within budget	Mock City	Mock Country	10723	Mock Street 724	COMPLETED	858	881
 5299	0	2024-03-08 15:38:00	2024-03-11 02:38:00	Within budget	Mock City	Mock Country	10723	Mock Street 724	COMPLETED	858	882
-5300	0	2024-03-07 09:14:00	\N	\N	Mock City	Mock Country	10724	Mock Street 725	PENDING	858	883
-5301	0	2024-03-07 15:24:00	\N	\N	Mock City	Mock Country	10724	Mock Street 725	PENDING	858	884
-5402	0	2024-03-06 09:38:00	2024-03-07 17:38:00	Within budget	Mock City	Mock Country	10725	Mock Street 726	COMPLETED	857	875
-5403	0	2024-03-06 15:12:00	2024-03-07 13:12:00	Within budget	Mock City	Mock Country	10725	Mock Street 726	COMPLETED	858	876
-5404	0	2024-03-05 09:40:00	2024-03-06 04:40:00	Within budget	Mock City	Mock Country	10726	Mock Street 727	COMPLETED	857	877
-5405	0	2024-03-05 15:40:00	\N	\N	Mock City	Mock Country	10726	Mock Street 727	PENDING	858	878
-5406	0	2024-03-04 09:23:00	\N	\N	Mock City	Mock Country	10727	Mock Street 728	PENDING	858	879
-5407	0	2024-03-04 15:24:00	2024-03-06 16:24:00	Within budget	Mock City	Mock Country	10727	Mock Street 728	COMPLETED	857	880
-5408	0	2024-03-03 09:04:00	\N	\N	Mock City	Mock Country	10728	Mock Street 729	PENDING	857	881
-5409	0	2024-03-03 15:59:00	2024-03-05 15:59:00	Within budget	Mock City	Mock Country	10728	Mock Street 729	COMPLETED	857	882
-5410	0	2024-03-02 09:41:00	2024-03-05 09:41:00	Within budget	Mock City	Mock Country	10729	Mock Street 730	COMPLETED	857	883
-5411	0	2024-03-02 15:53:00	2024-03-05 07:53:00	Within budget	Mock City	Mock Country	10729	Mock Street 730	COMPLETED	858	884
-5412	0	2024-03-01 09:51:00	2024-03-04 03:51:00	Too expensive	Mock City	Mock Country	10730	Mock Street 731	REJECTED	857	875
-5413	0	2024-03-01 15:50:00	\N	\N	Mock City	Mock Country	10730	Mock Street 731	PENDING	858	876
-5414	0	2024-02-29 09:15:00	\N	\N	Mock City	Mock Country	10731	Mock Street 732	PENDING	857	877
-5415	0	2024-02-29 15:49:00	2024-03-03 03:49:00	Within budget	Mock City	Mock Country	10731	Mock Street 732	COMPLETED	858	878
-5416	0	2024-02-28 09:07:00	2024-03-01 05:07:00	No availability	Mock City	Mock Country	10732	Mock Street 733	CANCELLED	857	879
-5417	0	2024-02-28 15:08:00	\N	\N	Mock City	Mock Country	10732	Mock Street 733	PENDING	858	880
-5418	0	2024-02-27 09:06:00	2024-02-29 20:06:00	No availability	Mock City	Mock Country	10733	Mock Street 734	CANCELLED	858	881
-5419	0	2024-02-27 15:00:00	2024-02-29 17:00:00	Within budget	Mock City	Mock Country	10733	Mock Street 734	COMPLETED	858	882
-5420	0	2024-02-26 09:48:00	2024-02-27 17:48:00	Too expensive	Mock City	Mock Country	10734	Mock Street 735	REJECTED	858	883
-5421	0	2024-02-26 15:21:00	2024-02-28 11:21:00	No availability	Mock City	Mock Country	10734	Mock Street 735	CANCELLED	857	884
-5422	0	2024-02-25 09:54:00	2024-02-27 19:54:00	Within budget	Mock City	Mock Country	10735	Mock Street 736	COMPLETED	857	875
-5423	0	2024-02-25 15:17:00	\N	\N	Mock City	Mock Country	10735	Mock Street 736	PENDING	858	876
-5424	0	2024-02-24 09:25:00	2024-02-26 16:25:00	No availability	Mock City	Mock Country	10736	Mock Street 737	CANCELLED	857	877
-5425	0	2024-02-24 15:03:00	\N	\N	Mock City	Mock Country	10736	Mock Street 737	PENDING	857	878
-5426	0	2024-02-23 09:39:00	2024-02-25 12:39:00	Too expensive	Mock City	Mock Country	10737	Mock Street 738	REJECTED	857	879
-5427	0	2024-02-23 15:48:00	2024-02-26 02:48:00	Within budget	Mock City	Mock Country	10737	Mock Street 738	COMPLETED	857	880
-5428	0	2024-02-22 09:22:00	2024-02-24 07:22:00	Too expensive	Mock City	Mock Country	10738	Mock Street 739	REJECTED	857	881
-5429	0	2024-02-22 15:54:00	\N	\N	Mock City	Mock Country	10738	Mock Street 739	PENDING	858	882
-5430	0	2024-02-21 09:01:00	2024-02-23 00:01:00	No availability	Mock City	Mock Country	10739	Mock Street 740	CANCELLED	857	883
-5431	0	2024-02-21 15:15:00	2024-02-22 13:15:00	Too expensive	Mock City	Mock Country	10739	Mock Street 740	REJECTED	857	884
-5432	0	2024-02-20 09:27:00	2024-02-21 03:27:00	Within budget	Mock City	Mock Country	10740	Mock Street 741	COMPLETED	858	875
-5433	0	2024-02-20 15:28:00	2024-02-21 11:28:00	Within budget	Mock City	Mock Country	10740	Mock Street 741	COMPLETED	857	876
-5434	0	2024-02-19 09:43:00	\N	\N	Mock City	Mock Country	10741	Mock Street 742	PENDING	858	877
-5435	0	2024-02-19 15:49:00	2024-02-20 22:49:00	Too expensive	Mock City	Mock Country	10741	Mock Street 742	REJECTED	857	878
-5436	0	2024-02-18 09:06:00	2024-02-18 22:06:00	No availability	Mock City	Mock Country	10742	Mock Street 743	CANCELLED	857	879
-5437	0	2024-02-18 15:30:00	2024-02-19 06:30:00	No availability	Mock City	Mock Country	10742	Mock Street 743	CANCELLED	858	880
-5438	0	2024-02-17 09:22:00	2024-02-20 03:22:00	No availability	Mock City	Mock Country	10743	Mock Street 744	CANCELLED	857	881
-5439	0	2024-02-17 15:37:00	2024-02-18 02:37:00	No availability	Mock City	Mock Country	10743	Mock Street 744	CANCELLED	857	882
-5440	0	2024-02-16 09:14:00	\N	\N	Mock City	Mock Country	10744	Mock Street 745	PENDING	858	883
-5441	0	2024-02-16 15:36:00	2024-02-16 16:36:00	Too expensive	Mock City	Mock Country	10744	Mock Street 745	REJECTED	857	884
-5442	0	2024-02-15 09:51:00	\N	\N	Mock City	Mock Country	10745	Mock Street 746	PENDING	858	875
-5443	0	2024-02-15 15:50:00	2024-02-16 06:50:00	No availability	Mock City	Mock Country	10745	Mock Street 746	CANCELLED	858	876
-5444	0	2024-02-14 09:39:00	2024-02-14 10:39:00	Too expensive	Mock City	Mock Country	10746	Mock Street 747	REJECTED	858	877
-5445	0	2024-02-14 15:10:00	2024-02-16 16:10:00	Too expensive	Mock City	Mock Country	10746	Mock Street 747	REJECTED	858	878
-5446	0	2024-02-13 09:46:00	2024-02-13 17:46:00	Too expensive	Mock City	Mock Country	10747	Mock Street 748	REJECTED	857	879
-5447	0	2024-02-13 15:17:00	2024-02-16 12:17:00	Too expensive	Mock City	Mock Country	10747	Mock Street 748	REJECTED	857	880
-5448	0	2024-02-12 09:10:00	2024-02-13 10:10:00	Too expensive	Mock City	Mock Country	10748	Mock Street 749	REJECTED	857	881
-5449	0	2024-02-12 15:55:00	2024-02-14 21:55:00	Too expensive	Mock City	Mock Country	10748	Mock Street 749	REJECTED	858	882
-5450	0	2024-02-11 09:27:00	2024-02-12 10:27:00	Within budget	Mock City	Mock Country	10749	Mock Street 750	COMPLETED	857	883
-5451	0	2024-02-11 15:00:00	2024-02-12 16:00:00	Within budget	Mock City	Mock Country	10749	Mock Street 750	COMPLETED	857	884
-5552	0	2024-02-10 09:18:00	2024-02-11 06:18:00	Within budget	Mock City	Mock Country	10750	Mock Street 751	COMPLETED	858	875
-5553	0	2024-02-10 15:17:00	2024-02-12 22:17:00	Within budget	Mock City	Mock Country	10750	Mock Street 751	COMPLETED	857	876
-5554	0	2024-02-09 09:06:00	2024-02-11 22:06:00	No availability	Mock City	Mock Country	10751	Mock Street 752	CANCELLED	858	877
-5555	0	2024-02-09 15:46:00	2024-02-10 22:46:00	No availability	Mock City	Mock Country	10751	Mock Street 752	CANCELLED	857	878
-5556	0	2024-02-08 09:06:00	2024-02-09 05:06:00	Within budget	Mock City	Mock Country	10752	Mock Street 753	COMPLETED	858	879
-5557	0	2024-02-08 15:52:00	2024-02-11 06:52:00	Too expensive	Mock City	Mock Country	10752	Mock Street 753	REJECTED	857	880
-5558	0	2024-02-07 09:21:00	\N	\N	Mock City	Mock Country	10753	Mock Street 754	PENDING	857	881
-5559	0	2024-02-07 15:53:00	2024-02-09 01:53:00	Too expensive	Mock City	Mock Country	10753	Mock Street 754	REJECTED	857	882
-5560	0	2024-02-06 09:27:00	2024-02-08 01:27:00	No availability	Mock City	Mock Country	10754	Mock Street 755	CANCELLED	858	883
-5561	0	2024-02-06 15:50:00	2024-02-08 06:50:00	No availability	Mock City	Mock Country	10754	Mock Street 755	CANCELLED	858	884
-5562	0	2024-02-05 09:01:00	2024-02-08 08:01:00	Within budget	Mock City	Mock Country	10755	Mock Street 756	COMPLETED	857	875
-5563	0	2024-02-05 15:35:00	\N	\N	Mock City	Mock Country	10755	Mock Street 756	PENDING	858	876
-5564	0	2024-02-04 09:21:00	\N	\N	Mock City	Mock Country	10756	Mock Street 757	PENDING	858	877
-5565	0	2024-02-04 15:51:00	\N	\N	Mock City	Mock Country	10756	Mock Street 757	PENDING	858	878
-5566	0	2024-02-03 09:17:00	\N	\N	Mock City	Mock Country	10757	Mock Street 758	PENDING	857	879
-5567	0	2024-02-03 15:17:00	2024-02-05 03:17:00	Within budget	Mock City	Mock Country	10757	Mock Street 758	COMPLETED	857	880
-5568	0	2024-02-02 09:30:00	2024-02-04 23:30:00	No availability	Mock City	Mock Country	10758	Mock Street 759	CANCELLED	858	881
-5569	0	2024-02-02 15:41:00	2024-02-03 01:41:00	No availability	Mock City	Mock Country	10758	Mock Street 759	CANCELLED	858	882
-5570	0	2024-02-01 09:54:00	2024-02-03 17:54:00	Too expensive	Mock City	Mock Country	10759	Mock Street 760	REJECTED	857	883
-5571	0	2024-02-01 15:39:00	\N	\N	Mock City	Mock Country	10759	Mock Street 760	PENDING	857	884
-5572	0	2024-01-31 09:03:00	2024-02-01 07:03:00	Within budget	Mock City	Mock Country	10760	Mock Street 761	COMPLETED	858	875
-5573	0	2024-01-31 15:22:00	2024-02-03 13:22:00	Too expensive	Mock City	Mock Country	10760	Mock Street 761	REJECTED	857	876
-5574	0	2024-01-30 09:17:00	\N	\N	Mock City	Mock Country	10761	Mock Street 762	PENDING	857	877
-5575	0	2024-01-30 15:02:00	\N	\N	Mock City	Mock Country	10761	Mock Street 762	PENDING	857	878
-5576	0	2024-01-29 09:24:00	2024-01-31 10:24:00	Too expensive	Mock City	Mock Country	10762	Mock Street 763	REJECTED	858	879
-5577	0	2024-01-29 15:28:00	2024-01-31 03:28:00	Within budget	Mock City	Mock Country	10762	Mock Street 763	COMPLETED	858	880
-5578	0	2024-01-28 09:43:00	2024-01-30 15:43:00	Within budget	Mock City	Mock Country	10763	Mock Street 764	COMPLETED	858	881
-5579	0	2024-01-28 15:00:00	2024-01-31 09:00:00	No availability	Mock City	Mock Country	10763	Mock Street 764	CANCELLED	857	882
-5580	0	2024-01-27 09:28:00	2024-01-28 12:28:00	Within budget	Mock City	Mock Country	10764	Mock Street 765	COMPLETED	858	883
-5581	0	2024-01-27 15:44:00	2024-01-27 19:44:00	Too expensive	Mock City	Mock Country	10764	Mock Street 765	REJECTED	857	884
-5582	0	2024-01-26 09:25:00	2024-01-27 11:25:00	Within budget	Mock City	Mock Country	10765	Mock Street 766	COMPLETED	857	875
-5583	0	2024-01-26 15:53:00	2024-01-28 17:53:00	Too expensive	Mock City	Mock Country	10765	Mock Street 766	REJECTED	857	876
-5584	0	2024-01-25 09:03:00	2024-01-25 10:03:00	Within budget	Mock City	Mock Country	10766	Mock Street 767	COMPLETED	857	877
-5585	0	2024-01-25 15:19:00	2024-01-28 10:19:00	Too expensive	Mock City	Mock Country	10766	Mock Street 767	REJECTED	857	878
-5586	0	2024-01-24 09:30:00	\N	\N	Mock City	Mock Country	10767	Mock Street 768	PENDING	858	879
-5587	0	2024-01-24 15:39:00	2024-01-27 03:39:00	Within budget	Mock City	Mock Country	10767	Mock Street 768	COMPLETED	858	880
-5588	0	2024-01-23 09:00:00	2024-01-23 23:00:00	Within budget	Mock City	Mock Country	10768	Mock Street 769	COMPLETED	857	881
-5589	0	2024-01-23 15:38:00	2024-01-24 11:38:00	Within budget	Mock City	Mock Country	10768	Mock Street 769	COMPLETED	858	882
-5590	0	2024-01-22 09:23:00	\N	\N	Mock City	Mock Country	10769	Mock Street 770	PENDING	857	883
-5591	0	2024-01-22 15:25:00	2024-01-23 22:25:00	Within budget	Mock City	Mock Country	10769	Mock Street 770	COMPLETED	858	884
-5592	0	2024-01-21 09:40:00	2024-01-21 15:40:00	Within budget	Mock City	Mock Country	10770	Mock Street 771	COMPLETED	858	875
-5593	0	2024-01-21 15:57:00	2024-01-22 12:57:00	Too expensive	Mock City	Mock Country	10770	Mock Street 771	REJECTED	858	876
-5594	0	2024-01-20 09:02:00	2024-01-22 22:02:00	Too expensive	Mock City	Mock Country	10771	Mock Street 772	REJECTED	858	877
-5595	0	2024-01-20 15:48:00	\N	\N	Mock City	Mock Country	10771	Mock Street 772	PENDING	857	878
-5596	0	2024-01-19 09:06:00	\N	\N	Mock City	Mock Country	10772	Mock Street 773	PENDING	858	879
-5597	0	2024-01-19 15:23:00	2024-01-19 21:23:00	Too expensive	Mock City	Mock Country	10772	Mock Street 773	REJECTED	857	880
-5598	0	2024-01-18 09:54:00	2024-01-19 04:54:00	Too expensive	Mock City	Mock Country	10773	Mock Street 774	REJECTED	858	881
-5599	0	2024-01-18 15:02:00	2024-01-19 08:02:00	Too expensive	Mock City	Mock Country	10773	Mock Street 774	REJECTED	858	882
-5600	0	2024-01-17 09:24:00	2024-01-17 21:24:00	Within budget	Mock City	Mock Country	10774	Mock Street 775	COMPLETED	858	883
-5601	0	2024-01-17 15:40:00	2024-01-20 11:40:00	Too expensive	Mock City	Mock Country	10774	Mock Street 775	REJECTED	858	884
-5702	0	2024-01-16 09:49:00	2024-01-18 00:49:00	Within budget	Mock City	Mock Country	10775	Mock Street 776	COMPLETED	858	875
-5703	0	2024-01-16 15:32:00	2024-01-18 22:32:00	No availability	Mock City	Mock Country	10775	Mock Street 776	CANCELLED	858	876
-5704	0	2024-01-15 09:02:00	\N	\N	Mock City	Mock Country	10776	Mock Street 777	PENDING	858	877
-5705	0	2024-01-15 15:15:00	2024-01-17 17:15:00	Within budget	Mock City	Mock Country	10776	Mock Street 777	COMPLETED	857	878
-5706	0	2024-01-14 09:00:00	\N	\N	Mock City	Mock Country	10777	Mock Street 778	PENDING	857	879
-5707	0	2024-01-14 15:39:00	2024-01-16 19:39:00	Within budget	Mock City	Mock Country	10777	Mock Street 778	COMPLETED	857	880
-5708	0	2024-01-13 09:39:00	2024-01-15 16:39:00	Within budget	Mock City	Mock Country	10778	Mock Street 779	COMPLETED	857	881
-5709	0	2024-01-13 15:26:00	\N	\N	Mock City	Mock Country	10778	Mock Street 779	PENDING	857	882
-5710	0	2024-01-12 09:03:00	2024-01-13 09:03:00	Too expensive	Mock City	Mock Country	10779	Mock Street 780	REJECTED	858	883
-5711	0	2024-01-12 15:02:00	2024-01-13 11:02:00	Within budget	Mock City	Mock Country	10779	Mock Street 780	COMPLETED	857	884
-5712	0	2024-01-11 09:30:00	\N	\N	Mock City	Mock Country	10780	Mock Street 781	PENDING	857	875
-5713	0	2024-01-11 15:05:00	2024-01-12 23:05:00	Too expensive	Mock City	Mock Country	10780	Mock Street 781	REJECTED	858	876
-5714	0	2024-01-10 09:42:00	2024-01-11 21:42:00	No availability	Mock City	Mock Country	10781	Mock Street 782	CANCELLED	857	877
-5715	0	2024-01-10 15:55:00	2024-01-12 15:55:00	Within budget	Mock City	Mock Country	10781	Mock Street 782	COMPLETED	858	878
-5716	0	2024-01-09 09:09:00	2024-01-09 17:09:00	No availability	Mock City	Mock Country	10782	Mock Street 783	CANCELLED	857	879
-5717	0	2024-01-09 15:24:00	2024-01-11 00:24:00	No availability	Mock City	Mock Country	10782	Mock Street 783	CANCELLED	857	880
-5718	0	2024-01-08 09:11:00	2024-01-08 15:11:00	Too expensive	Mock City	Mock Country	10783	Mock Street 784	REJECTED	858	881
-5719	0	2024-01-08 15:25:00	2024-01-11 13:25:00	Too expensive	Mock City	Mock Country	10783	Mock Street 784	REJECTED	857	882
-5720	0	2024-01-07 09:17:00	2024-01-10 07:17:00	No availability	Mock City	Mock Country	10784	Mock Street 785	CANCELLED	857	883
-5721	0	2024-01-07 15:11:00	2024-01-09 06:11:00	Too expensive	Mock City	Mock Country	10784	Mock Street 785	REJECTED	857	884
-5722	0	2024-01-06 09:33:00	2024-01-08 15:33:00	No availability	Mock City	Mock Country	10785	Mock Street 786	CANCELLED	857	875
-5723	0	2024-01-06 15:10:00	\N	\N	Mock City	Mock Country	10785	Mock Street 786	PENDING	858	876
-5724	0	2024-01-05 09:23:00	2024-01-06 11:23:00	Too expensive	Mock City	Mock Country	10786	Mock Street 787	REJECTED	857	877
-5725	0	2024-01-05 15:52:00	2024-01-07 03:52:00	No availability	Mock City	Mock Country	10786	Mock Street 787	CANCELLED	858	878
-5726	0	2024-01-04 09:57:00	2024-01-06 14:57:00	Within budget	Mock City	Mock Country	10787	Mock Street 788	COMPLETED	858	879
-5727	0	2024-01-04 15:57:00	2024-01-04 16:57:00	No availability	Mock City	Mock Country	10787	Mock Street 788	CANCELLED	858	880
-5728	0	2024-01-03 09:56:00	2024-01-03 17:56:00	Within budget	Mock City	Mock Country	10788	Mock Street 789	COMPLETED	858	881
-5729	0	2024-01-03 15:38:00	\N	\N	Mock City	Mock Country	10788	Mock Street 789	PENDING	857	882
-5730	0	2024-01-02 09:03:00	2024-01-02 22:03:00	Within budget	Mock City	Mock Country	10789	Mock Street 790	COMPLETED	858	883
-5731	0	2024-01-02 15:27:00	2024-01-05 03:27:00	Within budget	Mock City	Mock Country	10789	Mock Street 790	COMPLETED	857	884
-5732	0	2024-01-01 09:42:00	2024-01-04 07:42:00	Within budget	Mock City	Mock Country	10790	Mock Street 791	COMPLETED	858	875
-5733	0	2024-01-01 15:24:00	2024-01-04 09:24:00	Within budget	Mock City	Mock Country	10790	Mock Street 791	COMPLETED	858	876
-5734	0	2023-12-31 09:49:00	\N	\N	Mock City	Mock Country	10791	Mock Street 792	PENDING	858	877
-5735	0	2023-12-31 15:47:00	2024-01-01 00:47:00	No availability	Mock City	Mock Country	10791	Mock Street 792	CANCELLED	857	878
-5736	0	2023-12-30 09:59:00	\N	\N	Mock City	Mock Country	10792	Mock Street 793	PENDING	858	879
-5737	0	2023-12-30 15:34:00	2024-01-01 22:34:00	No availability	Mock City	Mock Country	10792	Mock Street 793	CANCELLED	857	880
-5738	0	2023-12-29 09:33:00	\N	\N	Mock City	Mock Country	10793	Mock Street 794	PENDING	857	881
-5739	0	2023-12-29 15:59:00	2023-12-29 20:59:00	Too expensive	Mock City	Mock Country	10793	Mock Street 794	REJECTED	858	882
-5740	0	2023-12-28 09:10:00	\N	\N	Mock City	Mock Country	10794	Mock Street 795	PENDING	858	883
-5741	0	2023-12-28 15:51:00	2023-12-31 15:51:00	No availability	Mock City	Mock Country	10794	Mock Street 795	CANCELLED	857	884
-5742	0	2023-12-27 09:48:00	\N	\N	Mock City	Mock Country	10795	Mock Street 796	PENDING	857	875
-5743	0	2023-12-27 15:11:00	\N	\N	Mock City	Mock Country	10795	Mock Street 796	PENDING	858	876
-5744	0	2023-12-26 09:49:00	2023-12-28 10:49:00	Within budget	Mock City	Mock Country	10796	Mock Street 797	COMPLETED	857	877
-5745	0	2023-12-26 15:27:00	2023-12-27 23:27:00	No availability	Mock City	Mock Country	10796	Mock Street 797	CANCELLED	857	878
-5746	0	2023-12-25 09:19:00	2023-12-27 19:19:00	Within budget	Mock City	Mock Country	10797	Mock Street 798	COMPLETED	858	879
-5747	0	2023-12-25 15:45:00	2023-12-27 21:45:00	No availability	Mock City	Mock Country	10797	Mock Street 798	CANCELLED	857	880
-5748	0	2023-12-24 09:38:00	2023-12-25 18:38:00	Too expensive	Mock City	Mock Country	10798	Mock Street 799	REJECTED	857	881
-5749	0	2023-12-24 15:00:00	2023-12-25 03:00:00	Too expensive	Mock City	Mock Country	10798	Mock Street 799	REJECTED	858	882
-5750	0	2023-12-23 09:22:00	2023-12-23 12:22:00	Within budget	Mock City	Mock Country	10799	Mock Street 800	COMPLETED	857	883
-5751	0	2023-12-23 15:31:00	2023-12-26 02:31:00	Too expensive	Mock City	Mock Country	10799	Mock Street 800	REJECTED	857	884
+5295	1	2024-03-10 15:58:00	2026-03-07 14:45:37.935862	Insufficient stock: Book of playing the cello: needs 3, has 0, Book of playing the cello: needs 3, has 0, The mother of all references: creating software: needs 5, has 0	Mock City	Mock Country	10721	Mock Street 722	CANCELLED	857	878
+5278	1	2024-03-18 09:46:00	2026-03-07 14:45:43.270663	Insufficient stock: The art of giant needles: needs 2, has 0	Mock City	Mock Country	10713	Mock Street 714	CANCELLED	857	881
+5279	1	2024-03-18 15:48:00	2026-03-07 14:45:57.291868	Insufficient stock: The secrets of debugging: needs 5, has 0	Mock City	Mock Country	10713	Mock Street 714	CANCELLED	857	882
+5261	1	2024-03-27 15:44:00	2026-03-07 14:46:02.561209	Insufficient stock: Surviving gardening: needs 1, has 0	Mock City	Mock Country	10704	Mock Street 705	CANCELLED	857	884
+5259	1	2024-03-28 15:38:00	2026-03-07 14:46:05.405277	Insufficient stock: The cheap way to ice hockey: needs 2, has 0	Mock City	Mock Country	10703	Mock Street 704	CANCELLED	857	882
+5201	1	2024-04-01 15:43:00	2026-03-07 14:46:07.966664	\N	Mock City	Mock Country	10699	Mock Street 700	COMPLETED	857	884
+5199	1	2024-04-02 15:56:00	2026-03-07 14:46:11.296004	Insufficient stock: The cheap way to meditation: needs 1, has 0	Mock City	Mock Country	10698	Mock Street 699	CANCELLED	857	882
+5301	1	2024-03-07 15:24:00	2026-03-07 14:49:19.392818	Insufficient stock: The mother of all references: creating software: needs 1, has 0	Mock City	Mock Country	10724	Mock Street 725	CANCELLED	858	884
+5297	1	2024-03-09 15:46:00	2026-03-07 14:49:21.967828	\N	Mock City	Mock Country	10722	Mock Street 723	COMPLETED	858	880
+5286	1	2024-03-14 09:06:00	2026-03-07 14:49:24.341884	\N	Mock City	Mock Country	10717	Mock Street 718	COMPLETED	858	879
+5271	1	2024-03-22 15:34:00	2026-03-07 14:49:33.777234	Insufficient stock: The secrets of creating software: needs 4, has 0, Becoming one with winter bathing: needs 2, has 0	Mock City	Mock Country	10709	Mock Street 710	CANCELLED	858	884
+5268	1	2024-03-23 09:22:00	2026-03-07 14:49:37.403955	\N	Mock City	Mock Country	10708	Mock Street 709	COMPLETED	858	881
+5265	1	2024-03-25 15:38:00	2026-03-07 14:49:40.473725	\N	Mock City	Mock Country	10706	Mock Street 707	COMPLETED	858	878
+5200	1	2024-04-01 09:51:00	2026-03-07 14:49:43.329553	Insufficient stock: Encyclopedia of winter bathing: needs 3, has 0	Mock City	Mock Country	10699	Mock Street 700	CANCELLED	858	883
+4901	1	2024-05-21 15:48:00	2026-03-07 14:50:26.27401	Insufficient stock: Surviving computer programming: needs 2, has 0	Mock City	Mock Country	10649	Mock Street 650	CANCELLED	858	884
+5181	1	2024-04-11 15:39:00	2026-03-07 14:46:15.275144	Insufficient stock: The mother of all references: winter bathing: needs 2, has 0	Mock City	Mock Country	10689	Mock Street 690	CANCELLED	857	884
+5163	1	2024-04-20 15:26:00	2026-03-07 14:46:28.249259	\N	Mock City	Mock Country	10680	Mock Street 681	COMPLETED	857	876
+5040	1	2024-05-01 09:47:00	2026-03-07 14:46:34.729018	Insufficient stock: Avoiding running barefoot: needs 5, has 0	Mock City	Mock Country	10669	Mock Street 670	CANCELLED	857	883
+5027	1	2024-05-08 15:42:00	2026-03-07 14:46:39.895524	Insufficient stock: The secrets of debugging: needs 4, has 0	Mock City	Mock Country	10662	Mock Street 663	CANCELLED	857	880
+5014	1	2024-05-14 09:53:00	2026-03-07 14:46:52.914073	Insufficient stock: Avoiding children's education: needs 4, has 0	Mock City	Mock Country	10656	Mock Street 657	CANCELLED	857	877
+4894	1	2024-05-24 09:37:00	2026-03-07 14:46:58.223234	Insufficient stock: Encyclopedia of rubber bands: needs 4, has 0, The art of dummies: needs 2, has 0, The art of feeling down: needs 4, has 0	Mock City	Mock Country	10646	Mock Street 647	CANCELLED	857	877
+4867	1	2024-06-07 15:10:00	2026-03-07 14:47:20.846001	Insufficient stock: Mastering speaking to a big audience: needs 4, has 0, Beginners guide to speaking to a big audience: needs 3, has 0	Mock City	Mock Country	10632	Mock Street 633	CANCELLED	857	880
+4864	1	2024-06-08 09:27:00	2026-03-07 14:47:24.542056	\N	Mock City	Mock Country	10631	Mock Street 632	COMPLETED	857	877
+4747	1	2024-06-17 15:33:00	2026-03-07 14:47:30.065372	Insufficient stock: The ultimate guide to rubber bands: needs 4, has 0	Mock City	Mock Country	10622	Mock Street 623	CANCELLED	857	880
+4731	1	2024-06-25 15:50:00	2026-03-07 14:47:37.380735	Insufficient stock: 10 important facts about designing tree houses: needs 4, has 0	Mock City	Mock Country	10614	Mock Street 615	CANCELLED	857	884
+4715	1	2024-07-03 15:07:00	2026-03-07 14:47:43.428968	Insufficient stock: Encyclopedia of gardening: needs 1, has 0	Mock City	Mock Country	10606	Mock Street 607	CANCELLED	857	878
+4600	1	2024-07-10 09:10:00	2026-03-07 14:47:51.763159	Insufficient stock: The Vaadin way: Vaadin TreeTable: needs 2, has 0	Mock City	Mock Country	10599	Mock Street 600	CANCELLED	857	883
+4594	1	2024-07-13 09:54:00	2026-03-07 14:47:57.404784	Insufficient stock: The ultimate guide to rubber bands: needs 2, has 0, Book of dummies: needs 3, has 0, The art of meditation: needs 3, has 0	Mock City	Mock Country	10596	Mock Street 597	CANCELLED	857	877
+4559	1	2024-07-31 15:13:00	2026-03-07 14:48:19.809625	Insufficient stock: Avoiding running barefoot: needs 2, has 0	Mock City	Mock Country	10578	Mock Street 579	CANCELLED	857	882
+4438	1	2024-08-10 09:37:00	2026-03-07 14:48:27.144892	Insufficient stock: The Vaadin way: living a healthy life: needs 3, has 0, The art of feeling down: needs 1, has 0	Mock City	Mock Country	10568	Mock Street 569	CANCELLED	857	881
+4278	1	2024-09-09 09:06:00	2026-03-07 14:48:35.900225	Insufficient stock: Book of running barefoot: needs 4, has 0	Mock City	Mock Country	10538	Mock Street 539	CANCELLED	857	881
+5287	1	2024-03-14 15:13:00	2026-03-07 14:49:27.23087	\N	Mock City	Mock Country	10717	Mock Street 718	COMPLETED	858	880
+5270	1	2024-03-22 09:12:00	2026-03-07 14:49:29.494749	Insufficient stock: Learning the basics of designing tree houses: needs 4, has 0, Surviving playing the cello: needs 1, has 0	Mock City	Mock Country	10709	Mock Street 710	CANCELLED	858	883
+5196	1	2024-04-03 09:35:00	2026-03-07 14:49:48.837365	Insufficient stock: Book of dummies: needs 3, has 0, Book of running barefoot: needs 5, has 0	Mock City	Mock Country	10697	Mock Street 698	CANCELLED	858	879
+5188	1	2024-04-07 09:30:00	2026-03-07 14:49:55.510167	Insufficient stock: Avoiding children's education: needs 5, has 0	Mock City	Mock Country	10693	Mock Street 694	CANCELLED	858	881
+5164	1	2024-04-19 09:48:00	2026-03-07 14:50:10.052305	Insufficient stock: How to fail at playing the cello: needs 5, has 0	Mock City	Mock Country	10681	Mock Street 682	CANCELLED	858	877
+5049	1	2024-04-27 15:19:00	2026-03-07 14:50:16.192006	Insufficient stock: Surviving computer programming: needs 4, has 0	Mock City	Mock Country	10673	Mock Street 674	CANCELLED	858	882
 \.
 
 
 --
--- Data for Name: purchase_line; Type: TABLE DATA; Schema: public; Owner: creator
+-- Data for Name: purchase_line; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.purchase_line (id, version, quantity, unit_price, product_id, purchase_id) FROM stdin;
@@ -5402,321 +5357,13 @@ COPY public.purchase_line (id, version, quantity, unit_price, product_id, purcha
 5385	0	3	14.50	842	5299
 5386	0	3	18.30	149	5299
 5387	0	4	18.30	849	5299
-5388	0	5	22.30	813	5300
-5389	0	2	14.80	848	5300
-5390	0	2	21.10	105	5300
 5391	0	3	11.60	798	5301
 5392	0	1	21.70	446	5301
-5393	0	5	11.20	815	5402
-5394	0	2	7.10	771	5402
-5395	0	2	22.30	113	5402
-5396	0	3	15.90	128	5403
-5397	0	2	20.50	92	5404
-5398	0	1	27.00	86	5404
-5399	0	4	27.30	811	5404
-5400	0	4	12.30	774	5405
-5401	0	1	14.70	109	5405
-5452	0	5	11.90	834	5405
-5453	0	1	11.50	477	5406
-5454	0	1	11.00	765	5406
-5455	0	3	27.80	53	5407
-5456	0	3	23.10	482	5407
-5457	0	3	16.60	420	5408
-5458	0	4	24.10	787	5409
-5459	0	1	20.00	785	5409
-5460	0	1	11.00	415	5409
-5461	0	1	6.00	147	5410
-5462	0	5	22.30	802	5410
-5463	0	5	27.70	408	5411
-5464	0	2	27.60	130	5411
-5465	0	4	12.30	424	5411
-5466	0	3	15.40	112	5412
-5467	0	5	7.30	496	5412
-5468	0	5	8.10	99	5413
-5469	0	4	16.60	70	5414
-5470	0	5	19.90	800	5415
-5471	0	5	12.50	840	5415
-5472	0	1	6.60	72	5415
-5473	0	5	19.10	444	5416
-5474	0	1	9.70	68	5416
-5475	0	2	14.70	752	5417
-5476	0	1	20.30	791	5418
-5477	0	2	22.30	813	5418
-5478	0	5	8.90	110	5418
-5479	0	3	14.80	789	5419
-5480	0	2	5.00	409	5420
-5481	0	4	25.60	133	5421
-5482	0	4	15.80	845	5421
-5483	0	5	23.70	56	5422
-5484	0	3	7.80	779	5423
-5485	0	1	8.80	780	5423
-5486	0	2	13.70	63	5423
-5487	0	2	20.50	92	5424
-5488	0	1	19.40	469	5425
-5489	0	2	28.40	754	5426
-5490	0	1	20.30	836	5427
-5491	0	2	12.50	416	5427
-5492	0	3	29.80	114	5428
-5493	0	1	24.10	87	5428
-5494	0	1	14.80	498	5428
-5495	0	3	9.40	485	5429
-5496	0	1	22.30	467	5429
-5497	0	2	15.70	75	5429
-5498	0	3	21.70	796	5430
-5499	0	4	19.40	458	5430
-5500	0	1	27.80	403	5431
-5501	0	5	12.10	93	5431
-5502	0	2	19.10	444	5432
-5503	0	5	20.50	792	5433
-5504	0	4	22.30	813	5433
-5505	0	1	24.10	787	5434
-5506	0	3	23.70	406	5434
-5507	0	2	29.50	769	5434
-5508	0	2	12.50	766	5435
-5509	0	5	11.50	477	5435
-5510	0	1	15.00	823	5435
-5511	0	5	27.30	111	5436
-5512	0	2	11.50	827	5436
-5513	0	3	27.00	786	5436
-5514	0	3	26.20	788	5437
-5515	0	5	25.50	757	5438
-5516	0	1	11.60	798	5438
-5517	0	1	12.50	840	5439
-5518	0	5	19.90	800	5439
-5519	0	5	29.50	797	5439
-5520	0	5	27.70	758	5440
-5521	0	3	14.40	417	5440
-5522	0	4	9.30	139	5440
-5523	0	5	15.10	137	5441
-5524	0	1	14.50	842	5441
-5525	0	1	14.40	417	5442
-5526	0	5	23.30	122	5442
-5527	0	5	16.60	420	5443
-5528	0	2	9.40	475	5444
-5529	0	2	6.60	72	5444
-5530	0	3	25.60	133	5445
-5531	0	4	7.20	820	5446
-5532	0	5	7.50	816	5447
-5533	0	2	23.10	132	5447
-5534	0	1	18.30	149	5448
-5535	0	1	15.90	478	5448
-5536	0	4	6.60	72	5449
-5537	0	3	7.00	829	5449
-5538	0	3	29.50	419	5449
-5539	0	2	27.60	130	5450
-5540	0	1	27.60	830	5450
-5541	0	4	15.10	487	5450
-5542	0	4	28.40	404	5451
-5543	0	2	9.70	768	5451
-5544	0	2	7.50	816	5552
-5545	0	3	19.10	444	5552
-5546	0	5	27.60	480	5552
-5547	0	5	10.00	434	5553
-5548	0	5	7.30	846	5553
-5549	0	2	24.10	437	5554
-5550	0	3	14.00	423	5554
-5551	0	5	12.20	843	5555
-5602	0	1	24.90	104	5555
-5603	0	3	14.70	459	5555
-5604	0	3	7.50	466	5556
-5605	0	1	11.00	65	5557
-5606	0	5	21.70	96	5558
-5607	0	2	12.20	493	5558
-5608	0	4	8.50	427	5559
-5609	0	2	22.70	807	5560
-5610	0	4	5.00	409	5560
-5611	0	2	19.90	100	5561
-5612	0	3	13.70	63	5562
-5613	0	2	22.30	467	5562
-5614	0	3	27.80	753	5562
-5615	0	2	15.00	123	5563
-5616	0	2	25.60	833	5563
-5617	0	4	25.80	428	5564
-5618	0	4	16.50	412	5564
-5619	0	2	10.00	831	5565
-5620	0	3	7.20	820	5565
-5621	0	1	14.40	417	5565
-5622	0	4	7.20	470	5566
-5623	0	5	10.40	124	5567
-5624	0	1	14.50	492	5567
-5625	0	2	14.80	789	5567
-5626	0	1	16.60	770	5568
-5627	0	5	24.10	437	5569
-5628	0	3	7.00	829	5569
-5629	0	3	27.60	130	5569
-5630	0	1	11.60	448	5570
-5631	0	3	29.70	844	5570
-5632	0	3	26.20	438	5571
-5633	0	2	19.10	94	5571
-5634	0	2	7.20	820	5571
-5635	0	2	7.80	79	5572
-5636	0	1	7.30	496	5573
-5637	0	3	8.50	77	5573
-5638	0	3	11.20	453	5574
-5639	0	4	9.30	489	5574
-5640	0	4	21.90	106	5574
-5641	0	4	6.00	847	5575
-5642	0	2	5.70	826	5575
-5643	0	2	15.70	75	5576
-5644	0	3	10.10	821	5576
-5645	0	2	15.90	828	5577
-5646	0	1	10.40	124	5578
-5647	0	5	22.30	117	5578
-5648	0	4	29.10	64	5578
-5649	0	4	19.90	800	5579
-5650	0	5	8.60	410	5579
-5651	0	5	14.80	439	5580
-5652	0	5	28.60	61	5581
-5653	0	1	27.70	408	5581
-5654	0	5	11.50	477	5582
-5655	0	4	20.00	435	5582
-5656	0	2	26.20	438	5583
-5657	0	4	29.70	844	5583
-5658	0	2	20.00	785	5584
-5659	0	3	7.30	496	5584
-5660	0	4	13.60	83	5585
-5661	0	5	27.30	461	5586
-5662	0	3	22.70	807	5586
-5663	0	5	28.20	432	5586
-5664	0	2	27.60	830	5587
-5665	0	5	7.10	421	5587
-5666	0	4	7.20	470	5587
-5667	0	4	8.80	780	5588
-5668	0	5	8.80	780	5589
-5669	0	2	5.30	851	5590
-5670	0	5	26.20	788	5590
-5671	0	3	9.40	835	5590
-5672	0	2	29.50	69	5591
-5673	0	3	28.40	754	5592
-5674	0	3	7.00	129	5592
-5675	0	3	18.30	849	5592
-5676	0	3	29.50	97	5593
-5677	0	1	27.80	753	5593
-5678	0	2	9.40	125	5594
-5679	0	4	27.30	461	5594
-5680	0	1	21.60	90	5595
-5681	0	3	21.60	790	5595
-5682	0	4	26.20	88	5596
-5683	0	1	12.10	93	5596
-5684	0	3	6.30	491	5597
-5685	0	4	29.80	114	5597
-5686	0	5	22.30	802	5597
-5687	0	4	18.30	149	5598
-5688	0	1	18.30	149	5598
-5689	0	2	8.80	80	5598
-5690	0	1	6.60	422	5599
-5691	0	1	27.00	86	5599
-5692	0	3	15.10	487	5600
-5693	0	1	24.10	787	5600
-5694	0	4	15.80	495	5600
-5695	0	3	5.70	476	5601
-5696	0	5	27.30	811	5601
-5697	0	5	22.70	807	5601
-5698	0	5	16.60	70	5702
-5699	0	2	9.70	768	5702
-5700	0	5	14.50	842	5702
-5701	0	3	13.70	763	5703
-5752	0	4	7.50	116	5703
-5753	0	5	13.70	63	5703
-5754	0	4	10.00	434	5704
-5755	0	4	22.70	107	5704
-5756	0	1	12.50	766	5704
-5757	0	2	6.00	147	5705
-5758	0	1	9.40	825	5706
-5759	0	3	12.20	143	5706
-5760	0	4	10.00	131	5707
-5761	0	2	19.10	94	5707
-5762	0	4	8.50	77	5708
-5763	0	3	8.50	427	5708
-5764	0	3	12.20	143	5708
-5765	0	3	24.10	87	5709
-5766	0	1	15.00	123	5709
-5767	0	1	12.50	840	5710
-5768	0	1	19.40	469	5710
-5769	0	5	29.50	419	5711
-5770	0	2	15.10	837	5712
-5771	0	4	11.00	415	5712
-5772	0	4	14.80	148	5712
-5773	0	1	13.70	413	5713
-5774	0	5	19.40	808	5713
-5775	0	3	24.10	787	5713
-5776	0	2	20.00	785	5714
-5777	0	4	18.30	149	5715
-5778	0	1	28.90	451	5715
-5779	0	2	8.80	80	5715
-5780	0	2	28.90	801	5716
-5781	0	3	11.60	448	5716
-5782	0	5	24.90	104	5716
-5783	0	1	28.40	54	5717
-5784	0	4	7.50	116	5718
-5785	0	2	9.30	839	5719
-5786	0	4	12.50	140	5719
-5787	0	1	14.70	809	5720
-5788	0	5	22.60	500	5720
-5789	0	5	20.30	91	5721
-5790	0	3	14.80	439	5721
-5791	0	1	14.70	402	5722
-5792	0	3	5.00	59	5723
-5793	0	3	27.70	408	5723
-5794	0	2	8.80	430	5724
-5795	0	5	22.60	150	5725
-5796	0	5	8.60	410	5725
-5797	0	5	8.90	810	5725
-5798	0	4	12.30	74	5726
-5799	0	1	27.70	408	5726
-5800	0	2	15.80	495	5727
-5801	0	1	8.90	110	5727
-5802	0	5	23.70	756	5728
-5803	0	2	11.50	477	5728
-5804	0	4	16.50	62	5728
-5805	0	2	15.00	123	5729
-5806	0	3	15.80	845	5730
-5807	0	3	7.10	771	5730
-5808	0	4	10.40	474	5730
-5809	0	5	7.50	116	5731
-5810	0	4	21.60	790	5731
-5811	0	3	13.70	763	5732
-5812	0	2	15.40	112	5732
-5813	0	1	14.40	767	5732
-5814	0	1	8.00	488	5733
-5815	0	2	6.30	841	5734
-5816	0	1	14.60	818	5735
-5817	0	2	11.20	453	5735
-5818	0	2	27.70	408	5736
-5819	0	3	27.60	830	5737
-5820	0	4	7.00	479	5737
-5821	0	5	22.30	102	5737
-5822	0	5	6.60	422	5738
-5823	0	5	26.20	88	5739
-5824	0	3	7.20	120	5740
-5825	0	4	12.50	840	5741
-5826	0	4	14.80	148	5742
-5827	0	2	28.40	404	5742
-5828	0	5	20.00	785	5743
-5829	0	1	29.50	447	5743
-5830	0	2	21.10	805	5744
-5831	0	4	19.10	444	5744
-5832	0	5	22.60	150	5744
-5833	0	2	15.70	425	5745
-5834	0	1	15.90	828	5745
-5835	0	4	9.40	475	5746
-5836	0	2	10.10	471	5746
-5837	0	5	14.70	52	5746
-5838	0	3	11.60	98	5747
-5839	0	3	7.80	779	5748
-5840	0	1	22.30	452	5749
-5841	0	3	23.10	132	5749
-5842	0	5	27.60	130	5750
-5843	0	5	12.20	843	5750
-5844	0	4	23.30	122	5750
-5845	0	1	21.10	105	5751
-5846	0	2	25.80	428	5751
-5847	0	3	7.10	771	5751
 \.
 
 
 --
--- Data for Name: user_supervisor; Type: TABLE DATA; Schema: public; Owner: creator
+-- Data for Name: user_supervisor; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.user_supervisor (id, version, employee_id, supervisor_id) FROM stdin;
@@ -5724,14 +5371,14 @@ COPY public.user_supervisor (id, version, employee_id, supervisor_id) FROM stdin
 
 
 --
--- Name: idgenerator; Type: SEQUENCE SET; Schema: public; Owner: creator
+-- Name: idgenerator; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.idgenerator', 5851, true);
+SELECT pg_catalog.setval('public.idgenerator', 5951, true);
 
 
 --
--- Name: application_user application_user_pkey; Type: CONSTRAINT; Schema: public; Owner: creator
+-- Name: application_user application_user_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.application_user
@@ -5739,7 +5386,7 @@ ALTER TABLE ONLY public.application_user
 
 
 --
--- Name: category category_pkey; Type: CONSTRAINT; Schema: public; Owner: creator
+-- Name: category category_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.category
@@ -5747,7 +5394,7 @@ ALTER TABLE ONLY public.category
 
 
 --
--- Name: draft_category draft_category_pkey; Type: CONSTRAINT; Schema: public; Owner: creator
+-- Name: draft_category draft_category_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.draft_category
@@ -5755,7 +5402,7 @@ ALTER TABLE ONLY public.draft_category
 
 
 --
--- Name: draft draft_pkey; Type: CONSTRAINT; Schema: public; Owner: creator
+-- Name: draft draft_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.draft
@@ -5763,7 +5410,7 @@ ALTER TABLE ONLY public.draft
 
 
 --
--- Name: message message_pkey; Type: CONSTRAINT; Schema: public; Owner: creator
+-- Name: message message_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.message
@@ -5771,7 +5418,7 @@ ALTER TABLE ONLY public.message
 
 
 --
--- Name: product_category product_category_pkey; Type: CONSTRAINT; Schema: public; Owner: creator
+-- Name: product_category product_category_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.product_category
@@ -5779,7 +5426,7 @@ ALTER TABLE ONLY public.product_category
 
 
 --
--- Name: product product_pkey; Type: CONSTRAINT; Schema: public; Owner: creator
+-- Name: product product_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.product
@@ -5787,7 +5434,7 @@ ALTER TABLE ONLY public.product
 
 
 --
--- Name: purchase_line purchase_line_pkey; Type: CONSTRAINT; Schema: public; Owner: creator
+-- Name: purchase_line purchase_line_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.purchase_line
@@ -5795,7 +5442,7 @@ ALTER TABLE ONLY public.purchase_line
 
 
 --
--- Name: purchase purchase_pkey; Type: CONSTRAINT; Schema: public; Owner: creator
+-- Name: purchase purchase_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.purchase
@@ -5803,7 +5450,23 @@ ALTER TABLE ONLY public.purchase
 
 
 --
--- Name: user_supervisor user_supervisor_pkey; Type: CONSTRAINT; Schema: public; Owner: creator
+-- Name: application_user uq_application_user_user_name; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.application_user
+    ADD CONSTRAINT uq_application_user_user_name UNIQUE (user_name);
+
+
+--
+-- Name: category uq_category_category_name; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.category
+    ADD CONSTRAINT uq_category_category_name UNIQUE (category_name);
+
+
+--
+-- Name: user_supervisor user_supervisor_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_supervisor
@@ -5811,7 +5474,42 @@ ALTER TABLE ONLY public.user_supervisor
 
 
 --
--- Name: draft fk182ehu5bem243kfbbg9m8mjf3; Type: FK CONSTRAINT; Schema: public; Owner: creator
+-- Name: idx_purchase_approver_status_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_purchase_approver_status_created_at ON public.purchase USING btree (approver_id, status, created_at);
+
+
+--
+-- Name: idx_purchase_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_purchase_created_at ON public.purchase USING btree (created_at);
+
+
+--
+-- Name: idx_purchase_line_purchase_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_purchase_line_purchase_id ON public.purchase_line USING btree (purchase_id);
+
+
+--
+-- Name: idx_purchase_requester_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_purchase_requester_created_at ON public.purchase USING btree (requester_id, created_at);
+
+
+--
+-- Name: idx_purchase_status_decided_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_purchase_status_decided_at ON public.purchase USING btree (status, decided_at);
+
+
+--
+-- Name: draft fk182ehu5bem243kfbbg9m8mjf3; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.draft
@@ -5819,7 +5517,7 @@ ALTER TABLE ONLY public.draft
 
 
 --
--- Name: purchase_line fk1fg92nu4upappgba6vm6mxp0d; Type: FK CONSTRAINT; Schema: public; Owner: creator
+-- Name: purchase_line fk1fg92nu4upappgba6vm6mxp0d; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.purchase_line
@@ -5827,7 +5525,7 @@ ALTER TABLE ONLY public.purchase_line
 
 
 --
--- Name: draft_category fk4kqo4bt43hu95a1eps91ycsrc; Type: FK CONSTRAINT; Schema: public; Owner: creator
+-- Name: draft_category fk4kqo4bt43hu95a1eps91ycsrc; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.draft_category
@@ -5835,7 +5533,7 @@ ALTER TABLE ONLY public.draft_category
 
 
 --
--- Name: purchase_line fkf13kjx8dac73h8k13urbl613i; Type: FK CONSTRAINT; Schema: public; Owner: creator
+-- Name: purchase_line fkf13kjx8dac73h8k13urbl613i; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.purchase_line
@@ -5843,7 +5541,7 @@ ALTER TABLE ONLY public.purchase_line
 
 
 --
--- Name: purchase fkgs57qse1tn06weqpd57lo1v6g; Type: FK CONSTRAINT; Schema: public; Owner: creator
+-- Name: purchase fkgs57qse1tn06weqpd57lo1v6g; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.purchase
@@ -5851,7 +5549,7 @@ ALTER TABLE ONLY public.purchase
 
 
 --
--- Name: product_category fkja2hwfcn4uqknuehnveejoo0v; Type: FK CONSTRAINT; Schema: public; Owner: creator
+-- Name: product_category fkja2hwfcn4uqknuehnveejoo0v; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.product_category
@@ -5859,7 +5557,7 @@ ALTER TABLE ONLY public.product_category
 
 
 --
--- Name: draft_category fkjlgxjdy09fd32qlewurq6hbr8; Type: FK CONSTRAINT; Schema: public; Owner: creator
+-- Name: draft_category fkjlgxjdy09fd32qlewurq6hbr8; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.draft_category
@@ -5867,7 +5565,7 @@ ALTER TABLE ONLY public.draft_category
 
 
 --
--- Name: purchase fkmusayi051hmyr9n7xuc4ds94i; Type: FK CONSTRAINT; Schema: public; Owner: creator
+-- Name: purchase fkmusayi051hmyr9n7xuc4ds94i; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.purchase
@@ -5875,7 +5573,7 @@ ALTER TABLE ONLY public.purchase
 
 
 --
--- Name: user_supervisor fko2hem2api9g5kq9xoo9fs8u2r; Type: FK CONSTRAINT; Schema: public; Owner: creator
+-- Name: user_supervisor fko2hem2api9g5kq9xoo9fs8u2r; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_supervisor
@@ -5883,7 +5581,7 @@ ALTER TABLE ONLY public.user_supervisor
 
 
 --
--- Name: product_category fkpcmsq096b3sna4u2p9xnxlmgf; Type: FK CONSTRAINT; Schema: public; Owner: creator
+-- Name: product_category fkpcmsq096b3sna4u2p9xnxlmgf; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.product_category
@@ -5891,7 +5589,7 @@ ALTER TABLE ONLY public.product_category
 
 
 --
--- Name: user_supervisor fksgj761i1f2nk22cdj6q5qegiv; Type: FK CONSTRAINT; Schema: public; Owner: creator
+-- Name: user_supervisor fksgj761i1f2nk22cdj6q5qegiv; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_supervisor
@@ -5902,5 +5600,5 @@ ALTER TABLE ONLY public.user_supervisor
 -- PostgreSQL database dump complete
 --
 
-\unrestrict kK7ebemqBBvS44XCJMNvGkO9Gwn8J0bGc1IpB31SZQtAdNa9pSlWuzGTWpjdpuA
+\unrestrict cweHgidzyurSJYdXqzeUwOnPguNc77VuHg0jrdRdZaGbNcDjkTqlIBIucxGOiKV
 

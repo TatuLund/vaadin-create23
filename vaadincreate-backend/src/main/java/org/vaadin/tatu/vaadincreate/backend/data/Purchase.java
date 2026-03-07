@@ -12,6 +12,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -30,7 +31,11 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 @Entity
-@Table(name = "purchase")
+@Table(name = "purchase", indexes = {
+        @Index(name = "idx_purchase_requester_created_at", columnList = "requester_id, created_at"),
+        @Index(name = "idx_purchase_approver_status_created_at", columnList = "approver_id, status, created_at"),
+        @Index(name = "idx_purchase_created_at", columnList = "created_at"),
+        @Index(name = "idx_purchase_status_decided_at", columnList = "status, decided_at") })
 public class Purchase extends AbstractEntity {
 
     @NotNull(message = "{requester.required}")

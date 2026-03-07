@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -21,7 +22,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 @Entity
-@Table(name = "purchase_line")
+@Table(name = "purchase_line", indexes = {
+        @Index(name = "idx_purchase_line_purchase_id", columnList = "purchase_id") })
 public class PurchaseLine extends AbstractEntity {
 
     @NotNull(message = "{purchase.required}")

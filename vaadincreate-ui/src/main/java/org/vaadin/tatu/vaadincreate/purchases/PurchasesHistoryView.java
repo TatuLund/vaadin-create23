@@ -29,7 +29,7 @@ import com.vaadin.ui.themes.ValoTheme;
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class PurchasesHistoryView extends VerticalLayout
-        implements TabView, HasI18N {
+        implements TabView {
 
     /** Id of the Purge button, used by tests to locate it. */
     public static final String PURGE_BUTTON_ID = "purge-button";
@@ -87,7 +87,7 @@ public class PurchasesHistoryView extends VerticalLayout
                     RETENTION_MONTHS), Type.WARNING_MESSAGE);
             purgeButton.setEnabled(true);
             historyGrid.setOldPurchaseHighlight(cutoff);
-            historyGrid.scrollToFromBottom((int) (purgeCount - 1));
+            historyGrid.scrollToFromBottom((int) purgeCount);
         } else {
             purgeButton.setEnabled(false);
             historyGrid.setOldPurchaseHighlight(null);

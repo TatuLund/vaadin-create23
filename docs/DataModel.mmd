@@ -2,7 +2,7 @@ erDiagram
   APPLICATION_USER {
     int id PK
     int version
-    string user_name
+    string user_name "unique"
     string passwd
     string role
     datetime last_status_check
@@ -52,7 +52,7 @@ erDiagram
   CATEGORY {
     int id PK
     int version
-    string category_name
+    string category_name "unique"
   }
 
   DRAFT {

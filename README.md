@@ -6,6 +6,8 @@ This project is my dogfooding test application for legacy Vaadin 8, as we are st
 
 Despite the application using the old Vaadin 8, many of the examples featured here are applicable to more current Vaadin versions.
 
+For a framework-agnostic functional specification of the application behavior, see the [VaadinCreate Product Requirements Document](docs/VaadinCreate.PRD.md). For visual UX layout specs, see [WireFrames](docs/WireFrames.md).
+
 ## Covered topics
 
 Despite being a somewhat artificial internal purchase tool, this demo app covers various use cases you may encounter in a real-life application. The demonstrated cases are based on actual customer questions I have seen during my career as a software consultant.
@@ -27,12 +29,13 @@ As a result, the project has a wiki that collects practical notes, examples, and
 - [How to Use the Vaadin 8 Component Event Bus](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Use-the-Vaadin-8-Component-Event-Bus)
 - [How To Use the Latest Vaadin 8 Binder Features](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Use-the-Latest-Vaadin-8-Binder-Features)
 - [How to Implement an Application Event Bus for a Typical Vaadin Business App](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Implement-an-Application-Event-Bus-for-a-Typical-Vaadin-Business-App)
-- [How To Reduce Flaky Tests in Vaadin 8 TestBench ](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Reduce-Flaky-Tests-in-Vaadin-8-TestBench)
+- [How To Reduce Flaky Tests in Vaadin 8 TestBench](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Reduce-Flaky-Tests-in-Vaadin-8-TestBench)
 - [How To Show Non-Interactive, Accessible Details in a Vaadin 8 Grid](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Show-Non%E2%80%90Interactive,-Accessible-Details-in-a-Vaadin-8-Grid)
 - [How To Compose HTML Content in Vaadin 8 Safely](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Compose-HTML-Content-in-Vaadin-8-Safely-(Without-XSS-Surprises))
 - [How to implement hierarchical navigation in Vaadin 8](https://github.com/TatuLund/vaadin-create23/wiki/How-to-implement-hierarchical-navigation-in-Vaadin-8)
 - [How to Build a Test Pyramid for Vaadin 8 Apps](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Build-a-Test-Pyramid-for-Vaadin-8-Apps)
 - [How to Optimize Paged Queries for a Vaadin 8 Grid](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Optimize-Paged-Queries-for-a-Vaadin-8-Grid)
+- [How To Build a Containerized Test Environment for a Vaadin 8 App](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Build-a-Containerized-Test-Environment-for-a-Vaadin-8-App)
 
 ## Backend
 

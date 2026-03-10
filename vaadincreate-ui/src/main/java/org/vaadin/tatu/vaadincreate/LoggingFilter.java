@@ -27,7 +27,8 @@ public class LoggingFilter implements Filter {
             .getLogger(LoggingFilter.class);
 
     private static final String[] ALLOWED_PREFIXES = { "/", "/VAADIN", "/UIDL",
-            "/HEARTBEAT", "/PUSH", "/APP" };
+            "/HEARTBEAT", "/PUSH", "/APP", "/manifest.webmanifest", "/sw.js",
+            "/offline.html", "/icons/" };
 
     private static boolean isGoodUrl(HttpServletRequest request) {
         String uri = request.getRequestURI();

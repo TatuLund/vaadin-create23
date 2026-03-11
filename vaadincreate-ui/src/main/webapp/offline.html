@@ -322,7 +322,7 @@
         <section class="offline-card">
           <h1>Vaadin Create '23</h1>
           <p>The application is offline. Interactive views are unavailable.</p>
-          <div class="status-chip" id="status-chip">Offline mode active</div>
+          <div role="button" tabindex="0" class="status-chip" id="status-chip">Offline mode active</div>
           <div class="hint">You will be redirected to the app when connection returns.</div>
         </section>
       </div>
@@ -354,20 +354,22 @@
         if (returnUrl.indexOf("/offline.html") !== -1) {
           returnUrl = "";
         }
+        console.log("Navigating back to app, returnUrl:", returnUrl);
         window.location.href = returnUrl || "/";
       }
 
-      function updateStatus() {
-        if (navigator.onLine) {
-          chip.textContent = "Back online, returning to app...";
-          setTimeout(navigateBackToApp, 250);
-        } else {
-          chip.textContent = "Offline mode active";
-        }
+      function updateOnline() {
+        chip.textContent = "Back online, returning to app...";
+        chip.addEventListener("click", navigateBackToApp);
+        setTimeout(navigateBackToApp, 250);
       }
 
-      window.addEventListener("online", updateStatus);
-      window.addEventListener("offline", updateStatus);
+      function updateOffline() {
+          chip.textContent = "Offline mode active";
+      }
+
+      window.addEventListener("offline", updateOffline);
+      window.addEventListener("online", updateOnline);
 
       if (menuToggle) {
         menuToggle.addEventListener("click", toggleMenu);
@@ -376,7 +378,21 @@
         menuBackdrop.addEventListener("click", closeMenu);
       }
 
-      updateStatus();
+      function startPolling() {
+        fetch(window.location.href, { method: "HEAD", cache: "no-store" })
+          .then(function (response) {
+            if (response.ok) {
+              updateOnline();
+            } else {
+              setTimeout(startPolling, 1000);
+            }
+          })
+          .catch(function () {
+            setTimeout(startPolling, 1000);
+          });
+      }
+
+      setTimeout(startPolling, 1000);
     })();
   </script>
 </body>

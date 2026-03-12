@@ -47,25 +47,25 @@
 
   <script>
     (function () {
-      var chip = document.getElementById("status-chip");
-      var menuToggle = document.getElementById("menu-toggle");
-      var menuBackdrop = document.getElementById("menu-backdrop");
-      var topbar = document.getElementById("offline-topbar");
-      var topbarLogout = document.getElementById("topbar-logout");
-      var nav = document.getElementById("offline-nav");
-      var navAbout = document.getElementById("nav-about");
-      var navBooks = document.getElementById("nav-books");
-      var navPurchases = document.getElementById("nav-purchases");
-      var navStats = document.getElementById("nav-stats");
-      var navAdmin = document.getElementById("nav-admin");
-      var offlineUser = document.getElementById("offline-user");
-      var offlineBanner = document.getElementById("offline-banner");
-      var offlineMessage = document.getElementById("offline-message");
-      var offlineHint = document.getElementById("offline-hint");
-      var offlineChip = document.getElementById("status-chip");
-      var returnUrlKey = "pwa-return-url";
-      var redirectScheduled = false;
-      var translations = {
+      const chip = document.getElementById("status-chip");
+      const menuToggle = document.getElementById("menu-toggle");
+      const menuBackdrop = document.getElementById("menu-backdrop");
+      const topbar = document.getElementById("offline-topbar");
+      const topbarLogout = document.getElementById("topbar-logout");
+      const nav = document.getElementById("offline-nav");
+      const navAbout = document.getElementById("nav-about");
+      const navBooks = document.getElementById("nav-books");
+      const navPurchases = document.getElementById("nav-purchases");
+      const navStats = document.getElementById("nav-stats");
+      const navAdmin = document.getElementById("nav-admin");
+      const offlineUser = document.getElementById("offline-user");
+      const offlineBanner = document.getElementById("offline-banner");
+      const offlineMessage = document.getElementById("offline-message");
+      const offlineHint = document.getElementById("offline-hint");
+      const offlineChip = document.getElementById("status-chip");
+      const returnUrlKey = "pwa-return-url";
+      let redirectScheduled = false;
+      const translations = {
         en: {
           pageTitle: "Vaadin Create 23 - Offline",
           topbarLabel: "Offline top bar",
@@ -85,7 +85,7 @@
           offlineHint: "You will be redirected to the app when connection returns."
         },
         fi: {
-          pageTitle: "Vaadin Create 23 - Ei yhteytta",
+          pageTitle: "Vaadin Create 23 - Ei yhteyttä",
           topbarLabel: "Offline-ylapalkki",
           toggleMenu: "Valikko",
           toggleMenuAria: "Avaa valikko",
@@ -95,9 +95,9 @@
           books: "Kirjat",
           purchases: "Ostot",
           stats: "Tilastot",
-          admin: "Yllapito",
-          offlineBanner: "Ei yhteytta",
-          offlineMessage: "Sovellus on offline-tilassa. Interaktiiviset nakymat eivat ole kaytettavissa.",
+          admin: "Ylläpito",
+          offlineBanner: "Ei yhteyttä",
+          offlineMessage: "Sovellus on offline-tilassa. Interaktiiviset näkymät eivät ole käytettävissä.",
           statusOffline: "Offline-tila aktiivinen",
           statusOnline: "Yhteys palautui, palataan sovellukseen...",
           offlineHint: "Sinut ohjataan sovellukseen, kun yhteys palautuu."
@@ -106,21 +106,21 @@
           pageTitle: "Vaadin Create 23 - Offline",
           topbarLabel: "Offline-rad",
           toggleMenu: "Meny",
-          toggleMenuAria: "Vaxla meny",
+          toggleMenuAria: "Växla meny",
           logout: "Logga ut",
           appNav: "Applikation",
           about: "Om",
-          books: "Bocker",
-          purchases: "Kop",
+          books: "Böcker",
+          purchases: "Köp",
           stats: "Statistik",
           admin: "Admin",
           offlineBanner: "Offline",
-          offlineMessage: "Applikationen ar offline. Interaktiva vyer ar inte tillgangliga.",
-          statusOffline: "Offline-lage aktivt",
-          statusOnline: "Uppkopplad igen, atergar till applikationen...",
-          offlineHint: "Du omdirigeras till appen nar anslutningen ar tillbaka."
+          offlineMessage: "Applikationen är offline. Interaktiva vyer är inte tillgängliga.",
+          statusOffline: "Offline-läge aktivt",
+          statusOnline: "Uppkopplad igen, återgår till applikationen...",
+          offlineHint: "Du omdirigeras till appen när anslutningen är tillbaka."
         },
-        ge: {
+        de: {
           pageTitle: "Vaadin Create 23 - Offline",
           topbarLabel: "Offline-Leiste",
           toggleMenu: "Menue",
@@ -128,15 +128,15 @@
           logout: "Abmelden",
           appNav: "Anwendung",
           about: "Info",
-          books: "Bucher",
-          purchases: "Kauefe",
+          books: "Bücher",
+          purchases: "Käufe",
           stats: "Statistik",
           admin: "Admin",
           offlineBanner: "Offline",
-          offlineMessage: "Die Anwendung ist offline. Interaktive Ansichten sind nicht verfuegbar.",
+          offlineMessage: "Die Anwendung ist offline. Interaktive Ansichten sind nicht verfügbar.",
           statusOffline: "Offline-Modus aktiv",
-          statusOnline: "Wieder online, zurueck zur Anwendung...",
-          offlineHint: "Du wirst zur App weitergeleitet, sobald die Verbindung zurueck ist."
+          statusOnline: "Wieder online, zurück zur Anwendung...",
+          offlineHint: "Du wirst zur App weitergeleitet, sobald die Verbindung zurück ist."
         }
       };
       var texts = resolveTexts();
@@ -146,26 +146,23 @@
         if (lang) {
           lang = lang.toLowerCase();
         }
-        if (lang === "de") {
-          lang = "ge";
-        }
         if (!translations[lang]) {
           lang = "en";
         }
-        document.documentElement.lang = lang === "ge" ? "de" : lang;
+        document.documentElement.lang = lang;
         return translations[lang];
       }
 
       function getCookieValue(name) {
         var cookieParts = document.cookie ? document.cookie.split(";") : [];
-        for (var i = 0; i < cookieParts.length; i++) {
-          var part = cookieParts[i].trim();
+        for (var part of cookieParts) {
+          part = part.trim();
           if (part.indexOf(name + "=") === 0) {
             var value = part.substring(name.length + 1);
             try {
               return decodeURIComponent(value);
-            } catch (ignore) {
-              return value;
+            } catch (error_) {
+              throw error_;
             }
           }
         }
@@ -234,10 +231,9 @@
         } catch (ignore) {
           returnUrl = "";
         }
-        if (returnUrl.indexOf("/offline.html") !== -1) {
+        if (returnUrl.includes("/offline.html")) {
           returnUrl = "";
         }
-        console.log("Navigating back to app, returnUrl:", returnUrl);
         window.location.href = returnUrl || "/";
       }
 
@@ -248,6 +244,11 @@
         redirectScheduled = true;
         chip.textContent = texts.statusOnline;
         chip.onclick = navigateBackToApp;
+        chip.onkeydown = (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            navigateBackToApp();
+          }
+        };
         setTimeout(navigateBackToApp, 250);
       }
 

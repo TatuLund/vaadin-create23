@@ -521,7 +521,95 @@ flowchart TB
     end
 ```
 
-## 11. Implementation-Oriented Notes
+## 11. PWA Offline Page
+
+### 11.1 Offline Desktop Composition
+
+```mermaid
+flowchart LR
+    subgraph OP["[Offline Page | Desktop]"]
+        direction LR
+
+        subgraph ONAV["[Left rail ~240px]"]
+            direction TB
+            OLOGO["Brand / logo"]
+            ONAVLIST["About | Books | Purchases | Stats | Admin"]
+            OUSER["Logout label"]
+            OLOGO --> ONAVLIST
+            ONAVLIST --> OUSER
+        end
+
+        subgraph OMAIN["[Main content area]"]
+            direction TB
+            OBANNER["Offline banner"]
+            subgraph OCARD["[Offline card]"]
+                direction TB
+                OTITLE["Vaadin Create '23"]
+                OMSG["Offline explanation message"]
+                OCHIP("Status chip")
+                OHINT["Auto-return hint"]
+                OTITLE --> OMSG
+                OMSG --> OCHIP
+                OCHIP --> OHINT
+            end
+            OBANNER --> OCARD
+        end
+
+        ONAV --> OMAIN
+    end
+```
+
+### 11.2 Offline Narrow/Mobile Composition
+
+```mermaid
+flowchart TB
+    subgraph OPM["[Offline Page | Narrow]"]
+        direction TB
+
+        subgraph OTOP["[Top bar]"]
+            direction LR
+            MTOGGLE("Menu")
+            MTITLE["Logout label"]
+        end
+
+        subgraph OCONTENT["[Scrollable content]"]
+            MBANNER["Offline banner"]
+            MCARD["Offline card with message + status chip + hint"]
+            MBANNER --> MCARD
+        end
+
+        MDRAWER["[Slide-in menu]"]
+        MBACKDROP["[Backdrop overlay]"]
+    end
+
+    MTOGGLE -. opens/closes .-> MDRAWER
+    MBACKDROP -. closes .-> MDRAWER
+```
+
+### 11.3 Connectivity State Flow
+
+```mermaid
+flowchart LR
+    APP["User in app route"] --> OFF{"Browser offline?"}
+    OFF -- yes --> SAVE["Save current URL in sessionStorage\npwa-return-url"]
+    SAVE --> REDIR["Redirect to /offline.html"]
+    REDIR --> PAGE["Offline page"]
+
+    PAGE --> ONLINE{"Back online?"}
+    ONLINE -- no --> POLL["HEAD polling loop"]
+    POLL --> ONLINE
+
+    ONLINE -- yes --> RETURN["Resolve return URL\n(if missing/invalid -> root)"]
+    RETURN --> NAV["Navigate back to app"]
+```
+
+Callouts:
+- Offline page visually mirrors app shell but navigation links are informational only while offline.
+- Status chip is interactive and supports click + keyboard activation (Enter/Space).
+- Locale-sensitive copy updates page title, labels, and offline messages from language cookie.
+- Service worker fallback is navigation-focused: failed app navigations route to cached `offline.html`.
+
+## 12. Implementation-Oriented Notes
 
 - Keep toolbar/actions visually detached from data grids using a dedicated row.
 - Keep row-detail content inside grid context; do not navigate away for details.

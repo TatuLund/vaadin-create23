@@ -791,6 +791,86 @@ The Purchases history tab shall support an admin-only data-retention purge flow 
   - Must not delete or modify referenced `User` or `Product` master data.
 
 
+## 19. Progressive Web App (PWA) and Offline Experience
+
+### 19.1 Bootstrap Integration and Installability Metadata
+
+- The application shell shall inject PWA metadata into the bootstrap page head:
+  - `manifest` link to `/manifest.webmanifest`.
+  - `theme-color` meta value `#0b5fff`.
+  - mobile web app capability meta tags.
+  - app icons for 192x192 and 512x512 sizes.
+- The web manifest shall define at least:
+  - `name` and `short_name`.
+  - `start_url` and `scope` as root (`/`).
+  - `display` mode `standalone`.
+  - standard and maskable icon entries.
+
+### 19.2 Service Worker Registration and Scope
+
+- On client `window.load`, the UI bootstrap script shall attempt to register a service worker from `/sw.js`.
+- Registration failures shall be logged to the browser console and shall not block normal app startup.
+- The service worker shall cache an offline shell versioned by a cache key (currently `vaadincreate-offline-v2`).
+
+### 19.3 Offline Shell Caching Strategy
+
+- During service worker install, the offline shell cache shall prefetch:
+  - `/offline.html`
+  - `/VAADIN/themes/vaadincreate/styles.css`
+  - `/VAADIN/styles/additional-styles.css`
+  - `/VAADIN/themes/vaadincreate/images/bookstore.png`
+- During activation, stale caches with non-matching cache keys shall be removed.
+- Fetch handling shall be network-first for navigation requests (`request.mode == navigate`):
+  - if network fetch succeeds, serve live content.
+  - if network fetch fails, serve cached `/offline.html`.
+  - non-navigation requests are not intercepted by this offline fallback handler.
+
+### 19.4 Offline Entry and Return Flow
+
+- The app shall react to browser connectivity events:
+  - On `offline`, if current path is not `/offline.html`, persist current URL in session storage key `pwa-return-url` and redirect to `/offline.html`.
+  - On initial load, if `navigator.onLine == false` and current path is not `/offline.html`, the app shall perform the same redirect/persist behavior.
+  - On `online`, if current path is `/offline.html`, redirect back to the stored return URL, or to app root if none exists.
+- Redirect safety rule:
+  - If the stored return URL points to `/offline.html`, ignore it and use app root.
+
+### 19.5 Offline Page UX and Behavior
+
+- The offline page shall reuse the application visual language (menu shell, title area, card-based content) but act as a static fallback screen.
+- The page shall include:
+  - banner text indicating offline state.
+  - explanatory message that interactive views are unavailable.
+  - status chip showing current connectivity state.
+  - hint text that user will be redirected when connectivity returns.
+  - mobile menu toggle and backdrop behavior consistent with the main shell pattern.
+- Connectivity recovery behavior on the offline page:
+  - On `online`, status chip text shall change to an online-returning message.
+  - Clicking the chip or pressing Enter/Space on the chip shall navigate back to the app.
+  - Automatic navigation back shall also be triggered shortly after online detection.
+  - Polling fallback shall issue periodic `HEAD` requests; first successful response triggers return-to-app navigation.
+
+### 19.6 Offline Page Localization
+
+- Offline page text content shall be localized using the persisted `language` cookie.
+- At minimum, offline copy shall be provided in:
+  - English (`en`)
+  - Finnish (`fi`)
+  - Swedish (`sv`)
+  - German (`de`)
+- If cookie locale is missing or unsupported, fallback locale shall be English.
+- Localization shall update document title and key accessibility labels (topbar and navigation labels) in addition to visible strings.
+
+### 19.7 Static Resource Serving and Request Filtering
+
+- Dedicated servlet routing shall serve PWA resources with explicit content types:
+  - `/sw.js`
+  - `/manifest.webmanifest`
+  - `/offline.html`
+  - `/icons/*`
+- Service worker responses shall be marked with `Cache-Control: no-cache` to support timely updates.
+- Request filtering/allowlisting shall explicitly permit PWA resource paths so offline resources are reachable outside authenticated app routing.
+
+
 ---
 
 This PRD intentionally mirrors the behavior validated by the existing automated tests in a framework-neutral manner. Any migration or reimplementation (e.g., to Vaadin 24 or another UI framework) should preserve these requirements unless explicitly superseded by new design decisions.

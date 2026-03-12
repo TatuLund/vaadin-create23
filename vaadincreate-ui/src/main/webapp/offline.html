@@ -8,322 +8,38 @@
   <!-- Reuse app theme when cached -->
   <link rel="stylesheet" href="./VAADIN/themes/vaadincreate/styles.css" />
   <link rel="stylesheet" href="./VAADIN/styles/additional-styles.css" />
-
-  <style>
-    :root {
-      --menu-bg: rgb(59, 63, 66);
-      --menu-text: rgba(255, 255, 255, 0.8);
-      --menu-text-strong: #fff;
-      --menu-header-height: 38px;
-      --content-bg: #fafafa;
-      --card-bg: #fff;
-      --card-border: #dedede;
-      --accent: rgb(33, 101, 161);
-      --warning-bg: #fff4d6;
-      --warning-border: #f0d58a;
-      --warning-text: #6f4e00;
-    }
-
-    html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      min-height: 100vh;
-      min-height: 100dvh;
-      font-family: "Open Sans", "Segoe UI", Arial, sans-serif;
-      background: var(--content-bg);
-      color: #1f2328;
-      overflow: hidden;
-    }
-
-    .offline-ui {
-      display: flex;
-      width: 100vw;
-      min-height: 100vh;
-      min-height: 100dvh;
-      position: relative;
-    }
-
-    /* Override Vaadin UI class sizing so the offline shell always fills screen */
-    .offline-ui.v-ui {
-      width: 100vw;
-      min-height: 100vh;
-      min-height: 100dvh;
-      box-sizing: border-box;
-    }
-
-    .offline-menu {
-      width: 156px;
-      flex: 0 0 156px;
-      background: var(--menu-bg);
-      color: var(--menu-text);
-      filter: blur(1px);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      min-height: 100dvh;
-    }
-
-    .offline-title {
-      padding: 14px 16px 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      height: 80px;
-      align-content: center;
-      padding-left: 60px !important
-    }
-
-    .offline-title img {
-      width: 38px;
-      height: 38px;
-      max-width: 100%;
-      display: block;
-    }
-
-    .offline-toggle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border: none;
-      background: transparent;
-      color: var(--menu-text);
-      width: 44px;
-      height: 36px;
-      font-size: 14px;
-      cursor: pointer;
-      border-radius: 3px;
-    }
-
-    .offline-toggle:hover {
-      color: #fff;
-      background: rgba(255,255,255,0.1);
-    }
-
-    .offline-topbar {
-      filter: blur(1px);
-      display: none;
-      height: var(--menu-header-height);
-      align-items: center;
-      gap: 8px;
-      padding: 0 10px;
-      background: var(--accent);
-      color: var(--menu-text-strong);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      box-sizing: border-box;
-    }
-
-    .offline-topbar-title {
-      margin-left: auto;
-      font-size: 15px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .offline-nav {
-      padding: 8px;
-      flex: 1;
-    }
-
-    .offline-nav a {
-      display: block;
-      text-decoration: none;
-      color: var(--menu-text);
-      padding: 8px 12px;
-      border-radius: 4px;
-      margin-bottom: 4px;
-      pointer-events: none;
-      cursor: default;
-      user-select: none;
-    }
-
-    .offline-nav a.selected {
-      background: rgba(255,255,255,0.12);
-      color: var(--menu-text-strong);
-    }
-
-    .offline-user {
-      border-top: 1px solid rgba(255,255,255,0.08);
-      padding: 10px 14px;
-      color: var(--menu-text);
-      font-size: 13px;
-    }
-
-    .offline-content {
-      flex: 1;
-      min-width: 0;
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-sizing: border-box;
-      overflow: auto;
-      padding: 24px;
-      background: var(--content-bg);
-    }
-
-    .offline-about {
-      width: min(500px, 100%);
-      max-width: 500px;
-      margin: 0;
-    }
-
-    .offline-banner {
-      border: 1px solid #dce6f2;
-      background: #f4f8fd;
-      color: var(--warning-text);
-      border-radius: 4px;
-      padding: 7px 10px;
-      margin-bottom: 10px;
-      font-weight: 500;
-      font-size: 13px;
-    }
-
-    .offline-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 6px;
-      box-shadow: 0 2px 3px rgba(0,0,0,0.05);
-      padding: 20px;
-      max-width: 760px;
-    }
-
-    .offline-card h1 {
-      margin: 0 0 10px;
-      font-size: 22px;
-      font-weight: 600;
-    }
-
-    .offline-card p {
-      margin: 0 0 10px;
-      line-height: 1.45;
-      color: #4f5863;
-    }
-
-    .status-chip {
-      display: inline-block;
-      margin-top: 10px;
-      border: 1px solid #cfd4da;
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 13px;
-      color: #3c434a;
-      background: #fff;
-    }
-
-    .hint {
-      margin-top: 10px;
-      color: #6a737d;
-      font-size: 13px;
-    }
-
-    .menu-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.35);
-      z-index: 10;
-    }
-
-    @media (max-width: 800px) {
-      .offline-ui {
-        flex-direction: column;
-        width: 100%;
-        min-height: 100vh;
-        min-height: 100dvh;
-      }
-
-      .offline-menu {
-        position: fixed;
-        top: var(--menu-header-height);
-        left: 0;
-        width: 156px;
-        max-width: 85vw;
-        transform: translateX(-100%);
-        transition: transform 140ms ease;
-        z-index: 20;
-        box-shadow: 0 4px 18px rgba(0,0,0,0.35);
-      }
-
-      body.menu-open .offline-menu {
-        transform: translateX(0);
-      }
-
-      body.menu-open .menu-backdrop {
-        display: block;
-      }
-
-      .offline-topbar {
-        display: flex;
-      }
-
-      .offline-title {
-        display: none;
-      }
-
-      .offline-nav {
-        display: block;
-      }
-
-      .offline-nav a {
-        margin-bottom: 4px;
-      }
-
-      .offline-content {
-        min-height: 0;
-        padding: 12px;
-      }
-
-      .offline-about {
-        margin-top: 0;
-      }
-
-      .offline-card {
-        padding: 14px;
-      }
-
-      .offline-card h1 {
-        font-size: 20px;
-      }
-
-      .offline-user {
-        border-top: 1px solid rgba(255,255,255,0.08);
-        padding: 14px;
-      }
-    }
-  </style>
 </head>
-<body>
+<body class="vaadincreate offline-page">
   <div class="menu-backdrop" id="menu-backdrop" aria-hidden="true"></div>
-  <div class="offline-ui vaadincreate v-ui with-menu">
-    <header class="offline-topbar" aria-label="Offline top bar">
+  <div class="offline-ui v-ui with-menu">
+    <header class="offline-topbar" id="offline-topbar" aria-label="Offline top bar">
       <button class="offline-toggle" id="menu-toggle" type="button"
         aria-label="Toggle menu">Menu</button>
-      <div class="offline-topbar-title">Logout</div>
+      <div class="offline-topbar-title" id="topbar-logout">Logout</div>
     </header>
 
     <aside class="offline-menu valo-menu valo-menu-root valo-menu-part">
       <div class="offline-title valo-menu-title">
         <img src="./VAADIN/themes/vaadincreate/images/bookstore.png" alt="Bookstore Logo" />
       </div>
-      <nav class="offline-nav valo-menuitems valo-menu-items" aria-label="Application">
-        <a class="selected" href="#">About</a>
-        <a href="#">Books</a>
-        <a href="#">Purchases</a>
-        <a href="#">Stats</a>
-        <a href="#">Admin</a>
+      <nav class="offline-nav valo-menuitems valo-menu-items" id="offline-nav" aria-label="Application">
+        <a class="selected" href="#" id="nav-about">About</a>
+        <a href="#" id="nav-books">Books</a>
+        <a href="#" id="nav-purchases">Purchases</a>
+        <a href="#" id="nav-stats">Stats</a>
+        <a href="#" id="nav-admin">Admin</a>
       </nav>
-      <div class="offline-user">Logout</div>
+      <div class="offline-user" id="offline-user">Logout</div>
     </aside>
 
     <main class="offline-content valo-content">
       <div class="offline-about">
-        <div class="offline-banner">Offline</div>
+        <div class="offline-banner" id="offline-banner">Offline</div>
         <section class="offline-card">
           <h1>Vaadin Create '23</h1>
-          <p>The application is offline. Interactive views are unavailable.</p>
+          <p id="offline-message">The application is offline. Interactive views are unavailable.</p>
           <div role="button" tabindex="0" class="status-chip" id="status-chip">Offline mode active</div>
-          <div class="hint">You will be redirected to the app when connection returns.</div>
+          <div class="hint" id="offline-hint">You will be redirected to the app when connection returns.</div>
         </section>
       </div>
     </main>
@@ -334,7 +50,174 @@
       var chip = document.getElementById("status-chip");
       var menuToggle = document.getElementById("menu-toggle");
       var menuBackdrop = document.getElementById("menu-backdrop");
+      var topbar = document.getElementById("offline-topbar");
+      var topbarLogout = document.getElementById("topbar-logout");
+      var nav = document.getElementById("offline-nav");
+      var navAbout = document.getElementById("nav-about");
+      var navBooks = document.getElementById("nav-books");
+      var navPurchases = document.getElementById("nav-purchases");
+      var navStats = document.getElementById("nav-stats");
+      var navAdmin = document.getElementById("nav-admin");
+      var offlineUser = document.getElementById("offline-user");
+      var offlineBanner = document.getElementById("offline-banner");
+      var offlineMessage = document.getElementById("offline-message");
+      var offlineHint = document.getElementById("offline-hint");
+      var offlineChip = document.getElementById("status-chip");
       var returnUrlKey = "pwa-return-url";
+      var redirectScheduled = false;
+      var translations = {
+        en: {
+          pageTitle: "Vaadin Create 23 - Offline",
+          topbarLabel: "Offline top bar",
+          toggleMenu: "Menu",
+          toggleMenuAria: "Toggle menu",
+          logout: "Logout",
+          appNav: "Application",
+          about: "About",
+          books: "Books",
+          purchases: "Purchases",
+          stats: "Stats",
+          admin: "Admin",
+          offlineBanner: "Offline",
+          offlineMessage: "The application is offline. Interactive views are unavailable.",
+          statusOffline: "Offline mode active",
+          statusOnline: "Back online, returning to app...",
+          offlineHint: "You will be redirected to the app when connection returns."
+        },
+        fi: {
+          pageTitle: "Vaadin Create 23 - Ei yhteytta",
+          topbarLabel: "Offline-ylapalkki",
+          toggleMenu: "Valikko",
+          toggleMenuAria: "Avaa valikko",
+          logout: "Kirjaudu ulos",
+          appNav: "Sovellus",
+          about: "Tietoa",
+          books: "Kirjat",
+          purchases: "Ostot",
+          stats: "Tilastot",
+          admin: "Yllapito",
+          offlineBanner: "Ei yhteytta",
+          offlineMessage: "Sovellus on offline-tilassa. Interaktiiviset nakymat eivat ole kaytettavissa.",
+          statusOffline: "Offline-tila aktiivinen",
+          statusOnline: "Yhteys palautui, palataan sovellukseen...",
+          offlineHint: "Sinut ohjataan sovellukseen, kun yhteys palautuu."
+        },
+        sv: {
+          pageTitle: "Vaadin Create 23 - Offline",
+          topbarLabel: "Offline-rad",
+          toggleMenu: "Meny",
+          toggleMenuAria: "Vaxla meny",
+          logout: "Logga ut",
+          appNav: "Applikation",
+          about: "Om",
+          books: "Bocker",
+          purchases: "Kop",
+          stats: "Statistik",
+          admin: "Admin",
+          offlineBanner: "Offline",
+          offlineMessage: "Applikationen ar offline. Interaktiva vyer ar inte tillgangliga.",
+          statusOffline: "Offline-lage aktivt",
+          statusOnline: "Uppkopplad igen, atergar till applikationen...",
+          offlineHint: "Du omdirigeras till appen nar anslutningen ar tillbaka."
+        },
+        ge: {
+          pageTitle: "Vaadin Create 23 - Offline",
+          topbarLabel: "Offline-Leiste",
+          toggleMenu: "Menue",
+          toggleMenuAria: "Menue umschalten",
+          logout: "Abmelden",
+          appNav: "Anwendung",
+          about: "Info",
+          books: "Bucher",
+          purchases: "Kauefe",
+          stats: "Statistik",
+          admin: "Admin",
+          offlineBanner: "Offline",
+          offlineMessage: "Die Anwendung ist offline. Interaktive Ansichten sind nicht verfuegbar.",
+          statusOffline: "Offline-Modus aktiv",
+          statusOnline: "Wieder online, zurueck zur Anwendung...",
+          offlineHint: "Du wirst zur App weitergeleitet, sobald die Verbindung zurueck ist."
+        }
+      };
+      var texts = resolveTexts();
+
+      function resolveTexts() {
+        var lang = getCookieValue("language");
+        if (lang) {
+          lang = lang.toLowerCase();
+        }
+        if (lang === "de") {
+          lang = "ge";
+        }
+        if (!translations[lang]) {
+          lang = "en";
+        }
+        document.documentElement.lang = lang === "ge" ? "de" : lang;
+        return translations[lang];
+      }
+
+      function getCookieValue(name) {
+        var cookieParts = document.cookie ? document.cookie.split(";") : [];
+        for (var i = 0; i < cookieParts.length; i++) {
+          var part = cookieParts[i].trim();
+          if (part.indexOf(name + "=") === 0) {
+            var value = part.substring(name.length + 1);
+            try {
+              return decodeURIComponent(value);
+            } catch (ignore) {
+              return value;
+            }
+          }
+        }
+        return "";
+      }
+
+      function applyLocalization() {
+        document.title = texts.pageTitle;
+        if (topbar) {
+          topbar.setAttribute("aria-label", texts.topbarLabel);
+        }
+        if (menuToggle) {
+          menuToggle.textContent = texts.toggleMenu;
+          menuToggle.setAttribute("aria-label", texts.toggleMenuAria);
+        }
+        if (topbarLogout) {
+          topbarLogout.textContent = texts.logout;
+        }
+        if (offlineUser) {
+          offlineUser.textContent = texts.logout;
+        }
+        if (nav) {
+          nav.setAttribute("aria-label", texts.appNav);
+        }
+        if (navAbout) {
+          navAbout.textContent = texts.about;
+        }
+        if (navBooks) {
+          navBooks.textContent = texts.books;
+        }
+        if (navPurchases) {
+          navPurchases.textContent = texts.purchases;
+        }
+        if (navStats) {
+          navStats.textContent = texts.stats;
+        }
+        if (navAdmin) {
+          navAdmin.textContent = texts.admin;
+        }
+        if (offlineBanner) {
+          offlineBanner.textContent = texts.offlineBanner;
+        }
+        if (offlineMessage) {
+          offlineMessage.textContent = texts.offlineMessage;
+        }
+        if (offlineHint) {
+          offlineHint.textContent = texts.offlineHint;
+        }
+        if (offlineChip) {
+          offlineChip.textContent = texts.statusOffline;
+        }
+      }
 
       function closeMenu() {
         document.body.classList.remove("menu-open");
@@ -359,13 +242,18 @@
       }
 
       function updateOnline() {
-        chip.textContent = "Back online, returning to app...";
-        chip.addEventListener("click", navigateBackToApp);
+        if (redirectScheduled) {
+          return;
+        }
+        redirectScheduled = true;
+        chip.textContent = texts.statusOnline;
+        chip.onclick = navigateBackToApp;
         setTimeout(navigateBackToApp, 250);
       }
 
       function updateOffline() {
-          chip.textContent = "Offline mode active";
+        redirectScheduled = false;
+        chip.textContent = texts.statusOffline;
       }
 
       window.addEventListener("offline", updateOffline);
@@ -392,6 +280,7 @@
           });
       }
 
+      applyLocalization();
       setTimeout(startPolling, 1000);
     })();
   </script>

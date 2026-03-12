@@ -1,0 +1,280 @@
+@mixin offline {
+  $offline-menu-bg: $valo-menu-background-color;
+  $offline-content-bg: $editor-background-color;
+  $offline-warning-base: $v-error-indicator-level-warning-color;
+
+  &.offline-page {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    font-family: "Open Sans", "Segoe UI", Arial, sans-serif;
+    background: $offline-content-bg;
+    color: #1f2328;
+    overflow: hidden;
+  }
+
+  .offline-ui {
+    --menu-bg: #{$offline-menu-bg};
+    --menu-text: #{valo-font-color($offline-menu-bg, 0.8)};
+    --menu-text-strong: #fff;
+    --menu-header-height: 38px;
+    --content-bg: #{$offline-content-bg};
+    --card-bg: #fff;
+    --card-border: #{darken($offline-content-bg, 9%)};
+    --accent: #{$v-focus-color};
+
+    display: flex;
+    width: 100vw;
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
+  }
+
+  // Override Vaadin UI class sizing so the offline shell always fills screen.
+  .offline-ui.v-ui {
+    width: 100vw;
+    min-height: 100vh;
+    min-height: 100dvh;
+    box-sizing: border-box;
+  }
+
+  .offline-menu {
+    width: 156px;
+    flex: 0 0 156px;
+    background: var(--menu-bg);
+    color: var(--menu-text);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .offline-title {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    height: 80px;
+    align-content: center;
+    padding-left: 60px !important;
+  }
+
+  .offline-title img {
+    width: 38px;
+    height: 38px;
+    max-width: 100%;
+    display: block;
+  }
+
+  .offline-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--menu-text);
+    width: 44px;
+    height: 36px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+
+  .offline-toggle:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .offline-topbar {
+    display: none;
+    height: var(--menu-header-height);
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    background: var(--accent);
+    color: var(--menu-text-strong);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-sizing: border-box;
+  }
+
+  .offline-topbar-title {
+    margin-left: auto;
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .offline-nav {
+    padding: 8px;
+    flex: 1;
+  }
+
+  .offline-nav a {
+    display: block;
+    text-decoration: none;
+    color: var(--menu-text);
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    pointer-events: none;
+    cursor: default;
+    user-select: none;
+  }
+
+  .offline-nav a.selected {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--menu-text-strong);
+  }
+
+  .offline-user {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 10px 14px;
+    color: var(--menu-text);
+    font-size: 13px;
+  }
+
+  .offline-content {
+    flex: 1;
+    min-width: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: auto;
+    padding: 24px;
+    background: var(--content-bg);
+  }
+
+  .offline-about {
+    width: min(500px, 100%);
+    max-width: 500px;
+    margin: 0;
+  }
+
+  .offline-banner {
+    border: 1px solid lighten($offline-warning-base, 20%);
+    background: lighten($offline-warning-base, 46%);
+    color: darken($offline-warning-base, 34%);
+    border-radius: 4px;
+    padding: 7px 10px;
+    margin-bottom: 10px;
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  .offline-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    box-shadow: $light-shadow;
+    padding: 20px;
+    max-width: 760px;
+  }
+
+  .offline-card h1 {
+    margin: 0 0 10px;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .offline-card p {
+    margin: 0 0 10px;
+    line-height: 1.45;
+    color: valo-font-color($offline-content-bg, 0.75);
+  }
+
+  .status-chip {
+    display: inline-block;
+    margin-top: 10px;
+    border: 1px solid darken($offline-content-bg, 13%);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: valo-font-color($offline-content-bg, 0.85);
+    background: #fff;
+  }
+
+  .hint {
+    margin-top: 10px;
+    color: valo-font-color($offline-content-bg, 0.62);
+    font-size: 13px;
+  }
+
+  .menu-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 10;
+  }
+
+  @media (max-width: 800px) {
+    .offline-ui {
+      flex-direction: column;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    .offline-menu {
+      position: fixed;
+      top: var(--menu-header-height);
+      left: 0;
+      width: 156px;
+      max-width: 85vw;
+      transform: translateX(-100%);
+      transition: transform 140ms ease;
+      z-index: 20;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    &.offline-page.menu-open .offline-menu {
+      transform: translateX(0);
+    }
+
+    &.offline-page.menu-open .menu-backdrop {
+      display: block;
+    }
+
+    .offline-topbar {
+      display: flex;
+    }
+
+    .offline-title {
+      display: none;
+    }
+
+    .offline-nav {
+      display: block;
+    }
+
+    .offline-nav a {
+      margin-bottom: 4px;
+    }
+
+    .offline-content {
+      min-height: 0;
+      padding: 12px;
+    }
+
+    .offline-about {
+      margin-top: 0;
+    }
+
+    .offline-card {
+      padding: 14px;
+    }
+
+    .offline-card h1 {
+      font-size: 20px;
+    }
+
+    .offline-user {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px;
+    }
+  }
+}

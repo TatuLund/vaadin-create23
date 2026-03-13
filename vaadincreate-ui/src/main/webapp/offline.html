@@ -48,6 +48,7 @@
   <script>
     (function () {
       const chip = document.getElementById("status-chip");
+      const offlineUi = document.querySelector(".offline-ui");
       const menuToggle = document.getElementById("menu-toggle");
       const menuBackdrop = document.getElementById("menu-backdrop");
       const topbar = document.getElementById("offline-topbar");
@@ -217,11 +218,21 @@
       }
 
       function closeMenu() {
-        document.body.classList.remove("menu-open");
+        if (offlineUi) {
+          offlineUi.classList.remove("menu-open");
+        }
+        if (menuBackdrop) {
+          menuBackdrop.classList.remove("menu-open");
+        }
       }
 
       function toggleMenu() {
-        document.body.classList.toggle("menu-open");
+        if (!offlineUi || !menuBackdrop) {
+          return;
+        }
+        var willOpen = !offlineUi.classList.contains("menu-open");
+        offlineUi.classList.toggle("menu-open", willOpen);
+        menuBackdrop.classList.toggle("menu-open", willOpen);
       }
 
       function navigateBackToApp() {

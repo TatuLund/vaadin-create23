@@ -1,7 +1,13 @@
 @mixin offline {
+
   $offline-menu-bg: $valo-menu-background-color;
   $offline-content-bg: $editor-background-color;
   $offline-warning-base: $v-error-indicator-level-warning-color;
+  $offline-menu-header-height: 38px;
+  $offline-menu-text: #{valo-font-color($offline-menu-bg, 0.8)};
+  $offline-menu-text-strong: #fff;
+  $offline-card-bg: #fff;
+  $offline-card-border: #{darken($offline-content-bg, 9%)};
 
   &.offline-page {
     margin: 0;
@@ -16,15 +22,6 @@
   }
 
   .offline-ui {
-    --menu-bg: #{$offline-menu-bg};
-    --menu-text: #{valo-font-color($offline-menu-bg, 0.8)};
-    --menu-text-strong: #fff;
-    --menu-header-height: 38px;
-    --content-bg: #{$offline-content-bg};
-    --card-bg: #fff;
-    --card-border: #{darken($offline-content-bg, 9%)};
-    --accent: #{$v-focus-color};
-
     display: flex;
     width: 100vw;
     min-height: 100vh;
@@ -43,8 +40,8 @@
   .offline-menu {
     width: 156px;
     flex: 0 0 156px;
-    background: var(--menu-bg);
-    color: var(--menu-text);
+    background: $offline-menu-bg;
+    color: $offline-menu-text;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -72,7 +69,7 @@
     justify-content: center;
     border: none;
     background: transparent;
-    color: var(--menu-text);
+    color: $offline-menu-text;
     width: 44px;
     height: 36px;
     font-size: 14px;
@@ -82,17 +79,18 @@
 
   .offline-toggle:hover {
     color: #fff;
+    cursor: pointer;
     background: rgba(255, 255, 255, 0.1);
   }
 
   .offline-topbar {
     display: none;
-    height: var(--menu-header-height);
+    height: $menu-header-height;
     align-items: center;
     gap: 8px;
     padding: 0 10px;
-    background: var(--accent);
-    color: var(--menu-text-strong);
+    background: $v-focus-color;
+    color: $offline-menu-text-strong;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     box-sizing: border-box;
   }
@@ -113,7 +111,7 @@
   .offline-nav a {
     display: block;
     text-decoration: none;
-    color: var(--menu-text);
+    color: $offline-menu-text;
     padding: 8px 12px;
     border-radius: 4px;
     margin-bottom: 4px;
@@ -124,13 +122,13 @@
 
   .offline-nav a.selected {
     background: rgba(255, 255, 255, 0.12);
-    color: var(--menu-text-strong);
+    color: $offline-menu-text-strong;
   }
 
   .offline-user {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding: 10px 14px;
-    color: var(--menu-text);
+    color: $offline-menu-text;
     font-size: 13px;
   }
 
@@ -145,7 +143,7 @@
     box-sizing: border-box;
     overflow: auto;
     padding: 24px;
-    background: var(--content-bg);
+    background: $offline-content-bg;
   }
 
   .offline-about {
@@ -166,8 +164,8 @@
   }
 
   .offline-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
+    background: $offline-card-bg;
+    border: 1px solid $offline-card-border;
     border-radius: 6px;
     box-shadow: $light-shadow;
     padding: 20px;
@@ -211,6 +209,16 @@
     z-index: 10;
   }
 
+  .offline-ui.menu-open {
+    .offline-menu {
+      transform: translateX(0);
+    }
+  }
+
+  .menu-backdrop.menu-open {
+    display: block;
+  }
+
   @media (max-width: 800px) {
     .offline-ui {
       flex-direction: column;
@@ -221,26 +229,17 @@
 
     .offline-menu {
       position: fixed;
-      top: var(--menu-header-height);
+      top: $offline-menu-header-height;
       left: 0;
       width: 156px;
       max-width: 85vw;
       transform: translateX(-100%);
       transition: transform 140ms ease;
       z-index: 20;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
-    }
-
-    &.offline-page.menu-open .offline-menu {
-      transform: translateX(0);
-    }
-
-    &.offline-page.menu-open .menu-backdrop {
-      display: block;
     }
 
     .offline-topbar {
-      display: flex;
+      display: flex !important;
     }
 
     .offline-title {

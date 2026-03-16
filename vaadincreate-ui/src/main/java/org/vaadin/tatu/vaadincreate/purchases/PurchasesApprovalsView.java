@@ -96,8 +96,7 @@ public class PurchasesApprovalsView extends VerticalLayout
                 sourceButton.setEnabled(true);
             }
         });
-        getUI().addWindow(window);
-        window.center();
+        window.open();
     }
 
     private void handleDecision(Integer purchaseId, boolean isApprove,

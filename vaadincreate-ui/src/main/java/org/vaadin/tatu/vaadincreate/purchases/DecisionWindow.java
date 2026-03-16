@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.purchases;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
@@ -8,11 +9,14 @@ import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Composite;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
@@ -23,7 +27,7 @@ import com.vaadin.ui.themes.ValoTheme;
  */
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
-public class DecisionWindow extends Window implements HasI18N {
+public class DecisionWindow extends Composite implements HasI18N {
 
     /** Identifies the decision window. */
     public static final String DECISION_WINDOW_ID = "decision-window";
@@ -38,7 +42,7 @@ public class DecisionWindow extends Window implements HasI18N {
      * Functional interface invoked when the user confirms the decision.
      */
     @FunctionalInterface
-    public interface DecisionConfirmedListener extends java.io.Serializable {
+    public interface DecisionConfirmedListener extends Serializable {
         /**
          * Called when the decision is confirmed.
          *
@@ -52,6 +56,9 @@ public class DecisionWindow extends Window implements HasI18N {
     private final TextArea commentField;
     private final Button confirmButton;
     private boolean confirmed = false;
+    Window window = new Window();
+    @Nullable
+    private Registration resizeRegistration;
 
     /**
      * Creates a new {@code DecisionWindow}.
@@ -67,13 +74,14 @@ public class DecisionWindow extends Window implements HasI18N {
         Objects.requireNonNull(listener, "Listener must not be null");
         this.isApprove = isApprove;
 
-        setModal(true);
-        setClosable(true);
-        setResizable(false);
-        setIcon(VaadinIcons.PENCIL);
-        setWidth("400px");
-        setId(DECISION_WINDOW_ID);
-        setCaption(isApprove ? getTranslation(I18n.Storefront.APPROVE)
+        window.setModal(true);
+        window.setClosable(true);
+        window.setResizable(false);
+        window.setIcon(VaadinIcons.PENCIL);
+        window.setWidth("50%");
+        window.setHeight("50%");
+        window.setId(DECISION_WINDOW_ID);
+        window.setCaption(isApprove ? getTranslation(I18n.Storefront.APPROVE)
                 : getTranslation(I18n.Storefront.REJECT));
 
         commentField = buildCommentField();
@@ -84,11 +92,13 @@ public class DecisionWindow extends Window implements HasI18N {
         buttonBar.setSpacing(true);
 
         var content = new VerticalLayout(commentField, buttonBar);
+        content.setHeight("100%");
         content.setComponentAlignment(buttonBar, Alignment.BOTTOM_RIGHT);
         content.setMargin(true);
         content.setSpacing(true);
 
-        setContent(content);
+        window.setContent(content);
+        window.addCloseListener(closeEvent -> resizeRegistration.remove());
     }
 
     private TextArea buildCommentField() {
@@ -111,7 +121,7 @@ public class DecisionWindow extends Window implements HasI18N {
         var button = new Button(label, e -> {
             confirmed = true;
             var comment = commentField.getValue().trim();
-            close();
+            window.close();
             listener.onConfirmed(comment.isEmpty() ? null : comment);
         });
         button.setId(CONFIRM_BUTTON_ID);
@@ -127,7 +137,7 @@ public class DecisionWindow extends Window implements HasI18N {
 
     private Button buildCancelButton() {
         var button = new Button(getTranslation(I18n.CANCEL),
-                e -> close());
+                e -> window.close());
         button.setId(CANCEL_BUTTON_ID);
         return button;
     }
@@ -145,5 +155,17 @@ public class DecisionWindow extends Window implements HasI18N {
      */
     public boolean isConfirmed() {
         return confirmed;
+    }
+
+    public void open() {
+        var ui = UI.getCurrent();
+        ui.addWindow(window);
+        window.center();
+        resizeRegistration = ui.getPage()
+                .addBrowserWindowResizeListener(resizeEvent -> window.center());
+    }
+
+    public void addCloseListener(Window.CloseListener listener) {
+        window.addCloseListener(listener);
     }
 }

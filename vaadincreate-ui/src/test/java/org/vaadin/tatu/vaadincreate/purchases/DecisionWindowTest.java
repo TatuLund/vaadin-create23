@@ -43,11 +43,11 @@ public class DecisionWindowTest extends UIUnitTest {
         var window = new DecisionWindow(false, comment -> {
             // No-op for button state test.
         });
-        ui.addWindow(window);
+        window.open();
 
-        var confirmButton = $(window, Button.class)
+        var confirmButton = $(Button.class)
                 .id(DecisionWindow.CONFIRM_BUTTON_ID);
-        var commentField = $(window, TextArea.class)
+        var commentField = $(TextArea.class)
                 .id(DecisionWindow.DECISION_COMMENT_ID);
 
         assertNotNull(confirmButton);
@@ -69,11 +69,11 @@ public class DecisionWindowTest extends UIUnitTest {
     public void reject_mode_confirm_trims_reason_closes_window_and_marks_confirmed() {
         var callbackComment = new AtomicReference<String>();
         var window = new DecisionWindow(false, callbackComment::set);
-        ui.addWindow(window);
+        window.open();
 
-        var commentField = $(window, TextArea.class)
+        var commentField = $(TextArea.class)
                 .id(DecisionWindow.DECISION_COMMENT_ID);
-        var confirmButton = $(window, Button.class)
+        var confirmButton = $(Button.class)
                 .id(DecisionWindow.CONFIRM_BUTTON_ID);
 
         test(commentField).setValue("  Budget exceeded  ");
@@ -91,9 +91,9 @@ public class DecisionWindowTest extends UIUnitTest {
         var callbackCalled = new AtomicBoolean(false);
         var window = new DecisionWindow(false,
                 comment -> callbackCalled.set(true));
-        ui.addWindow(window);
+        window.open();
 
-        var cancelButton = $(window, Button.class)
+        var cancelButton = $(Button.class)
                 .id(DecisionWindow.CANCEL_BUTTON_ID);
         test(cancelButton).click();
 
@@ -109,9 +109,9 @@ public class DecisionWindowTest extends UIUnitTest {
     public void approve_mode_confirm_is_enabled_and_blank_comment_maps_to_null() {
         var callbackComment = new AtomicReference<String>();
         var window = new DecisionWindow(true, callbackComment::set);
-        ui.addWindow(window);
+        window.open();
 
-        var confirmButton = $(window, Button.class)
+        var confirmButton = $(Button.class)
                 .id(DecisionWindow.CONFIRM_BUTTON_ID);
         assertTrue("Approve confirm button should be enabled immediately",
                 confirmButton.isEnabled());
@@ -130,11 +130,11 @@ public class DecisionWindowTest extends UIUnitTest {
     public void approve_mode_confirm_trims_non_blank_comment_before_callback() {
         var callbackComment = new AtomicReference<String>();
         var window = new DecisionWindow(true, callbackComment::set);
-        ui.addWindow(window);
+        window.open();
 
-        var commentField = $(window, TextArea.class)
+        var commentField = $(TextArea.class)
                 .id(DecisionWindow.DECISION_COMMENT_ID);
-        var confirmButton = $(window, Button.class)
+        var confirmButton = $(Button.class)
                 .id(DecisionWindow.CONFIRM_BUTTON_ID);
 
         test(commentField).setValue("  Looks good  ");

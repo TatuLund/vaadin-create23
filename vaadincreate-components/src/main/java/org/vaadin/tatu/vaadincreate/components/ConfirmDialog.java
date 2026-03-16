@@ -51,6 +51,8 @@ public class ConfirmDialog extends Composite {
     private Button cancelButton;
     private Button confirmButton;
     Window window = new Window();
+    @Nullable
+    private Registration resizeRegistration;
 
     /**
      * Constructs a ConfirmDialog with given text and Type for style:
@@ -112,6 +114,7 @@ public class ConfirmDialog extends Composite {
         content.setComponentAlignment(message, Alignment.MIDDLE_CENTER);
         content.setComponentAlignment(buttons, Alignment.BOTTOM_CENTER);
         window.setContent(content);
+        window.addCloseListener(closeEvent -> resizeRegistration.remove());
     }
 
     /**
@@ -141,6 +144,8 @@ public class ConfirmDialog extends Composite {
         UI.getCurrent().addWindow(window);
         Shortcuts.setEscapeShortcut("#confirm-dialog", "#cancel-button");
         confirmButton.setClickShortcut(KeyCode.ENTER);
+        resizeRegistration = UI.getCurrent().getPage()
+                .addBrowserWindowResizeListener(resizeEvent -> window.center());
     }
 
     /**

@@ -15,18 +15,15 @@ import com.vaadin.shared.ui.window.WindowRole;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Composite;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.ReflectTools;
 
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
-public class ConfirmDialog extends Composite {
+public class ConfirmDialog extends AbstractDialog {
 
     /**
      * Type of the ConfirmDialog
@@ -50,9 +47,6 @@ public class ConfirmDialog extends Composite {
 
     private Button cancelButton;
     private Button confirmButton;
-    Window window = new Window();
-    @Nullable
-    private Registration resizeRegistration;
 
     /**
      * Constructs a ConfirmDialog with given text and Type for style:
@@ -65,13 +59,9 @@ public class ConfirmDialog extends Composite {
      *            Type of the Dialog
      */
     public ConfirmDialog(String caption, @Nullable String text, Type type) {
+        super();
         window.setId("confirm-dialog");
-        window.setModal(true);
         window.setClosable(false);
-        window.setResizable(false);
-        window.setWidth("50%");
-        window.setHeight("50%");
-        window.setDraggable(false);
         window.setIcon(VaadinIcons.EXCLAMATION_CIRCLE);
         window.setCaption(caption);
         var message = new Label(text);
@@ -114,7 +104,6 @@ public class ConfirmDialog extends Composite {
         content.setComponentAlignment(message, Alignment.MIDDLE_CENTER);
         content.setComponentAlignment(buttons, Alignment.BOTTOM_CENTER);
         window.setContent(content);
-        window.addCloseListener(closeEvent -> resizeRegistration.remove());
     }
 
     /**
@@ -137,15 +126,11 @@ public class ConfirmDialog extends Composite {
         confirmButton.setCaption(confirmText);
     }
 
-    /**
-     * Open the dialog
-     */
+    @Override
     public void open() {
-        UI.getCurrent().addWindow(window);
+        super.open();
         Shortcuts.setEscapeShortcut("#confirm-dialog", "#cancel-button");
         confirmButton.setClickShortcut(KeyCode.ENTER);
-        resizeRegistration = UI.getCurrent().getPage()
-                .addBrowserWindowResizeListener(resizeEvent -> window.center());
     }
 
     /**

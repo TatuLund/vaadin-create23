@@ -67,7 +67,7 @@ public class PurchasesApprovalsView extends VerticalLayout
         button.addStyleNames(ValoTheme.BUTTON_PRIMARY, ValoTheme.BUTTON_SMALL);
         button.setDisableOnClick(true);
         button.addClickListener(
-                clickEvent -> openDecisionWindow(purchase, true, button));
+                clickEvent -> openDecisionDialog(purchase, true, button));
         return button;
     }
 
@@ -77,26 +77,26 @@ public class PurchasesApprovalsView extends VerticalLayout
         button.addStyleNames(ValoTheme.BUTTON_DANGER, ValoTheme.BUTTON_SMALL);
         button.setDisableOnClick(true);
         button.addClickListener(
-                clickEvent -> openDecisionWindow(purchase, false, button));
+                clickEvent -> openDecisionDialog(purchase, false, button));
         return button;
     }
 
-    private void openDecisionWindow(Purchase purchase, boolean isApprove,
+    private void openDecisionDialog(Purchase purchase, boolean isApprove,
             Button sourceButton) {
         var purchaseId = purchase.getId();
         if (purchaseId == null) {
             return;
         }
-        var window = new DecisionWindow(isApprove,
+        var dialog = new DecisionDialog(isApprove,
                 comment -> handleDecision(purchaseId, isApprove, comment));
         // Re-enable the source button only if the window was closed without
         // confirming (i.e. user cancelled), so they can try again.
-        window.addCloseListener(closeEvent -> {
-            if (!window.isConfirmed()) {
+        dialog.addCloseListener(closeEvent -> {
+            if (!dialog.isConfirmed()) {
                 sourceButton.setEnabled(true);
             }
         });
-        window.open();
+        dialog.open();
     }
 
     private void handleDecision(Integer purchaseId, boolean isApprove,

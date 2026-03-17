@@ -273,18 +273,18 @@ public class PurchasesViewTest extends AbstractUITest {
 
         // THEN: DecisionWindow opens
         var decisionWindow = $(Window.class)
-                .id(DecisionWindow.DECISION_WINDOW_ID);
+                .id(DecisionDialog.DECISION_WINDOW_ID);
         assertNotNull("Decision window should be open", decisionWindow);
         assertTrue(decisionWindow.isAttached());
 
         // WHEN: Entering an optional comment and confirming
         var commentField = $(decisionWindow, TextArea.class)
-                .id(DecisionWindow.DECISION_COMMENT_ID);
+                .id(DecisionDialog.DECISION_COMMENT_ID);
         assertNotNull("Comment field should be present", commentField);
         test(commentField).setValue("Approved by supervisor");
 
         test($(decisionWindow, Button.class)
-                .id(DecisionWindow.CONFIRM_BUTTON_ID)).click();
+                .id(DecisionDialog.CONFIRM_BUTTON_ID)).click();
 
         // THEN: Window is closed
         assertFalse("Decision window should be closed after confirm",
@@ -380,19 +380,19 @@ public class PurchasesViewTest extends AbstractUITest {
 
         // THEN: DecisionWindow opens
         var decisionWindow = $(Window.class)
-                .id(DecisionWindow.DECISION_WINDOW_ID);
+                .id(DecisionDialog.DECISION_WINDOW_ID);
         assertNotNull("Decision window should be open", decisionWindow);
         assertTrue(decisionWindow.isAttached());
 
         // THEN: Confirm (reject) button is initially disabled – reason required
         var confirmButton = $(decisionWindow, Button.class)
-                .id(DecisionWindow.CONFIRM_BUTTON_ID);
+                .id(DecisionDialog.CONFIRM_BUTTON_ID);
         assertFalse("Confirm button should be disabled until reason is entered",
                 confirmButton.isEnabled());
 
         // WHEN: Entering a rejection reason
         var commentField = $(decisionWindow, TextArea.class)
-                .id(DecisionWindow.DECISION_COMMENT_ID);
+                .id(DecisionDialog.DECISION_COMMENT_ID);
         assertNotNull("Comment field should be present", commentField);
         test(commentField).setValue("Budget exceeded this quarter");
 
@@ -460,13 +460,13 @@ public class PurchasesViewTest extends AbstractUITest {
 
         // THEN: DecisionWindow opens
         var decisionWindow = $(Window.class)
-                .id(DecisionWindow.DECISION_WINDOW_ID);
+                .id(DecisionDialog.DECISION_WINDOW_ID);
         assertNotNull("Decision window should be open", decisionWindow);
         assertTrue(decisionWindow.isAttached());
 
         // WHEN: Clicking Cancel instead of confirming
         test($(decisionWindow, Button.class)
-                .id(DecisionWindow.CANCEL_BUTTON_ID)).click();
+                .id(DecisionDialog.CANCEL_BUTTON_ID)).click();
 
         // THEN: Window is closed
         assertFalse("Decision window should be closed after cancel",
@@ -515,13 +515,13 @@ public class PurchasesViewTest extends AbstractUITest {
 
         // THEN: DecisionWindow opens
         var decisionWindow = $(Window.class)
-                .id(DecisionWindow.DECISION_WINDOW_ID);
+                .id(DecisionDialog.DECISION_WINDOW_ID);
         assertNotNull("Decision window should be open", decisionWindow);
         assertTrue(decisionWindow.isAttached());
 
         // WHEN: Clicking Cancel instead of confirming
         test($(decisionWindow, Button.class)
-                .id(DecisionWindow.CANCEL_BUTTON_ID)).click();
+                .id(DecisionDialog.CANCEL_BUTTON_ID)).click();
 
         // THEN: Window is closed
         assertFalse("Decision window should be closed after cancel",
@@ -776,11 +776,11 @@ public class PurchasesViewTest extends AbstractUITest {
         test(approveButton).click();
 
         var decisionWindow = $(Window.class)
-                .id(DecisionWindow.DECISION_WINDOW_ID);
+                .id(DecisionDialog.DECISION_WINDOW_ID);
         assertNotNull("Decision window should be open", decisionWindow);
 
         test($(decisionWindow, Button.class)
-                .id(DecisionWindow.CONFIRM_BUTTON_ID))
+                .id(DecisionDialog.CONFIRM_BUTTON_ID))
                 .click();
 
         // THEN: conflict warning is shown (instead of global technical error

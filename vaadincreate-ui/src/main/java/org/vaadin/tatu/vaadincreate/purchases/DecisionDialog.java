@@ -5,29 +5,27 @@ import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.vaadin.tatu.vaadincreate.components.AbstractDialog;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.icons.VaadinIcons;
-import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Composite;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextArea;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 /**
- * Modal sub-window for entering an approval or rejection decision comment.
- * Approve allows an optional comment; reject requires a non-empty reason.
+ * Modal dialog for entering an approval or rejection decision comment. Approve
+ * allows an optional comment; reject requires a non-empty reason.
  */
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
-public class DecisionWindow extends Composite implements HasI18N {
+public class DecisionDialog extends AbstractDialog implements HasI18N {
 
     /** Identifies the decision window. */
     public static final String DECISION_WINDOW_ID = "decision-window";
@@ -56,12 +54,9 @@ public class DecisionWindow extends Composite implements HasI18N {
     private final TextArea commentField;
     private final Button confirmButton;
     private boolean confirmed = false;
-    Window window = new Window();
-    @Nullable
-    private Registration resizeRegistration;
 
     /**
-     * Creates a new {@code DecisionWindow}.
+     * Creates a new {@code DecisionDialog}.
      *
      * @param isApprove
      *            {@code true} for an approval dialog, {@code false} for
@@ -69,17 +64,14 @@ public class DecisionWindow extends Composite implements HasI18N {
      * @param listener
      *            callback invoked with the comment when the user confirms
      */
-    public DecisionWindow(boolean isApprove,
+    public DecisionDialog(boolean isApprove,
             DecisionConfirmedListener listener) {
+        super();
         Objects.requireNonNull(listener, "Listener must not be null");
         this.isApprove = isApprove;
 
-        window.setModal(true);
         window.setClosable(true);
-        window.setResizable(false);
         window.setIcon(VaadinIcons.PENCIL);
-        window.setWidth("50%");
-        window.setHeight("50%");
         window.setId(DECISION_WINDOW_ID);
         window.setCaption(isApprove ? getTranslation(I18n.Storefront.APPROVE)
                 : getTranslation(I18n.Storefront.REJECT));
@@ -98,7 +90,6 @@ public class DecisionWindow extends Composite implements HasI18N {
         content.setSpacing(true);
 
         window.setContent(content);
-        window.addCloseListener(closeEvent -> resizeRegistration.remove());
     }
 
     private TextArea buildCommentField() {
@@ -155,14 +146,6 @@ public class DecisionWindow extends Composite implements HasI18N {
      */
     public boolean isConfirmed() {
         return confirmed;
-    }
-
-    public void open() {
-        var ui = UI.getCurrent();
-        ui.addWindow(window);
-        window.center();
-        resizeRegistration = ui.getPage()
-                .addBrowserWindowResizeListener(resizeEvent -> window.center());
     }
 
     public void addCloseListener(Window.CloseListener listener) {

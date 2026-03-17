@@ -119,22 +119,18 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
                 .setCaption(getTranslation(I18n.Storefront.PURCHASE_ID))
                 .setSortable(false).setId("purchase-id");
 
-        var requesterColumn = grid.addColumn(
-                p -> p.getRequester() != null ? p.getRequester().getName() : "")
+        var requesterColumn = grid.addColumn(p -> p.getRequester().getName())
                 .setCaption(getTranslation(I18n.REQUESTER)).setSortable(false)
                 .setId("requester");
 
         var approverColumn = grid
-                .addColumn(
-                        p -> p.getApprover() != null ? p.getApprover().getName()
-                                : getTranslation(I18n.Storefront.PENDING))
+                .addColumn(p -> p.getApprover().getName())
                 .setCaption(getTranslation(I18n.Storefront.APPROVER))
                 .setSortable(false).setId("approver");
 
-        grid.addColumn(purchase -> {
-            Instant createdAt = purchase.getCreatedAt();
-            return createdAt != null ? Utils.formatDateTime(createdAt) : "";
-        }).setCaption(getTranslation(I18n.CREATED_AT)).setId("created-at")
+        grid.addColumn(
+                purchase -> Utils.formatDateTime(purchase.getCreatedAt()))
+                .setCaption(getTranslation(I18n.CREATED_AT)).setId("created-at")
                 .setSortable(false);
 
         grid.addColumn(Purchase::getStatus)
@@ -214,17 +210,15 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
     private Html.Div detailsHtmlForMyPurchase(Purchase purchase) {
         var root = Html.div().style("padding: 10px;");
 
-        var purchaseIdValue = purchase.getId() != null ? purchase.getId()
-                : getTranslation(I18n.Storefront.NOT_AVAILABLE);
         root.add(
                 Html.strong().text(getTranslation(I18n.Storefront.PURCHASE_ID)))
-                .add(Html.span().text(": " + purchaseIdValue)).add(Html.br());
+                .add(Html.span().text(": " + purchase.getId())).add(Html.br());
 
-        User approver = purchase.getApprover();
-        var approverValue = approver != null ? approver.getName()
-                : getTranslation(I18n.Storefront.PENDING);
+        var approver = purchase.getApprover();
+        assert approver != null : "Approver cannot be null";
         root.add(Html.strong().text(getTranslation(I18n.Storefront.APPROVER)))
-                .add(Html.span().text(": " + approverValue)).add(Html.br());
+                .add(Html.span().text(": " + approver.getName()))
+                .add(Html.br());
 
         Instant decidedAt = purchase.getDecidedAt();
         var decidedAtValue = decidedAt != null ? Utils.formatDateTime(decidedAt)
@@ -283,7 +277,6 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
      *            the exclusive upper-bound instant; {@code null} clears
      *            highlighting
      */
-    @SuppressWarnings("deprecation")
     public void setOldPurchaseHighlight(@Nullable Instant cutoff) {
         if (cutoff == null) {
             grid.setStyleGenerator(p -> null);

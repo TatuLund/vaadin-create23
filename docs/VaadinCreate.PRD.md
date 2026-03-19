@@ -79,6 +79,10 @@ See also:
   - Language selector for choosing UI locale.
   - Login action (button).
   - Optional "hint" action for demo credentials.
+  - A static informational panel explaining demo access policy, including that:
+    - `admin` has full access.
+    - other demo users have role-limited access.
+    - password equals username for demo accounts.
 
 - When the user submits correct credentials:
   - The authentication service shall mark the user as signed-in.
@@ -148,6 +152,13 @@ See also:
   - Storefront (visible for customer/employee role).
   - Purchases (visible for supervisor/admin roles).
   - Admin.
+
+- The app header shall include a user actions menu containing a Logout action that is available for all authenticated users.
+
+- Navigation content shall be role-dependent. At minimum, the observed baseline combinations are:
+  - Admin: About, Inventory, Purchases, Statistics, Admin.
+  - Approver/Supervisor: About, Inventory, Purchases, Statistics (no Admin).
+  - Customer/Employee: About, Storefront only.
 
 - Selecting a menu entry shall navigate to the associated view and update the visible content accordingly.
 
@@ -373,11 +384,13 @@ See also:
 - The user management view shall present:
   - A user-selection control listing existing users.
   - A form with fields: username, password, password confirmation, role.
+  - An Active checkbox in the form.
   - Buttons/actions: New, Save, Delete, Cancel.
 
 - On initial load:
   - The form shall be disabled.
   - Form fields shall be empty.
+  - The Active checkbox shall be visible but disabled.
   - Only the "New" button shall be enabled.
   - Save, Delete, and Cancel buttons shall be disabled.
 
@@ -468,6 +481,12 @@ See also:
 
 - The category management sub-view shall allow basic CRUD for categories (names, possibly other attributes) and shall emit appropriate events for the statistics view and inventory view to react to.
 
+- Category rows shall support inline name editing with immediate save on valid input.
+- Inline editor UX shall include:
+  - A placeholder indicating that valid values are autosaved and `Esc` cancels editing.
+  - Required-field indication for the category name.
+  - A per-row delete action.
+
 
 ## 12. About View and System Messages
 
@@ -511,6 +530,14 @@ See also:
 - If the confirmation is accepted:
   - A notification shall be shown with text such as "You will be logged out in 60 seconds.".
   - (Actual process termination / logout mechanics are outside the scope of this UI PRD but must align with this contract.)
+
+### 12.5 About Message Strip Behavior
+
+- The About view shall show the latest system/admin message as a timestamped strip containing:
+  - Message timestamp.
+  - Message text.
+  - A dismiss/clear control.
+- Dismissing the strip hides that message from the About view until a subsequent message event is received.
 
 
 ## 13. Event Bus
@@ -608,6 +635,7 @@ See also:
 - On entering the Storefront view:
   - A regular notification titled exactly "Status Updates" shall be shown.
   - An assistive notification announcing "Storefront opened" shall be emitted.
+  - The status notification body shall summarize counts by terminal states (for example completed/rejected/cancelled) and direct users to purchase history for details.
 
 ### 17.2 Purchase Wizard
 
@@ -616,8 +644,12 @@ The Storefront view shall include a multi-step purchase wizard with explicit Nex
 - **Step 1: Select Products**
   - The step title element shall display the exact text "Step 1: Select Products".
   - The product selection grid shall exist and be addressable with a stable id `purchase-grid`.
+  - Step 1 product rows shall provide:
+    - A row-selection checkbox.
+    - A quantity input (spinner) for selected rows.
+  - The quantity column shall include an Order Summary footer row showing current order total price and total quantity.
   - Previous shall be disabled on the first step.
-  - Attempting to proceed with an empty cart shall show a warning notification:
+  - Attempting to proceed with an empty cart (including cases where rows are selected but all selected quantities are `0`) shall show a warning notification:
     - "Your cart is empty. Please add items before proceeding."
 
 - **Step 2: Delivery Address**
@@ -657,6 +689,7 @@ The Storefront view shall show a purchase history grid with a stable id `purchas
 
 - The grid shall show existing purchases and include at least one completed purchase in the seeded/demo data.
 - Clicking a row’s toggle control shall show/hide row details.
+- The toggle control shall expose "Open" / "Close" text and corresponding expanded/collapsed state.
 - The row details content shall:
   - Use ARIA live updates with `aria-live="assertive"` and role `alert`.
   - Render purchase metadata (including purchase id, supervisor/approver name, and decision reason when present).
@@ -674,6 +707,9 @@ The Storefront view shall show a purchase history grid with a stable id `purchas
 ### 18.1 Purchases view shell and navigation
 
 - The application shall provide a Purchases view for supervisors/admins.
+- Tab composition is role-dependent:
+  - Admin: Purchase History, Approvals, Statistics.
+  - Approver/Supervisor: Approvals and Statistics.
 - On entering Purchases:
   - An assistive notification "Purchases opened" shall be emitted.
   - An assistive notification "Purchase History opened" shall be emitted when the history tab is shown.

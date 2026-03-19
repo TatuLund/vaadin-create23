@@ -10,7 +10,7 @@
 	<source path="client/" />
 
     <generate-with class="org.vaadin.tatu.vaadincreate.client.OptimizedConnectorBundleLoaderFactory">
-      <when-type-assignable class="com.vaadin.server.widgetsetutils.ConnectorBundleLoaderFactory" />
+      <when-type-assignable class="com.vaadin.client.metadata.ConnectorBundleLoader" />
     </generate-with>
 
     <inherits name="org.vaadin.tatu.vaadincreate.components.WidgetSet" />

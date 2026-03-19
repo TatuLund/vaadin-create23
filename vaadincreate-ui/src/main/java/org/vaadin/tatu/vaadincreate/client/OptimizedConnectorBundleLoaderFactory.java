@@ -59,9 +59,8 @@ public final class OptimizedConnectorBundleLoaderFactory
         if (EAGER_CONNECTORS.contains(connectorType.getQualifiedBinaryName())) {
             return LoadStyle.EAGER;
         }
-        // Loads all other connectors immediately after the initial view
-        // has
-        // been rendered
-        return LoadStyle.DEFERRED;
+        // Loads all other connectors on demand after the initial view
+        // has been rendered
+        return LoadStyle.LAZY;
     }
 }

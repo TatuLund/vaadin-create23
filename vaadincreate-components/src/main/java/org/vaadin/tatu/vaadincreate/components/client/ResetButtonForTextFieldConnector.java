@@ -69,7 +69,7 @@ public class ResetButtonForTextFieldConnector extends AbstractExtensionConnector
      * of a text field.
      * 
      * @param el
-     *           The element to attach the click listener to.
+     *            The element to attach the click listener to.
      */
     // @formatter:off
     public native void addResetButtonClickListener(Element el)

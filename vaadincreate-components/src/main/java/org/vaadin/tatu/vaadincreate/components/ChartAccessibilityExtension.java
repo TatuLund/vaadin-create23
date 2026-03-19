@@ -30,7 +30,7 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
      * component.
      *
      * @param chart
-     *              the chart component to make accessible
+     *            the chart component to make accessible
      * @return the extension instance
      */
     public static ChartAccessibilityExtension of(AbstractComponent chart) {
@@ -83,7 +83,7 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
      * Sets the legends clickable text.
      *
      * @param legendsClickable
-     *                         the new legends clickable text
+     *            the new legends clickable text
      */
     public void setLegendsClickable(String legendsClickable) {
         Objects.requireNonNull(legendsClickable,
@@ -112,7 +112,7 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
      * Sets the maximum number of retry attempts.
      *
      * @param maxAttempts
-     *                    the new maximum number of retry attempts
+     *            the new maximum number of retry attempts
      */
     public void setMaxAttempts(int maxAttempts) {
         if (maxAttempts <= 0) {
@@ -126,7 +126,7 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
      * Sets the retry interval.
      *
      * @param retryInterval
-     *                      the new retry interval
+     *            the new retry interval
      */
     public void setRetryInterval(int retryInterval) {
         if (retryInterval <= 0) {
@@ -159,10 +159,9 @@ public class ChartAccessibilityExtension extends AbstractJavaScriptExtension {
      * Sets the menu entries localized texts.
      *
      * @param menuEntries
-     *                    a list of 5 menu entry texts in the following order:
-     *                    "Print
-     *                    chart", "Download as PNG image", "Download as JPEG image",
-     *                    "Download as PDF document", "Download as SVG image"
+     *            a list of 5 menu entry texts in the following order: "Print
+     *            chart", "Download as PNG image", "Download as JPEG image",
+     *            "Download as PDF document", "Download as SVG image"
      */
     public void setMenuEntries(List<String> menuEntries) {
         Objects.requireNonNull(menuEntries, "Menu entries cannot be null");

@@ -44,20 +44,19 @@ public class CapsLockWarningConnector extends AbstractExtensionConnector {
     }
 
     // This is native JavaScript function. GWT does not have this new API.
+    // @formatter:off
     private native void addKeyDownListener(Element el)
     /*-{
-    var self = this;
-    el
-        .addEventListener(
-            'keydown',
-            $entry(function(e) {
-              if (e.getModifierState('CapsLock')) {
+        var self = this;
+        el.addEventListener('keydown', $entry(function(e) {
+            if (e.getModifierState('CapsLock')) {
                 self.@org.vaadin.tatu.vaadincreate.components.client.CapsLockWarningConnector::showWarning()();
-              } else {
+            } else {
                 self.@org.vaadin.tatu.vaadincreate.components.client.CapsLockWarningConnector::hideWarning()();
-              }
-            }));
+            }
+        }));
     }-*/;
+    // @formatter:on
 
     @OnStateChange("message")
     void setMessage() {

@@ -69,29 +69,33 @@ public class ResetButtonForTextFieldConnector extends AbstractExtensionConnector
      * of a text field.
      * 
      * @param el
-     *            The element to attach the click listener to.
+     *           The element to attach the click listener to.
      */
+    // @formatter:off
     public native void addResetButtonClickListener(Element el)
     /*-{
-    var self = this;
-    el.onclick = $entry(function() {
-      self.@org.vaadin.tatu.vaadincreate.components.client.ResetButtonForTextFieldConnector::clearTextField()();
-    });
-    el.onkeydown = $entry(function(e) {
-      if (e.code === 'Space' || e.code === 'Enter') {
-        self.@org.vaadin.tatu.vaadincreate.components.client.ResetButtonForTextFieldConnector::clearTextField()();
-      }
-    });
+        var self = this;
+        el.onclick = $entry(function() {
+            self.@org.vaadin.tatu.vaadincreate.components.client.ResetButtonForTextFieldConnector::clearTextField()();
+        });
+        el.onkeydown = $entry(function(e) {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                self.@org.vaadin.tatu.vaadincreate.components.client.ResetButtonForTextFieldConnector::clearTextField()();
+            }
+        });
     }-*/;
+    // @formatter:on
 
     /**
      * Removes the click listener from the specified element.
      */
+    // @formatter:off
     public native void removeResetButtonClickListener(Element el)
     /*-{
-    el.onclick = null;
-    el.onkeydown = null;
+        el.onclick = null;
+        el.onkeydown = null;
     }-*/;
+    // @formatter:on
 
     @Override
     public void onKeyUp(KeyUpEvent keyUpEvent) {

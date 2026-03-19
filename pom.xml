@@ -16,6 +16,7 @@
 	<properties>
 		<vaadin.version>8.30.1</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
+		<vaadin.gwt.version>2.13.0</vaadin.gwt.version>
 		<logback.version>1.5.25</logback.version>
 		<slf4j.version>2.0.9</slf4j.version>
 		<testbench.version>5.4.0</testbench.version>

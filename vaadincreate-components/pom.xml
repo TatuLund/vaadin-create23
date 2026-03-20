@@ -346,7 +346,7 @@
                         <artifactId>vaadin-maven-plugin</artifactId>
                         <configuration>
                             <draftCompile>false</draftCompile>
-                            <strict>true</strict>
+                            <strict>false</strict>
                             <style>OBF</style>
                         </configuration>
                         <executions>

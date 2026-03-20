@@ -38,6 +38,7 @@ See also:
 - [Application architecture](ApplicationArchitecture.md)
 - [Data model](DataModel.md)
 - [UX wireframes](WireFrames.md)
+- [Style guide](StyleGuide.md)
 
 - **Application Shell / Layout**
   - A single main layout ("App Layout") wraps all views and provides:

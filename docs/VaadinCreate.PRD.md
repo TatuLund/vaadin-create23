@@ -659,16 +659,20 @@ The Storefront view shall include a multi-step purchase wizard with explicit Nex
     - Postal Code
     - City
     - Country
+  - On entering Step 2, keyboard focus shall move to the Street field.
+  - Address fields should expose browser autofill/autocomplete semantics where applicable (for example street address, postal code, city/locality, country).
   - Attempting to proceed with required address fields missing shall show a notification:
     - "Please fill all required fields"
 
 - **Step 3: Supervisor selection**
   - The wizard shall require selecting a supervisor before proceeding.
+  - On entering Step 3, keyboard focus shall move to the supervisor selection control.
   - Attempting to proceed without selecting a supervisor shall show a notification:
     - "Please select a supervisor"
 
 - **Step 4: Review & Submit**
   - Entering the review step shall emit an assistive notification whose text contains "Order Summary".
+  - On entering Step 4, keyboard focus shall move to the Submit action.
   - Submitting shall create a new purchase request and show a success notification whose caption contains the word "created".
   - After a successful submit:
     - The wizard shall reset back to Step 1.

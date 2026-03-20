@@ -1,7 +1,10 @@
 package org.vaadin.tatu.vaadincreate.storefront;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.jsoup.Jsoup;
 
@@ -13,12 +16,14 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
 import org.vaadin.tatu.vaadincreate.backend.data.Address;
 import org.vaadin.tatu.vaadincreate.backend.data.Cart;
+import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.common.EuroConverter;
 import org.vaadin.tatu.vaadincreate.common.EuroRenderer;
 import org.vaadin.tatu.vaadincreate.common.NumberField;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.components.Html;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
@@ -81,15 +86,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
     // Step 2 components
     @Nullable
-    private Binder<Address> addressBinder;
-    @Nullable
-    private TextField streetField;
-    @Nullable
-    private TextField postalCodeField;
-    @Nullable
-    private TextField cityField;
-    @Nullable
-    private TextField countryField;
+    private AddressForm addressForm;
 
     // Step 3 components
     @Nullable
@@ -101,6 +98,13 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
     private StorefrontPresenter presenter;
 
+    /**
+     * Creates the purchase wizard with the given presenter for backend
+     * interactions.
+     *
+     * @param presenter
+     *            the presenter for backend interactions
+     */
     public PurchaseWizard(StorefrontPresenter presenter) {
         this.presenter = presenter;
         root = new VerticalLayout();
@@ -158,20 +162,11 @@ public class PurchaseWizard extends Composite implements HasI18N {
         stepContent.removeAllComponents();
 
         switch (step) {
-        case 1:
-            showStep1();
-            break;
-        case 2:
-            showStep2();
-            break;
-        case 3:
-            showStep3();
-            break;
-        case 4:
-            showStep4();
-            break;
-        default:
-            logger.error("Invalid step: {}", step);
+        case 1 -> showStep1();
+        case 2 -> showStep2();
+        case 3 -> showStep3();
+        case 4 -> showStep4();
+        default -> logger.error("Invalid step: {}", step);
         }
 
         prevButton.setEnabled(step > 1);
@@ -197,6 +192,11 @@ public class PurchaseWizard extends Composite implements HasI18N {
         stepContent.setExpandRatio(productGrid, 1.0f);
     }
 
+    /**
+     * Sets the products to be displayed in the product selection grid. If the
+     * collection is empty, shows a message indicating that no products are
+     * available.
+     */
     public void setProducts(Collection<ProductDto> products) {
         if (products.isEmpty()) {
             stepContent.addComponent(new Label(
@@ -210,41 +210,9 @@ public class PurchaseWizard extends Composite implements HasI18N {
     private void showStep2() {
         stepTitle.setValue(getTranslation(I18n.Storefront.STEP2_TITLE));
 
-        addressBinder = new Binder<>(Address.class);
-
-        streetField = new TextField(getTranslation(I18n.Storefront.STREET));
-        streetField.setWidth("100%");
-        addressBinder.forField(streetField)
-                .asRequired(getTranslation(I18n.Storefront.STREET_REQUIRED))
-                .bind(Address::getStreet, Address::setStreet);
-
-        postalCodeField = new TextField(
-                getTranslation(I18n.Storefront.POSTAL_CODE));
-        addressBinder.forField(postalCodeField)
-                .asRequired(
-                        getTranslation(I18n.Storefront.POSTAL_CODE_REQUIRED))
-                .bind(Address::getPostalCode, Address::setPostalCode);
-
-        cityField = new TextField(getTranslation(I18n.Storefront.CITY));
-        addressBinder.forField(cityField)
-                .asRequired(getTranslation(I18n.Storefront.CITY_REQUIRED))
-                .bind(Address::getCity, Address::setCity);
-
-        countryField = new TextField(getTranslation(I18n.Storefront.COUNTRY));
-        addressBinder.forField(countryField)
-                .asRequired(getTranslation(I18n.Storefront.COUNTRY_REQUIRED))
-                .bind(Address::getCountry, Address::setCountry);
-
-        addressBinder.setBean(address);
-
-        var formLayout = new FormLayout(streetField, postalCodeField, cityField,
-                countryField);
-        AttributeExtension.of(formLayout).setAttribute("role", "form");
-
-        stepContent.addComponent(formLayout);
+        addressForm = new AddressForm(address);
+        stepContent.addComponent(addressForm);
         stepContent.setMargin(true);
-
-        streetField.focus();
     }
 
     private void showStep3() {
@@ -295,15 +263,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
         var list = Html.ul();
         for (var entry : cart.getItems().entrySet()) {
-            var product = entry.getKey();
-            var quantity = entry.getValue();
-            var lineTotal = product.getPrice()
-                    .multiply(new BigDecimal(quantity));
-
-            var itemText = String.format("%s x %d @ %s = %s",
-                    product.getProductName(), quantity,
-                    euroFormat.format(product.getPrice()),
-                    euroFormat.format(lineTotal));
+            var itemText = getItemText(euroFormat, entry);
             list.add(Html.li().text(itemText));
         }
         div.add(list);
@@ -321,14 +281,25 @@ public class PurchaseWizard extends Composite implements HasI18N {
         return div.build();
     }
 
+    private String getItemText(NumberFormat euroFormat,
+            Entry<Product, Integer> entry) {
+        var product = entry.getKey();
+        var quantity = entry.getValue();
+        var lineTotal = product.getPrice()
+                .multiply(new BigDecimal(quantity));
+
+        return String.format("%s x %d @ %s = %s",
+                product.getProductName(), quantity,
+                euroFormat.format(product.getPrice()),
+                euroFormat.format(lineTotal));
+    }
+
     private void handleNext() {
-        if (currentStep == 1) {
+        switch (currentStep) {
+        case 1 -> {
             // Build cart from selected products with quantities
             cart.clear();
-            if (productGrid == null) {
-                logger.error("productGrid is null in step 1");
-                return;
-            }
+            assert productGrid != null : "productGrid is null in step 1";
 
             var selectedProducts = productGrid.getSelectedItems();
             if (selectedProducts.isEmpty()) {
@@ -337,19 +308,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
                 return;
             }
 
-            // Add products to cart - fetch actual Product entities from backend
-            for (var dto : selectedProducts) {
-                if (dto.getOrderQuantity() > 0) {
-                    // Fetch the actual Product entity from backend by ID
-                    var product = presenter.getProductById(dto.getProductId());
-                    if (product != null) {
-                        cart.setQuantity(product, dto.getOrderQuantity());
-                    } else {
-                        logger.error("Product with ID {} not found",
-                                dto.getProductId());
-                    }
-                }
-            }
+            addSelectedProductsToCart(selectedProducts);
 
             if (cart.isEmpty()) {
                 Notification.show(getTranslation(I18n.Storefront.CART_EMPTY),
@@ -358,24 +317,14 @@ public class PurchaseWizard extends Composite implements HasI18N {
             }
 
             showStep(2);
-        } else if (currentStep == 2) {
-            if (addressBinder == null) {
-                logger.error("addressBinder is null in step 2");
-                return;
-            }
-            try {
-                addressBinder.writeBean(address);
-                showStep(3);
-            } catch (ValidationException ex) {
-                Notification.show(
-                        getTranslation(I18n.Storefront.FILL_REQUIRED_FIELDS),
-                        Notification.Type.WARNING_MESSAGE);
-            }
-        } else if (currentStep == 3) {
-            if (supervisorComboBox == null) {
-                logger.error("supervisorComboBox is null in step 3");
-                return;
-            }
+        }
+        case 2 -> {
+            assert addressForm != null : "addressForm is null in step 2";
+            saveAddressDataAndShowStep3(addressForm.getBinder());
+        }
+        case 3 -> {
+            assert supervisorComboBox != null
+                    : "supervisorComboBox is null in step 3";
             selectedSupervisor = supervisorComboBox.getValue();
             if (selectedSupervisor == null) {
                 Notification.show(
@@ -384,8 +333,42 @@ public class PurchaseWizard extends Composite implements HasI18N {
                 return;
             }
             showStep(4);
-        } else if (currentStep == 4) {
-            submitPurchase();
+        }
+        case 4 -> submitPurchase();
+        default -> {
+            // No-op for unexpected step values.
+        }
+        }
+    }
+
+    private void saveAddressDataAndShowStep3(Binder<Address> binder) {
+        try {
+            binder.writeBean(address);
+            showStep(3);
+        } catch (ValidationException ex) {
+            Notification.show(
+                    getTranslation(I18n.Storefront.FILL_REQUIRED_FIELDS),
+                    Notification.Type.WARNING_MESSAGE);
+        }
+    }
+
+    private void addSelectedProductsToCart(Set<ProductDto> selectedProducts) {
+        // Add products to cart - fetch actual Product entities from backend
+        for (var dto : selectedProducts) {
+            addProductToCart(dto);
+        }
+    }
+
+    private void addProductToCart(ProductDto dto) {
+        if (dto.getOrderQuantity() > 0) {
+            // Fetch the actual Product entity from backend by ID
+            var product = presenter.getProductById(dto.getProductId());
+            if (product != null) {
+                cart.setQuantity(product, dto.getOrderQuantity());
+            } else {
+                logger.error("Product with ID {} not found",
+                        dto.getProductId());
+            }
         }
     }
 
@@ -421,6 +404,89 @@ public class PurchaseWizard extends Composite implements HasI18N {
             logger.error("Failed to create purchase", ex);
             Notification.show(getTranslation(I18n.Storefront.PURCHASE_FAILED),
                     Notification.Type.ERROR_MESSAGE);
+        }
+    }
+
+    static class AddressForm extends FormLayout
+            implements HasAttributes<AddressForm>, HasI18N {
+
+        private final Binder<Address> binder;
+
+        /**
+         * Creates an address form bound to the given Address bean. The form
+         * includes fields for street, postal code, city, and country, all of
+         * which are required.
+         *
+         * @param address
+         *            the Address bean to bind to the form
+         */
+        public AddressForm(Address address) {
+            binder = new Binder<>(Address.class);
+            setRole("form");
+
+            var streetField = new ATextField(
+                    getTranslation(I18n.Storefront.STREET));
+            streetField.setWidth("100%");
+            streetField.setAutocomplete("street-address");
+            binder.forField(streetField)
+                    .asRequired(getTranslation(
+                            I18n.Storefront.STREET_REQUIRED))
+                    .bind(Address::getStreet, Address::setStreet);
+
+            var postalCodeField = new ATextField(
+                    getTranslation(I18n.Storefront.POSTAL_CODE));
+            postalCodeField.setAutocomplete("postal-code");
+            binder.forField(postalCodeField)
+                    .asRequired(getTranslation(
+                            I18n.Storefront.POSTAL_CODE_REQUIRED))
+                    .bind(Address::getPostalCode, Address::setPostalCode);
+
+            var cityField = new ATextField(
+                    getTranslation(I18n.Storefront.CITY));
+            cityField.setAutocomplete("address-level2");
+            binder.forField(cityField)
+                    .asRequired(getTranslation(I18n.Storefront.CITY_REQUIRED))
+                    .bind(Address::getCity, Address::setCity);
+
+            var countryField = new ATextField(
+                    getTranslation(I18n.Storefront.COUNTRY));
+            countryField.setAutocomplete("country");
+            binder.forField(countryField)
+                    .asRequired(getTranslation(
+                            I18n.Storefront.COUNTRY_REQUIRED))
+                    .bind(Address::getCountry, Address::setCountry);
+
+            binder.setBean(address);
+            addComponents(streetField, postalCodeField, cityField,
+                    countryField);
+            streetField.focus();
+        }
+
+        /**
+         * Returns the Binder used for this address form, allowing the caller to
+         * write the form data back to the Address bean and check for
+         * validation.
+         */
+        public Binder<Address> getBinder() {
+            return binder;
+        }
+    }
+
+    static class ATextField extends TextField
+            implements HasAttributes<ATextField> {
+
+        public ATextField(String caption) {
+            super(caption);
+        }
+
+        /**
+         * Sets the autocomplete attribute for this text field to improve user
+         * experience by enabling browser autofill features. The value should be
+         * a valid autocomplete token as defined in HTML specifications, such as
+         * "street-address", "postal-code", "country", etc.
+         */
+        public void setAutocomplete(String value) {
+            setAttribute("autocomplete", value);
         }
     }
 

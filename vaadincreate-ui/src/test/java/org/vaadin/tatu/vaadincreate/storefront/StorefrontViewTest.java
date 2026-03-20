@@ -214,8 +214,9 @@ public class StorefrontViewTest extends AbstractUITest {
         test(nextButton).click();
 
         // Fill address
-        test($(TextField.class).caption("Street").first())
-                .setValue("123 Main St");
+        var streetField = $(TextField.class).caption("Street").first();
+        assertTrue(test(streetField).isFocused());
+        test(streetField).setValue("123 Main St");
         test($(TextField.class).caption("Postal Code").first())
                 .setValue("12345");
         test($(TextField.class).caption("City").first()).setValue("TestCity");
@@ -227,6 +228,7 @@ public class StorefrontViewTest extends AbstractUITest {
         @SuppressWarnings("unchecked")
         var supervisorCombo = (ComboBox<Object>) $(ComboBox.class).first();
         assertNotNull("Supervisor combobox should be present", supervisorCombo);
+        assertTrue(test(supervisorCombo).isFocused());
         var supervisors = supervisorCombo.getDataCommunicator()
                 .fetchItemsWithRange(0, 1);
         test(supervisorCombo).clickItem(supervisors.get(0));
@@ -243,6 +245,7 @@ public class StorefrontViewTest extends AbstractUITest {
 
         // Submit
         var submitButton = $(Button.class).caption("Submit").first();
+        assertTrue(test(submitButton).isFocused());
 
         // WHEN: User submits the purchase
         test(submitButton).click();

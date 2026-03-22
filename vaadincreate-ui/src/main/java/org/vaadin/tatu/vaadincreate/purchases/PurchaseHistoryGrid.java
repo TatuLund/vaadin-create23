@@ -49,6 +49,12 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
     private final PurchaseHistoryPresenter presenter;
     private final PurchaseHistoryMode mode;
     private final User currentUser;
+    @Nullable
+    private Instant oldHighlightCutoff;
+    @Nullable
+    private Instant selectedRangeFrom;
+    @Nullable
+    private Instant selectedRangeToExclusive;
 
     @Nullable
     private UI ui;
@@ -193,6 +199,19 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
         grid.scrollTo(targetIndex, ScrollDestination.START);
     }
 
+    /**
+     * Scrolls the grid to an absolute row index.
+     *
+     * @param index
+     *            zero-based index
+     */
+    public void scrollToIndex(int index) {
+        if (index < 0) {
+            return;
+        }
+        grid.scrollTo(index, ScrollDestination.START);
+    }
+
     private void configureDetailsGenerator() {
         grid.setDetailsGenerator(purchase -> {
             Html.Div htmlDiv;
@@ -278,16 +297,46 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
      *            highlighting
      */
     public void setOldPurchaseHighlight(@Nullable Instant cutoff) {
-        if (cutoff == null) {
-            grid.setStyleGenerator(p -> null);
-        } else {
-            grid.setStyleGenerator(p -> {
-                Instant createdAt = p.getCreatedAt();
-                return createdAt != null && createdAt.isBefore(cutoff)
-                        ? VaadinCreateTheme.PURCHASE_OLD
-                        : null;
-            });
-        }
+        oldHighlightCutoff = cutoff;
+        applyRowStyleGenerator();
+    }
+
+    /**
+     * Applies a highlight class for purchases in the selected range
+     * [fromInclusive, toExclusive). Passing null clears range highlighting.
+     *
+     * @param fromInclusive
+     *            inclusive start instant
+     * @param toExclusive
+     *            exclusive end instant
+     */
+    public void setSelectedRangeHighlight(@Nullable Instant fromInclusive,
+            @Nullable Instant toExclusive) {
+        selectedRangeFrom = fromInclusive;
+        selectedRangeToExclusive = toExclusive;
+        applyRowStyleGenerator();
+    }
+
+    private void applyRowStyleGenerator() {
+        grid.setStyleGenerator(p -> {
+            var createdAt = p.getCreatedAt();
+            if (createdAt == null) {
+                return null;
+            }
+            var style = new StringBuilder();
+            if (oldHighlightCutoff != null && createdAt.isBefore(oldHighlightCutoff)) {
+                style.append(VaadinCreateTheme.PURCHASE_OLD);
+            }
+            if (selectedRangeFrom != null && selectedRangeToExclusive != null
+                    && !createdAt.isBefore(selectedRangeFrom)
+                    && createdAt.isBefore(selectedRangeToExclusive)) {
+                if (!style.isEmpty()) {
+                    style.append(" ");
+                }
+                style.append(VaadinCreateTheme.PURCHASE_RANGE);
+            }
+            return style.isEmpty() ? null : style.toString();
+        });
     }
 
     /**

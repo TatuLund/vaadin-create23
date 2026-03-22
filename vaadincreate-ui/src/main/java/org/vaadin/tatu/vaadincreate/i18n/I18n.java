@@ -281,6 +281,16 @@ public final class I18n {
         public static final String PURGE_CONFIRM_CAPTION = "purge-confirm-caption";
         public static final String PURGE_CONFIRM_MESSAGE = "purge-confirm-message";
         public static final String PURGE_SUCCESS = "purge-success";
+        public static final String FROM = "from";
+        public static final String TO = "to";
+        public static final String EXPORT = "export";
+        public static final String EXPORT_MISSING_DATES = "export-missing-dates";
+        public static final String EXPORT_INVALID_RANGE = "export-invalid-range";
+        public static final String EXPORT_MAX_THREE_MONTHS = "export-max-three-months";
+        public static final String EXPORT_STARTED = "export-started";
+        public static final String EXPORT_FAILED = "export-failed";
+        public static final String EXPORT_READY = "export-ready";
+        public static final String DOWNLOAD = "download";
 
         private Storefront() {
             // private constructor to hide the implicit public one

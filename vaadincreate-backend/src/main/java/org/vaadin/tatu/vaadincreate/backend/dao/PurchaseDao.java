@@ -688,6 +688,86 @@ public class PurchaseDao {
         return result != null ? result : 0L;
     }
 
+    /**
+     * Returns purchases created within the given range (inclusive lower bound,
+     * exclusive upper bound) ordered by created-at descending and id ascending.
+     */
+    public List<@NonNull Purchase> findAllByCreatedAtBetween(Instant from,
+            Instant toExclusive) {
+        Objects.requireNonNull(from, "From must not be null");
+        Objects.requireNonNull(toExclusive, "To must not be null");
+        logger.debug("Fetching purchases between {} and {}", from, toExclusive);
+        var result = HibernateUtil.inSession(session -> {
+            var purchaseIds = session.createQuery(
+                    """
+                            select p.id from Purchase p
+                            where p.createdAt >= :from and p.createdAt < :to
+                            order by p.createdAt desc, p.id asc
+                            """,
+                    Integer.class).setParameter("from", from)
+                    .setParameter("to", toExclusive).list();
+            return fetchPurchasesWithLinesByIds(session, purchaseIds);
+        });
+        if (result == null) {
+            throw new IllegalStateException(
+                    "Result of findAllByCreatedAtBetween is null");
+        }
+        return result;
+    }
+
+    /**
+     * Resolves the first index in history ordering where created-at is on or
+     * after the given boundary. Ordering is created-at descending, id ascending.
+     *
+     * @param fromInclusive
+     *            inclusive boundary instant
+     * @return matching row index or null if no row matches
+     */
+    @Nullable
+    public Integer findFirstMatchingRowIndex(Instant fromInclusive) {
+        Objects.requireNonNull(fromInclusive, "From must not be null");
+        logger.debug("Resolving first matching row index from {}",
+                fromInclusive);
+        var result = HibernateUtil.inSession(session -> {
+            @Nullable
+            Long countBefore = session.createQuery(
+                    """
+                            select count(p) from Purchase p
+                            where p.createdAt > :from
+                            """,
+                    Long.class).setParameter("from", fromInclusive)
+                    .uniqueResult();
+            @Nullable
+            Long equalCount = session.createQuery(
+                    """
+                            select count(p) from Purchase p
+                            where p.createdAt = :from
+                            """,
+                    Long.class).setParameter("from", fromInclusive)
+                    .uniqueResult();
+            long before = countBefore != null ? countBefore : 0L;
+            long equals = equalCount != null ? equalCount : 0L;
+            if (equals > 0L) {
+                return before;
+            }
+            @Nullable
+            Long lastBefore = session.createQuery(
+                    """
+                            select count(p) from Purchase p
+                            where p.createdAt >= :from
+                            """,
+                    Long.class).setParameter("from", fromInclusive)
+                    .uniqueResult();
+            long index = lastBefore != null ? lastBefore : 0L;
+            return index > 0L ? index - 1L : null;
+        });
+        if (result == null) {
+            return null;
+        }
+        return result > Integer.MAX_VALUE ? Integer.MAX_VALUE
+                : Integer.valueOf(result.intValue());
+    }
+
     @SuppressWarnings("null")
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

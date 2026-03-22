@@ -355,6 +355,45 @@ public class PurchaseServiceImpl implements PurchaseService {
         return purchaseDao.purgePurchasesOlderThan(cutoff);
     }
 
+    @Override
+    @SuppressWarnings("null")
+    public List<@NonNull PurchaseExportRow> fetchPurchaseExportRows(
+            Instant fromInclusive, Instant toExclusive) {
+        Objects.requireNonNull(fromInclusive, "From must not be null");
+        Objects.requireNonNull(toExclusive, "To must not be null");
+        if (!fromInclusive.isBefore(toExclusive)) {
+            throw new IllegalArgumentException(
+                    "From must be before toExclusive");
+        }
+        var purchases = purchaseDao.findAllByCreatedAtBetween(fromInclusive,
+                toExclusive);
+        var rows = new ArrayList<PurchaseExportRow>();
+        for (var purchase : purchases) {
+            var lineIndex = 1;
+            var purchaseId = purchase.getId();
+            var requesterName = purchase.getRequester().getName();
+            var approver = purchase.getApprover();
+            var approverName = approver != null ? approver.getName() : null;
+            for (PurchaseLine line : purchase.getLines()) {
+                rows.add(new PurchaseExportRow(purchaseId,
+                        purchase.getCreatedAt(), purchase.getStatus().name(),
+                        requesterName, approverName, purchase.getDecidedAt(),
+                        purchase.getDecisionReason(), purchase.getTotalAmount(),
+                        lineIndex++, line.getProduct().getId(),
+                        line.getProduct().getProductName(), line.getUnitPrice(),
+                        line.getQuantity(), line.getLineTotal()));
+            }
+        }
+        return rows;
+    }
+
+    @Override
+    @Nullable
+    public Integer resolveFirstMatchingRowIndex(Instant fromInclusive) {
+        Objects.requireNonNull(fromInclusive, "From must not be null");
+        return purchaseDao.findFirstMatchingRowIndex(fromInclusive);
+    }
+
     @SuppressWarnings("null")
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

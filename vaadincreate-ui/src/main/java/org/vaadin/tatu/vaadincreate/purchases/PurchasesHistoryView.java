@@ -8,13 +8,14 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
+
 import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService.PurchaseExportRow;
 import org.vaadin.tatu.vaadincreate.common.TabView;
 import org.vaadin.tatu.vaadincreate.components.ConfirmDialog;
-import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
@@ -58,8 +59,10 @@ public class PurchasesHistoryView extends VerticalLayout
     private final Button exportButton;
     private final Button purgeButton;
     private final PurchaseHistoryCsvExporter csvExporter;
+    @Nullable
     private UI ui;
-    private CompletableFuture<Void> runningExport;
+    @Nullable
+    private transient CompletableFuture<Void> runningExport;
     private long purgeCount;
 
     public PurchasesHistoryView() {
@@ -163,7 +166,7 @@ public class PurchasesHistoryView extends VerticalLayout
     }
 
     private void onDateValueChanged(boolean userOriginated,
-            boolean isFromFieldChanged) {
+            boolean isToFieldChanged) {
         validateDateInputs();
         if (isDateRangeValid()) {
             var fromInstant = fromDate.getValue()
@@ -172,7 +175,7 @@ public class PurchasesHistoryView extends VerticalLayout
             var toExclusive = toDate.getValue().plusDays(1)
                     .atStartOfDay(ZoneId.systemDefault()).toInstant();
             historyGrid.setSelectedRangeHighlight(fromInstant, toExclusive);
-            if (userOriginated && isFromFieldChanged) {
+            if (userOriginated && isToFieldChanged) {
                 var index = presenter.resolveFirstMatchingRowIndex(
                         toDate.getValue());
                 if (index != null) {

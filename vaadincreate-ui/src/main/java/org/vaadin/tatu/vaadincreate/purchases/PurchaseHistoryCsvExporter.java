@@ -43,9 +43,11 @@ public class PurchaseHistoryCsvExporter implements Serializable {
                 writer.writeNext(new String[] { value(row.purchaseId()),
                         value(row.purchaseCreatedAt()),
                         value(row.purchaseStatus()), value(row.requesterName()),
-                        value(row.approverName()), value(row.purchaseDecidedAt()),
+                        value(row.approverName()),
+                        value(row.purchaseDecidedAt()),
                         value(row.decisionReason()),
-                        value(row.purchaseTotalAmount()), value(row.lineIndex()),
+                        value(row.purchaseTotalAmount()),
+                        value(row.lineIndex()),
                         value(row.productId()), value(row.productName()),
                         value(row.unitPrice()), value(row.quantity()),
                         value(row.lineTotal()) }, false);

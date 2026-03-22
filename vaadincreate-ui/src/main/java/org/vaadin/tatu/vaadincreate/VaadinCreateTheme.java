@@ -86,6 +86,8 @@ public final class VaadinCreateTheme {
     public static final String STOREFRONTVIEW_HISTORY = "storefrontview-history";
     public static final String STOREFRONTVIEW_HISTORY_LABEL = "storefrontview-history-label";
 
+    public static final String PURCHASEHISTORYVIEW = "purchasehistoryview";
+    public static final String PURCHASEHISTORYVIEW_TOOLBAR = "purchasehistoryview-toolbar";
     public static final String PURCHASE_OLD = "purchase-old";
     public static final String PURCHASE_RANGE = "purchase-range";
 

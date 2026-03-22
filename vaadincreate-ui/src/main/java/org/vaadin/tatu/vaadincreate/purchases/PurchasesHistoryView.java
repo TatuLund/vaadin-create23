@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.jspecify.annotations.NullMarked;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService.PurchaseExportRow;
 import org.vaadin.tatu.vaadincreate.common.TabView;
@@ -64,6 +65,7 @@ public class PurchasesHistoryView extends VerticalLayout
     public PurchasesHistoryView() {
         setSizeFull();
         setMargin(false);
+        addStyleName(VaadinCreateTheme.PURCHASEHISTORYVIEW);
         presenter = new PurchaseHistoryPresenter();
         historyGrid = new PurchaseHistoryGrid(presenter,
                 PurchaseHistoryMode.ALL, Utils.getCurrentUserOrThrow());
@@ -75,10 +77,12 @@ public class PurchasesHistoryView extends VerticalLayout
 
         var toolbar = new HorizontalLayout(fromDate, toDate, exportButton,
                 purgeButton);
+        toolbar.addStyleName(VaadinCreateTheme.PURCHASEHISTORYVIEW_TOOLBAR);
+        toolbar.setComponentAlignment(fromDate, Alignment.MIDDLE_RIGHT);
+        toolbar.setComponentAlignment(toDate, Alignment.MIDDLE_RIGHT);
         toolbar.setComponentAlignment(exportButton, Alignment.MIDDLE_RIGHT);
         toolbar.setComponentAlignment(purgeButton, Alignment.MIDDLE_RIGHT);
         toolbar.setExpandRatio(fromDate, 1);
-        toolbar.setExpandRatio(toDate, 1);
         toolbar.setWidth("100%");
         toolbar.setSpacing(true);
 
@@ -141,8 +145,10 @@ public class PurchasesHistoryView extends VerticalLayout
         field.setId(id);
         field.setRequiredIndicatorVisible(true);
         field.setRangeEnd(LocalDate.now());
-        field.addValueChangeListener(e -> onDateValueChanged(e.isUserOriginated(),
-                e.getSource() == fromDate));
+        field.setRangeStart(LocalDate.now().minusMonths(24));
+        field.addValueChangeListener(
+                e -> onDateValueChanged(e.isUserOriginated(),
+                        e.getSource() == toDate));
         return field;
     }
 
@@ -160,14 +166,15 @@ public class PurchasesHistoryView extends VerticalLayout
             boolean isFromFieldChanged) {
         validateDateInputs();
         if (isDateRangeValid()) {
-            var fromInstant = fromDate.getValue().atStartOfDay(ZoneId.systemDefault())
+            var fromInstant = fromDate.getValue()
+                    .atStartOfDay(ZoneId.systemDefault())
                     .toInstant();
             var toExclusive = toDate.getValue().plusDays(1)
                     .atStartOfDay(ZoneId.systemDefault()).toInstant();
             historyGrid.setSelectedRangeHighlight(fromInstant, toExclusive);
             if (userOriginated && isFromFieldChanged) {
                 var index = presenter.resolveFirstMatchingRowIndex(
-                        fromDate.getValue());
+                        toDate.getValue());
                 if (index != null) {
                     historyGrid.scrollToIndex(index);
                 }
@@ -222,7 +229,8 @@ public class PurchasesHistoryView extends VerticalLayout
         runningExport = presenter.startExport(from, to,
                 rows -> Utils.access(ui, () -> onExportReady(from, to, rows)),
                 throwable -> Utils.access(ui, () -> {
-                    Notification.show(getTranslation(I18n.Storefront.EXPORT_FAILED),
+                    Notification.show(
+                            getTranslation(I18n.Storefront.EXPORT_FAILED),
                             Type.ERROR_MESSAGE);
                     resetExportButtonState();
                 }));

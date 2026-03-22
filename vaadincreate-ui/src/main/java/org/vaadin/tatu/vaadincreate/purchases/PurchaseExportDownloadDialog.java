@@ -26,7 +26,6 @@ public class PurchaseExportDownloadDialog extends AbstractDialog
         implements HasI18N {
 
     public static final String DOWNLOAD_BUTTON_ID = "export-download-button";
-    public static final String CLOSE_BUTTON_ID = "export-close-button";
 
     public PurchaseExportDownloadDialog(StreamResource resource) {
         super();
@@ -41,12 +40,7 @@ public class PurchaseExportDownloadDialog extends AbstractDialog
         download.setId(DOWNLOAD_BUTTON_ID);
         new FileDownloader(resource).extend(download);
 
-        var close = new Button(getTranslation(I18n.Storefront.CLOSE), e -> {
-            window.close();
-        });
-        close.setId(CLOSE_BUTTON_ID);
-
-        var buttons = new HorizontalLayout(download, close);
+        var buttons = new HorizontalLayout(download);
         buttons.setSpacing(true);
         var content = new VerticalLayout(buttons);
         content.setMargin(true);
@@ -59,13 +53,8 @@ public class PurchaseExportDownloadDialog extends AbstractDialog
     public Registration addCloseListener(ClosedListener listener) {
         Objects.requireNonNull(listener, "Listener must not be null");
         assert ClosedListener.CLOSED_METHOD != null : "Closed method is null";
-        var reg = addListener(ClosedEvent.class, listener,
+        return addListener(ClosedEvent.class, listener,
                 ClosedListener.CLOSED_METHOD);
-        if (reg == null) {
-            throw new IllegalStateException(
-                    "Listener registration failed for ClosedEvent");
-        }
-        return reg;
     }
 
     public interface ClosedListener extends ConnectorEventListener {

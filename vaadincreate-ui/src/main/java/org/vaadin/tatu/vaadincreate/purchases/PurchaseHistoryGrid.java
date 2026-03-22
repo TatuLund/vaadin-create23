@@ -324,7 +324,8 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
                 return null;
             }
             var style = new StringBuilder();
-            if (oldHighlightCutoff != null && createdAt.isBefore(oldHighlightCutoff)) {
+            if (oldHighlightCutoff != null
+                    && createdAt.isBefore(oldHighlightCutoff)) {
                 style.append(VaadinCreateTheme.PURCHASE_OLD);
             }
             if (selectedRangeFrom != null && selectedRangeToExclusive != null

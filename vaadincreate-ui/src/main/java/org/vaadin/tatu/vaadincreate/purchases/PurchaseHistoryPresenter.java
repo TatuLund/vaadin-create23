@@ -174,7 +174,8 @@ public class PurchaseHistoryPresenter
         var current = Utils.getCurrentUserOrThrow();
         var fromInstant = fromDate.atStartOfDay(ZoneId.systemDefault())
                 .toInstant();
-        var toExclusive = toDate.plusDays(1).atStartOfDay(ZoneId.systemDefault())
+        var toExclusive = toDate.plusDays(1)
+                .atStartOfDay(ZoneId.systemDefault())
                 .toInstant();
 
         logger.info("Export started by '{}' for range [{} - {}]",

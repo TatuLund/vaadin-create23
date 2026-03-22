@@ -294,9 +294,9 @@ public interface PurchaseService {
             Instant fromInclusive, Instant toExclusive);
 
     /**
-     * Resolves the first matching grid row index for a given from-date
-     * boundary in the history ordering (created-at descending). Returns null
-     * when no matching row exists.
+     * Resolves the first matching grid row index for a given from-date boundary
+     * in the history ordering (created-at descending). Returns null when no
+     * matching row exists.
      *
      * @param fromInclusive
      *            inclusive from boundary instant

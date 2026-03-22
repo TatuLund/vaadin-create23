@@ -717,7 +717,8 @@ public class PurchaseDao {
 
     /**
      * Resolves the first index in history ordering where created-at is on or
-     * after the given boundary. Ordering is created-at descending, id ascending.
+     * after the given boundary. Ordering is created-at descending, id
+     * ascending.
      *
      * @param fromInclusive
      *            inclusive boundary instant

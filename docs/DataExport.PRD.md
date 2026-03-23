@@ -59,17 +59,18 @@ The design follows the [DataExport reference image](DataExport.png).
 - `From` and `To` use date-only values (no time picker in UI).
 - Required indicator must be visible on both date fields.
 - Future dates must be disallowed in both fields by setting field range end to today.
+- Date field lower bound is constrained to today minus 24 months.
 - The implementation should use DateField range limit API (`setRangeEnd`) for this constraint.
 
-## 4.2.1 From-Date Change Grid Positioning
+## 4.2.1 To-Date Change Grid Positioning
 
-When user changes `From` date to a valid value, the purchase history grid should move to the first row whose purchase date matches or follows the selected `From` boundary.
+When user changes `To` date to a valid value, the purchase history grid should move to the first row whose purchase date matches or follows the selected `To` boundary.
 
 - Because the grid supports `scrollTo(index)` (not `scrollToItem`), index must be resolved before scrolling.
 - Add a service-level method that resolves the first matching row index for the selected range boundary.
 - If a matching index exists, call grid `scrollTo(index)`.
 - If no matching row exists, do not scroll and keep current position.
-- Scroll operation must not execute when `From` value is null or current date inputs are invalid.
+- Scroll operation must not execute when `To` value is null or current date inputs are invalid.
 
 ## 4.3 Export Button Enablement Rules
 
@@ -120,6 +121,8 @@ When background export generation finishes successfully:
 
 - Open a dialog that contains a `Download` button.
 - `Download` button is extended with Vaadin `FileDownloader` bound to generated CSV resource.
+- Dialog content includes a localized export-ready status text (instead of a separate ready notification).
+- Dialog contains only the download action button; closing uses standard dialog close behavior.
 - Closing the dialog resets `Export` button from loading state to normal state.
 
 ## 4.7 Failure UX
@@ -203,7 +206,7 @@ Responsibilities:
 - Query purchase records for selected range.
 - Flatten purchase + line items into export DTO rows.
 - Return rows ordered deterministically.
-- Resolve grid row index for first purchase matching the selected `From` boundary (for view scroll behavior).
+- Resolve grid row index for first purchase matching the selected `To` boundary (for view scroll behavior).
 
 ## 6.4 CSV Exporter Class
 
@@ -293,7 +296,8 @@ Use OpenCSV for generation (dependency added to `vaadincreate-ui` module).
 - Use UTF-8 encoding.
 - Include header row.
 - Timestamps serialized as ISO-8601.
-- Monetary and numeric values serialized in machine-friendly format (dot decimal separator).
+- Monetary `BigDecimal` values are serialized using locale decimal separator.
+- CSV field separator is locale-driven: locales with comma decimal separator use semicolon (`;`), and locales with dot decimal separator use comma (`,`).
 - Nullable purchase fields (for example pending `decided_at`, `decision_reason`, nullable approver fields if applicable) must be serialized as empty string.
 
 ## 8.3 Escaping
@@ -337,7 +341,7 @@ Add i18n keys for:
 - export toolbar labels (`from`, `to`, `export`)
 - validation messages (`missing dates`, `invalid range`, `max three months`)
 - async states (`export started`, `export failed`, `export ready`)
-- dialog labels (`download`, `close`)
+- dialog labels (`download`)
 
 All supported locales must receive translations.
 
@@ -363,7 +367,7 @@ No sensitive data should be logged in full payload form.
 
 ## 13.1 Functional
 
-1. Toolbar contains From, To, Export, Purge in defined order.
+1. Toolbar contains From, To, Export, and Purge controls; tests should verify presence and behavior without coupling to exact child-index positions.
 2. Export disabled when either date missing.
 3. Required indicator is visible on both `From` and `To` fields.
 4. Export disabled when range exceeds three months.
@@ -378,19 +382,23 @@ No sensitive data should be logged in full payload form.
 13. On failure, user sees notification and button state is restored.
 14. If view detaches during export, future cancellation is attempted and no stale UI update errors occur.
 15. Date fields disallow selecting future dates.
-16. Changing `From` to a valid value scrolls grid to first matching row index when available.
-17. Rows inside currently selected range are visually emphasized with bold text weight.
+16. Date fields enforce lower bound of current date minus 24 months.
+17. Changing `To` to a valid value scrolls grid to first matching row index when available.
+18. Rows inside currently selected range are visually emphasized with bold text weight.
+19. On view enter, `From` date field receives initial focus.
+20. After successful export completion, download dialog shows export-ready text and download action.
 
 ## 13.2 Technical
 
-18. Async execution uses `VaadinCreateUI.getExecutor()`.
-19. Presenter contains orchestration only; CSV generation resides in dedicated exporter class.
-20. CSV generation uses OpenCSV in UI module.
-21. Download resource type is `StreamResource` bound through `FileDownloader`.
-22. Presenter asserts admin authorization before starting export.
-23. UI updates from async completion are done via UI-safe access mechanism.
-24. Date fields use DateField range end configuration to prevent future-date selection.
-25. Service exposes a method to resolve first matching grid row index for `From`-boundary scrolling.
+21. Async execution uses `VaadinCreateUI.getExecutor()`.
+22. Presenter contains orchestration only; CSV generation resides in dedicated exporter class.
+23. CSV generation uses OpenCSV in UI module.
+24. Download resource type is `StreamResource` bound through `FileDownloader`.
+25. Presenter asserts admin authorization before starting export.
+26. UI updates from async completion are done via UI-safe access mechanism.
+27. Date fields use DateField range limit configuration for both end (today) and start (today minus 24 months).
+28. Service exposes a method to resolve first matching grid row index for `To`-boundary scrolling.
+29. CSV exporter applies locale-based decimal formatting and locale-matching field separators.
 
 
 ## 14. Test Requirements
@@ -400,19 +408,22 @@ No sensitive data should be logged in full payload form.
 - Export button enablement matrix by date values.
 - Required indicator visibility for both date fields.
 - Future date values are not selectable in `From` and `To` fields.
+- Date field lower bound is enforced at current date minus 24 months.
 - `To` date field component-error visibility/clearing for invalid range states.
-- `From` value change triggers grid scroll to expected index when match exists.
-- No scroll is triggered when `From` is null, invalid, or no match exists.
+- `To` value change triggers grid scroll to expected index when match exists.
+- No scroll is triggered when `To` is null, invalid, or no match exists.
 - Row style class is applied only for rows inside selected range and removed when out of range.
 - Loading icon/state transitions on click/success/failure/dialog-close.
 - Dialog opens only after async completion.
 - Download button exists and is enabled in dialog.
+- `From` field is initially focused when entering Purchase History tab.
+- Export-ready feedback is shown inside dialog content (not as a separate notification).
 - Detach/navigation-away during export does not produce stale-component failures.
 
 ## 14.2 Service/Presenter Tests
 
 - Date-range validation logic, especially boundary at exactly three months.
-- First matching index resolution for `From` date boundary (match/no-match/boundary cases).
+- First matching index resolution for `To` date boundary (match/no-match/boundary cases).
 - Async completion callback routes (success/failure).
 - Authorization enforcement for admin-only export.
 
@@ -426,6 +437,7 @@ No sensitive data should be logged in full payload form.
 - Header correctness and column ordering.
 - One-row-per-line flattening for purchases with multiple items.
 - Proper escaping for commas/quotes/newlines.
+- Locale-specific separator and decimal formatting for CSV numeric values.
 - Stable ordering.
 
 

@@ -8,9 +8,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import javax.annotation.Nullable;
-
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService.PurchaseExportRow;
@@ -98,6 +97,7 @@ public class PurchasesHistoryView extends VerticalLayout
     public void enter(ViewChangeEvent event) {
         openingView(event);
         checkRetentionPolicy();
+        fromDate.focus();
     }
 
     @Override
@@ -246,8 +246,6 @@ public class PurchasesHistoryView extends VerticalLayout
         var dialog = new PurchaseExportDownloadDialog(resource);
         dialog.addCloseListener(e -> resetExportButtonState());
         dialog.open();
-        Notification.show(getTranslation(I18n.Storefront.EXPORT_READY),
-                Type.HUMANIZED_MESSAGE);
     }
 
     private void resetExportButtonState() {

@@ -4,7 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -28,29 +30,41 @@ public class PurchaseHistoryCsvExporter implements Serializable {
 
     public StreamResource createResource(LocalDate from, LocalDate to,
             List<PurchaseExportRow> rows, Locale locale, String filePrefix) {
-        var bytes = toCsvBytes(rows);
+        var bytes = toCsvBytes(rows, locale);
         var fileName = buildFileName(from, to, filePrefix, locale);
         return new StreamResource(() -> new ByteArrayInputStream(bytes),
                 fileName);
     }
 
     byte[] toCsvBytes(List<PurchaseExportRow> rows) {
+        return toCsvBytes(rows, Locale.ROOT);
+    }
+
+    byte[] toCsvBytes(List<PurchaseExportRow> rows, Locale locale) {
         var out = new ByteArrayOutputStream();
+        var separator = separatorFor(locale);
         try (var writer = new CSVWriter(
-                new OutputStreamWriter(out, StandardCharsets.UTF_8))) {
+                new OutputStreamWriter(out, StandardCharsets.UTF_8),
+                separator,
+                CSVWriter.DEFAULT_QUOTE_CHARACTER,
+                CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                CSVWriter.DEFAULT_LINE_END)) {
             writer.writeNext(HEADER, false);
             for (var row : rows) {
-                writer.writeNext(new String[] { value(row.purchaseId()),
-                        value(row.purchaseCreatedAt()),
-                        value(row.purchaseStatus()), value(row.requesterName()),
-                        value(row.approverName()),
-                        value(row.purchaseDecidedAt()),
-                        value(row.decisionReason()),
-                        value(row.purchaseTotalAmount()),
-                        value(row.lineIndex()),
-                        value(row.productId()), value(row.productName()),
-                        value(row.unitPrice()), value(row.quantity()),
-                        value(row.lineTotal()) }, false);
+                writer.writeNext(new String[] { value(row.purchaseId(), locale),
+                        value(row.purchaseCreatedAt(), locale),
+                        value(row.purchaseStatus(), locale),
+                        value(row.requesterName(), locale),
+                        value(row.approverName(), locale),
+                        value(row.purchaseDecidedAt(), locale),
+                        value(row.decisionReason(), locale),
+                        value(row.purchaseTotalAmount(), locale),
+                        value(row.lineIndex(), locale),
+                        value(row.productId(), locale),
+                        value(row.productName(), locale),
+                        value(row.unitPrice(), locale),
+                        value(row.quantity(), locale),
+                        value(row.lineTotal(), locale) }, false);
             }
         } catch (java.io.IOException e) {
             throw new IllegalStateException("Failed to build CSV export", e);
@@ -70,7 +84,22 @@ public class PurchaseHistoryCsvExporter implements Serializable {
                 from.format(tokenFormat), to.format(tokenFormat));
     }
 
-    private static String value(Object value) {
-        return value == null ? "" : String.valueOf(value);
+    private static String value(Object value, Locale locale) {
+        if (value == null) {
+            return "";
+        }
+        if (value instanceof BigDecimal decimal) {
+            var decimalSeparator = DecimalFormatSymbols.getInstance(locale)
+                    .getDecimalSeparator();
+            return decimalSeparator == '.' ? decimal.toPlainString()
+                    : decimal.toPlainString().replace('.', decimalSeparator);
+        }
+        return String.valueOf(value);
+    }
+
+    private static char separatorFor(Locale locale) {
+        var decimalSeparator = DecimalFormatSymbols.getInstance(locale)
+                .getDecimalSeparator();
+        return decimalSeparator == ',' ? ';' : ',';
     }
 }

@@ -31,6 +31,40 @@ public class PurchaseHistoryCsvExporterTest {
     }
 
     @Test
+    public void should_use_semicolon_separator_for_comma_decimal_locale() {
+        var exporter = new PurchaseHistoryCsvExporter();
+        var rows = List.of(new PurchaseExportRow(101,
+                Instant.parse("2025-02-01T10:15:30Z"), "PENDING", "Alice",
+                "Boss", null, "Decision", new BigDecimal("99.90"), 1, 55,
+                "Test Product", new BigDecimal("9.99"), 10,
+                new BigDecimal("99.90")));
+
+        var bytes = exporter.toCsvBytes(rows, Locale.GERMANY);
+        var csv = new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
+
+        assertTrue(csv.startsWith(
+                "purchase_id;purchase_created_at;purchase_status;requester_name"));
+        assertTrue(csv.contains("99,90;1;55;Test Product;9,99;10;99,90"));
+    }
+
+    @Test
+    public void should_use_comma_separator_for_dot_decimal_locale() {
+        var exporter = new PurchaseHistoryCsvExporter();
+        var rows = List.of(new PurchaseExportRow(101,
+                Instant.parse("2025-02-01T10:15:30Z"), "PENDING", "Alice",
+                "Boss", null, "Decision", new BigDecimal("99.90"), 1, 55,
+                "Test Product", new BigDecimal("9.99"), 10,
+                new BigDecimal("99.90")));
+
+        var bytes = exporter.toCsvBytes(rows, Locale.US);
+        var csv = new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
+
+        assertTrue(csv.startsWith(
+                "purchase_id,purchase_created_at,purchase_status,requester_name"));
+        assertTrue(csv.contains("99.90,1,55,Test Product,9.99,10,99.90"));
+    }
+
+    @Test
     public void should_build_export_file_name_with_date_tokens() {
         var exporter = new PurchaseHistoryCsvExporter();
         var resource = exporter.createResource(LocalDate.of(2025, 1, 2),

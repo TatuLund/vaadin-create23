@@ -763,15 +763,10 @@ public class PurchasesViewTest extends AbstractUITest {
         assertTrue("To date should have required indicator",
                 toDate.isRequiredIndicatorVisible());
 
-        var toolbar = (HorizontalLayout) exportButton.getParent();
-        assertNotNull("Export button should belong to a toolbar", toolbar);
-        var components = new ArrayList<com.vaadin.ui.Component>();
-        toolbar.iterator().forEachRemaining(components::add);
-        assertEquals("Toolbar should have 4 controls", 4, components.size());
-        assertEquals(fromDate, components.get(0));
-        assertEquals(toDate, components.get(1));
-        assertEquals(exportButton, components.get(2));
-        assertEquals(purgeButton, components.get(3));
+        assertTrue(test(fromDate).isInteractable());
+        assertTrue(test(toDate).isInteractable());
+        assertFalse(test(exportButton).isInteractable());
+        assertTrue(test(fromDate).isFocused());
     }
 
     @Test
@@ -820,6 +815,40 @@ public class PurchasesViewTest extends AbstractUITest {
                 fromDate.getRangeEnd());
         assertEquals("To date range end should be today", LocalDate.now(),
                 toDate.getRangeEnd());
+    }
+
+    @Test
+    public void export_dialog_is_shown_when_export_button_clicked_with_valid_dates() {
+        view = navigate(PurchasesView.VIEW_NAME, PurchasesView.class);
+
+        var fromDate = $(DateField.class).id(PurchasesHistoryView.FROM_DATE_ID);
+        var toDate = $(DateField.class).id(PurchasesHistoryView.TO_DATE_ID);
+        var exportButton = $(Button.class)
+                .id(PurchasesHistoryView.EXPORT_BUTTON_ID);
+
+        var from = LocalDate.now().minusDays(10);
+        var to = LocalDate.now().minusDays(5);
+        test(fromDate).setValue(from);
+        test(toDate).setValue(to);
+
+        assertTrue("Export button should be enabled with valid dates",
+                exportButton.isEnabled());
+
+        // WHEN: Clicking Export
+        test(exportButton).click();
+        assertFalse(test(exportButton).isInteractable());
+
+        waitWhile(Window.class,
+                Void -> $(Window.class).id("purchase-export-dialog") == null,
+                1);
+
+        // THEN: Export dialog is shown
+        var exportDialog = $(Window.class).id("purchase-export-dialog");
+        assertNotNull("Export dialog should be open", exportDialog);
+        assertEquals("Export", exportDialog.getCaption());
+
+        exportDialog.close();
+        assertTrue(test(exportButton).isInteractable());
     }
 
     @Test

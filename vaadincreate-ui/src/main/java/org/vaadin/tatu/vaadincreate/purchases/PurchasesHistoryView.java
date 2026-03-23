@@ -20,10 +20,9 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.UserError;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.DateField;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
@@ -77,16 +76,10 @@ public class PurchasesHistoryView extends VerticalLayout
         purgeButton = buildPurgeButton();
         csvExporter = new PurchaseHistoryCsvExporter();
 
-        var toolbar = new HorizontalLayout(fromDate, toDate, exportButton,
+        var toolbar = new CssLayout(fromDate, toDate, exportButton,
                 purgeButton);
         toolbar.addStyleName(VaadinCreateTheme.PURCHASEHISTORYVIEW_TOOLBAR);
-        toolbar.setComponentAlignment(fromDate, Alignment.MIDDLE_RIGHT);
-        toolbar.setComponentAlignment(toDate, Alignment.MIDDLE_RIGHT);
-        toolbar.setComponentAlignment(exportButton, Alignment.MIDDLE_RIGHT);
-        toolbar.setComponentAlignment(purgeButton, Alignment.MIDDLE_RIGHT);
-        toolbar.setExpandRatio(fromDate, 1);
         toolbar.setWidth("100%");
-        toolbar.setSpacing(true);
 
         addComponent(toolbar);
         addComponent(historyGrid);
@@ -214,16 +207,6 @@ public class PurchasesHistoryView extends VerticalLayout
     }
 
     private void startExport() {
-        if (!isDateRangeValid()) {
-            Notification.show(
-                    getTranslation(I18n.Storefront.EXPORT_MISSING_DATES),
-                    Type.WARNING_MESSAGE);
-            resetExportButtonState();
-            return;
-        }
-        if (runningExport != null && !runningExport.isDone()) {
-            return;
-        }
         exportButton.setIcon(VaadinIcons.SPINNER);
         Notification.show(getTranslation(I18n.Storefront.EXPORT_STARTED),
                 Type.TRAY_NOTIFICATION);

@@ -133,18 +133,17 @@ public class PurchaseHistoryPresenter
     }
 
     /**
-     * Resolves the first matching row index for the selected from-date
-     * boundary.
+     * Resolves the first matching row index for the selected to-date boundary.
      *
-     * @param fromDate
-     *            from date
+     * @param toDate
+     *            to date
      * @return first matching row index or null if none
      */
     @Nullable
-    public Integer resolveFirstMatchingRowIndex(LocalDate fromDate) {
-        Objects.requireNonNull(fromDate, "From date must not be null");
+    public Integer resolveFirstMatchingRowIndex(LocalDate toDate) {
+        Objects.requireNonNull(toDate, "To date must not be null");
         return getPurchaseService().resolveFirstMatchingRowIndex(
-                fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                toDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     /**
@@ -237,9 +236,10 @@ public class PurchaseHistoryPresenter
     public void eventFired(AbstractEvent event) {
         switch (event) {
         case PurchaseStatusChangedEvent(Integer purchaseId) ->
-            handleStatusChanged(purchaseId);
-        case PurchaseSavedEvent(Integer purchaseId) ->
-            handlePurchaseSaved(purchaseId);
+            handleStatusChanged(
+                    purchaseId);
+        case PurchaseSavedEvent(Integer purchaseId) -> handlePurchaseSaved(
+                purchaseId);
         default -> {
             // No action for other events
         }

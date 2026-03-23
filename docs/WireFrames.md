@@ -301,9 +301,17 @@ flowchart TB
 flowchart TB
     subgraph PH["[Tab: Purchase History]"]
         direction TB
-        TOP["[Top action row]"]
-        PURGE("Purge old purchases")
-        TOP --> PURGE
+        subgraph TOP["[Top action row]"]
+            direction LR
+            FROM("From date")
+            TO("To date")
+            EXPORT("Export")
+            PURGE("Purge old purchases")
+
+            FROM --> TO
+            TO --> EXPORT
+            EXPORT --> PURGE
+        end
 
         GRID["<purchase-history-grid>\n9 columns including toggle + metadata"]
         DETAIL["[Expandable row detail panel]\nPurchase ID\nApprover\nDecided At\nDecision Reason\nLine items"]
@@ -312,6 +320,18 @@ flowchart TB
     end
 
     GRID -. toggle open/close .-> DETAIL
+```
+
+### 7.2.1 Export Ready Dialog
+
+```mermaid
+flowchart TB
+    subgraph ED["{Export dialog}"]
+        direction TB
+        READY["Localized export-ready status text"]
+        DOWNLOAD("Download")
+        READY --> DOWNLOAD
+    end
 ```
 
 ### 7.3 Approvals Tab
@@ -352,6 +372,8 @@ flowchart TB
 Callouts:
 - Tabs are peer workspaces, not wizard steps.
 - History and approvals are grid-first, with actions and details attached to rows.
+- History toolbar order is fixed as From, To, Export, Purge.
+- Export dialog provides download as the primary action, with ready-state feedback shown inside the dialog.
 
 ## 8. Admin View
 

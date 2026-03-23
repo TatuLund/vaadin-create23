@@ -804,11 +804,11 @@ The Purchases history tab shall support an admin-only data-retention purge flow 
     - A notification shall be shown indicating old purchases exist.
     - Purgeable rows shall be highlighted using a theme style name (e.g., `purchase-old`) applied via grid row style generator.
     - The view shall scroll to the first purgeable purchase.
-    - A `Purge` action shall be visible.
+    - The `Purge` action shall be enabled.
   - If no purgeable purchases exist:
     - No old-purchases notification is shown.
     - No special row highlighting is applied.
-    - The `Purge` action is hidden.
+    - The `Purge` action remains visible but disabled.
 
 #### 18.5.2 Purge action, authorization, and backend contract
 
@@ -821,7 +821,7 @@ The Purchases history tab shall support an admin-only data-retention purge flow 
   - The system shall delete only purchases older than the cutoff.
   - A success notification shall show how many purchases were deleted.
   - The history grid shall refresh and old-purchase detection shall be re-evaluated.
-  - If none remain, row highlighting and the purge action shall be removed.
+  - If none remain, row highlighting shall be removed and the purge action shall become disabled.
 - Purge logic shall be executed through presenter/service logic (not view-local business logic) with a presenter-side admin authorization assertion.
 - Backend APIs shall provide support equivalent to:
   - `long countPurchasesOlderThan(Instant cutoff)`
@@ -830,6 +830,59 @@ The Purchases history tab shall support an admin-only data-retention purge flow 
   - Runs in a single transaction.
   - Deletes purchase rows and related purchase lines according to cascade/orphan rules.
   - Must not delete or modify referenced `User` or `Product` master data.
+
+### 18.6 Purchase history export (admin)
+
+The Purchases history tab shall support CSV export for a selected date range.
+
+#### 18.6.1 Toolbar controls and field constraints
+
+- The history toolbar shall include controls in this order:
+  - `From` date
+  - `To` date
+  - `Export`
+  - `Purge`
+- `From` and `To` are required date-only fields.
+- Date field upper bound is today.
+- Date field lower bound is today minus 24 months.
+- On entering the history tab, keyboard focus shall be set to `From`.
+
+#### 18.6.2 Validation and enablement
+
+- `Export` shall be disabled when:
+  - either date is missing,
+  - `To < From`, or
+  - the selected range exceeds three months (calendar-month semantics, `plusMonths(3)`).
+- Invalid ranges shall set a component-level error on the `To` field with a localized message.
+- When inputs become valid, `To` field error is cleared and `Export` can be enabled.
+
+#### 18.6.3 Grid reaction to date selection
+
+- When a user-originated change sets a valid `To` value, the view shall resolve the first matching history row index for that boundary and scroll to it when such index exists.
+- If no matching index exists, current scroll position is preserved.
+- Selected valid date range shall be highlighted in the history grid.
+
+#### 18.6.4 Export execution and async UX
+
+- Clicking `Export` with valid inputs starts an async export through presenter/service execution.
+- Export action uses disable-on-click behavior and switches icon to a loading spinner while running.
+- Duplicate starts from the same view instance are prevented while export is in progress.
+- On failure, the user shall see a localized error notification and button state must be restored.
+- On view detach, an in-flight export shall be canceled on best effort.
+
+#### 18.6.5 Export completion dialog and file behavior
+
+- On successful completion, open an export dialog (stable id `purchase-export-dialog`) with:
+  - localized export-ready status text,
+  - download button (stable id `export-download-button`) backed by a generated download resource.
+- Closing the dialog restores export button icon/state according to current input validity.
+- CSV export contract:
+  - UTF-8 with header row.
+  - One row per purchase line item.
+  - Escaping handled per CSV standard via CSV library.
+  - Locale-driven number formatting for monetary values:
+    - comma-decimal locales use semicolon field separator and comma decimal formatting,
+    - dot-decimal locales use comma field separator and dot decimal formatting.
 
 
 ## 19. Progressive Web App (PWA) and Offline Experience

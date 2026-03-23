@@ -1,18 +1,24 @@
 package org.vaadin.tatu.vaadincreate.purchases;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
+import org.vaadin.tatu.vaadincreate.backend.PurchaseService.PurchaseExportRow;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
@@ -21,6 +27,7 @@ import org.vaadin.tatu.vaadincreate.backend.events.PurchaseSavedEvent;
 import org.vaadin.tatu.vaadincreate.backend.events.PurchaseStatusChangedEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus.EventBusListener;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 /**
  * Presenter for fetching purchase history data. Subscribes to
@@ -43,6 +50,18 @@ public class PurchaseHistoryPresenter
 
     @Nullable
     private User currentUser;
+    @Nullable
+    private transient ExecutorService executor;
+
+    @FunctionalInterface
+    public interface ExportSuccessCallback extends Serializable {
+        void onSuccess(List<PurchaseExportRow> rows);
+    }
+
+    @FunctionalInterface
+    public interface ExportFailureCallback extends Serializable {
+        void onFailure(Throwable throwable);
+    }
 
     /**
      * Fetches purchases for the given mode and user.
@@ -111,6 +130,82 @@ public class PurchaseHistoryPresenter
         long purged = getPurchaseService().purgePurchasesOlderThan(cutoff);
         logger.info("Purged {} purchases older than {}", purged, cutoff);
         return purged;
+    }
+
+    /**
+     * Resolves the first matching row index for the selected from-date
+     * boundary.
+     *
+     * @param fromDate
+     *            from date
+     * @return first matching row index or null if none
+     */
+    @Nullable
+    public Integer resolveFirstMatchingRowIndex(LocalDate fromDate) {
+        Objects.requireNonNull(fromDate, "From date must not be null");
+        return getPurchaseService().resolveFirstMatchingRowIndex(
+                fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * Starts asynchronous CSV export row retrieval and delegates completion via
+     * callbacks.
+     *
+     * @param fromDate
+     *            from date, inclusive
+     * @param toDate
+     *            to date, inclusive
+     * @param success
+     *            success callback
+     * @param failure
+     *            failure callback
+     * @return future representing export task
+     */
+    public CompletableFuture<Void> startExport(LocalDate fromDate,
+            LocalDate toDate, ExportSuccessCallback success,
+            ExportFailureCallback failure) {
+        Objects.requireNonNull(fromDate, "From date must not be null");
+        Objects.requireNonNull(toDate, "To date must not be null");
+        Objects.requireNonNull(success, "Success callback must not be null");
+        Objects.requireNonNull(failure, "Failure callback must not be null");
+
+        validateExportRange(fromDate, toDate);
+        AccessControl.get().assertAdmin();
+        var current = Utils.getCurrentUserOrThrow();
+        var fromInstant = fromDate.atStartOfDay(ZoneId.systemDefault())
+                .toInstant();
+        var toExclusive = toDate.plusDays(1)
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant();
+
+        logger.info("Export started by '{}' for range [{} - {}]",
+                current.getName(), fromDate, toDate);
+        var started = System.currentTimeMillis();
+        return CompletableFuture
+                .supplyAsync(() -> getPurchaseService().fetchPurchaseExportRows(
+                        fromInstant, toExclusive), getExecutor())
+                .thenAccept(rows -> {
+                    logger.info(
+                            "Export completed by '{}' for range [{} - {}], rows: {}, durationMs: {}",
+                            current.getName(), fromDate, toDate, rows.size(),
+                            System.currentTimeMillis() - started);
+                    success.onSuccess(rows);
+                }).exceptionally(throwable -> {
+                    logger.error("Export failed for range [{} - {}]", fromDate,
+                            toDate, throwable);
+                    failure.onFailure(throwable);
+                    return null;
+                });
+    }
+
+    private void validateExportRange(LocalDate fromDate, LocalDate toDate) {
+        if (toDate.isBefore(fromDate)) {
+            throw new IllegalArgumentException("To date cannot be before from");
+        }
+        if (toDate.isAfter(fromDate.plusMonths(3))) {
+            throw new IllegalArgumentException(
+                    "Range can be at most three months");
+        }
     }
 
     /**
@@ -202,5 +297,12 @@ public class PurchaseHistoryPresenter
 
     private EventBus getEventBus() {
         return EventBus.get();
+    }
+
+    private ExecutorService getExecutor() {
+        if (executor == null) {
+            executor = VaadinCreateUI.get().getExecutor();
+        }
+        return executor;
     }
 }

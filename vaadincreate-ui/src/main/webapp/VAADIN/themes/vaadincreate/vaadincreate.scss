@@ -65,6 +65,7 @@ $fake-grid-background-color: white;
 @import "mixins/utilities.scss";
 @import "mixins/responsive.scss";
 @import "mixins/offline.scss";
+@import "mixins/purchases.scss";
 
 @keyframes fadeIn { from { opacity: 1; } to { opacity: 0; } }
 
@@ -92,6 +93,7 @@ $fake-grid-background-color: white;
   @include utilities;
   @include responsive;
   @include offline;
+  @include purchases;
 
   // GENERAL NON VIEW SPECIFIC STYLES
   --color-available: #2dd085;

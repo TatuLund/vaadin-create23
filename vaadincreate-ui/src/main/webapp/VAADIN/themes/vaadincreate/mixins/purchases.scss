@@ -1,0 +1,30 @@
+@mixin purchases {
+  .v-grid-row.purchase-old > td {
+    background-color: #fff3cd;
+  }
+
+  .v-grid-row.purchase-old:hover > td {
+    background-color: #ffe8a1;
+  }
+
+  .v-grid-row.purchase-range > td {
+    font-weight: 600;
+  }
+
+  .purchasehistoryview-toolbar {
+    height: 32px !important;
+
+    .v-expand {
+      padding-left: 438px !important;
+    }
+
+    .v-slot:first-child {
+      margin-left: -438px !important;
+    }
+
+    .v-widget.v-has-caption.v-caption-on-top {
+      display: inline-flex;
+      align-items: baseline;
+    }
+  }
+}

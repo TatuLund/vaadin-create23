@@ -48,6 +48,18 @@ public interface PurchaseService {
     }
 
     /**
+     * Flattened purchase export row containing both purchase-level and
+     * line-level fields.
+     */
+    record PurchaseExportRow(Integer purchaseId, Instant purchaseCreatedAt,
+            String purchaseStatus, String requesterName,
+            @Nullable String approverName, @Nullable Instant purchaseDecidedAt,
+            @Nullable String decisionReason, BigDecimal purchaseTotalAmount,
+            int lineIndex, Integer productId, String productName,
+            BigDecimal unitPrice, int quantity, BigDecimal lineTotal) {
+    }
+
+    /**
      * Fetches a purchase by its id.
      *
      * @param purchaseId
@@ -267,6 +279,31 @@ public interface PurchaseService {
      * @return number of purchases deleted
      */
     long purgePurchasesOlderThan(Instant cutoff);
+
+    /**
+     * Fetches flattened purchase export rows in the selected created-at range.
+     * The range uses inclusive lower bound and exclusive upper bound semantics.
+     *
+     * @param fromInclusive
+     *            inclusive created-at lower bound
+     * @param toExclusive
+     *            exclusive created-at upper bound
+     * @return flattened export rows ordered deterministically
+     */
+    List<@NonNull PurchaseExportRow> fetchPurchaseExportRows(
+            Instant fromInclusive, Instant toExclusive);
+
+    /**
+     * Resolves the first matching grid row index for a given from-date boundary
+     * in the history ordering (created-at descending). Returns null when no
+     * matching row exists.
+     *
+     * @param fromInclusive
+     *            inclusive from boundary instant
+     * @return first matching row index, or null if none
+     */
+    @Nullable
+    Integer resolveFirstMatchingRowIndex(Instant fromInclusive);
 
     /**
      * Gets the singleton instance of the PurchaseService.

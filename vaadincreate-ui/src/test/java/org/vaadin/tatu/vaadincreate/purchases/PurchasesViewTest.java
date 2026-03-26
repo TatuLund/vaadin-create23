@@ -7,7 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
+import java.util.Objects;
 import java.time.LocalDate;
 
 import javax.persistence.OptimisticLockException;
@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.jsoup.Jsoup;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
@@ -636,6 +637,19 @@ public class PurchasesViewTest extends AbstractUITest {
                         + notifications,
                 hasOldPurchasesNotification);
 
+        // Spot check that the oldest purchase in the grid has the "old
+        // purchase" style
+        @SuppressWarnings("unchecked")
+        var historyGrid = (Grid<Object>) $(Grid.class)
+                .id("purchase-history-grid");
+        int last = test(historyGrid).size();
+        assertEquals(VaadinCreateTheme.PURCHASE_OLD,
+                test(historyGrid).styleName(last - 1));
+        assertEquals(VaadinCreateTheme.PURCHASE_OLD,
+                test(historyGrid).styleName(last - 10));
+        assertEquals(VaadinCreateTheme.PURCHASE_OLD,
+                test(historyGrid).styleName(last - 20));
+
         SerializationDebugUtil.assertSerializable(view);
     }
 
@@ -849,6 +863,43 @@ public class PurchasesViewTest extends AbstractUITest {
 
         exportDialog.close();
         assertTrue(test(exportButton).isInteractable());
+    }
+
+    @Test
+    public void export_range_is_highlighted_with_styled_rows_in_grid() {
+        view = navigate(PurchasesView.VIEW_NAME, PurchasesView.class);
+
+        var fromDate = $(DateField.class).id(PurchasesHistoryView.FROM_DATE_ID);
+        var toDate = $(DateField.class).id(PurchasesHistoryView.TO_DATE_ID);
+        var historyGrid = $(Grid.class).id("purchase-history-grid");
+
+        var from = LocalDate.now().minusDays(10);
+        var to = LocalDate.now();
+        test(fromDate).setValue(from);
+        test(toDate).setValue(to);
+
+        // THEN: Rows in the grid that fall within the selected date range have
+        // the "in-range" style, and rows outside the range do not
+        boolean hasInRange = false;
+        boolean hasOutOfRange = false;
+        for (int i = 0; i < 100; i++) {
+            @SuppressWarnings("unchecked")
+            String style = test(historyGrid).styleName(i);
+            if (Objects.equals(style, VaadinCreateTheme.PURCHASE_RANGE)) {
+                hasInRange = true;
+            } else {
+                hasOutOfRange = true;
+            }
+            if (hasInRange && hasOutOfRange) {
+                break; // no need to check further if we have both cases
+            }
+        }
+        assertTrue(
+                "Expected at least one in-range purchase with correct styling",
+                hasInRange);
+        assertTrue(
+                "Expected at least one out-of-range purchase without in-range styling",
+                hasOutOfRange);
     }
 
     @Test

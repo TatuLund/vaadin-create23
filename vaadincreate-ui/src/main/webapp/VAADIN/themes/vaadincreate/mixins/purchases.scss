@@ -19,9 +19,8 @@
     justify-content: end;
     gap: 8px;
 
-    .v-widget.v-has-caption.v-caption-on-top {
-      display: inline-flex;
-      align-items: baseline;
+    #purge-button {
+      margin-left: auto;
     }
   }
 }

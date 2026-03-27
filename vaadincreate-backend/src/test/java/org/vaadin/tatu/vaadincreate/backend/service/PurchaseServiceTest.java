@@ -9,6 +9,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Address;
 import org.vaadin.tatu.vaadincreate.backend.data.Cart;
 import org.vaadin.tatu.vaadincreate.backend.data.Product;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
+import org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 
@@ -62,7 +63,9 @@ public class PurchaseServiceTest {
                 .filter(u -> u.getRole() == User.Role.USER).findFirst().get();
 
         // Get a test product
-        testProduct = productService.getAllProducts().iterator().next();
+        var productIterator = productService.getAllProducts().iterator();
+        productIterator.next();
+        testProduct = productIterator.next();
     }
 
     @Test
@@ -273,13 +276,13 @@ public class PurchaseServiceTest {
         Product product1 = iter.next();
         Product product2 = iter.next();
 
-        var line1 = new org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine();
+        var line1 = new PurchaseLine();
         line1.setProduct(product1);
         line1.setQuantity(2);
         line1.setUnitPrice(new BigDecimal("10.00"));
         purchase.addLine(line1);
 
-        var line2 = new org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine();
+        var line2 = new PurchaseLine();
         line2.setProduct(product2);
         line2.setQuantity(3);
         line2.setUnitPrice(new BigDecimal("5.50"));

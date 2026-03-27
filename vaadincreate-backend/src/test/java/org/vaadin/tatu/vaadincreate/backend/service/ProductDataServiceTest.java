@@ -77,7 +77,11 @@ public class ProductDataServiceTest {
     @Test
     public void removeProduct() {
         var oldSize = service.getAllProducts().size();
-        var p = service.getAllProducts().iterator().next();
+        var iterator = service.getAllProducts().iterator();
+        for (int i = 0; i < 10; i++) {
+            iterator.next();
+        }
+        var p = iterator.next();
         var pid = p.getId();
         service.deleteProduct(pid);
         assertEquals(null, service.getProductById(pid));

@@ -64,7 +64,6 @@ public class PurchaseServiceTest {
 
         // Get a test product
         var productIterator = productService.getAllProducts().iterator();
-        productIterator.next();
         testProduct = productIterator.next();
     }
 

@@ -37,8 +37,6 @@ public class ResetButtonForTextFieldConnector extends AbstractExtensionConnector
 
     @Override
     protected void extend(ServerConnector serverConnector) {
-        serverConnector.addStateChangeHandler(event -> Scheduler.get()
-                .scheduleDeferred(this::updateResetButtonVisibility));
         textFieldConnector = (AbstractTextFieldConnector) serverConnector;
         textField = (VTextField) textFieldConnector.getWidget();
         var textFieldStyle = CLASSNAME + "-textfield";
@@ -53,6 +51,8 @@ public class ResetButtonForTextFieldConnector extends AbstractExtensionConnector
 
         textField.addAttachHandler(this);
         textField.addKeyUpHandler(this);
+        serverConnector.addStateChangeHandler(event -> Scheduler.get()
+                .scheduleDeferred(this::updateResetButtonVisibility));
     }
 
     private void updateResetButtonVisibility() {

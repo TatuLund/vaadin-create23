@@ -1,7 +1,5 @@
 package org.vaadin.tatu.vaadincreate.components;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -42,11 +40,6 @@ public abstract class AbstractComponentTest extends TestBenchTestCase {
     @Rule
     public ScreenshotOnFailureRule rule = new ScreenshotOnFailureRule(this,
             true);
-
-    @BeforeClass
-    public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
-    }
 
     public AbstractComponentTest() {
         this("");

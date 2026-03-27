@@ -1,13 +1,12 @@
 package org.vaadin.tatu.vaadincreate;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -53,11 +52,6 @@ public abstract class AbstractViewTest extends TestBenchTestCase {
     @Rule
     public ScreenshotOnFailureRule rule = new ScreenshotOnFailureRule(this,
             true);
-
-    @BeforeClass
-    public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
-    }
 
     public AbstractViewTest() {
         this("");

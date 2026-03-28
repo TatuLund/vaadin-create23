@@ -25,6 +25,7 @@
 		<servlet.version>4.0.1</servlet.version>
 		<selenium.version>4.41.0</selenium.version>
 		<spotless.version>3.2.1</spotless.version>
+		<spotless.skip>false</spotless.skip>
 	</properties>
 
 	<modules>
@@ -43,6 +44,7 @@
 					<artifactId>spotless-maven-plugin</artifactId>
 					<version>${spotless.version}</version>
 					<configuration>
+						<skip>${spotless.skip}</skip>
 						<java>
 							<eclipse>
 								<version>4.30</version>
@@ -70,6 +72,7 @@
 				<version>${spotless.version}</version>
 				<inherited>false</inherited>
 				<configuration>
+					<skip>${spotless.skip}</skip>
 					<java>
 						<eclipse>
 							<version>4.30</version>
@@ -82,6 +85,19 @@
 	</build>
 
 	<profiles>
+		<profile>
+			<!-- m2e sets this property; skip Spotless only for IDE workspace builds. -->
+			<id>m2e</id>
+			<activation>
+				<property>
+					<name>m2e.version</name>
+				</property>
+			</activation>
+			<properties>
+				<spotless.skip>true</spotless.skip>
+			</properties>
+		</profile>
+
 		<profile>
 			<!-- Vaadin pre-release repositories -->
 			<id>vaadin-prerelease</id>

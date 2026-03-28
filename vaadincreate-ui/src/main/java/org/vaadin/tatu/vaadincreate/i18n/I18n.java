@@ -271,6 +271,12 @@ public final class I18n {
         public static final String PURCHASE_STATUS_REJECTED = "purchase-status-rejected";
         public static final String PURCHASE_STATUS_CANCELLED = "purchase-status-cancelled";
 
+        private Storefront() {
+            // private constructor to hide the implicit public one
+        }
+    }
+
+    public static final class Purchases {
         public static final String TOP_PRODUCTS = "top-purchased-products";
         public static final String LEAST_PRODUCTS = "least-purchased-products";
         public static final String MONTHLY_TOTALS = "monthly-purchases";
@@ -291,8 +297,9 @@ public final class I18n {
         public static final String EXPORT_FAILED = "export-failed";
         public static final String EXPORT_READY = "export-ready";
         public static final String DOWNLOAD = "download";
+        public static final String PURGE_TOOLTIP = "purge-tooltip";
 
-        private Storefront() {
+        private Purchases() {
             // private constructor to hide the implicit public one
         }
     }

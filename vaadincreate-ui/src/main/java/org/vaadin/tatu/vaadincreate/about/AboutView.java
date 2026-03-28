@@ -33,6 +33,7 @@ import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -105,8 +106,10 @@ public class AboutView extends VerticalLayout implements VaadinCreateView {
         setComponentAlignment(adminsContent, Alignment.MIDDLE_CENTER);
         if (accessControl.isUserInRole(Role.ADMIN)) {
             createShutdownButton();
-            addComponent(shutDownButton);
-            setComponentAlignment(shutDownButton, Alignment.MIDDLE_CENTER);
+            var wrapper = new CssLayout(shutDownButton);
+            wrapper.addStyleName(VaadinCreateTheme.HAS_TOOLTIP);
+            addComponent(wrapper);
+            setComponentAlignment(wrapper, Alignment.MIDDLE_CENTER);
         }
     }
 
@@ -141,7 +144,7 @@ public class AboutView extends VerticalLayout implements VaadinCreateView {
         editButton.setId("admin-edit");
         editButton.setIcon(VaadinIcons.EDIT);
         editButton.addStyleNames(ValoTheme.BUTTON_BORDERLESS,
-                ValoTheme.BUTTON_SMALL);
+                ValoTheme.BUTTON_SMALL, VaadinCreateTheme.SLOT_HAS_TOOLTIP);
         editButton.setDescription(getTranslation(I18n.About.EDIT_NOTE));
         AttributeExtension.of(editButton)
                 .setAttribute(AriaAttributes.DESCRIBEDBY, "admins-note");

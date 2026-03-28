@@ -18,6 +18,8 @@ public final class VaadinCreateTheme {
     }
 
     public static final String WHITESPACE_PRE = "whitespace-pre";
+    public static final String SLOT_HAS_TOOLTIP = "slot-has-tooltip";
+    public static final String HAS_TOOLTIP = "has-tooltip";
 
     public static final String LOGINVIEW_INFORMATION = "loginview-information";
     public static final String LOGINVIEW_FORM = "loginview-form";

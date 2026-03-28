@@ -35,13 +35,13 @@ public class PurchaseExportDownloadDialog extends AbstractDialog
     public PurchaseExportDownloadDialog(StreamResource resource) {
         super();
         window.setId("purchase-export-dialog");
-        window.setCaption(getTranslation(I18n.Storefront.EXPORT));
+        window.setCaption(getTranslation(I18n.Purchases.EXPORT));
         window.setClosable(true);
         window.setWidth("420px");
         window.setHeightUndefined();
         window.addCloseShortcut(com.vaadin.event.ShortcutAction.KeyCode.ESCAPE);
 
-        var download = new Button(getTranslation(I18n.Storefront.DOWNLOAD));
+        var download = new Button(getTranslation(I18n.Purchases.DOWNLOAD));
         download.setId(DOWNLOAD_BUTTON_ID);
         download.setIcon(VaadinIcons.DOWNLOAD);
         download.addStyleNames(ValoTheme.BUTTON_PRIMARY,
@@ -50,7 +50,7 @@ public class PurchaseExportDownloadDialog extends AbstractDialog
 
         var buttons = new HorizontalLayout(download);
         buttons.setSpacing(true);
-        var label = new Label(getTranslation(I18n.Storefront.EXPORT_READY));
+        var label = new Label(getTranslation(I18n.Purchases.EXPORT_READY));
         label.addStyleName(ValoTheme.LABEL_SUCCESS);
         AttributeExtension.of(label).setAttribute(AriaAttributes.LIVE,
                 "polite");

@@ -74,6 +74,13 @@ Used in availability badges/icons and product availability selectors.
 - Positive actions: Valo friendly style.
 - Destructive actions: Valo danger style with forced white foreground.
 - Warning/cancel actions: custom `.v-button-cancel` variant with amber tones.
+- Tooltip-enabled actions may add a corner indicator via wrapper/slot classes (`.has-tooltip` / `.v-slot-slot-has-tooltip`) instead of replacing the button icon.
+
+### 3.1 Tooltip Indicator Marker
+- Tooltip discoverability is reinforced with a small corner marker rendered as a right-angle triangle in the top-right corner of the target container.
+- Marker geometry: `8px x 8px`, black fill, clipped using `polygon(0% 0%, 100% 0%, 100% 100%)`.
+- Marker anchor: absolute positioning at `top: 0; right: 0;` with a relatively positioned host.
+- Intended usage includes Inventory filter/rows with responsive descriptions, About admin actions, and Purchases purge controls.
 
 ### 4. Focus and Accessibility
 - Keyboard focus ring is strongly standardized: `2px` outline in focus color with small offset/radius.
@@ -116,6 +123,8 @@ Defined in `mixins/utilities.scss` and shared by views:
 - `.row-focus`: replace cell focus with row highlight + row border
 - `.v-select-optiongroup-scrollable`: scrollable boxed checkbox group
 - `.v-button-cancel`: warning-toned cancel button skin
+- `.has-tooltip`: generic host class that renders the top-right tooltip marker
+- `.v-slot-slot-has-tooltip`: Vaadin slot host variant for tooltip marker rendering
 
 Additional CSS utility behavior in `additional-styles.css`:
 - Tab captions with error indicators are tinted amber via `:has(.v-errorindicator)`
@@ -160,6 +169,7 @@ Additional CSS utility behavior in `additional-styles.css`:
 - Keep spacing aligned to the base unit scale (18px/21px rhythm derived from `32px` unit).
 - For data-heavy screens, follow inventory/dashboard structure: toolbar/header + card/grid body.
 - For mobile variants, stack columns and preserve full-width controls.
+- When a control exposes a tooltip/description that affects task safety or context, prefer adding the tooltip marker classes so discoverability is consistent across views.
 
 ## Reference Baselines
 

@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.components.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
@@ -78,7 +79,8 @@ public class CategoryForm extends Composite implements HasI18N {
 
         deleteButton = new Button(VaadinIcons.TRASH,
                 click -> handleConfirmDelete());
-        deleteButton.addStyleName(ValoTheme.BUTTON_DANGER);
+        deleteButton.addStyleNames(ValoTheme.BUTTON_DANGER,
+                VaadinCreateTheme.SLOT_HAS_TOOLTIP);
         deleteButton.setDescription(String.format("%s: %s",
                 getTranslation(I18n.DELETE), category.getName()));
         deleteButton.setEnabled(category.getId() != null);

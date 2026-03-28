@@ -98,7 +98,7 @@ public class PurchasesStatsView extends VerticalLayout implements TabView {
         topProductsChart
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_FOCUSRING);
         var conf = topProductsChart.getConfiguration();
-        conf.setTitle(getTranslation(I18n.Storefront.TOP_PRODUCTS));
+        conf.setTitle(getTranslation(I18n.Purchases.TOP_PRODUCTS));
         conf.setLang(lang);
         conf.getLegend().setEnabled(false);
         conf.getyAxis().setTitle(getTranslation(I18n.Stats.COUNT));
@@ -117,7 +117,7 @@ public class PurchasesStatsView extends VerticalLayout implements TabView {
         leastProductsChart
                 .addStyleName(VaadinCreateTheme.DASHBOARD_CHART_FOCUSRING);
         var conf = leastProductsChart.getConfiguration();
-        conf.setTitle(getTranslation(I18n.Storefront.LEAST_PRODUCTS));
+        conf.setTitle(getTranslation(I18n.Purchases.LEAST_PRODUCTS));
         conf.setLang(lang);
         conf.getLegend().setEnabled(false);
         conf.getyAxis().setTitle(getTranslation(I18n.Stats.COUNT));
@@ -135,7 +135,7 @@ public class PurchasesStatsView extends VerticalLayout implements TabView {
         monthlyChart.setId("purchases-per-month-chart");
         monthlyChart.addStyleName(VaadinCreateTheme.DASHBOARD_CHART_FOCUSRING);
         var conf = monthlyChart.getConfiguration();
-        conf.setTitle(getTranslation(I18n.Storefront.MONTHLY_TOTALS));
+        conf.setTitle(getTranslation(I18n.Purchases.MONTHLY_TOTALS));
         conf.setLang(lang);
         conf.getLegend().setEnabled(false);
         Utils.configureChartTooltip(conf);
@@ -182,18 +182,18 @@ public class PurchasesStatsView extends VerticalLayout implements TabView {
 
     private void updateTopProductsChart(List<ProductPurchaseStat> stats) {
         var series = buildProductSeries(stats,
-                getTranslation(I18n.Storefront.TOP_PRODUCTS));
+                getTranslation(I18n.Purchases.TOP_PRODUCTS));
         topProductsChart.getConfiguration().setSeries(series);
         updateColumnChartAriaLabel(topProductsChart,
-                getTranslation(I18n.Storefront.TOP_PRODUCTS), series);
+                getTranslation(I18n.Purchases.TOP_PRODUCTS), series);
     }
 
     private void updateLeastProductsChart(List<ProductPurchaseStat> stats) {
         var series = buildProductSeries(stats,
-                getTranslation(I18n.Storefront.LEAST_PRODUCTS));
+                getTranslation(I18n.Purchases.LEAST_PRODUCTS));
         leastProductsChart.getConfiguration().setSeries(series);
         updateColumnChartAriaLabel(leastProductsChart,
-                getTranslation(I18n.Storefront.LEAST_PRODUCTS), series);
+                getTranslation(I18n.Purchases.LEAST_PRODUCTS), series);
     }
 
     private static DataSeries buildProductSeries(
@@ -224,19 +224,19 @@ public class PurchasesStatsView extends VerticalLayout implements TabView {
         conf.addxAxis(xAxis);
 
         var yAxis = new YAxis();
-        yAxis.setTitle(getTranslation(I18n.Storefront.AMOUNT));
+        yAxis.setTitle(getTranslation(I18n.Purchases.AMOUNT));
         yAxis.getLabels().setFormat("{value:.2f} €");
         conf.removeyAxes();
         conf.addyAxis(yAxis);
 
         var series = new DataSeries();
-        series.setName(getTranslation(I18n.Storefront.MONTHLY_TOTALS));
+        series.setName(getTranslation(I18n.Purchases.MONTHLY_TOTALS));
         stats.forEach(stat -> series
                 .add(new DataSeriesItem(stat.yearMonth(), stat.totalAmount())));
         conf.setSeries(series);
 
         var alt = String.format("%s: %s",
-                getTranslation(I18n.Storefront.MONTHLY_TOTALS),
+                getTranslation(I18n.Purchases.MONTHLY_TOTALS),
                 stats.stream()
                         .map(s -> String.format("%s %.2f €", s.yearMonth(),
                                 s.totalAmount()))

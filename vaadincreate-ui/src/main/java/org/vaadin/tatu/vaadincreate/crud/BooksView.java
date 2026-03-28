@@ -277,9 +277,11 @@ public class BooksView extends CssLayout implements VaadinCreateView {
 
         var topLayout = new HorizontalLayout();
         topLayout.setWidth("100%");
-        topLayout.addComponents(filterField, newProduct);
-        topLayout.setComponentAlignment(filterField, Alignment.MIDDLE_LEFT);
-        topLayout.setExpandRatio(filterField, 1);
+        var filterWrapper = new CssLayout(filterField);
+        filterWrapper.addStyleName(VaadinCreateTheme.HAS_TOOLTIP);
+        topLayout.addComponents(filterWrapper, newProduct);
+        topLayout.setComponentAlignment(filterWrapper, Alignment.MIDDLE_LEFT);
+        topLayout.setExpandRatio(filterWrapper, 1);
         topLayout.setStyleName(VaadinCreateTheme.BOOKVIEW_TOOLBAR);
         return topLayout;
     }

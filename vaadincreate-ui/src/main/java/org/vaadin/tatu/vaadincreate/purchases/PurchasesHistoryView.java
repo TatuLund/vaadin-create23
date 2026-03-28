@@ -70,14 +70,16 @@ public class PurchasesHistoryView extends VerticalLayout
         presenter = new PurchaseHistoryPresenter();
         historyGrid = new PurchaseHistoryGrid(presenter,
                 PurchaseHistoryMode.ALL, Utils.getCurrentUserOrThrow());
-        fromDate = buildDateField(I18n.Storefront.FROM, FROM_DATE_ID);
-        toDate = buildDateField(I18n.Storefront.TO, TO_DATE_ID);
+        fromDate = buildDateField(I18n.Purchases.FROM, FROM_DATE_ID);
+        toDate = buildDateField(I18n.Purchases.TO, TO_DATE_ID);
         exportButton = buildExportButton();
         purgeButton = buildPurgeButton();
+        var purgeWrapper = new CssLayout(purgeButton);
+        purgeWrapper.addStyleName(VaadinCreateTheme.HAS_TOOLTIP);
         csvExporter = new PurchaseHistoryCsvExporter();
 
         var toolbar = new CssLayout(fromDate, toDate, exportButton,
-                purgeButton);
+                purgeWrapper);
         toolbar.addStyleName(VaadinCreateTheme.PURCHASEHISTORYVIEW_TOOLBAR);
         toolbar.setWidth("100%");
 
@@ -125,7 +127,7 @@ public class PurchasesHistoryView extends VerticalLayout
         purgeCount = presenter.countPurchasesOlderThan(cutoff);
         if (purgeCount > 0) {
             Notification.show(getTranslation(
-                    I18n.Storefront.PURGE_OLD_PURCHASES_NOTIFICATION,
+                    I18n.Purchases.PURGE_OLD_PURCHASES_NOTIFICATION,
                     RETENTION_MONTHS), Type.WARNING_MESSAGE);
             purgeButton.setEnabled(true);
             historyGrid.setOldPurchaseHighlight(cutoff);
@@ -141,7 +143,7 @@ public class PurchasesHistoryView extends VerticalLayout
         field.setId(id);
         field.setRequiredIndicatorVisible(true);
         field.setRangeEnd(LocalDate.now());
-        field.setRangeStart(LocalDate.now().minusMonths(24));
+        field.setRangeStart(LocalDate.now().minusMonths(RETENTION_MONTHS));
         field.addValueChangeListener(
                 e -> onDateValueChanged(e.isUserOriginated(),
                         e.getSource() == toDate));
@@ -149,7 +151,7 @@ public class PurchasesHistoryView extends VerticalLayout
     }
 
     private Button buildExportButton() {
-        var button = new Button(getTranslation(I18n.Storefront.EXPORT),
+        var button = new Button(getTranslation(I18n.Purchases.EXPORT),
                 VaadinIcons.DOWNLOAD);
         button.setId(EXPORT_BUTTON_ID);
         button.setEnabled(false);
@@ -188,13 +190,13 @@ public class PurchasesHistoryView extends VerticalLayout
         }
         if (toDate.getValue().isBefore(fromDate.getValue())) {
             toDate.setComponentError(new UserError(
-                    getTranslation(I18n.Storefront.EXPORT_INVALID_RANGE)));
+                    getTranslation(I18n.Purchases.EXPORT_INVALID_RANGE)));
             exportButton.setEnabled(false);
             return;
         }
         if (toDate.getValue().isAfter(fromDate.getValue().plusMonths(3))) {
             toDate.setComponentError(new UserError(
-                    getTranslation(I18n.Storefront.EXPORT_MAX_THREE_MONTHS)));
+                    getTranslation(I18n.Purchases.EXPORT_MAX_THREE_MONTHS)));
             exportButton.setEnabled(false);
             return;
         }
@@ -208,7 +210,7 @@ public class PurchasesHistoryView extends VerticalLayout
 
     private void startExport() {
         exportButton.setIcon(VaadinIcons.SPINNER);
-        Notification.show(getTranslation(I18n.Storefront.EXPORT_STARTED),
+        Notification.show(getTranslation(I18n.Purchases.EXPORT_STARTED),
                 Type.TRAY_NOTIFICATION);
         var from = fromDate.getValue();
         var to = toDate.getValue();
@@ -216,7 +218,7 @@ public class PurchasesHistoryView extends VerticalLayout
                 rows -> Utils.access(ui, () -> onExportReady(from, to, rows)),
                 throwable -> Utils.access(ui, () -> {
                     Notification.show(
-                            getTranslation(I18n.Storefront.EXPORT_FAILED),
+                            getTranslation(I18n.Purchases.EXPORT_FAILED),
                             Type.ERROR_MESSAGE);
                     resetExportButtonState();
                 }));
@@ -225,7 +227,7 @@ public class PurchasesHistoryView extends VerticalLayout
     private void onExportReady(LocalDate from, LocalDate to,
             List<PurchaseExportRow> rows) {
         var resource = csvExporter.createResource(from, to, rows, getLocale(),
-                getTranslation(I18n.Storefront.EXPORT));
+                getTranslation(I18n.Purchases.EXPORT));
         var dialog = new PurchaseExportDownloadDialog(resource);
         dialog.addCloseListener(e -> resetExportButtonState());
         dialog.open();
@@ -238,10 +240,11 @@ public class PurchasesHistoryView extends VerticalLayout
     }
 
     private Button buildPurgeButton() {
-        var button = new Button(getTranslation(I18n.Storefront.PURGE),
+        var button = new Button(getTranslation(I18n.Purchases.PURGE),
                 VaadinIcons.TRASH);
         button.setId(PURGE_BUTTON_ID);
         button.addStyleName(ValoTheme.BUTTON_DANGER);
+        button.setDescription(getTranslation(I18n.Purchases.PURGE_TOOLTIP));
         button.setEnabled(false);
         button.setDisableOnClick(true);
         button.addClickListener(e -> openPurgeConfirmDialog());
@@ -250,11 +253,11 @@ public class PurchasesHistoryView extends VerticalLayout
 
     private void openPurgeConfirmDialog() {
         var dialog = new ConfirmDialog(
-                getTranslation(I18n.Storefront.PURGE_CONFIRM_CAPTION),
-                getTranslation(I18n.Storefront.PURGE_CONFIRM_MESSAGE,
+                getTranslation(I18n.Purchases.PURGE_CONFIRM_CAPTION),
+                getTranslation(I18n.Purchases.PURGE_CONFIRM_MESSAGE,
                         purgeCount, RETENTION_MONTHS),
                 ConfirmDialog.Type.ALERT);
-        dialog.setConfirmText(getTranslation(I18n.Storefront.PURGE));
+        dialog.setConfirmText(getTranslation(I18n.Purchases.PURGE));
         dialog.setCancelText(getTranslation(I18n.CANCEL));
         dialog.addConfirmedListener(e -> executePurge());
         dialog.addCancelledListener(e -> purgeButton.setEnabled(true));
@@ -264,7 +267,7 @@ public class PurchasesHistoryView extends VerticalLayout
     private void executePurge() {
         Instant cutoff = retentionCutoff();
         long purged = presenter.purgePurchases(cutoff);
-        Notification.show(getTranslation(I18n.Storefront.PURGE_SUCCESS, purged,
+        Notification.show(getTranslation(I18n.Purchases.PURGE_SUCCESS, purged,
                 RETENTION_MONTHS), Type.HUMANIZED_MESSAGE);
         historyGrid.refresh();
         checkRetentionPolicy();

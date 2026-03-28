@@ -60,6 +60,8 @@ public class BookGrid extends Grid<Product>
     private Product editedProduct;
     private int edited;
 
+    private boolean showTooltipIndicator;
+
     /**
      * The BookGrid class represents a grid component that displays a list of
      * books. It provides various columns to display different properties of the
@@ -77,13 +79,19 @@ public class BookGrid extends Grid<Product>
 
         // Set highlight color to last edited row with style generator.
         setStyleGenerator(book -> {
+            var style = "";
+            if (showTooltipIndicator) {
+                style = VaadinCreateTheme.HAS_TOOLTIP;
+            }
             if (book.getId() != null && book.getId() == edited) {
-                return VaadinCreateTheme.BOOKVIEW_GRID_EDITED;
+                return String.format("%s %s", style,
+                        VaadinCreateTheme.BOOKVIEW_GRID_EDITED).trim();
             }
             if (getLockedBooks().isLocked(book) != null) {
-                return VaadinCreateTheme.BOOKVIEW_GRID_LOCKED;
+                return String.format("%s %s", style,
+                        VaadinCreateTheme.BOOKVIEW_GRID_LOCKED).trim();
             }
-            return "";
+            return style;
         });
 
         addColumn(product -> product.getId() != null ? product.getId() : -1,
@@ -368,6 +376,7 @@ public class BookGrid extends Grid<Product>
      *            the width of the grid
      */
     private void adjustColumns(int width) {
+        showTooltipIndicator = false;
         setDescriptionGenerator(book -> {
             var userName = getLockedBooks().isLocked(book);
             if (userName != null) {
@@ -380,6 +389,7 @@ public class BookGrid extends Grid<Product>
             getColumn(NAME_ID).setHidden(false).setWidth(300);
             getColumn(PRICE_ID).setHidden(false);
             setDescriptionGenerator(this::createTooltip, ContentMode.HTML);
+            showTooltipIndicator = true;
         } else if (width < 920) {
             getColumn(NAME_ID).setHidden(false).setWidthUndefined();
             getColumn(PRICE_ID).setHidden(false);
@@ -396,6 +406,7 @@ public class BookGrid extends Grid<Product>
         if (width > 650 && width < 800) {
             getColumn(AVAILABILITY_ID)
                     .setDescriptionGenerator(this::availabilityDescription);
+            showTooltipIndicator = true;
         } else {
             getColumn(AVAILABILITY_ID).setDescriptionGenerator(null);
         }

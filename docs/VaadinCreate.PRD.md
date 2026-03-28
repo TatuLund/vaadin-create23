@@ -336,6 +336,12 @@ See also:
 - When some categories are selected for a product:
   - Those selected categories shall appear first in the selector’s visible order, followed by unselected categories.
 
+### 8.11 Tooltip Indicators in Inventory
+
+- Controls that provide tooltip/help text in the Inventory view shall also provide a visible corner marker indicating tooltip availability.
+- The Inventory filter field container shall show a small top-right triangular marker when a tooltip/description is present.
+- Inventory grid rows that expose row-level tooltip content (for example responsive or availability-related tooltip states) shall include the same marker as part of row styling.
+
 
 ## 9. Statistics Dashboard
 
@@ -539,6 +545,11 @@ See also:
   - Message text.
   - A dismiss/clear control.
 - Dismissing the strip hides that message from the About view until a subsequent message event is received.
+
+### 12.6 Tooltip Indicators in About View
+
+- About view actions that expose tooltip text (for example Edit and Shutdown) shall display a small top-right triangular tooltip marker.
+- The marker shall be rendered by wrapping or styling the action component so the marker appears on the action slot/container rather than replacing the button icon.
 
 
 ## 13. Event Bus
@@ -846,6 +857,8 @@ The Purchases history tab shall support CSV export for a selected date range.
 - Date field upper bound is today.
 - Date field lower bound is today minus 24 months.
 - On entering the history tab, keyboard focus shall be set to `From`.
+- The `Purge` action shall expose a localized tooltip explaining that old purchase records are permanently deleted.
+- The `Purge` action container shall display a visible top-right triangular marker when the tooltip is available.
 
 #### 18.6.2 Validation and enablement
 

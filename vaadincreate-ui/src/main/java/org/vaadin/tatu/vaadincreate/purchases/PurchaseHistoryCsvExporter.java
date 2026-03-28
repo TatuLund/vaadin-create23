@@ -13,9 +13,11 @@ import java.util.List;
 import java.util.Locale;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService.PurchaseExportRow;
 
 import com.opencsv.CSVWriter;
+import com.opencsv.ICSVWriter;
 import com.vaadin.server.StreamResource;
 
 @NullMarked
@@ -46,9 +48,9 @@ public class PurchaseHistoryCsvExporter implements Serializable {
         try (var writer = new CSVWriter(
                 new OutputStreamWriter(out, StandardCharsets.UTF_8),
                 separator,
-                CSVWriter.DEFAULT_QUOTE_CHARACTER,
-                CSVWriter.DEFAULT_ESCAPE_CHARACTER,
-                CSVWriter.DEFAULT_LINE_END)) {
+                ICSVWriter.DEFAULT_QUOTE_CHARACTER,
+                ICSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                ICSVWriter.DEFAULT_LINE_END)) {
             writer.writeNext(HEADER, false);
             for (var row : rows) {
                 writer.writeNext(new String[] { value(row.purchaseId(), locale),
@@ -84,7 +86,7 @@ public class PurchaseHistoryCsvExporter implements Serializable {
                 from.format(tokenFormat), to.format(tokenFormat));
     }
 
-    private static String value(Object value, Locale locale) {
+    private static String value(@Nullable Object value, Locale locale) {
         if (value == null) {
             return "";
         }

@@ -20,6 +20,7 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.UserError;
+import com.vaadin.shared.ui.datefield.AbstractDateFieldState.AccessibleElement;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.DateField;
@@ -143,6 +144,16 @@ public class PurchasesHistoryView extends VerticalLayout
         field.setId(id);
         field.setRequiredIndicatorVisible(true);
         field.setRangeEnd(LocalDate.now());
+        field.setAssistiveText(
+                getTranslation(I18n.Purchases.DATE_FIELD_ASSISTIVE_TEXT));
+        field.setAssistiveLabel(AccessibleElement.NEXT_MONTH,
+                getTranslation(I18n.Purchases.DATE_FIELD_NEXT_MONTH));
+        field.setAssistiveLabel(AccessibleElement.PREVIOUS_MONTH,
+                getTranslation(I18n.Purchases.DATE_FIELD_PREVIOUS_MONTH));
+        field.setAssistiveLabel(AccessibleElement.NEXT_YEAR,
+                getTranslation(I18n.Purchases.DATE_FIELD_NEXT_YEAR));
+        field.setAssistiveLabel(AccessibleElement.PREVIOUS_YEAR,
+                getTranslation(I18n.Purchases.DATE_FIELD_PREVIOUS_YEAR));
         field.setRangeStart(LocalDate.now().minusMonths(RETENTION_MONTHS));
         field.addValueChangeListener(
                 e -> onDateValueChanged(e.isUserOriginated(),

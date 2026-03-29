@@ -289,6 +289,11 @@ public final class I18n {
         public static final String PURGE_SUCCESS = "purge-success";
         public static final String FROM = "from";
         public static final String TO = "to";
+        public static final String DATE_FIELD_ASSISTIVE_TEXT = "date-field-assistive-text";
+        public static final String DATE_FIELD_NEXT_MONTH = "date-field-next-month";
+        public static final String DATE_FIELD_PREVIOUS_MONTH = "date-field-previous-month";
+        public static final String DATE_FIELD_NEXT_YEAR = "date-field-next-year";
+        public static final String DATE_FIELD_PREVIOUS_YEAR = "date-field-previous-year";
         public static final String EXPORT = "export";
         public static final String EXPORT_MISSING_DATES = "export-missing-dates";
         public static final String EXPORT_INVALID_RANGE = "export-invalid-range";

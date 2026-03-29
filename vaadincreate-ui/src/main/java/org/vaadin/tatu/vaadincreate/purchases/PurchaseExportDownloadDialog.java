@@ -46,6 +46,7 @@ public class PurchaseExportDownloadDialog extends AbstractDialog
         download.setIcon(VaadinIcons.DOWNLOAD);
         download.addStyleNames(ValoTheme.BUTTON_PRIMARY,
                 ValoTheme.BUTTON_ICON_ALIGN_TOP);
+        download.setDisableOnClick(true);
         new FileDownloader(resource).extend(download);
 
         var buttons = new HorizontalLayout(download);

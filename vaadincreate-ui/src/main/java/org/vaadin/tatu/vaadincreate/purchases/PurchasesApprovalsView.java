@@ -95,6 +95,7 @@ public class PurchasesApprovalsView extends VerticalLayout
             if (!dialog.isConfirmed()) {
                 sourceButton.setEnabled(true);
             }
+            approvalsGrid.focus();
         });
         dialog.open();
     }

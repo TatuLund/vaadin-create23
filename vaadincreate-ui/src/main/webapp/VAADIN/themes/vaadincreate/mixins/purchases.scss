@@ -23,4 +23,20 @@
       margin-left: auto;
     }
   }
+
+  #purchase-approvals-grid .v-grid-row .v-horizontal.v-widget {
+    display: none;
+  }
+
+  #purchase-approvals-grid .v-grid-row-focused .v-horizontal.v-widget {
+    display: inline-block;
+  }
+
+  #purchase-approvals-grid td:hover .v-horizontal.v-widget {
+    display: inline-block;
+  }
+
+  .purchase-old td.v-grid-cell.v-grid-cell-focused {
+    color: $v-focus-color;
+  }
 }

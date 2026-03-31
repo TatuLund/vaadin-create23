@@ -199,6 +199,11 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
         grid.scrollTo(targetIndex, ScrollDestination.START);
     }
 
+    @Override
+    public void focus() {
+        grid.focus();
+    }
+
     /**
      * Scrolls the grid to an absolute row index.
      *

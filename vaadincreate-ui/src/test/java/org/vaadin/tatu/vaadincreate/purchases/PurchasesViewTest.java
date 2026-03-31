@@ -484,6 +484,7 @@ public class PurchasesViewTest extends AbstractUITest {
         // THEN: Grid count is unchanged – purchase is still PENDING
         assertEquals("Grid count should be unchanged after cancel",
                 pendingCountBefore, test(approvalsGrid).size());
+        assertTrue(test(approvalsGrid).isFocused());
 
         SerializationDebugUtil.assertSerializable(view);
     }
@@ -539,6 +540,7 @@ public class PurchasesViewTest extends AbstractUITest {
         // THEN: Grid count is unchanged – purchase is still PENDING
         assertEquals("Grid count should be unchanged after cancel",
                 pendingCountBefore, test(approvalsGrid).size());
+        assertTrue(test(approvalsGrid).isFocused());
 
         SerializationDebugUtil.assertSerializable(view);
     }
@@ -861,8 +863,13 @@ public class PurchasesViewTest extends AbstractUITest {
         assertNotNull("Export dialog should be open", exportDialog);
         assertEquals("Export", exportDialog.getCaption());
 
+        var downloadButton = $(exportDialog, Button.class)
+                .id("export-download-button");
+        assertTrue(test(downloadButton).isFocused());
+
         exportDialog.close();
         assertTrue(test(exportButton).isInteractable());
+        assertTrue(test($(Grid.class).id("purchase-history-grid")).isFocused());
     }
 
     @Test

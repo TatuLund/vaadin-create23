@@ -19,3 +19,9 @@
     --filter-and-grid-display: none;  
   }
 }
+
+ /* Hides the selected date assistive text in the date field to reduce verbosity */
+.v-datefield-selecteddate {
+  display: none;
+}
+

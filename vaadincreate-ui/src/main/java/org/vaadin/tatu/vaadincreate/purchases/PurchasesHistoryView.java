@@ -248,6 +248,7 @@ public class PurchasesHistoryView extends VerticalLayout
         exportButton.setIcon(VaadinIcons.DOWNLOAD);
         validateDateInputs();
         runningExport = null;
+        historyGrid.focus();
     }
 
     private Button buildPurgeButton() {

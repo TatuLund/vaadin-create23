@@ -16,6 +16,7 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.StreamResource;
 import com.vaadin.shared.Registration;
+import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -31,6 +32,7 @@ public class PurchaseExportDownloadDialog extends AbstractDialog
         implements HasI18N {
 
     public static final String DOWNLOAD_BUTTON_ID = "export-download-button";
+    private Button download;
 
     public PurchaseExportDownloadDialog(StreamResource resource) {
         super();
@@ -41,7 +43,7 @@ public class PurchaseExportDownloadDialog extends AbstractDialog
         window.setHeightUndefined();
         window.addCloseShortcut(com.vaadin.event.ShortcutAction.KeyCode.ESCAPE);
 
-        var download = new Button(getTranslation(I18n.Purchases.DOWNLOAD));
+        download = new Button(getTranslation(I18n.Purchases.DOWNLOAD));
         download.setId(DOWNLOAD_BUTTON_ID);
         download.setIcon(VaadinIcons.DOWNLOAD);
         download.addStyleNames(ValoTheme.BUTTON_PRIMARY,
@@ -62,6 +64,12 @@ public class PurchaseExportDownloadDialog extends AbstractDialog
         content.setComponentAlignment(buttons, Alignment.MIDDLE_CENTER);
         window.setContent(content);
         window.addCloseListener(e -> fireEvent(new ClosedEvent(this)));
+    }
+
+    @Override
+    public void open() {
+        super.open();
+        download.focus();
     }
 
     public Registration addCloseListener(ClosedListener listener) {

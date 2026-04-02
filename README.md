@@ -38,6 +38,7 @@ As a result, the project has a wiki that collects practical notes, examples, and
 - [How To Build a Containerized Test Environment for a Vaadin 8 App](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Build-a-Containerized-Test-Environment-for-a-Vaadin-8-App)
 - [How To Make a Vaadin 8 Application a PWA](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Make-a-Vaadin-8-Application-a-PWA)
 - [How To Use Composite Pattern in Vaadin 8](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Use-Composite-Pattern-in-Vaadin-8)
+- [How to Upgrade GWT and Selenium in a Vaadin 8 Project Running on Java 11+](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Upgrade-GWT-and-Selenium-in-a-Vaadin-8-Project-Running-on-Java-11-)
 
 ## Backend
 

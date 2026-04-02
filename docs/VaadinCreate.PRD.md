@@ -734,6 +734,7 @@ The Storefront view shall show a purchase history grid with a stable id `purchas
 
 - Purchases history shall be presented using a grid with a stable id `purchase-history-grid`.
 - The history grid shall present 9 columns.
+- The history grid wrapper shall be programmatically focusable; invoking focus on the wrapper shall move keyboard focus to the underlying grid.
 - Row details shall be toggleable via an explicit toggle button:
   - Initial state:
     - `aria-label` is "Open"
@@ -783,8 +784,15 @@ The Purchases view shall provide an approvals tab that lists only purchases pend
   - Clicking Cancel closes the decision window without changing the purchase status.
   - The relevant action button (Approve/Reject) shall become enabled again so the action can be retried.
   - The pending approvals grid item count shall remain unchanged.
+  - After the decision window closes (including cancel), keyboard focus shall return to the approvals grid.
 
-#### 18.3.2 Approver scoping
+#### 18.3.2 Keyboard-visible row actions
+
+- In the approvals grid, per-row action controls shall be hidden by default and revealed when either:
+  - the row is keyboard-focused, or
+  - the row is hovered by pointer.
+
+#### 18.3.3 Approver scoping
 
 - The approvals tab shall only show pending purchases assigned to the currently logged-in approver.
 - Different approvers shall see disjoint pending queues (i.e., approver A does not see approver B’s pending items).
@@ -857,6 +865,7 @@ The Purchases history tab shall support CSV export for a selected date range.
 - Date field upper bound is today.
 - Date field lower bound is today minus 24 months.
 - On entering the history tab, keyboard focus shall be set to `From`.
+- The selected-date assistive text element inside date fields may be visually hidden to reduce repeated verbosity in the compact toolbar layout.
 - The `Purge` action shall expose a localized tooltip explaining that old purchase records are permanently deleted.
 - The `Purge` action container shall display a visible top-right triangular marker when the tooltip is available.
 
@@ -888,7 +897,9 @@ The Purchases history tab shall support CSV export for a selected date range.
 - On successful completion, open an export dialog (stable id `purchase-export-dialog`) with:
   - localized export-ready status text,
   - download button (stable id `export-download-button`) backed by a generated download resource.
+- When the export dialog opens, keyboard focus shall move to the `Download` button.
 - Closing the dialog restores export button icon/state according to current input validity.
+- Closing the export dialog shall return keyboard focus to the purchase history grid.
 - CSV export contract:
   - UTF-8 with header row.
   - One row per purchase line item.

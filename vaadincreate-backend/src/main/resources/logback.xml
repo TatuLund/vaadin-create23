@@ -9,6 +9,9 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
+    <logger name="oshi.util.FileUtil" level="info" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
     <logger name="org.eclipse.jetty" level="info" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>

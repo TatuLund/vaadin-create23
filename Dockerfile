@@ -1,5 +1,5 @@
 # Produce the WAR file for the Vaadin 8 application
-FROM maven:3.9.9-eclipse-temurin-21 AS build
+FROM maven:3.9.12-eclipse-temurin-21 AS build
 COPY . /app/
 # Set the working directory
 WORKDIR /app
@@ -29,6 +29,10 @@ COPY --from=build /app/vaadincreate-ui/target/ROOT.war /usr/local/tomcat/webapps
 
 # Copy and set permissions for setenv.sh
 COPY setenv.sh /usr/local/tomcat/bin/
+# Add VAADIN_PRO_KEY as an environment variable in setenv.sh
+ARG VAADIN_PRO_KEY
+ENV VAADIN_PRO_KEY=${VAADIN_PRO_KEY}
+RUN echo "export VAADIN_PRO_KEY=${VAADIN_PRO_KEY}" >> /usr/local/tomcat/bin/setenv.sh
 RUN chmod +x /usr/local/tomcat/bin/setenv.sh
 
 # Replace the default context.xml with a custom one

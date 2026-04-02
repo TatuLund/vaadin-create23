@@ -52,7 +52,7 @@ This is intentional to demonstrate the current state of Vaadin 8 extended mainte
 
 The following commercial products are used.
 
-- Vaadin 8.30.1. The application uses some features it provides. (The latest free version 8.14.3)
+- Vaadin 8.31.0. The application uses some features it provides. (The latest free version 8.14.3)
   - Eager UI cleanup
   - Binder: change tracking
   - Binder: draft saving

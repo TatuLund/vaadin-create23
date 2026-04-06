@@ -262,4 +262,17 @@ $fake-grid-background-color: white;
       display: none;
     }
   }
+
+  // Imoprove warning type Notification contrast
+  .v-Notification.warning {
+    background: #FFF3E2;
+
+    .v-Notification-caption {
+      color: #6A5A00;
+    }
+
+    .v-Notification-description {
+      color: #7D673D;
+    }
+  }
 }

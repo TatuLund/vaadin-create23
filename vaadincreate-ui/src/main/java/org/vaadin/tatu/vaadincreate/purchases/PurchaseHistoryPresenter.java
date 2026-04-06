@@ -247,45 +247,37 @@ public class PurchaseHistoryPresenter
     }
 
     private void handleStatusChanged(Integer purchaseId) {
-        var capturedGrid = grid;
-        var capturedUser = currentUser;
-        if (capturedGrid == null || capturedUser == null) {
-            return;
-        }
+        assert grid != null : "Grid reference is null";
+        assert currentUser != null : "Current user reference is null";
+
         var purchase = getPurchaseService().fetchPurchaseById(purchaseId);
-        if (purchase == null) {
+        assert purchase != null : "Purchase not found for id: " + purchaseId;
+        if (!currentUser.equals(purchase.getRequester())) {
             return;
         }
-        if (!capturedUser.equals(purchase.getRequester())) {
-            return;
-        }
+
         logger.info(
                 "PurchaseStatusChangedEvent received for purchase {}, refreshing grid",
                 purchaseId);
-        capturedGrid.showStatusNotificationAsync(purchase);
-        capturedGrid.refreshItemAsync(purchase);
+        grid.showStatusNotificationAsync(purchase);
+        grid.refreshItemAsync(purchase);
     }
 
     private void handlePurchaseSaved(Integer purchaseId) {
-        var capturedGrid = grid;
-        var capturedUser = currentUser;
-        if (capturedGrid == null || capturedUser == null) {
-            return;
-        }
+        assert grid != null : "Grid reference is null";
+        assert currentUser != null : "Current user reference is null";
         var purchase = getPurchaseService().fetchPurchaseById(purchaseId);
-        if (purchase == null) {
-            return;
-        }
-        boolean isAdmin = capturedUser.getRole() == Role.ADMIN;
-        boolean isApprover = capturedUser.equals(purchase.getApprover());
-        boolean isRequester = capturedUser.equals(purchase.getRequester());
+        assert purchase != null : "Purchase not found for id: " + purchaseId;
+        boolean isAdmin = currentUser.getRole() == Role.ADMIN;
+        boolean isApprover = currentUser.equals(purchase.getApprover());
+        boolean isRequester = currentUser.equals(purchase.getRequester());
         if (!isAdmin && !isApprover && !isRequester) {
             return;
         }
         logger.info(
                 "PurchaseSavedEvent received for purchase {}, refreshing grid",
                 purchaseId);
-        capturedGrid.refreshAsync();
+        grid.refreshAsync();
     }
 
     private PurchaseService getPurchaseService() {

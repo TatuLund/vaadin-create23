@@ -497,8 +497,8 @@ public class StorefrontViewTest extends AbstractUITest {
                 .post(new PurchaseStatusChangedEvent(pendingPurchase.getId()));
 
         final int finalRow = row;
-        waitWhile(Grid.class, grid -> test(historyGrid).cell(5, finalRow)
-                .toString().equals("PENDING"), 1);
+        waitWhile(() -> test(historyGrid).cell(5, finalRow).toString()
+                .equals("PENDING"), 1);
 
         // THEN: Grid size is unchaged
         int sizeAfterEvent = test(historyGrid).size();
@@ -563,8 +563,7 @@ public class StorefrontViewTest extends AbstractUITest {
                         .anyMatch(n -> n.getCaption() != null
                                 && n.getCaption().contains("created")));
 
-        waitWhile(Grid.class, grid -> initialSize == test(historyGrid).size(),
-                1);
+        waitWhile(() -> initialSize == test(historyGrid).size(), 1);
 
         int row = findFirstPurchaseRow(historyGrid, PurchaseStatus.PENDING);
         int sizeAfterSubmit = test(historyGrid).size();

@@ -474,7 +474,6 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void deleting_product_with_purchase_history_shows_blocked_message() {
         var purchasedProduct = findProductWithPurchaseHistory();
         var productId = purchasedProduct.getId();
@@ -1238,7 +1237,7 @@ public class BooksViewTest extends AbstractUITest {
         var presenter = new BooksPresenter(bookView);
         presenter.requestUpdateProducts();
         var fake = $(bookView, FakeGrid.class).first();
-        waitWhile(fake, f -> f.isVisible(), 10);
+        waitWhile(fake::isVisible);
         return presenter;
     }
 

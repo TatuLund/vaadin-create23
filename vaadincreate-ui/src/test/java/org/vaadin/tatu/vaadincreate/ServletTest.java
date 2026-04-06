@@ -94,8 +94,7 @@ public class ServletTest extends UIUnitTest {
 
         // Act
         servlet.handleError(new ErrorEvent(exception), session);
-        waitWhile(Notification.class,
-                not -> $(Notification.class).first() != null, 1);
+        waitWhile(() -> $(Notification.class).first() == null, 1);
 
         // Assert
         var notification = $(Notification.class).first();
@@ -123,8 +122,7 @@ public class ServletTest extends UIUnitTest {
 
         // Act
         servlet.handleError(new ErrorEvent(exception), session);
-        waitWhile(Notification.class,
-                not -> $(Notification.class).first() != null, 1);
+        waitWhile(() -> $(Notification.class).first() == null, 1);
 
         // Assert
         var notification = $(Notification.class).first();

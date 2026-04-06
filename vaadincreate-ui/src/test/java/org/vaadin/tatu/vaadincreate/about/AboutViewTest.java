@@ -78,7 +78,7 @@ public class AboutViewTest extends AbstractUITest {
         assertEquals("<b><img>A new message</b>", note.getValue());
 
         // THEN: A notification is shown with sanitized value
-        waitWhile(view, n -> $(Notification.class).last() == null, 2);
+        waitUntil(() -> $(Notification.class).last() != null, 2);
         var notification = $(Notification.class).last();
         assertEquals("<b><img>A new message</b>",
                 notification.getDescription());
@@ -125,7 +125,7 @@ public class AboutViewTest extends AbstractUITest {
 
         // THEN: Text area is hidden, a notification is shown and the message is
         // in the label
-        waitWhile(view, n -> $(Notification.class).last() == null, 2);
+        waitWhile(() -> $(Notification.class).last() == null, 2);
         var notification = $(Notification.class).last();
 
         assertFalse(area.isVisible());
@@ -148,7 +148,7 @@ public class AboutViewTest extends AbstractUITest {
         // WHEN: Clicking confirm
         test($(confirmDialog, Button.class).id("confirm-button")).click();
 
-        waitWhile(String.class, t -> $(Notification.class).size() == 2, 2);
+        waitWhile(() -> $(Notification.class).size() == 2, 2);
 
         // THEN: A notification is shown
         assertNotification("You will be logged out in 60 seconds.");

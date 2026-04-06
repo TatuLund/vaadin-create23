@@ -166,7 +166,7 @@ public class StatsViewTest extends AbstractUITest {
         var presenter = new BooksPresenter(bookView);
         presenter.requestUpdateProducts();
         var fake = $(bookView, FakeGrid.class).first();
-        waitWhile(fake, f -> f.isVisible(), 10);
+        waitWhile(fake::isVisible);
         return presenter;
     }
 

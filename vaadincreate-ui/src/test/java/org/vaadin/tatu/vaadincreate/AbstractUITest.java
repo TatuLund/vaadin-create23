@@ -69,7 +69,7 @@ public abstract class AbstractUITest extends UIUnitTest {
         assertFalse(grid.isVisible());
 
         var fake = $(layout, FakeGrid.class).first();
-        waitWhile(fake, f -> f.isVisible(), 10);
+        waitWhile(fake::isVisible);
         assertTrue(grid.isVisible());
     }
 
@@ -80,7 +80,7 @@ public abstract class AbstractUITest extends UIUnitTest {
      *            The dashboard
      */
     protected void waitForCharts(CssLayout dashboard) {
-        waitWhile(dashboard, d -> !d.getStyleName().contains("loaded"), 15);
+        waitWhile(() -> !dashboard.getStyleName().contains("loaded"));
     }
 
     /**

@@ -834,6 +834,7 @@ public class PurchasesViewTest extends AbstractUITest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void export_dialog_is_shown_when_export_button_clicked_with_valid_dates() {
         view = navigate(PurchasesView.VIEW_NAME, PurchasesView.class);
 
@@ -854,9 +855,7 @@ public class PurchasesViewTest extends AbstractUITest {
         test(exportButton).click();
         assertFalse(test(exportButton).isInteractable());
 
-        waitWhile(Window.class,
-                Void -> $(Window.class).id("purchase-export-dialog") == null,
-                1);
+        waitWhile(() -> $(Window.class).size() == 0, 1);
 
         // THEN: Export dialog is shown
         var exportDialog = $(Window.class).id("purchase-export-dialog");

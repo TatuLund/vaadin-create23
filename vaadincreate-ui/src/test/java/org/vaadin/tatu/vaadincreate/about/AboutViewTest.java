@@ -78,7 +78,7 @@ public class AboutViewTest extends AbstractUITest {
         assertEquals("<b><img>A new message</b>", note.getValue());
 
         // THEN: A notification is shown with sanitized value
-        waitUntil(() -> $(Notification.class).last() != null, 2);
+        waitWhile(() -> $(Notification.class).last() == null, 2);
         var notification = $(Notification.class).last();
         assertEquals("<b><img>A new message</b>",
                 notification.getDescription());

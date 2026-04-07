@@ -14,7 +14,10 @@ import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService.PurchaseExportRow;
 import org.vaadin.tatu.vaadincreate.common.TabView;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.components.ConfirmDialog;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
+import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
@@ -69,24 +72,33 @@ public class PurchasesHistoryView extends VerticalLayout
         setMargin(false);
         addStyleName(VaadinCreateTheme.PURCHASEHISTORYVIEW);
         presenter = new PurchaseHistoryPresenter();
+        csvExporter = new PurchaseHistoryCsvExporter();
+
         historyGrid = new PurchaseHistoryGrid(presenter,
                 PurchaseHistoryMode.ALL, Utils.getCurrentUserOrThrow());
+
         fromDate = buildDateField(I18n.Purchases.FROM, FROM_DATE_ID);
         toDate = buildDateField(I18n.Purchases.TO, TO_DATE_ID);
         exportButton = buildExportButton();
         purgeButton = buildPurgeButton();
-        var purgeWrapper = new CssLayout(purgeButton);
-        purgeWrapper.addStyleName(VaadinCreateTheme.HAS_TOOLTIP);
-        csvExporter = new PurchaseHistoryCsvExporter();
 
-        var toolbar = new CssLayout(fromDate, toDate, exportButton,
-                purgeWrapper);
-        toolbar.addStyleName(VaadinCreateTheme.PURCHASEHISTORYVIEW_TOOLBAR);
-        toolbar.setWidth("100%");
+        var toolbar = buildToolbar();
 
         addComponent(toolbar);
         addComponent(historyGrid);
         setExpandRatio(historyGrid, 1);
+    }
+
+    private CssLayout buildToolbar() {
+        var purgeWrapper = new CssLayout(purgeButton);
+        purgeWrapper.addStyleName(VaadinCreateTheme.HAS_TOOLTIP);
+        var toolbar = new CssLayout(fromDate, toDate, exportButton,
+                purgeWrapper);
+        toolbar.addStyleName(VaadinCreateTheme.PURCHASEHISTORYVIEW_TOOLBAR);
+        toolbar.setWidth("100%");
+        AttributeExtension.of(toolbar).setAttribute(AriaAttributes.ROLE,
+                AriaRoles.TOOLBAR);
+        return toolbar;
     }
 
     @Override
@@ -144,6 +156,8 @@ public class PurchasesHistoryView extends VerticalLayout
         field.setId(id);
         field.setRequiredIndicatorVisible(true);
         field.setRangeEnd(LocalDate.now());
+        field.setRangeStart(LocalDate.now().minusMonths(RETENTION_MONTHS));
+
         field.setAssistiveText(
                 getTranslation(I18n.Purchases.DATE_FIELD_ASSISTIVE_TEXT));
         field.setAssistiveLabel(AccessibleElement.NEXT_MONTH,
@@ -154,7 +168,10 @@ public class PurchasesHistoryView extends VerticalLayout
                 getTranslation(I18n.Purchases.DATE_FIELD_NEXT_YEAR));
         field.setAssistiveLabel(AccessibleElement.PREVIOUS_YEAR,
                 getTranslation(I18n.Purchases.DATE_FIELD_PREVIOUS_YEAR));
-        field.setRangeStart(LocalDate.now().minusMonths(RETENTION_MONTHS));
+        field.setParseErrorMessage(
+                getTranslation(I18n.Purchases.DATE_FIELD_PARSE_ERROR));
+        field.setDateOutOfRangeMessage(
+                getTranslation(I18n.Purchases.DATE_FIELD_OUT_OF_RANGE));
         field.addValueChangeListener(
                 e -> onDateValueChanged(e.isUserOriginated(),
                         e.getSource() == toDate));

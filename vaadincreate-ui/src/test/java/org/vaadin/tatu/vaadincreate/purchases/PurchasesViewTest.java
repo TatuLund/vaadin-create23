@@ -909,7 +909,7 @@ public class PurchasesViewTest extends AbstractUITest {
     }
 
     @Test
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings("unchecked")
     public void approving_purchase_when_optimistic_lock_conflict_shows_conflict_notification()
             throws Exception {
         // GIVEN
@@ -920,7 +920,7 @@ public class PurchasesViewTest extends AbstractUITest {
                         + PurchasesApprovalsView.VIEW_NAME,
                 PurchasesView.class);
 
-        var approvalsGrid = (Grid<Purchase>) (Grid) $(Grid.class)
+        var approvalsGrid = (Grid<Purchase>) $(Grid.class)
                 .id("purchase-approvals-grid");
         assertNotNull("Approvals grid should be present", approvalsGrid);
         assertTrue("There must be at least one pending purchase",
@@ -950,8 +950,7 @@ public class PurchasesViewTest extends AbstractUITest {
         assertNotNull("Decision window should be open", decisionWindow);
 
         test($(decisionWindow, Button.class)
-                .id(DecisionDialog.CONFIRM_BUTTON_ID))
-                .click();
+                .id(DecisionDialog.CONFIRM_BUTTON_ID)).click();
 
         // THEN: conflict warning is shown (instead of global technical error
         // flow)

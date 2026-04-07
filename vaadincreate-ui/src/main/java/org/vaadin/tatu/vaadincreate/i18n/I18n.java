@@ -294,6 +294,8 @@ public final class I18n {
         public static final String DATE_FIELD_PREVIOUS_MONTH = "date-field-previous-month";
         public static final String DATE_FIELD_NEXT_YEAR = "date-field-next-year";
         public static final String DATE_FIELD_PREVIOUS_YEAR = "date-field-previous-year";
+        public static final String DATE_FIELD_PARSE_ERROR = "date-field-parse-error";
+        public static final String DATE_FIELD_OUT_OF_RANGE = "date-field-out-of-range";
         public static final String EXPORT = "export";
         public static final String EXPORT_MISSING_DATES = "export-missing-dates";
         public static final String EXPORT_INVALID_RANGE = "export-invalid-range";

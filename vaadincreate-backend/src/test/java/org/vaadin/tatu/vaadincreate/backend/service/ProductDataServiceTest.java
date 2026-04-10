@@ -76,13 +76,14 @@ public class ProductDataServiceTest {
 
     @Test
     public void removeProduct() {
+        Product p = new Product();
+        p.setProductName("Product to remove");
+        p.setPrice(new BigDecimal(10));
+        assertNull(p.getId());
+        var newProduct = service.updateProduct(p);
+
         var oldSize = service.getAllProducts().size();
-        var iterator = service.getAllProducts().iterator();
-        for (int i = 0; i < 10; i++) {
-            iterator.next();
-        }
-        var p = iterator.next();
-        var pid = p.getId();
+        var pid = newProduct.getId();
         service.deleteProduct(pid);
         assertEquals(null, service.getProductById(pid));
         assertEquals(oldSize - 1, service.getAllProducts().size());

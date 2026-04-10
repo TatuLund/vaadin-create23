@@ -861,9 +861,11 @@ The Purchases history tab shall support CSV export for a selected date range.
   - `To` date
   - `Export`
   - `Purge`
+- The history toolbar container shall expose toolbar semantics for assistive technologies.
 - `From` and `To` are required date-only fields.
 - Date field upper bound is today.
 - Date field lower bound is today minus 24 months.
+- Date fields shall provide localized parse-error and out-of-range error messages.
 - On entering the history tab, keyboard focus shall be set to `From`.
 - The selected-date assistive text element inside date fields may be visually hidden to reduce repeated verbosity in the compact toolbar layout.
 - The `Purge` action shall expose a localized tooltip explaining that old purchase records are permanently deleted.
@@ -876,6 +878,7 @@ The Purchases history tab shall support CSV export for a selected date range.
   - `To < From`, or
   - the selected range exceeds three months (calendar-month semantics, `plusMonths(3)`).
 - Invalid ranges shall set a component-level error on the `To` field with a localized message.
+- Presenter/service export start shall defensively reject invalid ranges (`To < From` or range longer than three months), even if UI-level validation is bypassed.
 - When inputs become valid, `To` field error is cleared and `Export` can be enabled.
 
 #### 18.6.3 Grid reaction to date selection
@@ -887,6 +890,7 @@ The Purchases history tab shall support CSV export for a selected date range.
 #### 18.6.4 Export execution and async UX
 
 - Clicking `Export` with valid inputs starts an async export through presenter/service execution.
+- Export initiation shall assert admin authorization in presenter/service logic and reject non-admin attempts.
 - Export action uses disable-on-click behavior and switches icon to a loading spinner while running.
 - Duplicate starts from the same view instance are prevented while export is in progress.
 - On failure, the user shall see a localized error notification and button state must be restored.

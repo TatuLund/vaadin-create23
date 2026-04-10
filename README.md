@@ -6,7 +6,7 @@ This project is my dogfooding test application for legacy Vaadin 8, as we are st
 
 Despite the application using the old Vaadin 8, many of the examples featured here are applicable to more current Vaadin versions.
 
-For a framework-agnostic functional specification of the application behavior, see the [VaadinCreate Product Requirements Document](docs/VaadinCreate.PRD.md). For visual UX layout specs, see [WireFrames](docs/WireFrames.md).
+For a functional specification of the application behavior, see the [VaadinCreate Product Requirements Document](docs/VaadinCreate.PRD.md). For domain structure details, see [Data Model](docs/DataModel.md). For visual UX layout specs, see [WireFrames](docs/WireFrames.md). For UI styling and design conventions, see [Style Guide](docs/StyleGuide.md).
 
 ## Covered topics
 
@@ -39,6 +39,7 @@ As a result, the project has a wiki that collects practical notes, examples, and
 - [How To Make a Vaadin 8 Application a PWA](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Make-a-Vaadin-8-Application-a-PWA)
 - [How To Use Composite Pattern in Vaadin 8](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Use-Composite-Pattern-in-Vaadin-8)
 - [How to Upgrade GWT and Selenium in a Vaadin 8 Project Running on Java 11+](https://github.com/TatuLund/vaadin-create23/wiki/How-to-Upgrade-GWT-and-Selenium-in-a-Vaadin-8-Project-Running-on-Java-11-)
+- [How To Ensure Serializable Sessions With Vaadin 8](https://github.com/TatuLund/vaadin-create23/wiki/How-To-Ensure-Serializable-Sessions-With-Vaadin-8)
 
 ## Backend
 
@@ -114,7 +115,7 @@ For further development of this project, the following toolchain is recommended:
 - Eclipse IDE
 - m2e wtp plug-in (install it from Eclipse Marketplace)
 - Vaadin Eclipse plug-in (install it from Eclipse Marketplace)
-- For Java hotswapping setup HotSwapAgent with JBR 17 or use JRebel Eclipse plug-in (install it from Eclipse Marketplace)
+- For Java hotswapping setup HotSwapAgent with JBR 21 or use JRebel Eclipse plug-in (install it from Eclipse Marketplace)
 - Chrome/Edge/Firefox browser
 
 ### Importing project

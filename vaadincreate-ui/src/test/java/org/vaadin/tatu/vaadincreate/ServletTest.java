@@ -52,7 +52,8 @@ public class ServletTest extends UIUnitTest {
         System.clearProperty("vaadin.productionMode");
         var initParameters = new Properties();
         var servlet = new Servlet();
-        assertTrue(!servlet.createDeploymentConfiguration(initParameters)
+        assertTrue(!servlet
+                .createDeploymentConfiguration(initParameters)
                 .isProductionMode());
     }
 
@@ -81,6 +82,52 @@ public class ServletTest extends UIUnitTest {
     }
 
     @Test
+    public void handleRequest_updates_exising_locale_cookie_with_selected_language()
+            throws ServiceException {
+        // Arrange
+        var servlet = new Servlet();
+        mockVaadin();
+
+        var session = VaadinSession.getCurrent();
+        session.setAttribute("locale",
+                DefaultI18NProvider.LOCALE_FI.getLanguage());
+
+        // Act
+        servlet.handleRequest(VaadinSession.getCurrent(),
+                new MockRequestEn(new MockServletRequest(null),
+                        VaadinService.getCurrent()),
+                VaadinResponse.getCurrent());
+
+        // Assert
+        var locale = ((VaadinServletResponse) VaadinResponse.getCurrent())
+                .getLocale();
+        assertNotNull(locale);
+        assertEquals(DefaultI18NProvider.LOCALE_FI.getLanguage(),
+                locale.getLanguage());
+
+        tearDown();
+    }
+
+    @Test
+    public void handleRequest_do_not_set_cookie_when_locale_is_not_in_session()
+            throws ServiceException {
+        // Arrange
+        var servlet = new Servlet();
+        mockVaadin();
+
+        // Act
+        servlet.handleRequest(VaadinSession.getCurrent(),
+                VaadinRequest.getCurrent(), VaadinResponse.getCurrent());
+
+        // Assert
+        var locale = ((VaadinServletResponse) VaadinResponse.getCurrent())
+                .getLocale();
+        assertNull(locale);
+
+        tearDown();
+    }
+
+    @Test
     public void handleError_displays_error_notification()
             throws ServiceException {
         // Arrange
@@ -88,7 +135,8 @@ public class ServletTest extends UIUnitTest {
         mockVaadin(ui);
         var servlet = new Servlet();
         var rootCause = new Exception("Test exception");
-        var exception = new RuntimeException("Wrapper exception", rootCause);
+        var exception = new RuntimeException("Wrapper exception",
+                rootCause);
         var session = VaadinSession.getCurrent();
         Locale.setDefault(DefaultI18NProvider.LOCALE_EN);
 
@@ -114,9 +162,11 @@ public class ServletTest extends UIUnitTest {
         var ui = new VaadinCreateUI();
         mockVaadin(ui);
         var servlet = new Servlet();
-        var specialCause = new DatabaseConnectionException("Database error",
+        var specialCause = new DatabaseConnectionException(
+                "Database error",
                 new Throwable("Root cause"));
-        var exception = new RuntimeException("Wrapper exception", specialCause);
+        var exception = new RuntimeException("Wrapper exception",
+                specialCause);
         var session = VaadinSession.getCurrent();
         Locale.setDefault(DefaultI18NProvider.LOCALE_EN);
 
@@ -144,7 +194,8 @@ public class ServletTest extends UIUnitTest {
         var servlet = new Servlet() {
             @Override
             protected VaadinServletService getService() {
-                return (VaadinServletService) VaadinService.getCurrent();
+                return (VaadinServletService) VaadinService
+                        .getCurrent();
             }
         };
         servlet.servletInitialized();
@@ -176,7 +227,8 @@ public class ServletTest extends UIUnitTest {
 
         // Assert
         assertEquals(DefaultI18NProvider.LOCALE_FI.getLanguage(),
-                response.getDocument().getElementsByTag("html").attr("lang"));
+                response.getDocument().getElementsByTag("html")
+                        .attr("lang"));
 
         tearDown();
     }
@@ -191,18 +243,37 @@ public class ServletTest extends UIUnitTest {
         @Override
         public Cookie[] getCookies() {
             return new Cookie[] { CookieUtils.createNewCookie(this,
-                    DefaultI18NProvider.LOCALE_FI.getLanguage()) };
+                    DefaultI18NProvider.LOCALE_FI
+                            .getLanguage()) };
         }
     }
 
-    public static class MockBootstrapResponse extends BootstrapPageResponse {
+    public static class MockRequestEn extends VaadinServletRequest {
+
+        public MockRequestEn(HttpServletRequest request,
+                VaadinService vaadinService) {
+            super(request, (VaadinServletService) vaadinService);
+        }
+
+        @Override
+        public Cookie[] getCookies() {
+            return new Cookie[] { CookieUtils.createNewCookie(this,
+                    DefaultI18NProvider.LOCALE_EN
+                            .getLanguage()) };
+        }
+    }
+
+    public static class MockBootstrapResponse
+            extends BootstrapPageResponse {
 
         private static final String HTML = "<html><head></head><body></body></html>";
 
         public MockBootstrapResponse(VaadinRequest request,
                 VaadinSession session, UI ui) {
-            super(new MockBootstrapHandler(), request, session, ui.getClass(),
-                    Jsoup.parse(HTML), new HashMap<>(), null);
+            super(new MockBootstrapHandler(), request, session,
+                    ui.getClass(),
+                    Jsoup.parse(HTML), new HashMap<>(),
+                    null);
         }
 
     }

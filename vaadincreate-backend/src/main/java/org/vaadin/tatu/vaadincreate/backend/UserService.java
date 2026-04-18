@@ -3,7 +3,6 @@ package org.vaadin.tatu.vaadincreate.backend;
 import java.util.List;
 import java.util.Optional;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
@@ -54,9 +53,9 @@ public interface UserService {
     public abstract User updateUser(User editedUser,
             @Nullable User deputyApproverOrNull);
 
-    public abstract List<@NonNull User> getAllUsers();
+    public abstract List<User> getAllUsers();
 
-    public abstract List<@NonNull User> getUsersByRole(User.Role role);
+    public abstract List<User> getUsersByRole(User.Role role);
 
     @Nullable
     public User getUserById(Integer userId);
@@ -71,7 +70,7 @@ public interface UserService {
      *            the user to exclude (the one being edited)
      * @return list of eligible deputy approvers
      */
-    public List<@NonNull User> getActiveApprovers(User excludeUser);
+    public List<User> getActiveApprovers(User excludeUser);
 
     public static UserService get() {
         return UserServiceImpl.getInstance();

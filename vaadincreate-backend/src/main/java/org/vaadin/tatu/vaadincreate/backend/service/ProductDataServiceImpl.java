@@ -3,7 +3,6 @@ package org.vaadin.tatu.vaadincreate.backend.service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
@@ -33,17 +32,10 @@ public class ProductDataServiceImpl implements ProductDataService {
     private static ProductDataServiceImpl instance;
     private final ProductDao productDao;
     private final DraftDao draftDao;
-    private final Random random;
-    private boolean slow = false;
 
     private ProductDataServiceImpl() {
         this.productDao = new ProductDao();
         this.draftDao = new DraftDao();
-        this.random = new Random();
-        var backendMode = System.getProperty("backend.mode");
-        if (backendMode != null && backendMode.equals("slow")) {
-            slow = true;
-        }
         var env = System.getProperty("generate.data");
         if (env == null || env.equals("true")) {
             var categories = MockDataGenerator.createCategories();
@@ -71,14 +63,12 @@ public class ProductDataServiceImpl implements ProductDataService {
     @Override
     public Product updateProduct(Product product) {
         Objects.requireNonNull(product, "product can't be null");
-        randomWait(1);
         return productDao.updateProduct(product);
     }
 
     @Override
     public void deleteProduct(Integer id) {
         Objects.requireNonNull(id, ID_CANT_BE_NULL);
-        randomWait(1);
         try {
             productDao.deleteProduct(id);
         } catch (RuntimeException e) {
@@ -94,32 +84,27 @@ public class ProductDataServiceImpl implements ProductDataService {
     @Override
     public Product getProductById(Integer id) {
         Objects.requireNonNull(id, ID_CANT_BE_NULL);
-        randomWait(1);
         return productDao.getProduct(id);
     }
 
     @Override
-    public Collection<@NonNull Product> getAllProducts() {
-        randomWait(6);
+    public Collection<Product> getAllProducts() {
         return productDao.getAllProducts();
     }
 
     @Override
-    public Collection<@NonNull Product> getOrderableProducts() {
-        randomWait(6);
+    public Collection<Product> getOrderableProducts() {
         return productDao.getOrderableProducts();
     }
 
     @Override
-    public Collection<@NonNull Category> getAllCategories() {
-        randomWait(2);
+    public Collection<Category> getAllCategories() {
         return productDao.getAllCategories();
     }
 
     @Override
     public void deleteCategory(Integer id) {
         Objects.requireNonNull(id, ID_CANT_BE_NULL);
-        randomWait(2);
         var category = productDao.getCategory(id);
         if (category == null) {
             throw new IllegalArgumentException("Category not found");
@@ -129,10 +114,9 @@ public class ProductDataServiceImpl implements ProductDataService {
     }
 
     @Override
-    public Set<@NonNull Category> findCategoriesByIds(
+    public Set<Category> findCategoriesByIds(
             Set<Integer> ids) {
         Objects.requireNonNull(ids, "ids can't be null");
-        randomWait(1);
         return productDao.getCategoriesByIds(ids);
     }
 
@@ -141,7 +125,6 @@ public class ProductDataServiceImpl implements ProductDataService {
         Objects.requireNonNull(category, "category can't be null");
         var name = category.getName();
         Objects.requireNonNull(name, "category name can't be null");
-        randomWait(1);
         if (category.getId() == null
                 && productDao.getCategoryByName(name) != null) {
             throw new IllegalArgumentException(
@@ -153,7 +136,6 @@ public class ProductDataServiceImpl implements ProductDataService {
     @Override
     public void saveDraft(User user, @Nullable Product draftProduct) {
         Objects.requireNonNull(user, "user can't be null");
-        randomWait(1);
         logger.info("Saving draft for user '{}'", user.getName());
         if (draftProduct == null) {
             draftDao.deleteDraft(user);
@@ -170,19 +152,6 @@ public class ProductDataServiceImpl implements ProductDataService {
         logger.info("Finding draft for user '{}'", user.getName());
         var draft = draftDao.findDraft(user);
         return draft != null ? draft.toProduct() : null;
-    }
-
-    @SuppressWarnings("java:S2142")
-    private void randomWait(int count) {
-        if (!slow) {
-            return;
-        }
-        int wait = 20 + random.nextInt(40);
-        try {
-            Thread.sleep(wait * (long) count);
-        } catch (InterruptedException e) {
-            // NOP
-        }
     }
 
     @SuppressWarnings("null")

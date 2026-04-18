@@ -14,6 +14,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Entity representing a line item in a purchase request. Each line references a
@@ -29,6 +30,7 @@ public class PurchaseLine extends AbstractEntity {
     @NotNull(message = "{purchase.required}")
     @ManyToOne(optional = false)
     @JoinColumn(name = "purchase_id", nullable = false)
+    @Nullable
     private Purchase purchase;
 
     @NotNull(message = "{product.required}")
@@ -76,11 +78,12 @@ public class PurchaseLine extends AbstractEntity {
                 "Unit price must not be null");
     }
 
+    @Nullable
     public Purchase getPurchase() {
         return purchase;
     }
 
-    public void setPurchase(Purchase purchase) {
+    public void setPurchase(@Nullable Purchase purchase) {
         this.purchase = purchase;
     }
 

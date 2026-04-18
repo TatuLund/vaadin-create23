@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.backend.data.Address;
@@ -98,7 +97,7 @@ public interface PurchaseService {
      *            the maximum number of results
      * @return list of purchases
      */
-    List<@NonNull Purchase> findMyPurchases(User requester, int offset,
+    List<Purchase> findMyPurchases(User requester, int offset,
             int limit);
 
     /**
@@ -119,7 +118,7 @@ public interface PurchaseService {
      *            the maximum number of results
      * @return list of all purchases
      */
-    List<@NonNull Purchase> findAll(int offset, int limit);
+    List<Purchase> findAll(int offset, int limit);
 
     /**
      * Counts all purchases.
@@ -139,7 +138,7 @@ public interface PurchaseService {
      *            the maximum number of results
      * @return list of pending purchases
      */
-    List<@NonNull Purchase> findPendingForApprover(User approver, int offset,
+    List<Purchase> findPendingForApprover(User approver, int offset,
             int limit);
 
     /**
@@ -164,7 +163,7 @@ public interface PurchaseService {
      *            the current user driving the query
      * @return list of purchases
      */
-    List<@NonNull Purchase> fetchPurchases(PurchaseHistoryMode mode, int offset,
+    List<Purchase> fetchPurchases(PurchaseHistoryMode mode, int offset,
             int limit, User currentUser);
 
     /**
@@ -188,7 +187,7 @@ public interface PurchaseService {
      *            the timestamp to filter from
      * @return list of decided purchases since the given time
      */
-    List<@NonNull Purchase> findRecentlyDecidedPurchases(User requester,
+    List<Purchase> findRecentlyDecidedPurchases(User requester,
             java.time.Instant since);
 
     /**
@@ -233,7 +232,7 @@ public interface PurchaseService {
      *            maximum number of products to return
      * @return list of at most {@code limit} products, most purchased first
      */
-    List<@NonNull ProductPurchaseStat> getTopProductsByQuantity(int limit);
+    List<ProductPurchaseStat> getTopProductsByQuantity(int limit);
 
     /**
      * Returns the least purchased products by quantity from COMPLETED
@@ -244,7 +243,7 @@ public interface PurchaseService {
      *            maximum number of products to return
      * @return list of at most {@code limit} products, least purchased first
      */
-    List<@NonNull ProductPurchaseStat> getLeastProductsByQuantity(int limit);
+    List<ProductPurchaseStat> getLeastProductsByQuantity(int limit);
 
     /**
      * Returns monthly purchase totals (amount) for COMPLETED purchases over the
@@ -255,7 +254,7 @@ public interface PurchaseService {
      *            number of calendar months to include, must be positive
      * @return list of monthly totals ordered by month ascending
      */
-    List<@NonNull MonthlyPurchaseStat> getMonthlyTotals(int months);
+    List<MonthlyPurchaseStat> getMonthlyTotals(int months);
 
     /**
      * Counts purchases whose {@code createdAt} is strictly before the given
@@ -290,7 +289,7 @@ public interface PurchaseService {
      *            exclusive created-at upper bound
      * @return flattened export rows ordered deterministically
      */
-    List<@NonNull PurchaseExportRow> fetchPurchaseExportRows(
+    List<PurchaseExportRow> fetchPurchaseExportRows(
             Instant fromInclusive, Instant toExclusive);
 
     /**

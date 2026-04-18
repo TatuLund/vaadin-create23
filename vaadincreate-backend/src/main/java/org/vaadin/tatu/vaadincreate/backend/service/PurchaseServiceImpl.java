@@ -186,7 +186,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public List<@NonNull Purchase> findMyPurchases(User requester,
+    public List<Purchase> findMyPurchases(User requester,
             int offset, int limit) {
         Objects.requireNonNull(requester, REQUESTER_MUST_NOT_BE_NULL);
         return purchaseDao.findByRequester(requester, offset, limit);
@@ -199,7 +199,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public List<@NonNull Purchase> findAll(int offset, int limit) {
+    public List<Purchase> findAll(int offset, int limit) {
         return purchaseDao.findAll(offset, limit);
     }
 
@@ -209,7 +209,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public List<@NonNull Purchase> findPendingForApprover(
+    public List<Purchase> findPendingForApprover(
             User approver, int offset, int limit) {
         Objects.requireNonNull(approver, "Approver must not be null");
         return purchaseDao.findByApproverAndStatus(approver,
@@ -224,7 +224,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public List<@NonNull Purchase> fetchPurchases(PurchaseHistoryMode mode,
+    public List<Purchase> fetchPurchases(PurchaseHistoryMode mode,
             int offset, int limit, User currentUser) {
         Objects.requireNonNull(mode, "Mode must not be null");
         Objects.requireNonNull(currentUser, CURRENT_USER_MUST_NOT_BE_NULL);
@@ -250,7 +250,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public List<@NonNull Purchase> findRecentlyDecidedPurchases(
+    public List<Purchase> findRecentlyDecidedPurchases(
             User requester, Instant since) {
         Objects.requireNonNull(requester, REQUESTER_MUST_NOT_BE_NULL);
         Objects.requireNonNull(since, "Since timestamp must not be null");
@@ -281,7 +281,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @SuppressWarnings("null")
-    public List<@NonNull ProductPurchaseStat> getTopProductsByQuantity(
+    public List<ProductPurchaseStat> getTopProductsByQuantity(
             int limit) {
         var rows = purchaseDao.getTopProductsByQuantity(limit);
         return rows.stream().map(PurchaseServiceImpl::toProductStat).toList();
@@ -289,15 +289,14 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @SuppressWarnings("null")
-    public List<@NonNull ProductPurchaseStat> getLeastProductsByQuantity(
-            int limit) {
+    public List<ProductPurchaseStat> getLeastProductsByQuantity(int limit) {
         var rows = purchaseDao.getLeastProductsByQuantity(limit);
         return rows.stream().map(PurchaseServiceImpl::toProductStat).toList();
     }
 
     @Override
     @SuppressWarnings("null")
-    public List<@NonNull MonthlyPurchaseStat> getMonthlyTotals(int months) {
+    public List<MonthlyPurchaseStat> getMonthlyTotals(int months) {
         var now = YearMonth.now();
         var since = now.minusMonths(months - 1L).atDay(1).atStartOfDay()
                 .atZone(ZoneId.systemDefault()).toInstant();

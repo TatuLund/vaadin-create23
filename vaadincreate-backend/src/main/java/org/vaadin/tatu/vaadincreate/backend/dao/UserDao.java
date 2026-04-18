@@ -3,7 +3,6 @@ package org.vaadin.tatu.vaadincreate.backend.dao;
 import java.util.List;
 import java.util.Objects;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -96,9 +95,9 @@ public class UserDao {
      *
      * @return a List of User objects representing all users in the database.
      */
-    public List<@NonNull User> getAllUsers() {
+    public List<User> getAllUsers() {
         logger.debug("Fetching all Users");
-        List<@NonNull User> users = HibernateUtil.inSession(session -> {
+        var users = HibernateUtil.inSession(session -> {
             return session.createQuery("from User", User.class).list();
         });
         if (users == null) {
@@ -115,10 +114,10 @@ public class UserDao {
      *            the role to filter users by
      * @return a List of User objects with the specified role
      */
-    public List<@NonNull User> getUsersByRole(User.Role role) {
+    public List<User> getUsersByRole(User.Role role) {
         Objects.requireNonNull(role, "Role must not be null");
         logger.debug("Fetching Users with role {}", role);
-        List<@NonNull User> users = HibernateUtil.inSession(session -> {
+        var users = HibernateUtil.inSession(session -> {
             return session
                     .createQuery("from User where role = :role", User.class)
                     .setParameter("role", role).list();
@@ -138,11 +137,11 @@ public class UserDao {
      *            the user to exclude from the result (the one being edited)
      * @return list of eligible deputy approvers
      */
-    public List<@NonNull User> getActiveApprovers(User excludeUser) {
+    public List<User> getActiveApprovers(User excludeUser) {
         Objects.requireNonNull(excludeUser, "ExcludeUser must not be null");
         logger.debug("Fetching active approvers excluding user ({})",
                 excludeUser.getId());
-        List<@NonNull User> users = HibernateUtil.inSession(session -> {
+        var users = HibernateUtil.inSession(session -> {
             return session.createQuery(
                     "from User where active = true and role in (:user, :admin) and id != :id",
                     User.class)

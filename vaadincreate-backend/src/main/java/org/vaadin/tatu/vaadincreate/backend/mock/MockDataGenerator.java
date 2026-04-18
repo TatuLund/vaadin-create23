@@ -3,7 +3,6 @@ package org.vaadin.tatu.vaadincreate.backend.mock;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -52,21 +51,20 @@ public class MockDataGenerator implements Serializable {
             "speaking to a big audience", "creating software", "giant needles",
             "elephants", "keeping your wife happy" };
 
-    public static List<@NonNull Category> createCategories() {
-        List<@NonNull Category> categories = new ArrayList<>();
-        for (@NonNull
-        String name : categoryNames) {
+    public static List<Category> createCategories() {
+        var categories = new ArrayList<Category>();
+        for (String name : categoryNames) {
             Category c = createCategory(name);
             categories.add(c);
         }
         return categories;
     }
 
-    public static List<@NonNull Product> createProducts(
-            List<@NonNull Category> categories) {
-        List<@NonNull Product> products = new ArrayList<>();
+    public static List<Product> createProducts(
+            List<Category> categories) {
+        var products = new ArrayList<Product>();
         for (int i = 0; i < 100; i++) {
-            Product p = createProduct(categories);
+            var p = createProduct(categories);
             products.add(p);
         }
 
@@ -78,16 +76,16 @@ public class MockDataGenerator implements Serializable {
         return "System update complete";
     }
 
-    public static List<@NonNull User> createUsers() {
-        List<@NonNull User> users = new ArrayList<>();
-        for (Integer i = 0; i < 10; i++) {
-            User user = new User();
+    public static List<User> createUsers() {
+        var users = new ArrayList<User>();
+        for (int i = 0; i < 10; i++) {
+            var user = new User();
             user.setName("User" + i);
             user.setPasswd("user" + i);
             user.setRole(Role.USER);
             users.add(user);
         }
-        User admin = new User();
+        var admin = new User();
         admin.setName("Admin");
         admin.setPasswd("admin");
         admin.setRole(Role.ADMIN);
@@ -98,8 +96,8 @@ public class MockDataGenerator implements Serializable {
         admin.setRole(Role.ADMIN);
         users.add(admin);
         // Create 100 CUSTOMER users for testing storefront functionality
-        for (Integer i = 0; i < 100; i++) {
-            User customer = new User();
+        for (int i = 0; i < 100; i++) {
+            var customer = new User();
             customer.setName("Customer" + i);
             customer.setPasswd("customer" + i);
             customer.setRole(Role.CUSTOMER);
@@ -109,13 +107,13 @@ public class MockDataGenerator implements Serializable {
     }
 
     private static Category createCategory(String name) {
-        Category c = new Category();
+        var c = new Category();
         c.setName(name);
         return c;
     }
 
     private static Product createProduct(List<Category> categories) {
-        Product p = new Product();
+        var p = new Product();
         p.setProductName(generateName());
 
         var price = getPrice();
@@ -138,7 +136,7 @@ public class MockDataGenerator implements Serializable {
     private static Set<Category> getCategory(List<Category> categories, int min,
             int max) {
         int nr = random.nextInt(max) + min;
-        HashSet<Category> productCategories = new HashSet<>();
+        var productCategories = new HashSet<Category>();
         for (int i = 0; i < nr; i++) {
             productCategories
                     .add(categories.get(random.nextInt(categories.size())));
@@ -169,10 +167,8 @@ public class MockDataGenerator implements Serializable {
      *            products to pick from
      * @return list of 1600 transient Purchase entities
      */
-    public static List<@NonNull Purchase> createMockPurchases(
-            List<@NonNull User> customers,
-            List<@NonNull User> approvers,
-            List<@NonNull Product> products) {
+    public static List<Purchase> createMockPurchases(List<User> customers,
+            List<User> approvers, List<Product> products) {
         if (customers.isEmpty()) {
             throw new IllegalArgumentException("customers must not be empty");
         }
@@ -187,14 +183,14 @@ public class MockDataGenerator implements Serializable {
         final int totalPurchases = 1600;
         final int dateCount = totalPurchases / purchasesPerDate;
 
-        List<@NonNull Purchase> purchases = new ArrayList<>(totalPurchases);
-        LocalDate today = LocalDate.now();
-        ZoneId zone = ZoneId.systemDefault();
+        var purchases = new ArrayList<Purchase>(totalPurchases);
+        var today = LocalDate.now();
+        var zone = ZoneId.systemDefault();
 
         for (int dayIndex = 0; dayIndex < dateCount; dayIndex++) {
-            LocalDate date = today.minusDays(dayIndex);
+            var date = today.minusDays(dayIndex);
             for (int i = 0; i < purchasesPerDate; i++) {
-                Purchase purchase = new Purchase();
+                var purchase = new Purchase();
 
                 var requester = customers.get(
                         (dayIndex * purchasesPerDate + i)
@@ -204,13 +200,12 @@ public class MockDataGenerator implements Serializable {
                 var approver = approvers.get(random.nextInt(approvers.size()));
                 purchase.setApprover(approver);
 
-                PurchaseStatus status = PurchaseStatus
-                        .values()[random
-                                .nextInt(PurchaseStatus.values().length)];
+                var status = PurchaseStatus.values()[random
+                        .nextInt(PurchaseStatus.values().length)];
                 purchase.setStatus(status);
 
                 // Two distinct times per day to make ordering stable.
-                LocalDateTime created = date.atTime(i == 0 ? 9 : 15,
+                var created = date.atTime(i == 0 ? 9 : 15,
                         random.nextInt(60));
                 var createdAt = created.atZone(zone).toInstant();
                 purchase.setCreatedAt(createdAt);
@@ -241,11 +236,11 @@ public class MockDataGenerator implements Serializable {
 
                 int lineCount = 1 + random.nextInt(3);
                 for (int lineIndex = 0; lineIndex < lineCount; lineIndex++) {
-                    Product product = products
+                    var product = products
                             .get(random.nextInt(products.size()));
-                    int quantity = 1 + random.nextInt(5);
+                    var quantity = 1 + random.nextInt(5);
 
-                    PurchaseLine line = new PurchaseLine();
+                    var line = new PurchaseLine();
                     line.setProduct(product);
                     line.setQuantity(quantity);
                     line.setUnitPrice(product.getPrice());

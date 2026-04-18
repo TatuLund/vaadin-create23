@@ -41,6 +41,7 @@ public class Purchase extends AbstractEntity {
     @NotNull(message = "{requester.required}")
     @ManyToOne(optional = false)
     @JoinColumn(name = "requester_id", nullable = false)
+    @Nullable
     private User requester;
 
     @Nullable
@@ -98,6 +99,7 @@ public class Purchase extends AbstractEntity {
         this.status = PurchaseStatus.PENDING;
     }
 
+    @Nullable
     public User getRequester() {
         return requester;
     }

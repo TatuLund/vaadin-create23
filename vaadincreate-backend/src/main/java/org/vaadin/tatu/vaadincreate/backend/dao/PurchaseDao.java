@@ -8,7 +8,6 @@ import java.util.Objects;
 
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -93,7 +92,7 @@ public class PurchaseDao {
      *            the maximum number of results
      * @return list of purchases
      */
-    public List<@NonNull Purchase> findByRequester(User requester, int offset,
+    public List<Purchase> findByRequester(User requester, int offset,
             int limit) {
         Objects.requireNonNull(requester, REQUESTER_MUST_NOT_BE_NULL);
         logger.debug(
@@ -149,7 +148,7 @@ public class PurchaseDao {
      *            the maximum number of results
      * @return list of purchases
      */
-    public List<@NonNull Purchase> findByApproverAndStatus(User approver,
+    public List<Purchase> findByApproverAndStatus(User approver,
             PurchaseStatus status, int offset, int limit) {
         Objects.requireNonNull(approver, APPROVER_MUST_NOT_BE_NULL);
         Objects.requireNonNull(status, "Status must not be null");
@@ -207,7 +206,7 @@ public class PurchaseDao {
      *            the maximum number of results
      * @return list of all purchases
      */
-    public List<@NonNull Purchase> findAll(int offset, int limit) {
+    public List<Purchase> findAll(int offset, int limit) {
         logger.debug("Fetching purchases by offset: {} and limit: {}", offset,
                 limit);
         var result = HibernateUtil.inSession(session -> {
@@ -274,7 +273,7 @@ public class PurchaseDao {
      *            the timestamp to filter from
      * @return list of decided purchases since the given time
      */
-    public List<@NonNull Purchase> findRecentlyDecidedByRequester(
+    public List<Purchase> findRecentlyDecidedByRequester(
             User requester, Instant since) {
         Objects.requireNonNull(requester, REQUESTER_MUST_NOT_BE_NULL);
         Objects.requireNonNull(since, "Since timestamp must not be null");
@@ -308,7 +307,7 @@ public class PurchaseDao {
         return result;
     }
 
-    private List<@NonNull Purchase> fetchPurchasesWithLinesByIds(
+    private List<Purchase> fetchPurchasesWithLinesByIds(
             Session session,
             List<Integer> purchaseIds) {
         if (purchaseIds.isEmpty()) {
@@ -336,7 +335,7 @@ public class PurchaseDao {
             }
         }
 
-        var ordered = new ArrayList<@NonNull Purchase>(purchaseIds.size());
+        var ordered = new ArrayList<Purchase>(purchaseIds.size());
         for (var id : purchaseIds) {
             var purchase = purchasesById.get(id);
             if (purchase != null) {
@@ -666,7 +665,6 @@ public class PurchaseDao {
         Objects.requireNonNull(cutoff, "Cutoff must not be null");
         logger.info("Purging purchases older than {}", cutoff);
         var result = HibernateUtil.inTransaction(session -> {
-            @SuppressWarnings("unchecked")
             var ids = session
                     .createQuery(
                             "select p.id from Purchase p where p.createdAt < :cutoff")
@@ -692,7 +690,7 @@ public class PurchaseDao {
      * Returns purchases created within the given range (inclusive lower bound,
      * exclusive upper bound) ordered by created-at descending and id ascending.
      */
-    public List<@NonNull Purchase> findAllByCreatedAtBetween(Instant from,
+    public List<Purchase> findAllByCreatedAtBetween(Instant from,
             Instant toExclusive) {
         Objects.requireNonNull(from, "From must not be null");
         Objects.requireNonNull(toExclusive, "To must not be null");

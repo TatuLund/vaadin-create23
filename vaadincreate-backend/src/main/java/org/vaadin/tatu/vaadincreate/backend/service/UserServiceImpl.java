@@ -3,9 +3,7 @@ package org.vaadin.tatu.vaadincreate.backend.service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -27,8 +25,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
     private final PurchaseDao purchaseDao;
-    private final Random random;
-    private boolean slow = false;
 
     @Nullable
     private static UserServiceImpl instance;
@@ -44,11 +40,6 @@ public class UserServiceImpl implements UserService {
     private UserServiceImpl() {
         this.userDao = new UserDao();
         this.purchaseDao = new PurchaseDao();
-        this.random = new Random();
-        var backendMode = System.getProperty("backend.mode");
-        if (backendMode != null && backendMode.equals("slow")) {
-            slow = true;
-        }
         var env = System.getProperty("generate.data");
         if (env == null || env.equals("true")) {
             var users = MockDataGenerator.createUsers();
@@ -60,7 +51,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(User user) {
         Objects.requireNonNull(user, "User must not be null");
-        randomWait(2);
         var existingUser = userDao.findByName(user.getName());
         if (existingUser != null && !existingUser.equals(user)) {
             throw new IllegalArgumentException(
@@ -73,7 +63,6 @@ public class UserServiceImpl implements UserService {
     public User updateUser(User editedUser,
             @Nullable User deputyApproverOrNull) {
         Objects.requireNonNull(editedUser, "User must not be null");
-        randomWait(2);
 
         // When activating or no change in active state, use plain update.
         if (editedUser.isActive() && editedUser.getRole() != Role.CUSTOMER) {
@@ -85,7 +74,9 @@ public class UserServiceImpl implements UserService {
             logger.warn(
                     "Attempted to last active admin deactivation: user {} (id={})",
                     editedUser.getName(), editedUser.getId());
-            var existingUser = userDao.getUserById(editedUser.getId());
+            var id = Objects.requireNonNull(editedUser.getId(),
+                    "User ID must not be null");
+            var existingUser = userDao.getUserById(id);
             if (existingUser != null && existingUser.isActive()
                     && userDao.countActiveAdmins() <= 1) {
                 throw new IllegalStateException(
@@ -119,11 +110,13 @@ public class UserServiceImpl implements UserService {
     // same user as the one being deactivated.
     private void validateDeputy(User editedUser, User deputy) {
         Objects.requireNonNull(deputy, "Deputy must not be null");
+        var id = Objects.requireNonNull(deputy.getId(),
+                "Deputy ID must not be null");
         logger.debug(
                 "Validating deputy approver {} (id={}) for user {} (id={})",
-                deputy.getName(), deputy.getId(), editedUser.getName(),
+                deputy.getName(), id, editedUser.getName(),
                 editedUser.getId());
-        var freshDeputy = userDao.getUserById(deputy.getId());
+        var freshDeputy = userDao.getUserById(id);
         if (freshDeputy == null || !freshDeputy.isActive()) {
             throw new IllegalArgumentException(
                     "Deputy approver must be active");
@@ -142,7 +135,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findByName(String name) {
         Objects.requireNonNull(name, "Name must not be null");
-        randomWait(1);
         User user = userDao.findByName(name);
         return wrapUserInOptional(user);
     }
@@ -156,14 +148,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Integer userId) {
         Objects.requireNonNull(userId, "User ID must not be null");
-        randomWait(1);
         return userDao.getUserById(userId);
     }
 
     @Override
     public void removeUser(Integer userId) {
         Objects.requireNonNull(userId, "User ID must not be null");
-        randomWait(1);
         try {
             userDao.removeUser(userId);
         } catch (RuntimeException e) {
@@ -176,36 +166,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<@NonNull User> getAllUsers() {
-        randomWait(3);
+    public List<User> getAllUsers() {
         return userDao.getAllUsers();
     }
 
     @Override
-    public List<@NonNull User> getUsersByRole(User.Role role) {
+    public List<User> getUsersByRole(User.Role role) {
         Objects.requireNonNull(role, "Role must not be null");
-        randomWait(2);
         return userDao.getUsersByRole(role);
     }
 
     @Override
-    public List<@NonNull User> getActiveApprovers(User excludeUser) {
+    public List<User> getActiveApprovers(User excludeUser) {
         Objects.requireNonNull(excludeUser, "ExcludeUser must not be null");
-        randomWait(1);
         return userDao.getActiveApprovers(excludeUser);
-    }
-
-    @SuppressWarnings("java:S2142")
-    private void randomWait(int count) {
-        if (!slow) {
-            return;
-        }
-        int wait = 10 + random.nextInt(20);
-        try {
-            Thread.sleep(wait * (long) count);
-        } catch (InterruptedException e) {
-            // NOP
-        }
     }
 
     @SuppressWarnings("null")

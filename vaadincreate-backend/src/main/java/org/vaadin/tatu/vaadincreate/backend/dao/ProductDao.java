@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.Hibernate;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -94,7 +93,7 @@ public class ProductDao {
      * @return a collection of products that belong to the specified category
      */
     @SuppressWarnings("java:S1192")
-    public Collection<@NonNull Product> getProductsByCategory(
+    public Collection<Product> getProductsByCategory(
             Category category) {
         Objects.requireNonNull(category, "Category must not be null");
         Objects.requireNonNull(category.getId(),
@@ -121,7 +120,7 @@ public class ProductDao {
      * 
      * @return a collection of all products available in the database.
      */
-    public Collection<@NonNull Product> getAllProducts() {
+    public Collection<Product> getAllProducts() {
         // Method returns all products from the database using HibernateUtil
         logger.debug("Fetching all Products");
         var result = HibernateUtil.inSession(session -> {
@@ -144,7 +143,7 @@ public class ProductDao {
      *
      * @return a collection of orderable Product objects
      */
-    public Collection<@NonNull Product> getOrderableProducts() {
+    public Collection<Product> getOrderableProducts() {
         logger.debug("Fetching orderable Products");
         var result = HibernateUtil.inSession(session -> {
             return session.createQuery(
@@ -199,7 +198,7 @@ public class ProductDao {
      *
      * @return a collection of all categories.
      */
-    public Collection<@NonNull Category> getAllCategories() {
+    public Collection<Category> getAllCategories() {
         logger.debug("Fetching all Categories");
         var result = HibernateUtil.inSession(session -> {
             return session.createQuery("from Category", Category.class).list();
@@ -218,7 +217,7 @@ public class ProductDao {
      *            a set of integer IDs representing the categories to be fetched
      * @return a set of Category objects corresponding to the provided IDs
      */
-    public Set<@NonNull Category> getCategoriesByIds(Set<Integer> ids) {
+    public Set<Category> getCategoriesByIds(Set<Integer> ids) {
         Objects.requireNonNull(ids, "Category IDs must not be null");
         logger.debug("Fetching Categories: {}", ids);
         var result = HibernateUtil.inSession(session -> {

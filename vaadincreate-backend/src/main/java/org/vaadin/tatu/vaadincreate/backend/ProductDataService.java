@@ -3,7 +3,6 @@ package org.vaadin.tatu.vaadincreate.backend;
 import java.util.Collection;
 import java.util.Set;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
@@ -22,21 +21,21 @@ public interface ProductDataService {
      * 
      * @return Collection of Product
      */
-    public abstract Collection<@NonNull Product> getAllProducts();
+    public abstract Collection<Product> getAllProducts();
 
     /**
      * Get all orderable products (AVAILABLE and stock > 0).
      * 
      * @return Collection of orderable Product
      */
-    public abstract Collection<@NonNull Product> getOrderableProducts();
+    public abstract Collection<Product> getOrderableProducts();
 
     /**
      * Get all Categories in the database.
      * 
      * @return Collection of Category
      */
-    public abstract Collection<@NonNull Category> getAllCategories();
+    public abstract Collection<Category> getAllCategories();
 
     /**
      * Updates or saves a new Product. If {@link Product#getId()} is -1 product
@@ -94,7 +93,7 @@ public interface ProductDataService {
      *            the IDs of the categories to find
      * @return the categories with the given IDs
      */
-    public abstract Set<@NonNull Category> findCategoriesByIds(
+    public abstract Set<Category> findCategoriesByIds(
             Set<Integer> categories);
 
     /**

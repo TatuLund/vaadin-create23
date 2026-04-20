@@ -1,8 +1,7 @@
 package org.vaadin.tatu.vaadincreate.locking;
 
-import javax.annotation.Nullable;
-
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.backend.data.AbstractEntity;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
 

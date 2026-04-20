@@ -2,9 +2,8 @@ package org.vaadin.tatu.vaadincreate.common;
 
 import java.lang.reflect.Method;
 
-import javax.annotation.Nullable;
-
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.observability.Telemetry;

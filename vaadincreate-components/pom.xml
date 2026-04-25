@@ -17,8 +17,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>17</maven.compiler.source>
-		<maven.compiler.target>17</maven.compiler.target>
+		<maven.compiler.release>17</maven.compiler.release>
 
 		<!-- ZIP Manifest fields -->
 		<Implementation-Version>${project.version}</Implementation-Version>
@@ -196,6 +195,7 @@
 					<!-- You are free to mark this as permanently ignored in
 					Eclipse -->
 					<execution>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>resources</goal>
 							<goal>update-widgetset</goal>

@@ -1,11 +1,13 @@
 # Storefront & Purchases Epic – Product Requirements
 
+Terminology in this document follows the glossary in [Ubiquitous Language](UbiquitousLanguage.md). Where existing class names, view names, or legacy sample wording differ, the glossary defines the preferred business term.
+
 ## 0. Context & Goals
 
 We add an **internal purchase tool** on top of the existing Vaadin demo:
 
-- Employees (role `CUSTOMER`) create purchase requests for books.
-- Supervisors (`USER`) and admins (`ADMIN`) approve or reject requests.
+- Employees (role `CUSTOMER`) act as requesters and create purchase requests for products.
+- Supervisors (`USER`) and admins (`ADMIN`) act as approvers and approve or reject purchase requests.
 - Approval is the **business checkout** point where stock is decremented.
 - We maintain a reliable **audit trail** (who requested, who approved, when, what address, what prices).
 
@@ -47,17 +49,17 @@ Introduce backend domain model and service interface for purchases, without chan
 
 2. **`PurchaseStatus`** enum
    - Values:
-     - `PENDING` – waiting for supervisor decision.
-     - `COMPLETED` – approved, stock decremented; workflow finished.
-     - `REJECTED` – explicitly rejected, no stock change.
-     - `CANCELLED` - there were items missing in the inventory at the time of approval
+    - `PENDING` – waiting for approver decision.
+    - `COMPLETED` – approved, stock decremented; workflow finished.
+    - `REJECTED` – explicitly rejected, no stock change.
+    - `CANCELLED` - there were items missing in the inventory at the time of approval
    - No “reservation” / “pre-booking” statuses in this epic.
 
 3. **`Purchase`** entity
    - Fields:
      - `id` – primary key, inherited from AbstractEntity
-     - `requester` – `@ManyToOne User` (employee / `CUSTOMER`).
-     - `approver` – `@ManyToOne User` (supervisor / `USER` or `ADMIN`).
+     - `requester` – `@ManyToOne User` (user acting as requester, typically role `CUSTOMER`).
+     - `approver` – `@ManyToOne User` (assigned approver, typically role `USER` or `ADMIN`).
        - May be `null` while `PENDING` (not yet decided).
      - `status` – `PurchaseStatus`, default `PENDING`.
      - `createdAt` – `Instant`, set when purchase is first created.
@@ -78,7 +80,7 @@ Introduce backend domain model and service interface for purchases, without chan
    - Fields:
      - `id` – primary key, inherited from AbstractEntity
      - `purchase` – `@ManyToOne Purchase` (non-null).
-     - `product` – `@ManyToOne Product` (book).
+     - `product` – `@ManyToOne Product` (legacy sample may represent a book).
      - `quantity` – `int`, positive.
      - `unitPrice` – `BigDecimal`:
        - Snapshot of price at *request creation time*.
@@ -88,7 +90,7 @@ Introduce backend domain model and service interface for purchases, without chan
    - **Do not** persist `lineTotal`.
 
 5. **`UserSupervisor`** entity (mapping)
-   - Purpose: maps **employee → default supervisor**.
+   - Purpose: maps **requester/employee → default supervisor**.
    - Fields:
      - `id` – primary key, inherited from AbstractEntity
      - `employee` – `@ManyToOne User` (role `CUSTOMER`).
@@ -106,7 +108,7 @@ Introduce backend domain model and service interface for purchases, without chan
      - status,
      - paging (`offset`, `limit`).
    - Additional queries used by the UI:
-     - Find default supervisor for an employee (`UserSupervisor` mapping).
+     - Find default supervisor for a requester/employee (`UserSupervisor` mapping).
      - Find recently decided purchases for login-time notification.
 
 7. **`PurchaseService` interface** (singleton service)
@@ -163,7 +165,7 @@ Introduce `StorefrontView` for `CUSTOMER` role with a **wizard** that:
 
 - Builds an in-memory cart,
 - Captures delivery address,
-- Captures supervisor,
+- Captures the selected supervisor/approver,
 - Creates a **PENDING** `Purchase` via `PurchaseService`.
 
 No approval UI, no stock changes yet.
@@ -190,9 +192,9 @@ No approval UI, no stock changes yet.
 
    Steps:
 
-   1. **Select books & quantities**
-      - Shows orderable products via backend `ProductDataService.getOrderableProducts()`.
-      - UI is a multi-select grid:
+  1. **Select products & quantities**
+    - Shows orderable products via backend `ProductDataService.getOrderableProducts()`.
+    - UI is a multi-select grid:
         - Select one or more products.
         - Quantity input is shown for selected rows.
         - Footer shows total price and total quantity.
@@ -255,14 +257,14 @@ No approval UI, no stock changes yet.
 
 ---
 
-## 3. Step 3 – Customer “My Purchases” History & Login-time Notifications
+## 3. Step 3 – Requester “My Purchases” History & Login-time Notifications
 
 ### 3.1 Scope
 
 Extend backend and UI so that:
 
-- Customers see a **paged history** of their own purchases and statuses.
-- On login, customers are informed about **status changes** (completed/rejected/cancelled) since their last session.
+- Requesters see a **paged history** of their own purchases and statuses.
+- On login, requesters are informed about **status changes** (completed/rejected/cancelled) since their last session.
 
 ### 3.2 Requirements
 
@@ -340,8 +342,8 @@ Extend backend and UI so that:
 
 ### 3.4 Acceptance Criteria
 
-- Customer can see their own purchase history with correct statuses and amounts.
-- On entering Storefront, customer gets a status update tray notification when there have been new `COMPLETED`/`REJECTED`/`CANCELLED` decisions since the last check.
+- Requester can see their own purchase history with correct statuses and amounts.
+- On entering Storefront, the requester gets a status update tray notification when there have been new `COMPLETED`/`REJECTED`/`CANCELLED` decisions since the last check.
 - Summary updates `lastStatusCheck` correctly.
  - Storefront history and login-time summary behavior are covered by UI unit tests similar to current views.
 
@@ -361,7 +363,7 @@ Introduce reusable history component and a top-level `PurchasesView` (for USER/A
 
 2. It must support multiple **modes** via backend enum `PurchaseHistoryMode`:
 
-   - `MY_PURCHASES` – for customer:
+   - `MY_PURCHASES` – for requester:
      - Filter: purchases where `requester = currentUser`.
    - `ALL` – for admin history:
      - No filter (or broader org-based filter if needed).
@@ -639,9 +641,9 @@ Replace the placeholder “Stats” tab in `PurchasesView` with real purchase st
 
 ### 7.1 Scope
 
-When both employee and supervisor are online:
+When both requester and approver are online:
 
-- Employee’s Storefront history updates live when a supervisor approves/rejects a purchase.
+- The requester’s Storefront history updates live when the assigned approver approves/rejects a purchase.
 - No backend EventBus refactor; events are published from UI presenters.
 
 ### 7.2 Requirements
@@ -662,7 +664,7 @@ these are not data bearers. They should just have Purchase id.
 
 3. In `StorefrontPresenter`:
 
-   - After a customer submits a purchase for approval (service call succeeds):
+  - After a requester submits a purchase for approval (service call succeeds):
      - Publish `PurchaseSavedEvent` (purchase id only) on existing UI EventBus.
 
 4. In `PurchaseHistoryPresenter` (which is also used in `StorefrontView`):
@@ -689,9 +691,9 @@ these are not data bearers. They should just have Purchase id.
 ### 7.3 Acceptance Criteria
 
 - While both are online:
-  - Employee sees history updated and notification shortly after supervisor action.
+  - The requester sees history updated and a notification shortly after approver action.
 - Desired side effect
-  - When customer submits a purchase the purchase history is automatically refreshed
+  - When the requester submits a purchase the purchase history is automatically refreshed
   - Assert this in StorefrontTest
 - When offline:
   - Behavior remains as in Step 3 (login-time summary).
@@ -816,7 +818,7 @@ Users cannot be deleted safely once referenced by `Purchase` (requester/approver
 ### 8.4 Edge Cases
 
 - Deactivating a `CUSTOMER`:
-  - Allowed; existing purchases remain visible in history but the customer cannot log in.
+  - Allowed; existing purchases remain visible in history but the requester cannot log in.
 
 ### 8.5 Acceptance Criteria
 
@@ -918,6 +920,6 @@ Purchase history must not be retained forever. Admins need a simple way to ident
 - When no old purchases exist, admin sees no purge notification and no `Purge` button.
 - Clicking `Purge` requires confirmation.
 - Confirming purge deletes purchases older than 24 months and refreshes the grid; deleted count is shown.
-- Purge removes only purchases + purchase lines; users/customers/products remain intact.
+- Purge removes only purchases + purchase lines; users and products remain intact.
 
 ---

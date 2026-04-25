@@ -2,15 +2,17 @@
 
 ## 1. Overview
 
-VaadinCreate is a sample inventory and administration application for managing books, users, categories, and system messages, with supporting statistics and basic multi-user coordination. This PRD captures the functional and behavioral requirements inferred from the existing automated tests, in a framework-agnostic way, so the application can be reimplemented or migrated (for example to newer Vaadin versions) while preserving observable behavior.
+VaadinCreate is a sample inventory and administration application for managing products, users, categories, and system messages, with supporting statistics and basic multi-user coordination. This PRD captures the functional and behavioral requirements inferred from the existing automated tests, in a framework-agnostic way, so the application can be reimplemented or migrated (for example to newer Vaadin versions) while preserving observable behavior.
 
 This document deliberately avoids framework-specific APIs, focusing instead on views, flows, events, and user-visible behavior.
+
+Terminology in this PRD follows the glossary in [Ubiquitous Language](UbiquitousLanguage.md). Where legacy UI text or test names differ, the glossary defines the preferred business term.
 
 
 ## 2. Goals and Non-Functional Requirements
 
 - Provide a small but realistic back-office UI for:
-  - Managing a catalog of books/products.
+  - Managing a catalog of products.
   - Managing users and their roles.
   - Managing categories used to organize the catalog.
   - Viewing statistics about the catalog.
@@ -37,6 +39,7 @@ See also:
 
 - [Application architecture](ApplicationArchitecture.md)
 - [Data model](DataModel.md)
+- [Ubiquitous language](UbiquitousLanguage.md)
 - [UX wireframes](WireFrames.md)
 - [Style guide](StyleGuide.md)
 
@@ -49,17 +52,17 @@ See also:
 - **Views / Sections**
   - Login view (unauthenticated entry point).
   - About view (default landing view after login).
-  - Inventory (Books) view.
+  - Inventory (Products) view.
   - Statistics view.
-  - Storefront view (for purchase requests by customers/employees).
-  - Purchases view (for supervisors/admins) with tabs for history, approvals, and purchase statistics.
+  - Storefront view (for purchase requests by requesters in customer/employee roles).
+  - Purchases view (for approvers/supervisors/admins) with tabs for history, approvals, and purchase statistics.
   - Admin view, containing:
     - User Management sub-view.
     - Category Management sub-view.
 
 - **Services & Infrastructure (conceptual)**
   - Authentication & access control service (current user, role checks).
-  - Product service (books CRUD, categories, statistics data).
+  - Product service (product CRUD, categories, statistics data).
   - User service (users CRUD, role changes).
   - Category service (categories CRUD and events).
   - Event bus for domain events (message events, user updates, locking, category updates, product updates).
@@ -148,7 +151,7 @@ See also:
 
 - The main layout shall expose menu entries for at least:
   - About.
-  - Inventory (Books).
+  - Inventory (Products).
   - Statistics.
   - Storefront (visible for customer/employee role).
   - Purchases (visible for supervisor/admin roles).
@@ -216,7 +219,7 @@ See also:
   - Navigation to the admin view shall be denied; the error view shall be shown instead.
 
 
-## 8. Inventory / Books View
+## 8. Inventory / Products View
 
 ### 8.1 Grid Display
 
@@ -643,7 +646,7 @@ See also:
 
 ### 17.1 Access and entry behavior
 
-- The application shall provide a Storefront view intended for users acting as customers/employees who create purchase requests.
+- The application shall provide a Storefront view intended for users acting as requesters in customer/employee roles who create purchase requests.
 - On entering the Storefront view:
   - A regular notification titled exactly "Status Updates" shall be shown.
   - An assistive notification announcing "Storefront opened" shall be emitted.

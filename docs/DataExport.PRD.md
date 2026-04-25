@@ -1,5 +1,7 @@
 # Data Export Feature PRD (Admin Purchase History)
 
+Terminology in this document follows the glossary in [Ubiquitous Language](UbiquitousLanguage.md). Where existing class names or technical field names differ, the glossary defines the preferred business term.
+
 ## 1. Overview
 
 This document specifies the Purchase History Data Export feature for admin users.

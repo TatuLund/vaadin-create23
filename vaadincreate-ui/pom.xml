@@ -12,10 +12,6 @@
     <packaging>war</packaging>
     <name>VaadinCreate UI</name>
 
-    <prerequisites>
-        <maven>3</maven>
-    </prerequisites>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>

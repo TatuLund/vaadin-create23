@@ -9,11 +9,8 @@
 	<version>3.0-SNAPSHOT</version>
 	<name>VaadinCreate 23 Root Project</name>
 
-	<prerequisites>
-		<maven>3</maven>
-	</prerequisites>
-
 	<properties>
+		<maven.minimum.version>3</maven.minimum.version>
 		<vaadin.version>8.31.0</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<vaadin.gwt.version>2.13.0</vaadin.gwt.version>
@@ -23,7 +20,7 @@
 		<jetty.plugin.version>12.0.15</jetty.plugin.version>
 		<jspecify.version>1.0.0</jspecify.version>
 		<servlet.version>4.0.1</servlet.version>
-		<selenium.version>4.41.0</selenium.version>
+		<selenium.version>4.43.0</selenium.version>
 		<spotless.version>3.2.1</spotless.version>
 		<spotless.skip>false</spotless.skip>
 	</properties>
@@ -64,6 +61,27 @@
 		</pluginManagement>
 
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.5.0</version>
+				<executions>
+					<execution>
+						<id>enforce-maven-version</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>${maven.minimum.version}</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<!-- Root-only configuration so `mvn spotless:check` works at the repo root.
 			     Modules should declare the plugin (no config) to pick up pluginManagement. -->
 			<plugin>

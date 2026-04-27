@@ -74,8 +74,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         test($(FilterField.class).id("filter-field")).setValue("Draft book");
 
         // THEN: The book is found on the first row of the grid and the
-        // form is
-        // shown
+        // form is shown
         test(grid).click(1, 0);
         var book = test(grid).item(0);
         var id = book.getId();
@@ -202,8 +201,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertNull(service.findDraft(user));
 
         // THEN: The empty form is merged with the draft data and the
-        // form is
-        // marked as dirty
+        // form is marked as dirty
         assertEquals("Modified book",
                 $(form, TextField.class).id("product-name").getValue());
         assertTrue($(form, TextField.class).id("product-name").getStyleName()
@@ -318,8 +316,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
                 .contains("Edited book"));
 
         // THEN: The orignal stock count shown in the description is the
-        // one by
-        // the other user
+        // one by the other user
         assertEquals(Integer.valueOf(0),
                 $(form, NumberField.class).id("stock-count").getValue());
         assertTrue($(form, NumberField.class).id("stock-count").getStyleName()
@@ -394,8 +391,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertNotNull(service.findDraft(user));
 
         // WHEN: Simulating other user deleting the book and starting
-        // the UI
-        // again
+        // the UI again
         service.deleteProduct(book.getId());
 
         ui = new VaadinCreateUI();

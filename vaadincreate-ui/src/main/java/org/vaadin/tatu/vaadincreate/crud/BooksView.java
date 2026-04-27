@@ -52,7 +52,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * operations and controlling the view based on events from outside.
  */
 @NullMarked
-@SuppressWarnings({ "serial", "java:S2160" })
+@SuppressWarnings({ "serial", "java:S2160", "java:S110" })
 @RolesPermitted({ Role.USER, Role.ADMIN })
 public class BooksView extends CssLayout implements VaadinCreateView {
 
@@ -83,6 +83,8 @@ public class BooksView extends CssLayout implements VaadinCreateView {
     @Nullable
     private UI ui;
 
+    private CssLayout gridWrapper;
+
     public BooksView() {
         setSizeFull();
         addStyleName(VaadinCreateTheme.BOOKVIEW);
@@ -105,7 +107,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         registerFormListeners();
 
         var barAndGridLayout = new VerticalLayout();
-        var gridWrapper = new CssLayout();
+        gridWrapper = new CssLayout();
         gridWrapper.setSizeFull();
         gridWrapper.addStyleName(VaadinCreateTheme.BOOKVIEW_GRIDWRAPPER);
         gridWrapper.addComponents(noMatches, grid, fakeGrid);
@@ -304,9 +306,6 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         if (!accessControl.isUserInRole(Role.ADMIN)) {
             grid.setSelectionMode(SelectionMode.NONE);
             grid.setReadOnly(true);
-            form.setVisible(false);
-        } else {
-            form.setVisible(false);
         }
         presenter.requestUpdateProducts();
     }
@@ -361,7 +360,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
             logger.info("Updating products");
             grid.setItems(products);
             grid.setVisible(true);
-            fakeGrid.setVisible(false);
+            gridWrapper.removeComponent(fakeGrid);
             // Open form with url parameter based book
             presenter.enter(params);
         });

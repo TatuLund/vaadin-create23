@@ -69,7 +69,8 @@ public abstract class AbstractUITest extends UIUnitTest {
         assertFalse(grid.isVisible());
 
         var fake = $(layout, FakeGrid.class).first();
-        waitWhile(fake::isVisible);
+        assertNotNull(fake);
+        waitWhile(() -> !grid.isVisible(), 1);
         assertTrue(grid.isVisible());
     }
 

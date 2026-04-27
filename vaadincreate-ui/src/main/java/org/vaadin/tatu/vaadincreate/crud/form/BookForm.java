@@ -130,6 +130,7 @@ public class BookForm extends Composite implements HasI18N {
     @SuppressWarnings("java:S5669")
     public BookForm() {
         setCompositionRoot(sidePanel);
+        setVisible(false);
         buildForm();
 
         binder = new BeanValidationBinder<>(Product.class);

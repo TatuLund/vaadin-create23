@@ -11,7 +11,7 @@
 
 	<properties>
 		<maven.minimum.version>3</maven.minimum.version>
-		<vaadin.version>8.31.0</vaadin.version>
+		<vaadin.version>8.31.1</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<vaadin.gwt.version>2.13.0</vaadin.gwt.version>
 		<logback.version>1.5.25</logback.version>

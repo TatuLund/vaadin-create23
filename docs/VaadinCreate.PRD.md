@@ -674,6 +674,8 @@ The Storefront view shall include a multi-step purchase wizard with explicit Nex
     - City
     - Country
   - On entering Step 2, keyboard focus shall move to the Street field.
+  - On entering Step 2, if the current requester has a prior purchase history, the address fields shall be prefilled from the delivery address of that requester's latest prior purchase.
+  - If the current requester has no prior purchases, no default delivery address shall be applied.
   - Address fields should expose browser autofill/autocomplete semantics where applicable (for example street address, postal code, city/locality, country).
   - Attempting to proceed with required address fields missing shall show a notification:
     - "Please fill all required fields"
@@ -681,8 +683,13 @@ The Storefront view shall include a multi-step purchase wizard with explicit Nex
 - **Step 3: Supervisor selection**
   - The wizard shall require selecting a supervisor before proceeding.
   - On entering Step 3, keyboard focus shall move to the supervisor selection control.
+  - On entering Step 3, if the current requester has a prior purchase history, the supervisor selection shall default to the approver from that requester's latest prior purchase.
+  - If the current requester has no prior purchases, no default supervisor shall be selected.
   - Attempting to proceed without selecting a supervisor shall show a notification:
     - "Please select a supervisor"
+
+- The purchase wizard shall resolve default delivery address and default supervisor through presenter/service logic rather than direct view-level access to purchase data.
+- The presenter boundary shall provide optional lookups for the current requester's default delivery address and default supervisor.
 
 - **Step 4: Review & Submit**
   - Entering the review step shall emit an assistive notification whose text contains "Order Summary".
@@ -719,6 +726,12 @@ The Storefront view shall show a purchase history grid with a stable id `purchas
 
 - When the customer’s purchase history receives a purchase-status-changed event for a purchase belonging to the current user, the history grid shall refresh the affected purchase and show a notification about the status change.
 - When the wizard submits a new purchase successfully, the purchase history grid shall refresh and show the newly created `PENDING` purchase.
+
+### 17.6 Behavioral requirements validated by tests
+
+- Storefront baseline tests that verify behavior without purchase-history defaults shall use seeded requester data with no prior purchases.
+- Separate storefront tests shall cover requesters with existing purchase history and verify that entering Step 2 prefills the latest delivery address and entering Step 3 preselects the latest approver as supervisor.
+- Storefront tests that depend on existing purchase history or mutate purchase-history state shall be isolated from the no-history baseline coverage.
 
 
 ## 18. Purchases (Supervisor/Admin History, Approvals, Stats)

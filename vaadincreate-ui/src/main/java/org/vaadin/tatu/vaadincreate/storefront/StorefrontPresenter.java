@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
@@ -67,6 +68,31 @@ public class StorefrontPresenter implements Serializable {
         var admins = getUserService().getUsersByRole(Role.ADMIN);
         users.addAll(admins);
         return users;
+    }
+
+    /**
+     * Resolves the default delivery address for the requester from the latest
+     * purchase, if one exists.
+     *
+     * @param requester
+     *            the user who created the purchases
+     * @return optional snapshot of the latest delivery address
+     */
+    public Optional<Address> getDefaultAddress(User requester) {
+        return findLatestPurchase(requester).map(Purchase::getDeliveryAddress)
+                .map(this::copyAddress);
+    }
+
+    /**
+     * Resolves the default supervisor for the requester from the latest
+     * purchase, if one exists.
+     *
+     * @param requester
+     *            the user who created the purchases
+     * @return optional latest approver
+     */
+    public Optional<User> getDefaultSupervisor(User requester) {
+        return findLatestPurchase(requester).map(Purchase::getApprover);
     }
 
     /**
@@ -146,6 +172,15 @@ public class StorefrontPresenter implements Serializable {
     public void updateLastStatusCheck(User user, Instant timestamp) {
         user.setLastStatusCheck(timestamp);
         getUserService().updateUser(user);
+    }
+
+    private Optional<Purchase> findLatestPurchase(User requester) {
+        return fetchMyPurchases(requester, 0, 1).stream().findFirst();
+    }
+
+    private Address copyAddress(Address address) {
+        return new Address(address.getStreet(), address.getPostalCode(),
+                address.getCity(), address.getCountry());
     }
 
     private ProductDataService getProductService() {

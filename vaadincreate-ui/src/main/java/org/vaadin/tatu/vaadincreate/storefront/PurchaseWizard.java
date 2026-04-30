@@ -209,6 +209,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
     private void showStep2() {
         stepTitle.setValue(getTranslation(I18n.Storefront.STEP2_TITLE));
+        applyDefaultAddressIfAvailable();
 
         addressForm = new AddressForm(address);
         stepContent.addComponent(addressForm);
@@ -217,6 +218,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
 
     private void showStep3() {
         stepTitle.setValue(getTranslation(I18n.Storefront.STEP3_TITLE));
+        applyDefaultSupervisorIfAvailable();
 
         supervisorComboBox = new ComboBox<>(
                 getTranslation(I18n.Storefront.SUPERVISOR));
@@ -235,6 +237,41 @@ public class PurchaseWizard extends Composite implements HasI18N {
         stepContent.addComponent(supervisorComboBox);
         stepContent.setMargin(true);
         supervisorComboBox.focus();
+    }
+
+    private void applyDefaultAddressIfAvailable() {
+        if (!isAddressEmpty()) {
+            return;
+        }
+        presenter.getDefaultAddress(getCurrentUser())
+                .ifPresent(this::copyAddressToWizardState);
+    }
+
+    private void applyDefaultSupervisorIfAvailable() {
+        if (selectedSupervisor != null) {
+            return;
+        }
+        selectedSupervisor = presenter.getDefaultSupervisor(getCurrentUser())
+                .orElse(null);
+    }
+
+    private User getCurrentUser() {
+        return CurrentUser.get().orElseThrow(
+                () -> new IllegalStateException("User must be logged in"));
+    }
+
+    private boolean isAddressEmpty() {
+        return address.getStreet().isBlank()
+                && address.getPostalCode().isBlank()
+                && address.getCity().isBlank()
+                && address.getCountry().isBlank();
+    }
+
+    private void copyAddressToWizardState(Address defaultAddress) {
+        address.setStreet(defaultAddress.getStreet());
+        address.setPostalCode(defaultAddress.getPostalCode());
+        address.setCity(defaultAddress.getCity());
+        address.setCountry(defaultAddress.getCountry());
     }
 
     private void showStep4() {
@@ -407,6 +444,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         }
     }
 
+    @SuppressWarnings("java:S110")
     static class AddressForm extends FormLayout
             implements HasAttributes<AddressForm>, HasI18N {
 
@@ -472,6 +510,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         }
     }
 
+    @SuppressWarnings("java:S110")
     static class ATextField extends TextField
             implements HasAttributes<ATextField> {
 

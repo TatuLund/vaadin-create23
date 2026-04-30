@@ -182,10 +182,10 @@ public abstract class Html<T extends Html<T>> {
             sb.append(escape(text));
         }
         for (var child : children) {
-            if (child instanceof Raw) {
-                sb.append(((Raw) child).html);
-            } else if (child instanceof Html) {
-                sb.append(((Html<?>) child).build());
+            if (child instanceof Raw raw) {
+                sb.append(raw.html);
+            } else if (child instanceof Html<?> html) {
+                sb.append(html.build());
             }
         }
         sb.append("</").append(name).append('>');

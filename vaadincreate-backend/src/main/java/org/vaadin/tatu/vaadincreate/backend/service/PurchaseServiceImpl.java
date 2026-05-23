@@ -393,6 +393,13 @@ public class PurchaseServiceImpl implements PurchaseService {
         return purchaseDao.findFirstMatchingRowIndex(fromInclusive);
     }
 
+    @Override
+    @Nullable
+    public Purchase findLastPurchaseByRequester(User requester) {
+        Objects.requireNonNull(requester, REQUESTER_MUST_NOT_BE_NULL);
+        return purchaseDao.findLastPurchaseByRequester(requester);
+    }
+
     @SuppressWarnings("null")
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 }

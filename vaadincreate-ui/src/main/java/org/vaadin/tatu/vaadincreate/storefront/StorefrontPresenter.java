@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
@@ -67,6 +68,38 @@ public class StorefrontPresenter implements Serializable {
         var admins = getUserService().getUsersByRole(Role.ADMIN);
         users.addAll(admins);
         return users;
+    }
+
+    /**
+     * Gets the default delivery address for the given requester based on their
+     * most recent purchase. Returns null if no purchases exist.
+     *
+     * @param requester
+     *            the user requesting defaults
+     * @return the Address from last purchase, or null
+     */
+    @Nullable
+    public Address getDefaultAddress(User requester) {
+        Objects.requireNonNull(requester, "Requester must not be null");
+        var lastPurchase = getPurchaseService().findLastPurchaseByRequester(
+                requester);
+        return lastPurchase != null ? lastPurchase.getDeliveryAddress() : null;
+    }
+
+    /**
+     * Gets the default supervisor (approver) for the given requester based on
+     * their most recent purchase. Returns null if no purchases exist.
+     *
+     * @param requester
+     *            the user requesting defaults
+     * @return the approver from last purchase, or null
+     */
+    @Nullable
+    public User getDefaultSupervisor(User requester) {
+        Objects.requireNonNull(requester, "Requester must not be null");
+        var lastPurchase = getPurchaseService().findLastPurchaseByRequester(
+                requester);
+        return lastPurchase != null ? lastPurchase.getApprover() : null;
     }
 
     /**

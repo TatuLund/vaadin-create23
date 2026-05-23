@@ -136,6 +136,35 @@ public class PurchaseDao {
     }
 
     /**
+     * Finds the most recent purchase for a given requester, ordered by
+     * created-at descending. Returns null if no purchases exist.
+     *
+     * @param requester
+     *            the user who created the purchases
+     * @return the latest Purchase, or null if none found
+     */
+    @Nullable
+    public Purchase findLastPurchaseByRequester(User requester) {
+        Objects.requireNonNull(requester, REQUESTER_MUST_NOT_BE_NULL);
+        logger.debug("Fetching last purchase for requester: ({})",
+                requester.getId());
+        return HibernateUtil.inSession(session -> {
+            @Nullable
+            Purchase purchase = session.createQuery(
+                    "select p from Purchase p where p.requester = :requester order by p.createdAt desc",
+                    Purchase.class).setParameter(PURCHASE_REQUESTER_PARAM,
+                            requester)
+                    .setMaxResults(1).uniqueResult();
+            if (purchase != null) {
+                Hibernate.initialize(purchase.getLines());
+                Hibernate.initialize(purchase.getRequester());
+                Hibernate.initialize(purchase.getApprover());
+            }
+            return purchase;
+        });
+    }
+
+    /**
      * Finds purchases by approver and status.
      *
      * @param approver

@@ -210,6 +210,19 @@ public class PurchaseWizard extends Composite implements HasI18N {
     private void showStep2() {
         stepTitle.setValue(getTranslation(I18n.Storefront.STEP2_TITLE));
 
+        // Prefill address from last purchase if available
+        var currentUser = CurrentUser.get().orElse(null);
+        if (currentUser != null) {
+            @Nullable
+            Address defaultAddress = presenter.getDefaultAddress(currentUser);
+            if (defaultAddress != null) {
+                address.setStreet(defaultAddress.getStreet());
+                address.setPostalCode(defaultAddress.getPostalCode());
+                address.setCity(defaultAddress.getCity());
+                address.setCountry(defaultAddress.getCountry());
+            }
+        }
+
         addressForm = new AddressForm(address);
         stepContent.addComponent(addressForm);
         stepContent.setMargin(true);
@@ -227,9 +240,19 @@ public class PurchaseWizard extends Composite implements HasI18N {
         supervisorComboBox.setItems(supervisors);
         supervisorComboBox.setItemCaptionGenerator(User::getName);
 
-        // Pre-select if already set
+        // Prefill default supervisor from last purchase if available
+        var currentUser = CurrentUser.get().orElse(null);
+        @Nullable
+        User defaultSupervisor = null;
+        if (currentUser != null) {
+            defaultSupervisor = presenter.getDefaultSupervisor(currentUser);
+        }
+
+        // Pre-select: user's explicit choice takes priority, then default
         if (selectedSupervisor != null) {
             supervisorComboBox.setValue(selectedSupervisor);
+        } else if (defaultSupervisor != null) {
+            supervisorComboBox.setValue(defaultSupervisor);
         }
 
         stepContent.addComponent(supervisorComboBox);

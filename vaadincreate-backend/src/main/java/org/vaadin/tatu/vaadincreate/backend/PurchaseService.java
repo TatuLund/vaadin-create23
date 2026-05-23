@@ -305,6 +305,16 @@ public interface PurchaseService {
     Integer resolveFirstMatchingRowIndex(Instant fromInclusive);
 
     /**
+     * Finds the most recent purchase for a given requester.
+     *
+     * @param requester
+     *            the user who created the purchases
+     * @return the latest Purchase, or null if none found
+     */
+    @Nullable
+    Purchase findLastPurchaseByRequester(User requester);
+
+    /**
      * Gets the singleton instance of the PurchaseService.
      *
      * @return the PurchaseService instance

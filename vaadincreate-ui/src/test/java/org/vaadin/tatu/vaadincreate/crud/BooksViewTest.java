@@ -109,8 +109,7 @@ public class BooksViewTest extends AbstractUITest {
         // WHEN: Pressing page down
         test(form).shortcut(KeyCode.PAGE_DOWN);
         // THEN: Form is still shown and populated with the second row
-        // data and
-        // that row is selected
+        // data and that row is selected
         assertTrue(form.isShown());
         assertEquals(grid.getSelectedRow(), form.getProduct());
         then_form_is_filled_with_values_from_grid_row(1);
@@ -118,8 +117,7 @@ public class BooksViewTest extends AbstractUITest {
         // WHEN: Pressing page down
         test(form).shortcut(KeyCode.PAGE_DOWN);
         // THEN: Form is still shown and populated with the third row
-        // data and
-        // that row is selected
+        // data and that row is selected
         assertTrue(form.isShown());
         assertEquals(grid.getSelectedRow(), form.getProduct());
         then_form_is_filled_with_values_from_grid_row(2);
@@ -127,8 +125,7 @@ public class BooksViewTest extends AbstractUITest {
         // WHEN: Pressing page up
         test(form).shortcut(KeyCode.PAGE_UP);
         // THEN: Form is still shown and populated with the second row
-        // data and
-        // that row is selected
+        // data and that row is selected
         assertTrue(form.isShown());
         assertEquals(grid.getSelectedRow(), form.getProduct());
         then_form_is_filled_with_values_from_grid_row(1);
@@ -136,8 +133,7 @@ public class BooksViewTest extends AbstractUITest {
         // WHEN: Pressing page up
         test(form).shortcut(KeyCode.PAGE_UP);
         // THEN: Form is still shown and populated with the first row
-        // data and
-        // that row is selected
+        // data and that row is selected
         assertTrue(form.isShown());
         assertEquals(grid.getSelectedRow(), form.getProduct());
         then_form_is_filled_with_values_from_grid_row(0);
@@ -145,8 +141,7 @@ public class BooksViewTest extends AbstractUITest {
         // WHEN: Pressing page up
         test(form).shortcut(KeyCode.PAGE_UP);
         // THEN: Form is still shown and still populated with the first
-        // row data
-        // as it is the first row and that row is still selected
+        // row data as it is the first row and that row is still selected
         assertTrue(form.isShown());
         assertEquals(grid.getSelectedRow(), form.getProduct());
         then_form_is_filled_with_values_from_grid_row(0);
@@ -258,8 +253,7 @@ public class BooksViewTest extends AbstractUITest {
         assertFalse($(form, Button.class).id("save-button").isEnabled());
 
         // WHEN: Filling the form with wrong stock count and
-        // availability and
-        // clicking save button
+        // availability and clicking save button
         test($(form, TextField.class).id("product-name")).setValue("Te");
         test($(form, AvailabilitySelector.class).id("availability"))
                 .clickItem(Availability.COMING);
@@ -272,8 +266,7 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, Button.class).id("save-button")).click();
 
         // THEN: Form is still shown and save button is disabled and
-        // validation
-        // error is shown in stock count and availability fields
+        // validation error is shown in stock count and availability fields
         assertFalse($(form, Button.class).id("save-button").isEnabled());
         assertTrue(test($(form, AvailabilitySelector.class).id("availability"))
                 .isInvalid());
@@ -291,8 +284,7 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, NumberField.class).id("stock-count")).setValue(0);
 
         // THEN: Validation error is removed from stock count and
-        // availability
-        // and save button is enabled
+        // availability and save button is enabled
         assertFalse(test($(form, AvailabilitySelector.class).id("availability"))
                 .isInvalid());
         assertFalse(
@@ -462,8 +454,7 @@ public class BooksViewTest extends AbstractUITest {
         test($(dialog, Button.class).id("confirm-button")).click();
 
         // THEN: Notification is shown with the book name, form is
-        // closed, book
-        // is deleted and grid is empty
+        // closed, book is deleted and grid is empty
         assertNotification(
                 String.format("\"%s\" removed", book.getProductName()));
 
@@ -562,8 +553,7 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 0);
 
         // THEN: Error notification is shown and form is not opened and
-        // grid is
-        // empty
+        // grid is empty
         assertEquals("Product was deleted.",
                 $(Notification.class).last().getCaption());
         assertFalse(form.isShown());
@@ -674,8 +664,8 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 1);
 
         // THEN: The edited field is marked as dirty and has the
-        // original value
-        // is shown in the description and the confirm dialog is shown
+        // original value is shown in the description and the confirm dialog is
+        // shown
         assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
         assertTrue($(form, TextField.class).id("product-name").getDescription()
@@ -752,8 +742,8 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 1);
 
         // THEN: The edited field is marked as dirty and has the
-        // original value
-        // is shown in the description and the confirm dialog is shown
+        // original value is shown in the description and the confirm dialog is
+        // shown
         assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
         assertTrue($(form, TextField.class).id("product-name").getDescription()
@@ -776,8 +766,7 @@ public class BooksViewTest extends AbstractUITest {
         // WHEN: Clicking the discard button
         test($(form, Button.class).id("discard-button")).click();
 
-        // THEN: The field is no longer marked as dirty and the
-        // description is
+        // THEN: The field is no longer marked as dirty and the description is
         // not shown and the original value is shown in the field
         assertFalse($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
@@ -808,8 +797,7 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 0);
 
         // THEN: Form is shown and product name is upto date in the form
-        // and in
-        // the grid
+        // and in the grid
         assertTrue(form.isShown());
         assertEquals("Touched book",
                 $(form, TextField.class).id("product-name").getValue());
@@ -824,8 +812,7 @@ public class BooksViewTest extends AbstractUITest {
         assertFalse(form.isShown());
 
         // FINALLY: Reset the name back to original in order to avoid
-        // side
-        // effects
+        // side effects
         edited.setProductName(productName);
         ui.getProductService().updateProduct(saved);
     }
@@ -867,8 +854,7 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 1);
 
         // THEN: Form is shown and the book from the first row is not
-        // locked and
-        // the book from the second row is locked
+        // locked and the book from the second row is locked
         assertTrue(form.isShown());
         assertNull(LockedObjects.get().isLocked(book));
         assertNotNull(LockedObjects.get().isLocked(test(grid).item(1)));
@@ -932,8 +918,7 @@ public class BooksViewTest extends AbstractUITest {
     @Test
     public void editing_product_and_saving_changes_are_shown_in_grid() {
         // WHEN: Opening product from the first row and changing the
-        // product and
-        // clicking save button
+        // product and clicking save button
         test(grid).click(1, 0);
 
         var name = $(form, TextField.class).id("product-name").getValue();
@@ -954,8 +939,7 @@ public class BooksViewTest extends AbstractUITest {
         assertEquals("Different book", test(grid).cell(1, 0));
 
         // FINALLY: Reset the name back to original in order to avoid
-        // side
-        // effects
+        // side effects
         test(grid).click(1, 0);
         test($(form, TextField.class).id("product-name")).setValue(name);
 
@@ -1024,8 +1008,7 @@ public class BooksViewTest extends AbstractUITest {
         test($(dialog, Button.class).id("confirm-button")).click();
 
         // THEN: The form is closed and the about view is shown and book
-        // view is
-        // not shown
+        // view is not shown
         assertFalse(form.isShown());
 
         assertEquals(1, $(AboutView.class).size());
@@ -1046,8 +1029,7 @@ public class BooksViewTest extends AbstractUITest {
         logout();
 
         // THEN: Confirm dialog is shown and book view is still open and
-        // form is
-        // still shown
+        // form is still shown
         var dialog = $(Window.class).id("confirm-dialog");
         test($(dialog, Button.class).id("cancel-button")).click();
 
@@ -1064,16 +1046,14 @@ public class BooksViewTest extends AbstractUITest {
     @Test
     public void validation_is_shown_when_product_name_is_empty() {
         // WHEN: Opening product from the first row and clearing the
-        // product
-        // name and focusing on stock count
+        // product name and focusing on stock count
         test(grid).click(1, 0);
 
         test($(form, TextField.class).id("product-name")).setValue("");
         test($(form, NumberField.class).id("stock-count")).focus();
 
         // THEN: Validation error is shown in product name field and the
-        // field
-        // is invalid
+        // field is invalid
         assertTrue(
                 test($(form, TextField.class).id("product-name")).isInvalid());
         assertEquals(
@@ -1085,8 +1065,7 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, Button.class).id("discard-button")).click();
 
         // THEN: Clicking discard button closes the form without showing
-        // the
-        // confirm dialog
+        // the confirm dialog
         test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
     }
@@ -1104,8 +1083,7 @@ public class BooksViewTest extends AbstractUITest {
         test(grid).click(1, 0);
 
         // WHEN: Simulating other user deleting the category while
-        // editor is
-        // open
+        // editor is open
         ui.getProductService().deleteCategory(category.getId());
 
         // WHEN: Using the category in the product and saving the
@@ -1175,8 +1153,7 @@ public class BooksViewTest extends AbstractUITest {
         test($(dialog, Button.class).id("cancel-button")).click();
 
         // THEN: Form is still shown and field is dirty and has tooltip
-        // with the
-        // original content where JS is sanitized and text content
+        // with the original content where JS is sanitized and text content
         // remain
         assertTrue($(form, TextField.class).id("product-name").getStyleName()
                 .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
@@ -1189,8 +1166,7 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, Button.class).id("discard-button")).click();
 
         // THEN: Cancel button is clicked and form is closed without
-        // showing the
-        // confirm dialog
+        // showing the confirm dialog
         test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
 
@@ -1212,15 +1188,13 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue(form.isShown());
 
         // WHEN: Save item in the other presenter, that fires event
-        // catched by
-        // this view
+        // caught by this view
         var name = book.getProductName();
         book.setProductName("Book to be refreshed");
         var saved = presenter.saveProduct(book);
 
         // THEN: That item was properly refreshed in the event and form
-        // is not
-        // closed
+        // is not closed
         assertEquals("Book to be refreshed", test(grid).cell(1, 0));
         assertTrue(form.isShown());
 
@@ -1245,7 +1219,7 @@ public class BooksViewTest extends AbstractUITest {
         // WHEN: Searching book that does not exists
         test($(FilterField.class).id("filter-field")).setValue("No match");
 
-        // THEN: rGid is empty and no matches label is shown
+        // THEN: Grid is empty and no matches label is shown
         assertEquals(0, test(grid).size());
         assertTrue($(NoMatches.class)
                 .styleName(VaadinCreateTheme.BOOKVIEW_NOMATCHES).single()

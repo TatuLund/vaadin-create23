@@ -167,8 +167,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertTrue(form.isShown());
 
         // WHEN: Enterong partial data (not valid) in the new product
-        // and
-        // closing the session
+        // and closing the session
         test($(form, TextField.class).id("product-name"))
                 .setValue("Modified book");
         test($(form, NumberField.class).id("stock-count")).setValue(200);
@@ -279,8 +278,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         assertNotNull(service.findDraft(user));
 
         // WHEN: Simulating other user editing books stock count and
-        // starting
-        // the UI again
+        // starting the UI again
         var edited = service.getProductById(book.getId());
         edited.setProductName("Edited book");
         edited.setStockCount(300);
@@ -298,8 +296,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         test($(dialog, Button.class).id("confirm-button")).click();
 
         // THEN: books view is shown with the form open and draft is
-        // removed
-        // from the database
+        // removed from the database
         grid = $(BookGrid.class).single();
         waitForGrid((CssLayout) grid.getParent(), grid);
         form = $(BookForm.class).single();
@@ -372,8 +369,7 @@ public class BooksViewDraftsTest extends AbstractUITest {
         test($(FilterField.class).id("filter-field")).setValue("Draft book");
 
         // THEN: The book is found on the first row of the grid and the
-        // form is
-        // shown
+        // form is shown
         test(grid).click(1, 0);
         var book = test(grid).item(0);
         assertTrue(form.isShown());

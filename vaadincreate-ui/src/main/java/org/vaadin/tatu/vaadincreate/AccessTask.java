@@ -5,6 +5,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.vaadin.tatu.vaadincreate.observability.Telemetry;
+
 import com.vaadin.server.ErrorHandlingRunnable;
 import com.vaadin.ui.UIDetachedException;
 
@@ -29,7 +31,7 @@ public class AccessTask implements ErrorHandlingRunnable {
 
     @Override
     public void run() {
-        command.run();
+        Telemetry.accessTask(command);
     }
 
     private static Logger logger = LoggerFactory.getLogger(AccessTask.class);

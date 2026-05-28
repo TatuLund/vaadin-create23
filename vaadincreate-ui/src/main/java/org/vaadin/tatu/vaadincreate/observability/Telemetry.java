@@ -15,6 +15,7 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
 
 /**
  * Utility class for logging telemetry events using OpenTelemetry.
@@ -127,6 +128,30 @@ public final class Telemetry {
             if (started) {
                 span.end();
             }
+        }
+    }
+
+    /**
+     * Runs a command as a measured OpenTelemetry span named "access.task". Use
+     * this to track the duration of UI-access runnables submitted via
+     * {@code UI.access()} so slow tasks are visible in Jaeger.
+     *
+     * @param command
+     *            the runnable to execute and measure
+     */
+    public static void accessTask(Runnable command) {
+        Objects.requireNonNull(command, "Command cannot be null");
+        Span span = start("access.task");
+        span.setAttribute("task.type", command.getClass().getSimpleName());
+        try (Scope scope = span.makeCurrent()) {
+            command.run();
+            span.setStatus(StatusCode.OK);
+        } catch (Exception e) {
+            span.recordException(e);
+            span.setStatus(StatusCode.ERROR, e.getMessage());
+            throw e;
+        } finally {
+            span.end();
         }
     }
 

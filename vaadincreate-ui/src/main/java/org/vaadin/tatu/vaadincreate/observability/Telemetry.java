@@ -140,8 +140,24 @@ public final class Telemetry {
      *            the runnable to execute and measure
      */
     public static void accessTask(Runnable command) {
+        measure(command, "access.task");
+    }
+
+    /**
+     * Runs a command as a measured OpenTelemetry span named "event.task". Use
+     * this to track the duration of event listener runnables so slow tasks are
+     * visible in Jaeger.
+     *
+     * @param command
+     *            the runnable to execute and measure
+     */
+    public static void eventTask(Runnable command) {
+        measure(command, "event.task");
+    }
+
+    private static void measure(Runnable command, String spanName) {
         Objects.requireNonNull(command, "Command cannot be null");
-        Span span = start("access.task");
+        Span span = start(spanName);
         span.setAttribute("task.type", command.getClass().getSimpleName());
         try (Scope scope = span.makeCurrent()) {
             command.run();

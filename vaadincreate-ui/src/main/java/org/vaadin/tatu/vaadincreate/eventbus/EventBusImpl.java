@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.tatu.vaadincreate.backend.RedisPubSubService;
 import org.vaadin.tatu.vaadincreate.backend.events.AbstractEvent;
+import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 
 /**
  * Super simple event bus to be used with CDI, e.g. as application scoped
@@ -70,8 +71,9 @@ public class EventBusImpl implements EventBus {
         synchronized (eventListeners) {
             logger.debug("EventBus event fired for {} recipients.",
                     eventListeners.size());
-            eventListeners.forEach((listener, o) -> executor
-                    .execute(() -> listener.eventFired(event)));
+            eventListeners
+                    .forEach((listener, o) -> executor.execute(() -> Telemetry
+                            .eventTask(() -> listener.eventFired(event))));
         }
     }
 

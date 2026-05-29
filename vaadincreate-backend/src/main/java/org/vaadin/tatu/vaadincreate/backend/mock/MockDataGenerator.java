@@ -184,7 +184,7 @@ public class MockDataGenerator implements Serializable {
         final int dateCount = totalPurchases / purchasesPerDate;
 
         var purchases = new ArrayList<Purchase>(totalPurchases);
-        var today = LocalDate.now();
+        var today = LocalDate.now().minusDays(1);
         var zone = ZoneId.systemDefault();
 
         for (int dayIndex = 0; dayIndex < dateCount; dayIndex++) {

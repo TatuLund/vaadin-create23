@@ -16,11 +16,11 @@
 		<vaadin.gwt.version>2.13.0</vaadin.gwt.version>
 		<logback.version>1.5.25</logback.version>
 		<slf4j.version>2.0.9</slf4j.version>
-		<testbench.version>5.4.0</testbench.version>
+		<testbench.version>5.4.1</testbench.version>
 		<jetty.plugin.version>12.0.15</jetty.plugin.version>
 		<jspecify.version>1.0.0</jspecify.version>
 		<servlet.version>4.0.1</servlet.version>
-		<selenium.version>4.43.0</selenium.version>
+		<selenium.version>4.44.0</selenium.version>
 		<spotless.version>3.2.1</spotless.version>
 		<spotless.skip>false</spotless.skip>
 	</properties>

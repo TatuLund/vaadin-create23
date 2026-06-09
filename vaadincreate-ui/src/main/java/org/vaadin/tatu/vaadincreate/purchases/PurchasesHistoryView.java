@@ -39,7 +39,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * {@value #RETENTION_MONTHS} months.
  */
 @NullMarked
-@SuppressWarnings({ "serial", "java:S2160" })
+@SuppressWarnings({ "serial", "java:S2160", "java:S110" })
 public class PurchasesHistoryView extends VerticalLayout
         implements TabView {
 

@@ -24,3 +24,4 @@ vaadincreate-ui/src/main/resources/rebel.xml
 target/
 effective-pom.xml
 vaadincreate-ui/error-screenshots/
+.continue/

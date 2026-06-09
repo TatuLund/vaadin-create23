@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate;
+package org.vaadin.tatu.vaadincreate.applayout;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.vaadin.tatu.vaadincreate.AppLayout.MenuButton;
+import org.vaadin.tatu.vaadincreate.ErrorView;
 import org.vaadin.tatu.vaadincreate.auth.MockAccessControl;
 import org.vaadin.tatu.vaadincreate.auth.RolesPermitted;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;

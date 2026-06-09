@@ -35,7 +35,6 @@ public class BooksViewEditIdUserTest extends AbstractUITest {
         grid = $(layout, BookGrid.class).single();
         waitForGrid(layout, grid);
         form = $(view, BookForm.class).single();
-
     }
 
     @After

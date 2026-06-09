@@ -19,7 +19,7 @@ import com.vaadin.ui.VerticalLayout;
  * View for user/admin purchase history and approvals.
  */
 @NullMarked
-@SuppressWarnings({ "serial", "java:S2160" })
+@SuppressWarnings({ "serial", "java:S2160", "java:S110" })
 @RolesPermitted({ Role.USER, Role.ADMIN })
 public class PurchasesView extends VerticalLayout implements VaadinCreateView {
 

@@ -6,230 +6,27 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collections;
-
-import org.jsoup.Jsoup;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.vaadin.tatu.vaadincreate.AbstractUITest;
-import org.vaadin.tatu.vaadincreate.AppLayout.MenuButton;
 import org.vaadin.tatu.vaadincreate.about.AboutView;
+import org.vaadin.tatu.vaadincreate.applayout.MenuButton;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
-import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
-import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
 import org.vaadin.tatu.vaadincreate.backend.data.Availability;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
-import org.vaadin.tatu.vaadincreate.backend.data.Product;
-import org.vaadin.tatu.vaadincreate.common.EuroConverter;
 import org.vaadin.tatu.vaadincreate.common.NumberField;
 import org.vaadin.tatu.vaadincreate.crud.form.AvailabilitySelector;
-import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
 import org.vaadin.tatu.vaadincreate.locking.LockedObjects;
 
-import com.vaadin.data.ValueContext;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
-import com.vaadin.server.ServiceException;
 import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBoxGroup;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-public class BooksViewTest extends AbstractUITest {
-
-    private VaadinCreateUI ui;
-    private BooksView view;
-    private BookGrid grid;
-    private BookForm form;
-
-    @Before
-    public void setup() throws ServiceException {
-        ui = new VaadinCreateUI();
-        mockVaadin(ui);
-        login();
-
-        view = navigate(BooksView.VIEW_NAME, BooksView.class);
-        assertAssistiveNotification("Inventory opened");
-
-        var layout = $(view, VerticalLayout.class).first();
-        grid = $(layout, BookGrid.class).single();
-        waitForGrid(layout, grid);
-        form = $(view, BookForm.class).single();
-    }
-
-    @After
-    public void cleanUp() {
-        logout();
-        tearDown();
-    }
-
-    @Test
-    public void browsing_products_keeps_focus_in_grid() {
-        for (int i = 0; i < test(grid).size(); i += 10) {
-
-            // WHEN: Clicking on a row
-            test(grid).click(1, i);
-            assertAssistiveNotification(String.format("%s opened",
-                    test(grid).item(i).getProductName()));
-            assertFalse($(Button.class).id("new-product").isEnabled());
-
-            // THEN: Focus is still in the grid
-            assertTrue(test(grid).isFocused());
-
-            then_form_is_filled_with_values_from_grid_row(i);
-            then_selected_categories_are_shown_first();
-            then_availability_is_rendered_as_html(i);
-
-            // WHEN: Clicking the row again
-            test(grid).click(1, i);
-
-            // THEN: Form is closed
-            assertFalse(form.isShown());
-            assertTrue($(Button.class).id("new-product").isEnabled());
-            then_form_fields_are_reset_state();
-        }
-
-    }
-
-    @Test
-    @SuppressWarnings("java:S5961")
-    public void when_browsing_products_with_pgDown_pgUp_keys_the_form_is_populated_accordingly_and_Esc_closes_the_form() {
-        // WHEN: Clicking on the first row
-        test(grid).click(1, 0);
-        // THEN: Form is shown and populated with the first row data
-        assertTrue(form.isShown());
-        assertEquals(grid.getSelectedRow(), form.getProduct());
-        then_form_is_filled_with_values_from_grid_row(0);
-
-        // WHEN: Pressing page down
-        test(form).shortcut(KeyCode.PAGE_DOWN);
-        // THEN: Form is still shown and populated with the second row
-        // data and that row is selected
-        assertTrue(form.isShown());
-        assertEquals(grid.getSelectedRow(), form.getProduct());
-        then_form_is_filled_with_values_from_grid_row(1);
-
-        // WHEN: Pressing page down
-        test(form).shortcut(KeyCode.PAGE_DOWN);
-        // THEN: Form is still shown and populated with the third row
-        // data and that row is selected
-        assertTrue(form.isShown());
-        assertEquals(grid.getSelectedRow(), form.getProduct());
-        then_form_is_filled_with_values_from_grid_row(2);
-
-        // WHEN: Pressing page up
-        test(form).shortcut(KeyCode.PAGE_UP);
-        // THEN: Form is still shown and populated with the second row
-        // data and that row is selected
-        assertTrue(form.isShown());
-        assertEquals(grid.getSelectedRow(), form.getProduct());
-        then_form_is_filled_with_values_from_grid_row(1);
-
-        // WHEN: Pressing page up
-        test(form).shortcut(KeyCode.PAGE_UP);
-        // THEN: Form is still shown and populated with the first row
-        // data and that row is selected
-        assertTrue(form.isShown());
-        assertEquals(grid.getSelectedRow(), form.getProduct());
-        then_form_is_filled_with_values_from_grid_row(0);
-
-        // WHEN: Pressing page up
-        test(form).shortcut(KeyCode.PAGE_UP);
-        // THEN: Form is still shown and still populated with the first
-        // row data as it is the first row and that row is still selected
-        assertTrue(form.isShown());
-        assertEquals(grid.getSelectedRow(), form.getProduct());
-        then_form_is_filled_with_values_from_grid_row(0);
-
-        // WHEN: Pressing escape
-        test($(form, Button.class).id("cancel-button"))
-                .shortcut(KeyCode.ESCAPE);
-        // THEN: Form is closed
-        assertFalse(form.isShown());
-    }
-
-    @SuppressWarnings("java:S100")
-    private void then_availability_is_rendered_as_html(int i) {
-        var book = test(grid).item(i);
-        String color = "";
-        switch (book.getAvailability()) {
-        case AVAILABLE -> color = VaadinCreateTheme.COLOR_AVAILABLE;
-        case DISCONTINUED -> color = VaadinCreateTheme.COLOR_DISCONTINUED;
-        case COMING -> color = VaadinCreateTheme.COLOR_COMING;
-        }
-        var doc = Jsoup.parse((String) test(grid).cell(3, i));
-        assertEquals("v-icon",
-                doc.getElementsByTag("span").get(0).attr("class"));
-        assertEquals(String.format("font-family: Vaadin-Icons;color:%s", color),
-                doc.getElementsByTag("span").get(0).attr("style"));
-        assertEquals(
-                VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL + "-aria-label",
-                doc.getElementsByTag("span").get(1).attr("class"));
-        assertEquals(availability(book),
-                doc.getElementsByTag("span").get(1).attr("aria-label"));
-        assertEquals(VaadinCreateTheme.BOOKVIEW_AVAILABILITYLABEL,
-                doc.getElementsByTag("span").get(2).attr("class"));
-        assertEquals(book.getAvailability().toString(),
-                doc.getElementsByTag("span").get(2).text());
-    }
-
-    private static String availability(Product book) {
-        if (book.getAvailability() == Availability.AVAILABLE) {
-            return String.format("%s %d", book.getAvailability(),
-                    book.getStockCount());
-        }
-        return book.getAvailability().toString();
-    }
-
-    private void then_form_is_filled_with_values_from_grid_row(int i) {
-        var book = test(grid).item(i);
-        assertEquals(book.getProductName(),
-                $(form, TextField.class).id("product-name").getValue());
-        var price = $(form, TextField.class).id("price");
-        var converter = new EuroConverter("");
-        assertEquals(
-                converter.convertToPresentation(book.getPrice(),
-                        new ValueContext(null, price, ui.getLocale())),
-                price.getValue());
-        assertEquals(book.getStockCount(),
-                $(form, NumberField.class).id("stock-count").getValue());
-
-        assertEquals(book.getAvailability(), $(form, AvailabilitySelector.class)
-                .id("availability").getValue());
-        assertEquals(book.getCategory(),
-                $(form, CheckBoxGroup.class).id("category").getValue());
-    }
-
-    private void then_form_fields_are_reset_state() {
-        assertEquals("",
-                $(form, TextField.class).id("product-name").getValue());
-        assertEquals(Integer.valueOf(0),
-                $(form, NumberField.class).id("stock-count").getValue());
-        assertEquals("0.00 €", $(form, TextField.class).id("price").getValue());
-        assertEquals(Availability.COMING, $(form, AvailabilitySelector.class)
-                .id("availability").getValue());
-        assertEquals(Collections.emptySet(),
-                $(form, CheckBoxGroup.class).id("category").getValue());
-    }
-
-    private void then_selected_categories_are_shown_first() {
-        // Verify that the selected categories are the first in the list
-        var items = $(form, CheckBoxGroup.class).id("category")
-                .getDataCommunicator().fetchItemsWithRange(0,
-                        $(form, CheckBoxGroup.class).id("category")
-                                .getDataCommunicator().getDataProviderSize());
-        var size = $(form, CheckBoxGroup.class).id("category").getValue()
-                .size();
-        for (int j = 0; j < size; j++) {
-            assertTrue($(form, CheckBoxGroup.class).id("category").getValue()
-                    .contains(items.get(j)));
-        }
-    }
+public class BooksViewTest extends AbstractBooksViewTest {
 
     @Test
     public void pressing_ctrl_F_will_focus_filter_field() {
@@ -489,51 +286,6 @@ public class BooksViewTest extends AbstractUITest {
         assertNotNull(ui.getProductService().getProductById(productId));
     }
 
-    private Product findProductWithPurchaseHistory() {
-        var purchases = PurchaseService.get().findAll(0, 500);
-        for (var purchase : purchases) {
-            for (var line : purchase.getLines()) {
-                var lineProduct = line.getProduct();
-                if (lineProduct == null || lineProduct.getId() == null) {
-                    continue;
-                }
-                var existing = ui.getProductService()
-                        .getProductById(lineProduct.getId());
-                if (existing != null) {
-                    return existing;
-                }
-            }
-        }
-        throw new AssertionError(
-                "Expected at least one product referenced by purchase history");
-    }
-
-    private int findRowByProductId(Integer productId) {
-        for (int row = 0; row < test(grid).size(); row++) {
-            if (productId.equals(test(grid).item(row).getId())) {
-                return row;
-            }
-        }
-        throw new AssertionError("Product not found in grid: " + productId);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void createBook(String name) {
-        test($(view, Button.class).id("new-product")).click();
-        test($(TextField.class).id("product-name")).setValue(name);
-        test($(AvailabilitySelector.class).id("availability"))
-                .clickItem(Availability.AVAILABLE);
-        test($(TextField.class).id("price")).setValue("35.0 €");
-        var categories = VaadinCreateUI.get().getProductService()
-                .getAllCategories().stream().toList();
-        test($(CheckBoxGroup.class).id("category"))
-                .clickItem(categories.get(1));
-        test($(CheckBoxGroup.class).id("category"))
-                .clickItem(categories.get(2));
-        test($(NumberField.class).id("stock-count")).setValue(100);
-        test($(Button.class).id("save-button")).click();
-    }
-
     @Test
     public void attempting_to_open_product_deleted_concurrently_by_other_user_will_show_error() {
         // GIVEN: A book
@@ -694,34 +446,6 @@ public class BooksViewTest extends AbstractUITest {
         test($(form, Button.class).id("cancel-button")).click();
         assertFalse(form.isShown());
         assertTrue($(view, Button.class).id("new-product").isEnabled());
-    }
-
-    @Test
-    public void alt_n_will_open_new_book_form_and_esc_will_close_it() {
-        // WHEN: Pressing alt+N
-        test($(Button.class).id("new-product")).shortcut(KeyCode.N,
-                ModifierKey.ALT);
-
-        // THEN: New book form is opened
-        assertTrue(form.isShown());
-        then_form_fields_are_reset_state();
-        assertTrue(
-                test($(form, TextField.class).id("product-name")).isFocused());
-
-        // WHEN: Filling the form and pressing escape
-        test($(form, TextField.class).id("product-name")).setValue("Test book");
-        test($(form, Button.class).id("cancel-button"))
-                .shortcut(KeyCode.ESCAPE);
-
-        // THEN: Confirm dialog is shown
-        var dialog = $(Window.class).id("confirm-dialog");
-        var confirmButton = $(dialog, Button.class).id("confirm-button");
-
-        // WHEN: Confirming the cancel by pressing enter
-        test(confirmButton).shortcut(KeyCode.ENTER);
-
-        // THEN: Form is closed
-        assertFalse(form.isShown());
     }
 
     @Test
@@ -1103,78 +827,6 @@ public class BooksViewTest extends AbstractUITest {
     }
 
     @Test
-    @SuppressWarnings({ "unchecked", "java:S5961" })
-    public void tooltip_in_narrow_mode_and_edited_field_has_content_sanitized_to_prevent_xss() {
-        // WHEN: Making window small in order to show tooltip
-        ui.getPage().updateBrowserWindowSize(500, 1024, true);
-
-        // WHEN: Creating a book with offending content
-        test($(view, Button.class).id("new-product")).click();
-        test($(form, TextField.class).id("product-name")).setValue(
-                "<b><img src=1 onerror=alert(document.domain)>A new book</b>");
-        test($(form, TextField.class).id("price")).setValue("10.0 €");
-        test($(form, AvailabilitySelector.class).id("availability"))
-                .clickItem(Availability.AVAILABLE);
-        test($(form, NumberField.class).id("stock-count")).setValue(10);
-
-        var cat = ui.getProductService().getAllCategories().stream().findFirst()
-                .get();
-        test($(form, CheckBoxGroup.class).id("category")).clickItem(cat);
-
-        // WHEN: Clicking save button
-        test($(form, Button.class).id("save-button")).click();
-
-        // THEN: Form is closed and the product is on the last row
-        assertFalse(form.isShown());
-
-        int row = test(grid).size() - 1;
-
-        // THEN: The JS sanitized away and the text content remain
-        assertFalse(test(grid).description(row).contains("alert"));
-        assertTrue(test(grid).description(row).contains("A new book"));
-
-        // WHEN: Clicking the row
-        test(grid).click(1, row);
-        var id = test(grid).item(row).getId();
-        assertNotNull(id);
-
-        // THEN: Form is shown
-        assertTrue(form.isShown());
-
-        // WHEN: Editing the book and clicking cancel button
-        test($(form, TextField.class).id("product-name"))
-                .setValue("The new book");
-        test($(form, Button.class).id("cancel-button")).click();
-
-        // THEN: Confirm dialog is shown
-        var dialog = $(Window.class).id("confirm-dialog");
-
-        // WHEN: Canceling the cancel operation
-        test($(dialog, Button.class).id("cancel-button")).click();
-
-        // THEN: Form is still shown and field is dirty and has tooltip
-        // with the original content where JS is sanitized and text content
-        // remain
-        assertTrue($(form, TextField.class).id("product-name").getStyleName()
-                .contains(VaadinCreateTheme.BOOKFORM_FIELD_DIRTY));
-        assertFalse($(form, TextField.class).id("product-name").getDescription()
-                .contains("alert"));
-        assertTrue($(form, TextField.class).id("product-name").getDescription()
-                .contains("A new book"));
-
-        // WHEN: Clicking discard button
-        test($(form, Button.class).id("discard-button")).click();
-
-        // THEN: Cancel button is clicked and form is closed without
-        // showing the confirm dialog
-        test($(form, Button.class).id("cancel-button")).click();
-        assertFalse(form.isShown());
-
-        // Cleanup
-        ui.getProductService().deleteProduct(id);
-    }
-
-    @Test
     public void save_event_received_by_presenter_refreshes_grid() {
         // GIVEN: Create presenter simulating other user
         var presenter = createBooksPresenter();
@@ -1201,17 +853,6 @@ public class BooksViewTest extends AbstractUITest {
         // Cleanup
         saved.setProductName(name);
         ui.getProductService().updateProduct(saved);
-    }
-
-    private BooksPresenter createBooksPresenter() {
-        var bookView = new BooksView();
-        // It is not possible to have multiple parallel UIs in this
-        // thread
-        view.addComponent(bookView);
-        var presenter = new BooksPresenter(bookView);
-        presenter.requestUpdateProducts();
-        waitWhile(() -> $(bookView, FakeGrid.class).first() != null);
-        return presenter;
     }
 
     @Test
@@ -1253,130 +894,6 @@ public class BooksViewTest extends AbstractUITest {
         assertTrue($(NoMatches.class)
                 .styleName(VaadinCreateTheme.BOOKVIEW_NOMATCHES).single()
                 .isVisible());
-    }
-
-    @SuppressWarnings("java:S5961")
-    @Test
-    public void different_columns_are_shown_based_on_browser_window_width() {
-        // WHEN: Making window large
-        ui.getPage().updateBrowserWindowSize(1600, 1024, true);
-
-        // THEN: All columns are shown and no description is shown
-        grid.getColumns().forEach(col -> {
-            assertFalse(col.isHidden());
-        });
-        // THEN: Aria label is set for stock count cell when stock count is
-        // zero.
-        assertEquals(null, test(grid).description(0));
-        var html = Jsoup.parse((String) test(grid).cell(4, 0));
-        assertEquals("-", html.getElementsByTag("span").get(0).text());
-        assertEquals("0",
-                html.getElementsByTag("span").get(0).attr("aria-label"));
-
-        // WHEN: Making window smaller
-        ui.getPage().updateBrowserWindowSize(1200, 1024, true);
-
-        // THEN: First and last columns are hidden and no description is
-        // shown
-        assertTrue(grid.getColumns().get(0).isHidden());
-        assertFalse(grid.getColumns().get(1).isHidden());
-        assertFalse(grid.getColumns().get(2).isHidden());
-        assertFalse(grid.getColumns().get(3).isHidden());
-        assertFalse(grid.getColumns().get(4).isHidden());
-        assertTrue(grid.getColumns().get(5).isHidden());
-
-        assertEquals(null, test(grid).description(0));
-
-        // WHEN: Making window even smaller
-        ui.getPage().updateBrowserWindowSize(900, 1024, true);
-
-        // THEN: First, fith and last columns are hidden and description
-        // is still not shown
-        assertTrue(grid.getColumns().get(0).isHidden());
-        assertFalse(grid.getColumns().get(1).isHidden());
-        assertFalse(grid.getColumns().get(2).isHidden());
-        assertFalse(grid.getColumns().get(3).isHidden());
-        assertTrue(grid.getColumns().get(4).isHidden());
-        assertTrue(grid.getColumns().get(5).isHidden());
-
-        assertEquals(null, test(grid).description(0));
-
-        // WHEN: Making window even smaller
-        ui.getPage().updateBrowserWindowSize(700, 1024, true);
-
-        // THEN: Stock count is shown in description
-        assertEquals("Coming", test(grid).description(3, 0));
-        assertEquals("Available: 378", test(grid).description(3, 1));
-
-        // WHEN: Making window even smaller
-        ui.getPage().updateBrowserWindowSize(500, 1024, true);
-
-        // THEN: Only second and third columns are shown and description
-        // is shown
-        assertTrue(grid.getColumns().get(0).isHidden());
-        assertFalse(grid.getColumns().get(1).isHidden());
-        assertFalse(grid.getColumns().get(2).isHidden());
-        assertTrue(grid.getColumns().get(3).isHidden());
-        assertTrue(grid.getColumns().get(4).isHidden());
-        assertTrue(grid.getColumns().get(5).isHidden());
-
-        var doc = Jsoup.parse(test(grid).description(0));
-        var book = test(grid).item(0);
-        assertEquals(book.getProductName(),
-                doc.getElementsByTag("b").get(0).text());
-        assertEquals(1, doc.getElementsByClass("v-icon").size());
-    }
-
-    @Test
-    public void clicking_sorting_grid_by_price_will_sort_ascending_second_click_descending() {
-        int size = test(grid).size();
-
-        // WHEN: Clicking price column sorting toggle
-        test(grid).toggleColumnSorting(2);
-
-        // THEN: Grid is sorted by price in ascending order
-        for (int i = 1; i < size; i++) {
-            var result = test(grid).item(i - 1).getPrice()
-                    .compareTo(test(grid).item(i).getPrice());
-            assertTrue(result <= 0);
-        }
-
-        // WHEN: Clicking price column sorting toggle again
-        test(grid).toggleColumnSorting(2);
-
-        // THEN: Grid is sorted by price in descending order
-        for (int i = 1; i < size; i++) {
-            var result = test(grid).item(i - 1).getPrice()
-                    .compareTo(test(grid).item(i).getPrice());
-            assertTrue(result >= 0);
-        }
-    }
-
-    @Test
-    public void clicking_sorting_grid_by_name_will_sort_ascending_second_click_descending() {
-        int size = test(grid).size();
-
-        // WHEN: Clicking name column sorting toggle
-        test(grid).toggleColumnSorting(1);
-
-        // THEN: Grid is sorted by name in alphabetically ascending
-        // order
-        for (int i = 1; i < size; i++) {
-            var result = ((String) test(grid).cell(1, i - 1))
-                    .compareToIgnoreCase((String) test(grid).cell(1, i));
-            assertTrue(result <= 0);
-        }
-
-        // WHEN: Clicking name column sorting toggle again
-        test(grid).toggleColumnSorting(1);
-
-        // THEN: Grid is sorted by name in alphabetically descending
-        // order
-        for (int i = 1; i < size; i++) {
-            var result = ((String) test(grid).cell(1, i - 1))
-                    .compareToIgnoreCase((String) test(grid).cell(1, i));
-            assertTrue(result >= 0);
-        }
     }
 
     @Test

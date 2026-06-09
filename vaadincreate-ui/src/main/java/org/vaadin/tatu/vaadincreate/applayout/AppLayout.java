@@ -1,4 +1,4 @@
-package org.vaadin.tatu.vaadincreate;
+package org.vaadin.tatu.vaadincreate.applayout;
 
 import java.util.Objects;
 
@@ -6,6 +6,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.tatu.vaadincreate.ErrorView;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.AllPermitted;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
@@ -14,7 +15,6 @@ import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
-import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.observability.Telemetry;
@@ -273,118 +273,4 @@ public class AppLayout extends Composite implements HasI18N {
             firstItem.focus();
         }
     }
-
-    /**
-     * A button for the application menu.
-     */
-    public class MenuButton extends Button
-            implements HasAttributes<MenuButton> {
-
-        private String path;
-        private String caption;
-
-        /**
-         * Constructor.
-         *
-         * @param caption
-         *            The caption of the button
-         * @param path
-         *            The path of the view
-         * @param icon
-         *            The icon to be used in the menu item
-         */
-        public MenuButton(String caption, String path, Resource icon) {
-            super(caption);
-            this.path = path;
-            this.caption = caption;
-            setId(path);
-            setData(path);
-            addClickListener(click -> ui.getNavigator().navigateTo(path));
-            setPrimaryStyleName(ValoTheme.MENU_ITEM);
-            if (path.equals("")) {
-                addStyleName(ValoTheme.MENU_SELECTED);
-            }
-            setIcon(icon);
-            setRole(AriaRoles.LINK);
-        }
-
-        /**
-         * Get the path of the menu item.
-         *
-         * @return the path of the menu item
-         */
-        public String getPath() {
-            return path;
-        }
-
-        /**
-         * Set the selected state of the menu item. This will add or remove the
-         * {@link ValoTheme#MENU_SELECTED} style name.
-         * 
-         * @param selected
-         *            boolean value
-         */
-        public void setSelected(boolean selected) {
-            if (selected) {
-                addStyleName(ValoTheme.MENU_SELECTED);
-                setAriaLabel(String.format("%s %s", caption,
-                        getTranslation(I18n.CURRENT_PAGE)));
-            } else {
-                removeStyleName(ValoTheme.MENU_SELECTED);
-                setAriaLabel(caption);
-            }
-        }
-    }
-
-    /**
-     * A navigation component for the application shell.
-     */
-    static class Navigation extends Composite
-            implements HasAttributes<Navigation> {
-
-        private final CssLayout items = new CssLayout();
-
-        public Navigation() {
-            setCompositionRoot(items);
-            items.addStyleName(ValoTheme.MENU_ITEMS);
-            setRole(AriaRoles.NAVIGATION);
-            setAttribute(AriaAttributes.KEYSHORTCUTS, "Alt+Shift+N");
-        }
-
-        /**
-         * Add a menu button to the navigation.
-         * 
-         * @param button
-         *            A MenuButton to be added
-         */
-        void addMenuButton(MenuButton button) {
-            items.addComponent(button);
-        }
-
-        /**
-         * Clear the selected state of all menu items.
-         */
-        void clearSelected() {
-            var iter = items.iterator();
-            while (iter.hasNext()) {
-                iter.next().removeStyleName(ValoTheme.MENU_SELECTED);
-            }
-        }
-
-        /**
-         * Set the selected state of the menu item based on the path.
-         * 
-         * @param path
-         *            The path to set as selected
-         */
-        void setSelected(String path) {
-            var iter = items.iterator();
-            while (iter.hasNext()) {
-                var menuItem = (MenuButton) iter.next();
-                menuItem.setSelected(menuItem.getPath().equals(path));
-            }
-        }
-
-    }
-
 }

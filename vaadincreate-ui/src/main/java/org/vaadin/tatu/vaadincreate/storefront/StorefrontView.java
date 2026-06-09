@@ -34,7 +34,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * wizard interface and view their purchase history.
  */
 @NullMarked
-@SuppressWarnings({ "serial", "java:S2160" })
+@SuppressWarnings({ "serial", "java:S2160", "java:S110" })
 @RolesPermitted({ Role.CUSTOMER })
 public class StorefrontView extends CssLayout implements VaadinCreateView {
 

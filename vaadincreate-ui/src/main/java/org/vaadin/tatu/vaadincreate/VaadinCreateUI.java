@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.vaadin.tatu.vaadincreate.about.AboutView;
 import org.vaadin.tatu.vaadincreate.admin.AdminView;
+import org.vaadin.tatu.vaadincreate.applayout.AppLayout;
 import org.vaadin.tatu.vaadincreate.auth.AccessControl;
 import org.vaadin.tatu.vaadincreate.auth.BasicAccessControl;
 import org.vaadin.tatu.vaadincreate.auth.CurrentUser;
@@ -35,6 +36,7 @@ import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.login.LoginView;
 import org.vaadin.tatu.vaadincreate.purchases.PurchasesView;
 import org.vaadin.tatu.vaadincreate.stats.StatsView;
+import org.vaadin.tatu.vaadincreate.storefront.StorefrontView;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.annotations.Push;
@@ -155,11 +157,8 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         appLayout.addView(BooksView.class, getTranslation(BooksView.VIEW_NAME),
                 VaadinIcons.TABLE, BooksView.VIEW_NAME);
         appLayout.addView(
-                org.vaadin.tatu.vaadincreate.storefront.StorefrontView.class,
-                getTranslation(
-                        org.vaadin.tatu.vaadincreate.storefront.StorefrontView.VIEW_NAME),
-                VaadinIcons.SHOP,
-                org.vaadin.tatu.vaadincreate.storefront.StorefrontView.VIEW_NAME);
+                StorefrontView.class, getTranslation(StorefrontView.VIEW_NAME),
+                VaadinIcons.SHOP, StorefrontView.VIEW_NAME);
         appLayout.addView(PurchasesView.class,
                 getTranslation(PurchasesView.VIEW_NAME),
                 VaadinIcons.CART, PurchasesView.VIEW_NAME);

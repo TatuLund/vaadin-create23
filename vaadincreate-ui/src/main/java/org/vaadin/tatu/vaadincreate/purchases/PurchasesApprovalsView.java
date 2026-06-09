@@ -29,7 +29,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * current user with approve and reject action buttons.
  */
 @NullMarked
-@SuppressWarnings({ "serial", "java:S2160" })
+@SuppressWarnings({ "serial", "java:S2160", "java:S110" })
 public class PurchasesApprovalsView extends VerticalLayout
         implements TabView {
 

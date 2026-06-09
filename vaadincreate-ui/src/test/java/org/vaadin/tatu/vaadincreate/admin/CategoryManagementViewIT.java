@@ -3,6 +3,7 @@ package org.vaadin.tatu.vaadincreate.admin;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -62,9 +63,9 @@ public class CategoryManagementViewIT extends AbstractViewTest {
 
     @Test
     public void visual() throws IOException {
-        waitForElementPresent(By.id("new-category"));
-
         if (visualTests()) {
+            waitForElementPresent(By.id("new-category"));
+            wait(Duration.ofMillis(100));
             assertTrue(
                     $(UIElement.class).first().compareScreen("category.png"));
         }

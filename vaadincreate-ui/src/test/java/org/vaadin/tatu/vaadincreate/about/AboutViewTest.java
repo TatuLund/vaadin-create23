@@ -11,8 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
-import org.vaadin.tatu.vaadincreate.AppLayout.MenuButton;
 import org.vaadin.tatu.vaadincreate.about.AboutView.AdminsNoteField;
+import org.vaadin.tatu.vaadincreate.applayout.MenuButton;
 import org.vaadin.tatu.vaadincreate.backend.events.MessageEvent;
 import org.vaadin.tatu.vaadincreate.eventbus.EventBus;
 

@@ -124,8 +124,10 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     private void onLogin() {
         target = getInitialTarget();
         logger.info("Initial target '{}'", target);
-        // Normally we should do session fixation here, but this is not
-        // working with Nginx community edition.
+        // After login, we need to fix session fixation and reload the page to
+        // ensure that the session cookie is updated for secure session
+        // handling.
+        Utils.sessionFixation();
         getPage().reload();
         showAppLayout();
     }

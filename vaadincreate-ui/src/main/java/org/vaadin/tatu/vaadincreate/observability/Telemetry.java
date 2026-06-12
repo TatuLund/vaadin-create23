@@ -27,17 +27,21 @@ public final class Telemetry {
             .getTracer("vaadincreate");
 
     private Telemetry() {
+        // Utility class, prevent instantiation
     }
 
+    @SuppressWarnings("null")
     private static Span start(String name) {
+        assert name != null : "Span name cannot be null";
         return tracer.spanBuilder(name).setParent(Context.current())
                 .startSpan();
     }
 
-    /*
-     * §* Logs an item opened event to telemetry.
+    /**
+     * Logs an item opened event to telemetry.
      * 
-     * @param item the opened item
+     * @param item
+     *            the opened item
      */
     public static void openedItem(AbstractEntity item) {
         Objects.requireNonNull(item, ITEM_CANNOT_BE_NULL);
@@ -66,6 +70,7 @@ public final class Telemetry {
         item(item, "saved");
     }
 
+    @SuppressWarnings("null")
     private static void item(AbstractEntity item, String action) {
         assert action != null : "Action cannot be null";
         Span span = Span.current();
@@ -100,6 +105,7 @@ public final class Telemetry {
      * @param newView
      *            the new view, or null if unknown
      */
+    @SuppressWarnings("null")
     public static void entered(@Nullable ComponentContainer oldView,
             @Nullable ComponentContainer newView) {
         Span span = Span.current();
@@ -155,6 +161,7 @@ public final class Telemetry {
         measure(command, "event.task");
     }
 
+    @SuppressWarnings("null")
     private static void measure(Runnable command, String spanName) {
         Objects.requireNonNull(command, "Command cannot be null");
         Span span = start(spanName);
@@ -175,7 +182,9 @@ public final class Telemetry {
      * Records an exception to telemetry.
      * 
      * @param exception
+     *            the exception to record
      */
+    @SuppressWarnings("null")
     public static void exception(Throwable exception) {
         Objects.requireNonNull(exception, "Exception cannot be null");
         Span span = Span.current();

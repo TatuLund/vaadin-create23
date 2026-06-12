@@ -1,6 +1,5 @@
 package org.vaadin.tatu.vaadincreate.applayout;
 
-import org.hibernate.validator.constraints.pl.NIP;
 import org.jspecify.annotations.NullMarked;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;

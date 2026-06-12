@@ -133,7 +133,7 @@ public class StatsUtils {
      * Represents a price bracket where {@code max} is the upper bound
      * (exclusive) and the lower bound is always {@code max - 10} (inclusive).
      */
-    record PriceBracket(int max) implements Serializable {
+    record PriceBracket(Integer max) implements Serializable {
 
         public boolean isInPriceBracket(BigDecimal price) {
             BigDecimal upper = BigDecimal.valueOf(max);

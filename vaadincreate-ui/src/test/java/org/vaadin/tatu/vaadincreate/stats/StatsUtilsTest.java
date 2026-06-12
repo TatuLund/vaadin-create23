@@ -190,11 +190,11 @@ public class StatsUtilsTest {
         List<PriceBracket> bracketList = brackets.toList();
 
         assertEquals("Expected 3 brackets", 3, bracketList.size());
-        assertEquals("First bracket max should be 10", 10,
+        assertEquals("First bracket max should be 10", Integer.valueOf(10),
                 bracketList.get(0).max());
-        assertEquals("Second bracket max should be 20", 20,
+        assertEquals("Second bracket max should be 20", Integer.valueOf(20),
                 bracketList.get(1).max());
-        assertEquals("Third bracket max should be 30", 30,
+        assertEquals("Third bracket max should be 30", Integer.valueOf(30),
                 bracketList.get(2).max());
     }
 

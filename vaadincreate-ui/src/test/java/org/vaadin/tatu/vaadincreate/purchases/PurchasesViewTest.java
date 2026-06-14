@@ -16,7 +16,6 @@ import org.vaadin.tatu.vaadincreate.common.CustomChart;
 import org.vaadin.tatu.vaadincreate.common.EuroConverter;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
-import org.vaadin.tatu.vaadincreate.purchases.PurchaseHistoryGrid.ToggleButton;
 
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.icons.VaadinIcons;
@@ -160,8 +159,9 @@ public class PurchasesViewTest extends AbstractPurchasesTest {
 
         // AND: Details component contains the purchase line items with correct
         // ARIA attributes
-        var details = (Label) test(historyGrid).details(0);
-        assertPurchaseLineItems(purchase, details);
+        var details = (PurchaseDetails) test(historyGrid).details(0);
+        var detailsLabel = $(details, Label.class).first();
+        assertPurchaseLineItems(purchase, detailsLabel);
 
         // WHEN: Clicking toggle button again
         test(toggle).click();

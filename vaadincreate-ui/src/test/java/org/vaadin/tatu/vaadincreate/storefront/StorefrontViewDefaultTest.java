@@ -33,6 +33,7 @@ import com.vaadin.testbench.uiunittest.SerializationDebugUtil;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -90,8 +91,9 @@ public class StorefrontViewDefaultTest extends AbstractUITest {
 
         assertTrue(historyGrid.isDetailsVisible(purchase));
 
-        var details = (Label) test(historyGrid).details(row);
-        assertPurchaseLineItems(purchase, details);
+        var details = (HasComponents) test(historyGrid).details(row);
+        var detailsLabel = $(details, Label.class).first();
+        assertPurchaseLineItems(purchase, detailsLabel);
 
         test(historyGrid).click(0, row);
 

@@ -1,6 +1,5 @@
 package org.vaadin.tatu.vaadincreate.purchases;
 
-import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -9,34 +8,25 @@ import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
-import org.vaadin.tatu.vaadincreate.backend.data.PurchaseLine;
 import org.vaadin.tatu.vaadincreate.backend.data.User;
-import org.vaadin.tatu.vaadincreate.common.EuroConverter;
 import org.vaadin.tatu.vaadincreate.common.EuroRenderer;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
-import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
-import org.vaadin.tatu.vaadincreate.components.Html;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.data.provider.CallbackDataProvider;
 import com.vaadin.data.provider.DataProvider;
-import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.SerializableFunction;
-import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.shared.ui.grid.ScrollDestination;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.themes.ValoTheme;
 
 /**
  * Grid component for displaying purchase history. Supports pagination via
@@ -119,7 +109,8 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
     }
 
     private void configureColumns() {
-        grid.addComponentColumn(ToggleButton::new).setWidth(50);
+        grid.addComponentColumn(purchase -> new ToggleButton(grid, purchase))
+                .setWidth(50);
 
         var idColumn = grid.addColumn(Purchase::getId)
                 .setCaption(getTranslation(I18n.Storefront.PURCHASE_ID))
@@ -218,77 +209,8 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
     }
 
     private void configureDetailsGenerator() {
-        grid.setDetailsGenerator(purchase -> {
-            Html.Div htmlDiv;
-            if (mode == PurchaseHistoryMode.MY_PURCHASES) {
-                htmlDiv = detailsHtmlForMyPurchase(purchase);
-            } else {
-                htmlDiv = buildPurchaseLinesHtml(purchase);
-            }
-            htmlDiv.attr(AriaAttributes.LIVE, "assertive");
-            htmlDiv.attr(AriaAttributes.ROLE, AriaRoles.ALERT);
-            return new Label(htmlDiv.build(), ContentMode.HTML);
-        });
-    }
-
-    private Html.Div detailsHtmlForMyPurchase(Purchase purchase) {
-        var root = Html.div().style("padding: 10px;");
-
-        root.add(
-                Html.strong().text(getTranslation(I18n.Storefront.PURCHASE_ID)))
-                .add(Html.span().text(": " + purchase.getId())).add(Html.br());
-
-        var approver = purchase.getApprover();
-        assert approver != null : "Approver cannot be null";
-        root.add(Html.strong().text(getTranslation(I18n.Storefront.APPROVER)))
-                .add(Html.span().text(": " + approver.getName()))
-                .add(Html.br());
-
-        Instant decidedAt = purchase.getDecidedAt();
-        var decidedAtValue = decidedAt != null ? Utils.formatDateTime(decidedAt)
-                : getTranslation(I18n.Storefront.NOT_AVAILABLE);
-        root.add(Html.strong().text(getTranslation(I18n.Storefront.DECIDED_AT)))
-                .add(Html.span().text(": " + decidedAtValue)).add(Html.br());
-
-        String decisionReason = purchase.getDecisionReason();
-        if (decisionReason != null && !decisionReason.isEmpty()) {
-            root.add(Html.strong()
-                    .text(getTranslation(I18n.Storefront.DECISION_REASON)))
-                    .add(Html.span().text(": " + decisionReason))
-                    .add(Html.br());
-        }
-
-        // Append purchase line items
-        if (!purchase.getLines().isEmpty()) {
-            root.add(Html.br());
-            root.add(buildPurchaseLinesHtml(purchase));
-        }
-
-        return root;
-    }
-
-    /**
-     * Builds an HTML fragment listing all purchase lines for the given
-     * purchase. Each line includes product name, unit price, quantity and line
-     * total.
-     */
-    private Html.Div buildPurchaseLinesHtml(Purchase purchase) {
-        var container = Html.div();
-        NumberFormat euroFormat = EuroConverter.createEuroFormat();
-
-        for (PurchaseLine line : purchase.getLines()) {
-            var productName = line.getProduct().getProductName();
-            var unitPrice = euroFormat.format(line.getUnitPrice());
-            var quantity = line.getQuantity();
-            var lineTotal = euroFormat.format(line.getLineTotal());
-
-            var text = String.format("%s: %s x %d = %s", productName, unitPrice,
-                    quantity, lineTotal);
-
-            container.add(Html.span().text(text)).add(Html.br());
-        }
-
-        return container;
+        grid.setDetailsGenerator(
+                purchase -> new PurchaseDetails(purchase, mode));
     }
 
     /**
@@ -413,35 +335,5 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
                 "Action provider must not be null");
         grid.addComponentColumn(actionProvider::apply).setId("actions")
                 .setWidth(200);
-    }
-
-    /**
-     * Button component for toggling the visibility of purchase details.
-     * Displays an appropriate icon and ARIA label based on the current state of
-     * the details visibility.
-     */
-    class ToggleButton extends Button implements HasAttributes<ToggleButton> {
-        public ToggleButton(Purchase purchase) {
-            setIcon(grid.isDetailsVisible(purchase) ? VaadinIcons.ANGLE_DOWN
-                    : VaadinIcons.ANGLE_RIGHT);
-            setAriaLabel(grid.isDetailsVisible(purchase)
-                    ? getTranslation(I18n.Storefront.CLOSE)
-                    : getTranslation(I18n.Storefront.OPEN));
-            setAttribute(AriaAttributes.EXPANDED,
-                    String.valueOf(grid.isDetailsVisible(purchase)));
-            addStyleNames(ValoTheme.BUTTON_ICON_ONLY,
-                    ValoTheme.BUTTON_BORDERLESS);
-            addClickListener(clickEvent -> {
-                grid.setDetailsVisible(purchase,
-                        !grid.isDetailsVisible(purchase));
-                setIcon(grid.isDetailsVisible(purchase) ? VaadinIcons.ANGLE_DOWN
-                        : VaadinIcons.ANGLE_RIGHT);
-                setAriaLabel(grid.isDetailsVisible(purchase)
-                        ? getTranslation(I18n.Storefront.CLOSE)
-                        : getTranslation(I18n.Storefront.OPEN));
-                setAttribute(AriaAttributes.EXPANDED,
-                        String.valueOf(grid.isDetailsVisible(purchase)));
-            });
-        }
     }
 }

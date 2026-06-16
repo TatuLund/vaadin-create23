@@ -5,6 +5,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.Address;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
+import org.vaadin.tatu.vaadincreate.storefront.ATextField.Autocomplete;
 
 import com.vaadin.data.Binder;
 import com.vaadin.ui.FormLayout;
@@ -31,7 +32,7 @@ class AddressForm extends FormLayout
         var streetField = new ATextField(
                 getTranslation(I18n.Storefront.STREET));
         streetField.setWidth("100%");
-        streetField.setAutocomplete("street-address");
+        streetField.setAutocomplete(Autocomplete.STREET_ADDRESS);
         binder.forField(streetField)
                 .asRequired(getTranslation(
                         I18n.Storefront.STREET_REQUIRED))
@@ -39,7 +40,7 @@ class AddressForm extends FormLayout
 
         var postalCodeField = new ATextField(
                 getTranslation(I18n.Storefront.POSTAL_CODE));
-        postalCodeField.setAutocomplete("postal-code");
+        postalCodeField.setAutocomplete(Autocomplete.POSTAL_CODE);
         binder.forField(postalCodeField)
                 .asRequired(getTranslation(
                         I18n.Storefront.POSTAL_CODE_REQUIRED))
@@ -47,14 +48,14 @@ class AddressForm extends FormLayout
 
         var cityField = new ATextField(
                 getTranslation(I18n.Storefront.CITY));
-        cityField.setAutocomplete("address-level2");
+        cityField.setAutocomplete(Autocomplete.ADDRESS_LEVEL2);
         binder.forField(cityField)
                 .asRequired(getTranslation(I18n.Storefront.CITY_REQUIRED))
                 .bind(Address::getCity, Address::setCity);
 
         var countryField = new ATextField(
                 getTranslation(I18n.Storefront.COUNTRY));
-        countryField.setAutocomplete("country");
+        countryField.setAutocomplete(Autocomplete.COUNTRY);
         binder.forField(countryField)
                 .asRequired(getTranslation(
                         I18n.Storefront.COUNTRY_REQUIRED))

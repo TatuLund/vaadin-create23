@@ -18,6 +18,17 @@ import com.vaadin.ui.themes.ValoTheme;
  */
 class ToggleButton extends Button
         implements HasAttributes<ToggleButton>, HasI18N {
+
+    /**
+     * Creates a ToggleButton for the given purchase and grid. The button's
+     * icon, ARIA label, and expanded state are initialized based on whether the
+     * details of the purchase are currently visible in the grid.
+     *
+     * @param grid
+     *            the grid containing the purchase details
+     * @param purchase
+     *            the purchase for which the toggle button is created
+     */
     public ToggleButton(Grid<Purchase> grid, Purchase purchase) {
         setIcon(grid.isDetailsVisible(purchase) ? VaadinIcons.ANGLE_DOWN
                 : VaadinIcons.ANGLE_RIGHT);

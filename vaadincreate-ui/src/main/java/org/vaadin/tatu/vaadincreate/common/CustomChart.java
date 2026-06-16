@@ -1,6 +1,7 @@
 package org.vaadin.tatu.vaadincreate.common;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -11,7 +12,9 @@ import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
 import com.vaadin.addon.charts.Chart;
+import com.vaadin.addon.charts.model.Buttons;
 import com.vaadin.addon.charts.model.ChartType;
+import com.vaadin.addon.charts.model.Exporting;
 import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Component.Focusable;
 
@@ -29,6 +32,8 @@ import com.vaadin.ui.Component.Focusable;
 @SuppressWarnings({ "serial", "java:S2160" })
 public class CustomChart extends Chart
         implements HasAttributes<CustomChart>, Focusable, HasI18N {
+
+    private static final String CHARTS_EXPORT_SERVICE_URL = "http://charts:export@127.0.0.1:8083/";
 
     @Nullable
     private ChartAccessibilityExtension a11y;
@@ -75,5 +80,28 @@ public class CustomChart extends Chart
                     if (chart) { chart.focus(); }
                 }, 100);
                 """.formatted(getId()));
+    }
+
+    /**
+     * Enables exporting functionality for the chart, allowing users to export
+     * the chart in various formats. This method configures the exporting
+     * options, including setting a custom file name for the exported chart and
+     * specifying the URL of the export service. It also adds custom buttons to
+     * the exporting menu.
+     */
+    public void enableExporting() {
+        Objects.requireNonNull(getConfiguration(),
+                "Chart configuration must not be null to enable exporting");
+        // Create the export configuration
+        var exporting = new Exporting(true);
+        // Customize the file name of the download file
+        exporting.setFilename("chart");
+        // Use the exporting configuration in the chart, note in the
+        // real production environment the URL should point to a
+        // actual address where the application is hosted instead
+        // of localhost.
+        exporting.setUrl(CHARTS_EXPORT_SERVICE_URL);
+        exporting.setButtons(new Buttons());
+        getConfiguration().setExporting(exporting);
     }
 }

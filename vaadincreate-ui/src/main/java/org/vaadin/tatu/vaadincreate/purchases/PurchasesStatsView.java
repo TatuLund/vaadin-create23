@@ -47,7 +47,7 @@ import com.vaadin.ui.VerticalLayout;
  * same pattern as {@link StatsView}.
  */
 @NullMarked
-@SuppressWarnings({ "serial", "java:S2160" })
+@SuppressWarnings({ "serial", "java:S2160", "java:S110" })
 public class PurchasesStatsView extends VerticalLayout implements TabView {
 
     private static final Logger logger = LoggerFactory
@@ -106,6 +106,7 @@ public class PurchasesStatsView extends VerticalLayout implements TabView {
         xaxis.setCategories(IntStream.rangeClosed(1, 10)
                 .mapToObj(String::valueOf).toArray(String[]::new));
         Utils.configureChartTooltip(conf);
+        topProductsChart.enableExporting();
         wrapper.addComponent(topProductsChart);
         return wrapper;
     }
@@ -125,6 +126,7 @@ public class PurchasesStatsView extends VerticalLayout implements TabView {
         xaxis.setCategories(IntStream.rangeClosed(1, 10)
                 .mapToObj(String::valueOf).toArray(String[]::new));
         Utils.configureChartTooltip(conf);
+        leastProductsChart.enableExporting();
         wrapper.addComponent(leastProductsChart);
         return wrapper;
     }
@@ -140,6 +142,7 @@ public class PurchasesStatsView extends VerticalLayout implements TabView {
         conf.getLegend().setEnabled(false);
         Utils.configureChartTooltip(conf);
         conf.getTooltip().setValueSuffix("€");
+        monthlyChart.enableExporting();
         wrapper.addComponent(monthlyChart);
         return wrapper;
     }

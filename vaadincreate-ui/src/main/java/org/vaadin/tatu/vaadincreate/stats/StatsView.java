@@ -19,11 +19,10 @@ import org.vaadin.tatu.vaadincreate.stats.StatsPresenter.ProductStatistics;
 import org.vaadin.tatu.vaadincreate.stats.StatsUtils.CategoryStats;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
-import com.vaadin.addon.charts.model.Buttons;
+import com.vaadin.addon.charts.LegendItemClickEvent;
 import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
-import com.vaadin.addon.charts.model.Exporting;
 import com.vaadin.addon.charts.model.Lang;
 import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.model.style.SolidColor;
@@ -37,7 +36,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 @NullMarked
-@SuppressWarnings({ "serial", "java:S2160" })
+@SuppressWarnings({ "serial", "java:S2160", "java:S110" })
 @RolesPermitted({ Role.USER, Role.ADMIN })
 public class StatsView extends VerticalLayout implements VaadinCreateView {
 
@@ -83,19 +82,6 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         setSizeFull();
         setMargin(false);
         addComponent(dashboard);
-        // Create the export configuration
-        var exporting = new Exporting(true);
-        // Customize the file name of the download file
-        exporting.setFilename("chart");
-        // Use the exporting configuration in the chart, note in the
-        // real production environment the URL should point to a
-        // actual address where the application is hosted instead
-        // of localhost.
-        exporting.setUrl("http://charts:export@127.0.0.1:8083/");
-        exporting.setButtons(new Buttons());
-        categoryChart.getConfiguration().setExporting(exporting);
-        availabilityChart.getConfiguration().setExporting(exporting);
-        priceChart.getConfiguration().setExporting(exporting);
         setComponentAlignment(dashboard, Alignment.MIDDLE_CENTER);
     }
 
@@ -108,6 +94,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         conf.setTitle(getTranslation(I18n.Stats.PRICES));
         conf.setLang(lang);
         Utils.configureChartTooltip(conf);
+        priceChart.enableExporting();
         priceChartWrapper.addComponent(priceChart);
         return priceChartWrapper;
     }
@@ -123,17 +110,21 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         conf.setLang(lang);
         Utils.configureChartTooltip(conf);
         categoryChartWrapper.addComponent(categoryChart);
-        categoryChart.addLegendItemClickListener(legendItemClicked -> {
-            var series = (DataSeries) legendItemClicked.getSeries();
-            series.setVisible(!series.isVisible(), true);
-            var titles = (DataSeries) categoryChart.getConfiguration()
-                    .getSeries().get(0);
-            var stockCounts = (DataSeries) categoryChart.getConfiguration()
-                    .getSeries().get(1);
-            categoryChart.setAttribute(AriaAttributes.LIVE, "polite");
-            updateCategoryChartAccessibilityAttributes(titles, stockCounts);
-        });
+        categoryChart.addLegendItemClickListener(this::toggleSeriesVisibility);
+        categoryChart.enableExporting();
         return categoryChartWrapper;
+    }
+
+    private void toggleSeriesVisibility(
+            LegendItemClickEvent legendItemClicked) {
+        var series = (DataSeries) legendItemClicked.getSeries();
+        series.setVisible(!series.isVisible(), true);
+        var titles = (DataSeries) categoryChart.getConfiguration()
+                .getSeries().get(0);
+        var stockCounts = (DataSeries) categoryChart.getConfiguration()
+                .getSeries().get(1);
+        categoryChart.setAttribute(AriaAttributes.LIVE, "polite");
+        updateCategoryChartAccessibilityAttributes(titles, stockCounts);
     }
 
     private CssLayout configureAvailabilityChart() {
@@ -147,6 +138,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         conf.setTitle(getTranslation(I18n.Stats.AVAILABILITIES));
         conf.setLang(lang);
         Utils.configureChartTooltip(conf);
+        availabilityChart.enableExporting();
         availabilityChartWrapper.addComponent(availabilityChart);
         return availabilityChartWrapper;
     }

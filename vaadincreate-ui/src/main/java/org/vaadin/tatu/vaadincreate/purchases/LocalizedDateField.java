@@ -24,7 +24,6 @@ public class LocalizedDateField extends DateField implements HasI18N {
      */
     LocalizedDateField(String caption) {
         super(caption);
-        setRequiredIndicatorVisible(true);
         setRangeEnd(LocalDate.now());
         setAssistiveText(
                 getTranslation(I18n.Purchases.DATE_FIELD_ASSISTIVE_TEXT));

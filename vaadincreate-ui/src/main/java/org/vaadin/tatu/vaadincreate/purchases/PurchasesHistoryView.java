@@ -21,6 +21,9 @@ import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
+import com.vaadin.data.Binder;
+import com.vaadin.data.BinderValidationStatus;
+import com.vaadin.data.StatusChangeEvent;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.UserError;
 import com.vaadin.ui.Button;
@@ -60,6 +63,8 @@ public class PurchasesHistoryView extends VerticalLayout
     private final Button exportButton;
     private final Button purgeButton;
     private final PurchaseHistoryCsvExporter csvExporter;
+    private final Binder<ExportRange> exportRangeBinder;
+    private final ExportRange exportRange;
     @Nullable
     private UI ui;
     @Nullable
@@ -72,6 +77,8 @@ public class PurchasesHistoryView extends VerticalLayout
         addStyleName(VaadinCreateTheme.PURCHASEHISTORYVIEW);
         presenter = new PurchaseHistoryPresenter();
         csvExporter = new PurchaseHistoryCsvExporter();
+        exportRangeBinder = new Binder<>(ExportRange.class);
+        exportRange = new ExportRange();
 
         historyGrid = new PurchaseHistoryGrid(presenter,
                 PurchaseHistoryMode.ALL, Utils.getCurrentUserOrThrow());
@@ -79,6 +86,7 @@ public class PurchasesHistoryView extends VerticalLayout
         fromDate = buildDateField(I18n.Purchases.FROM, FROM_DATE_ID);
         toDate = buildDateField(I18n.Purchases.TO, TO_DATE_ID);
         exportButton = buildExportButton();
+        bindExportRange();
         purgeButton = buildPurgeButton();
 
         var toolbar = buildToolbar();
@@ -154,9 +162,6 @@ public class PurchasesHistoryView extends VerticalLayout
         var field = new LocalizedDateField(getTranslation(translationKey));
         field.setId(id);
         field.setRangeStart(LocalDate.now().minusMonths(RETENTION_MONTHS));
-        field.addValueChangeListener(
-                e -> onDateValueChanged(e.isUserOriginated(),
-                        e.getSource() == toDate));
         return field;
     }
 
@@ -170,60 +175,93 @@ public class PurchasesHistoryView extends VerticalLayout
         return button;
     }
 
-    private void onDateValueChanged(boolean userOriginated,
-            boolean isToFieldChanged) {
-        validateDateInputs();
-        if (isDateRangeValid()) {
-            var fromInstant = fromDate.getValue()
-                    .atStartOfDay(ZoneId.systemDefault())
-                    .toInstant();
-            var toExclusive = toDate.getValue().plusDays(1)
-                    .atStartOfDay(ZoneId.systemDefault()).toInstant();
-            historyGrid.setSelectedRangeHighlight(fromInstant, toExclusive);
-            if (userOriginated && isToFieldChanged) {
-                var index = presenter.resolveFirstMatchingRowIndex(
-                        toDate.getValue());
-                if (index != null) {
-                    historyGrid.scrollToIndex(index);
-                }
-            }
-        } else {
+    private void bindExportRange() {
+        exportRangeBinder.forField(fromDate)
+                .asRequired(getTranslation(
+                        I18n.Purchases.EXPORT_MISSING_DATES))
+                .bind(ExportRange::getFrom, ExportRange::setFrom);
+        exportRangeBinder.forField(toDate)
+                .asRequired(getTranslation(
+                        I18n.Purchases.EXPORT_MISSING_DATES))
+                .bind(ExportRange::getTo, ExportRange::setTo);
+        exportRangeBinder
+                .withValidator(this::isToDateOnOrAfterFromDate,
+                        getTranslation(I18n.Purchases.EXPORT_INVALID_RANGE))
+                .withValidator(this::isExportRangeAtMostThreeMonths,
+                        getTranslation(I18n.Purchases.EXPORT_MAX_THREE_MONTHS));
+        exportRangeBinder.setValidationStatusHandler(
+                this::handleExportRangeValidationStatus);
+        exportRangeBinder.addStatusChangeListener(
+                this::onExportRangeStatusChanged);
+        exportRangeBinder.setBean(exportRange);
+    }
+
+    private boolean isToDateOnOrAfterFromDate(ExportRange range) {
+        var from = range.getFrom();
+        var to = range.getTo();
+        return from == null || to == null || !to.isBefore(from);
+    }
+
+    private boolean isExportRangeAtMostThreeMonths(ExportRange range) {
+        var from = range.getFrom();
+        var to = range.getTo();
+        return from == null || to == null || !to.isAfter(from.plusMonths(3));
+    }
+
+    private void handleExportRangeValidationStatus(
+            BinderValidationStatus<ExportRange> status) {
+        status.notifyBindingValidationStatusHandlers();
+        var toDateHasFieldError = status.getFieldValidationErrors().stream()
+                .anyMatch(fieldStatus -> fieldStatus.getField() == toDate);
+        if (toDateHasFieldError) {
+            return;
+        }
+
+        var beanError = status.getBeanValidationErrors().stream().findFirst();
+        toDate.setComponentError(beanError
+                .map(error -> new UserError(error.getErrorMessage()))
+                .orElse(null));
+    }
+
+    private void onExportRangeStatusChanged(StatusChangeEvent status) {
+        var valid = isExportRangeComplete() && !status.hasValidationErrors();
+        exportButton.setEnabled(valid && runningExport == null);
+        updateSelectedRangeHighlight(valid);
+    }
+
+    private boolean isExportRangeComplete() {
+        return exportRange.getFrom() != null && exportRange.getTo() != null;
+    }
+
+    private void updateSelectedRangeHighlight(boolean valid) {
+        if (!valid) {
             historyGrid.setSelectedRangeHighlight(null, null);
+            return;
         }
-    }
 
-    private void validateDateInputs() {
-        toDate.setComponentError(null);
-        if (fromDate.getValue() == null || toDate.getValue() == null) {
-            exportButton.setEnabled(false);
-            return;
-        }
-        if (toDate.getValue().isBefore(fromDate.getValue())) {
-            toDate.setComponentError(new UserError(
-                    getTranslation(I18n.Purchases.EXPORT_INVALID_RANGE)));
-            exportButton.setEnabled(false);
-            return;
-        }
-        if (toDate.getValue().isAfter(fromDate.getValue().plusMonths(3))) {
-            toDate.setComponentError(new UserError(
-                    getTranslation(I18n.Purchases.EXPORT_MAX_THREE_MONTHS)));
-            exportButton.setEnabled(false);
-            return;
-        }
-        exportButton.setEnabled(true);
-    }
+        var from = exportRange.getFrom();
+        var to = exportRange.getTo();
+        assert from != null;
+        assert to != null;
 
-    private boolean isDateRangeValid() {
-        return fromDate.getValue() != null && toDate.getValue() != null
-                && toDate.getComponentError() == null;
+        var fromInstant = from.atStartOfDay(ZoneId.systemDefault())
+                .toInstant();
+        var toExclusive = to.plusDays(1)
+                .atStartOfDay(ZoneId.systemDefault()).toInstant();
+        historyGrid.setSelectedRangeHighlight(fromInstant, toExclusive);
     }
 
     private void startExport() {
+        if (!exportRangeBinder.isValid()) {
+            return;
+        }
         exportButton.setIcon(VaadinIcons.SPINNER);
         Notification.show(getTranslation(I18n.Purchases.EXPORT_STARTED),
                 Type.TRAY_NOTIFICATION);
-        var from = fromDate.getValue();
-        var to = toDate.getValue();
+        var from = exportRange.getFrom();
+        var to = exportRange.getTo();
+        assert from != null;
+        assert to != null;
         runningExport = presenter.startExport(from, to,
                 rows -> Utils.access(ui, () -> onExportReady(from, to, rows)),
                 throwable -> Utils.access(ui, () -> {
@@ -245,8 +283,8 @@ public class PurchasesHistoryView extends VerticalLayout
 
     private void resetExportButtonState() {
         exportButton.setIcon(VaadinIcons.DOWNLOAD);
-        validateDateInputs();
         runningExport = null;
+        exportButton.setEnabled(exportRangeBinder.isValid());
         historyGrid.focus();
     }
 

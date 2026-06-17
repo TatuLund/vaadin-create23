@@ -58,7 +58,7 @@ public class PurchasesExportTest extends AbstractPurchasesTest {
         assertFalse("Export starts disabled with missing dates",
                 exportButton.isEnabled());
 
-        var from = LocalDate.now().minusDays(5);
+        var from = LocalDate.now().minusMonths(4);
         test(fromDate).setValue(from);
         assertFalse("Export stays disabled when only from is set",
                 exportButton.isEnabled());

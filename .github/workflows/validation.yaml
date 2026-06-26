@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: '25'
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: Install Chrome
         uses: browser-actions/setup-chrome@latest
         with:

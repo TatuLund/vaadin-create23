@@ -99,7 +99,9 @@ public class PurchasesHistoryView extends VerticalLayout
     private CssLayout buildToolbar() {
         var purgeWrapper = new CssLayout(purgeButton);
         purgeWrapper.addStyleName(VaadinCreateTheme.HAS_TOOLTIP);
-        var toolbar = new CssLayout(fromDate, toDate, exportButton,
+        var fromWrapper = new CssLayout(fromDate);
+        var toWrapper = new CssLayout(toDate);
+        var toolbar = new CssLayout(fromWrapper, toWrapper, exportButton,
                 purgeWrapper);
         toolbar.addStyleName(VaadinCreateTheme.PURCHASEHISTORYVIEW_TOOLBAR);
         toolbar.setWidth("100%");

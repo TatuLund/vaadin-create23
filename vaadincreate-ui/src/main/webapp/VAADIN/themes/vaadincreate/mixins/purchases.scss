@@ -10,18 +10,32 @@
   .v-grid-row.purchase-range > td {
     font-weight: 600;
   }
-
+  
   .purchasehistoryview-toolbar {
-    height: 32px !important;
+    height: fit-content;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: baseline;
-    justify-content: end;
     gap: 8px;
+
+    .v-button {
+      margin-top: auto;
+    }
 
     .has-tooltip {
       margin-left: auto;
       margin-top: auto;
+    }
+
+    .v-csslayout {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+    }
+
+    .v-datefield {
+      min-width: 120px;
     }
   }
 

@@ -12,8 +12,6 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class ExportRange implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     @Nullable
     private LocalDate from;
     @Nullable

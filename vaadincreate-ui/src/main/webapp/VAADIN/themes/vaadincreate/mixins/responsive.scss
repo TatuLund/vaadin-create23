@@ -238,6 +238,28 @@
     .valo-menu .v-menubar-menuitem-caption .v-icon {
        margin: 0 4px 0 0px;
     }
+
+    .purchasehistoryview-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+
+      .v-csslayout {
+        .v-caption {
+          width: 100px;
+        }
+        .v-datefield {
+          width: 100%;
+        }
+      }
+
+      .has-tooltip {
+        margin-left: 0;
+
+        .v-button {
+          width: 100%;
+        }
+      }
+    }
   }
 
   .v-ui[width-range~="551px-1000px"] {

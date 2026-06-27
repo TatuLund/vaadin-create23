@@ -108,6 +108,12 @@ $fake-grid-background-color: white;
     color: $highlight-contrast-color;
   }
 
+  // Allow scrolling menu when using on mobile landscape mode
+  .valo-menuitems {
+    overflow-y: auto;
+    height: calc(100% - 140px);    
+  }
+
   .valo-menu-item {
     padding: 4px 32px 4px 16px;	  
   }

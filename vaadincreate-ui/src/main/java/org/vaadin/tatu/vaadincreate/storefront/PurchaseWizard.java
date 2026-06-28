@@ -369,7 +369,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         try {
             binder.writeBean(address);
             showStep(3);
-        } catch (ValidationException ex) {
+        } catch (ValidationException _) {
             Notification.show(
                     getTranslation(I18n.Storefront.FILL_REQUIRED_FIELDS),
                     Notification.Type.WARNING_MESSAGE);

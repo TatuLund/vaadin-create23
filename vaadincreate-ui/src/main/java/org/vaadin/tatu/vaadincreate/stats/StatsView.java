@@ -354,7 +354,7 @@ public class StatsView extends VerticalLayout implements VaadinCreateView {
         // however Chart requires re-layout also when window size changes
         // when using non-fixed sizes.
         resizeListener = ui.getPage().addBrowserWindowResizeListener(
-                resizeEvent -> JavaScript.eval("vaadin.forceLayout()"));
+                _ -> JavaScript.eval("vaadin.forceLayout()"));
         availabilityChart.focus();
     }
 

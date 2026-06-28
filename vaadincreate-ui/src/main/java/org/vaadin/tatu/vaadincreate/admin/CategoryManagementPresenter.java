@@ -58,7 +58,7 @@ public class CategoryManagementPresenter implements Serializable {
             getEventBus().post(new CategoriesUpdatedEvent(id,
                     CategoriesUpdatedEvent.CategoryChange.DELETE));
             view.showDeleted(category.getName());
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             view.showDeleteError();
         }
         logger.info("Category '{}' removed.", category.getName());
@@ -87,9 +87,8 @@ public class CategoryManagementPresenter implements Serializable {
             assert id != null : "Category ID should not be null";
             getEventBus().post(new CategoriesUpdatedEvent(id,
                     CategoriesUpdatedEvent.CategoryChange.SAVE));
-
         } catch (OptimisticLockException | IllegalStateException
-                | IllegalArgumentException e) {
+                | IllegalArgumentException _) {
             requestUpdateCategories();
             view.showSaveConflict();
         }

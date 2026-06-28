@@ -104,7 +104,7 @@ public class AppLayout extends Composite implements HasI18N {
         menuLayout.addComponent(title);
 
         // Add a button to toggle the visibility of the menu when on mobile
-        toggleButton = new Button(getTranslation(I18n.App.MENU), click -> {
+        toggleButton = new Button(getTranslation(I18n.App.MENU), _ -> {
             if (menuLayout.getStyleName().contains(ValoTheme.MENU_VISIBLE)) {
                 menuLayout.removeStyleName(ValoTheme.MENU_VISIBLE);
                 Notification.show(getTranslation(I18n.App.MENU_CLOSE),
@@ -127,7 +127,7 @@ public class AppLayout extends Composite implements HasI18N {
         var logout = new MenuBar();
         logout.setId("logout");
         var item = logout.addItem(getTranslation(I18n.App.LOGOUT),
-                e -> handleConfirmLogoutWhenChanges(ui, nav));
+                _ -> handleConfirmLogoutWhenChanges(ui, nav));
         item.setIcon(VaadinIcons.KEY);
 
         item.setDescription(

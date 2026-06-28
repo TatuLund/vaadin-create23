@@ -44,7 +44,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @NullMarked
 @AllPermitted
-@SuppressWarnings({ "serial", "java:S2160" })
+@SuppressWarnings({ "serial", "java:S2160", "java:S110" })
 public class AboutView extends VerticalLayout implements VaadinCreateView {
 
     private static final Logger logger = LoggerFactory

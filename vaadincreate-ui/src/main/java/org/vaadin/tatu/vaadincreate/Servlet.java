@@ -82,14 +82,13 @@ public class Servlet extends VaadinServlet {
                 logger.info("Invalidating session");
                 try {
                     wrappedSession.invalidate();
-                } catch (IllegalStateException e) {
+                } catch (IllegalStateException _) {
                     logger.warn("Session already invalidated");
                 }
             }
             logger.debug("Session ended");
         });
-        getService().addServiceDestroyListener(
-                serviceDestroy -> EventBus.get().shutdown());
+        getService().addServiceDestroyListener(_ -> EventBus.get().shutdown());
     }
 
     protected void handleError(ErrorEvent errorEvent, VaadinSession session) {

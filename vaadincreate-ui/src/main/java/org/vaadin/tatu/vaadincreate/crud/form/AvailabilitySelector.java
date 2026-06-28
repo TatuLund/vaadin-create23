@@ -21,7 +21,7 @@ import com.vaadin.ui.ComboBox;
  * </pre>
  */
 @NullMarked
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "java:S110" })
 public class AvailabilitySelector extends ComboBox<Availability> {
 
     public AvailabilitySelector(String caption) {
@@ -34,7 +34,7 @@ public class AvailabilitySelector extends ComboBox<Availability> {
         // chosen
         setEmptySelectionAllowed(false);
         setTextInputAllowed(false);
-        setItemIconGenerator(item -> VaadinIcons.CIRCLE);
+        setItemIconGenerator(_ -> VaadinIcons.CIRCLE);
         setStyleGenerator(this::getAvailabilityStyle);
         addValueChangeListener(valueChange -> {
             if (valueChange.getOldValue() != null) {

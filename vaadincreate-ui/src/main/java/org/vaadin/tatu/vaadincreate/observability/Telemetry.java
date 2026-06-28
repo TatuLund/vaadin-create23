@@ -15,7 +15,6 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
-import io.opentelemetry.context.Scope;
 
 /**
  * Utility class for logging telemetry events using OpenTelemetry.
@@ -166,7 +165,7 @@ public final class Telemetry {
         Objects.requireNonNull(command, "Command cannot be null");
         Span span = start(spanName);
         span.setAttribute("task.type", command.getClass().getSimpleName());
-        try (Scope scope = span.makeCurrent()) {
+        try (var _ = span.makeCurrent()) {
             command.run();
             span.setStatus(StatusCode.OK);
         } catch (Exception e) {

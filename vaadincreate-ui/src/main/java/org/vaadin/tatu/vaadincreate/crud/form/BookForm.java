@@ -159,26 +159,26 @@ public class BookForm extends Composite implements HasI18N {
             }
         });
 
-        binder.addValueChangeListener(valueChange -> {
+        binder.addValueChangeListener(_ -> {
             var hasChanges = binder.hasChanges();
             saveButton.setEnabled(hasChanges && isValid);
             discardButton.setEnabled(hasChanges);
         });
 
-        saveButton.addClickListener(clicked -> handleSave());
+        saveButton.addClickListener(_ -> handleSave());
         saveButton.setClickShortcut(KeyCode.S, ModifierKey.CTRL);
         AttributeExtension.of(saveButton)
                 .setAttribute(AriaAttributes.KEYSHORTCUTS, "Control+S");
 
-        discardButton.addClickListener(clicked -> handleDiscard());
+        discardButton.addClickListener(_ -> handleDiscard());
 
         cancelButton
-                .addClickListener(clicked -> fireEvent(new CancelEvent(this)));
+                .addClickListener(_ -> fireEvent(new CancelEvent(this)));
         cancelButton.setClickShortcut(KeyCode.ESCAPE);
         AttributeExtension.of(cancelButton)
                 .setAttribute(AriaAttributes.KEYSHORTCUTS, "Escape");
 
-        deleteButton.addClickListener(clicked -> handleDelete());
+        deleteButton.addClickListener(_ -> handleDelete());
         pageDownRegistration = addShortcutListener(
                 new ShortcutListener("Next", KeyCode.PAGE_DOWN, null) {
                     @Override
@@ -225,7 +225,7 @@ public class BookForm extends Composite implements HasI18N {
             dialog.setCancelText(getTranslation(I18n.CANCEL));
             dialog.open();
             dialog.addConfirmedListener(
-                    e -> fireEvent(new DeleteEvent(this, currentProduct)));
+                    _ -> fireEvent(new DeleteEvent(this, currentProduct)));
         }
     }
 

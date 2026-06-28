@@ -118,7 +118,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
     }
 
     private void showLoginView() {
-        setContent(new LoginView(getAccessControl(), login -> onLogin()));
+        setContent(new LoginView(getAccessControl(), _ -> onLogin()));
     }
 
     private void onLogin() {
@@ -189,9 +189,9 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
         dialog.setCancelText(getTranslation(I18n.DISCARD));
         dialog.setConfirmText(getTranslation(I18n.YES));
         var id = draft.getId() == null ? "new" : String.valueOf(draft.getId());
-        dialog.addConfirmedListener(confirmed -> getNavigator()
+        dialog.addConfirmedListener(_ -> getNavigator()
                 .navigateTo(String.format("%s/%s", BooksView.VIEW_NAME, id)));
-        dialog.addCancelledListener(cancelled -> {
+        dialog.addCancelledListener(_ -> {
             logger.info("Draft discarded");
             getProductService().saveDraft(CurrentUser.get().get(), null);
             getNavigator().navigateTo(target);
@@ -294,7 +294,7 @@ public class VaadinCreateUI extends UI implements EventBusListener, HasI18N {
                 });
             }
         }
-        case ShutdownEvent shutdownEvent -> {
+        case ShutdownEvent _ -> {
             access(() -> Notification.show(getTranslation(I18n.LOGOUT_60S),
                     Type.WARNING_MESSAGE));
             CompletableFuture.runAsync(() -> access(() -> {

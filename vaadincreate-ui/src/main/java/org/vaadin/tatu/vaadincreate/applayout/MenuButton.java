@@ -37,7 +37,7 @@ public class MenuButton extends Button
         this.caption = caption;
         setId(path);
         setData(path);
-        addClickListener(click -> getUI().getNavigator().navigateTo(path));
+        addClickListener(_ -> getUI().getNavigator().navigateTo(path));
         setPrimaryStyleName(ValoTheme.MENU_ITEM);
         if (path.equals("")) {
             addStyleName(ValoTheme.MENU_SELECTED);

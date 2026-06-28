@@ -48,7 +48,7 @@ public class TabNavigator extends Composite {
         tabSheet.setSizeFull();
         tabSheet.addStyleNames(ValoTheme.TABSHEET_PADDED_TABBAR,
                 ValoTheme.TABSHEET_CENTERED_TABS);
-        tabSheet.addSelectedTabChangeListener(tabChange -> {
+        tabSheet.addSelectedTabChangeListener(_ -> {
             var selectedTab = (TabView) tabSheet.getSelectedTab();
             String tabName = null;
             tabName = selectedTab.getTabName();

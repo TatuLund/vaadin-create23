@@ -121,7 +121,7 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
                 .setId("requester");
 
         var approverColumn = grid
-                .addColumn(p -> p.getApprover().getName())
+                .addColumn(purchase -> purchase.getApprover().getName())
                 .setCaption(getTranslation(I18n.Storefront.APPROVER))
                 .setSortable(false).setId("approver");
 
@@ -245,8 +245,8 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
     }
 
     private void applyRowStyleGenerator() {
-        grid.setStyleGenerator(p -> {
-            var createdAt = p.getCreatedAt();
+        grid.setStyleGenerator(purchase -> {
+            var createdAt = purchase.getCreatedAt();
             if (createdAt == null) {
                 return null;
             }

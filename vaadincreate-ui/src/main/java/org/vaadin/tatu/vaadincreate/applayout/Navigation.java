@@ -39,9 +39,8 @@ class Navigation extends Composite implements HasAttributes<Navigation> {
      * Clear the selected state of all menu items.
      */
     void clearSelected() {
-        var iter = items.iterator();
-        while (iter.hasNext()) {
-            iter.next().removeStyleName(ValoTheme.MENU_SELECTED);
+        for (var menuItem : items) {
+            menuItem.removeStyleName(ValoTheme.MENU_SELECTED);
         }
     }
 
@@ -52,10 +51,10 @@ class Navigation extends Composite implements HasAttributes<Navigation> {
      *            The path to set as selected
      */
     void setSelected(String path) {
-        var iter = items.iterator();
-        while (iter.hasNext()) {
-            var menuItem = (MenuButton) iter.next();
-            menuItem.setSelected(menuItem.getPath().equals(path));
+        for (var menuItem : items) {
+            if (menuItem instanceof MenuButton menuButton) {
+                menuButton.setSelected(menuButton.getPath().equals(path));
+            }
         }
     }
 }

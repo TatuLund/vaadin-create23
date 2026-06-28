@@ -8,7 +8,6 @@ import org.jspecify.annotations.Nullable;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.data.Category;
 import org.vaadin.tatu.vaadincreate.components.ConfirmDialog;
-import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
@@ -19,7 +18,6 @@ import com.vaadin.data.ValueContext;
 import com.vaadin.event.ConnectorEventListener;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.Registration;
-import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
@@ -69,16 +67,16 @@ public class CategoryForm extends Composite implements HasI18N {
         this.category = category;
         nameField = new NameField(category);
         nameField.addFocusListener(
-                focus -> fireEvent(new FormFocusEvent(this, true)));
+                _ -> fireEvent(new FormFocusEvent(this, true)));
         nameField.addBlurListener(
-                blur -> fireEvent(new FormFocusEvent(this, false)));
+                _ -> fireEvent(new FormFocusEvent(this, false)));
         // Focus the name field if the category is new
         if (category.getId() == null) {
             nameField.focus();
         }
 
         deleteButton = new Button(VaadinIcons.TRASH,
-                click -> handleConfirmDelete());
+                _ -> handleConfirmDelete());
         deleteButton.addStyleNames(ValoTheme.BUTTON_DANGER,
                 VaadinCreateTheme.SLOT_HAS_TOOLTIP);
         deleteButton.setDescription(String.format("%s: %s",
@@ -106,7 +104,7 @@ public class CategoryForm extends Composite implements HasI18N {
                 .withValidator(new CategoryNotDuplicateValidator())
                 .bind("name");
         binder.setBean(category);
-        binder.addValueChangeListener(valueChange -> {
+        binder.addValueChangeListener(_ -> {
             if (binder.isValid()) {
                 fireEvent(new FormSaveEvent(this, category));
             }
@@ -133,8 +131,8 @@ public class CategoryForm extends Composite implements HasI18N {
         dialog.setCancelText(getTranslation(I18n.CANCEL));
         dialog.open();
         dialog.addConfirmedListener(
-                confirmed -> fireEvent(new FormDeleteEvent(this, category)));
-        dialog.addCancelledListener(cancelled -> deleteButton.setEnabled(true));
+                _ -> fireEvent(new FormDeleteEvent(this, category)));
+        dialog.addCancelledListener(_ -> deleteButton.setEnabled(true));
     }
 
     /**
@@ -279,22 +277,6 @@ public class CategoryForm extends Composite implements HasI18N {
          */
         public boolean isFocused() {
             return focused;
-        }
-    }
-
-    static class NameField extends TextField
-            implements HasI18N, HasAttributes<NameField> {
-
-        public NameField(Category category) {
-            super();
-            setAttribute("autocomplete", "off");
-            setAriaLabel(getTranslation(I18n.Category.CATEGORY_NAME));
-            removeAttribute("aria-labelledby");
-            setId(String.format("name-%s", category.getId()));
-            setValueChangeMode(ValueChangeMode.LAZY);
-            setValueChangeTimeout(2000);
-            setWidthFull();
-            setPlaceholder(getTranslation(I18n.Category.INSTRUCTION));
         }
     }
 }

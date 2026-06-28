@@ -58,7 +58,7 @@ public class NumberField extends CustomField<Integer>
         textField.addValueChangeListener(valueChange -> {
             var result = stockCountConverter.convertToModel(
                     textField.getValue(), Utils.createValueContext());
-            result.ifError(errorMessage -> {
+            result.ifError(_ -> {
                 // Return null so that Binder will trigger validation error on
                 // missing value.
                 intValue = null;
@@ -138,6 +138,7 @@ public class NumberField extends CustomField<Integer>
         removeAttribute(AriaAttributes.LABELLEDBY);
     }
 
+    @SuppressWarnings("java:S110")
     static class Input extends TextField implements HasAttributes<Input> {
 
         public Input() {

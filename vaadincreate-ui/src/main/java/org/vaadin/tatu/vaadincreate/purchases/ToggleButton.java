@@ -39,7 +39,7 @@ class ToggleButton extends Button
                 String.valueOf(grid.isDetailsVisible(purchase)));
         addStyleNames(ValoTheme.BUTTON_ICON_ONLY,
                 ValoTheme.BUTTON_BORDERLESS);
-        addClickListener(clickEvent -> {
+        addClickListener(_ -> {
             grid.setDetailsVisible(purchase,
                     !grid.isDetailsVisible(purchase));
             setIcon(grid.isDetailsVisible(purchase) ? VaadinIcons.ANGLE_DOWN

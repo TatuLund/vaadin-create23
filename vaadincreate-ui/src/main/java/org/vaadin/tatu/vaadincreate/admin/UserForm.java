@@ -95,14 +95,13 @@ public class UserForm extends Composite implements HasI18N {
 
         binder.bind(role, "role");
         binder.bind(active, "active");
-        binder.addValueChangeListener(valueChange -> fireEvent(
-                new FormChangedEvent(this, isFormValid())));
+        binder.addValueChangeListener(
+                _ -> fireEvent(new FormChangedEvent(this, isFormValid())));
 
         // Deputy selection is outside the User binder (transient UI field).
         // Notify the view when deputy is selected so Save can be re-enabled.
         deputyApprover.addValueChangeListener(
-                valueChange -> fireEvent(new FormChangedEvent(this,
-                        isFormValid())));
+                _ -> fireEvent(new FormChangedEvent(this, isFormValid())));
 
         setCompositionRoot(form);
     }
@@ -112,10 +111,7 @@ public class UserForm extends Composite implements HasI18N {
             return false;
         }
         // When deputy is required (visible), a selection is mandatory.
-        if (deputyRequired && deputyApprover.getValue() == null) {
-            return false;
-        }
-        return true;
+        return !(deputyRequired && deputyApprover.getValue() == null);
     }
 
     /**

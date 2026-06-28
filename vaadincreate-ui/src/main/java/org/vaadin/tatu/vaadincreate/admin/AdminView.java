@@ -17,7 +17,7 @@ import com.vaadin.ui.VerticalLayout;
 // This is an example of a possible sub-navigation pattern in Vaadin 8
 // using url parameters.
 @NullMarked
-@SuppressWarnings({ "serial", "java:S2160" })
+@SuppressWarnings({ "serial", "java:S2160", "java:S110" })
 @RolesPermitted({ Role.ADMIN })
 public class AdminView extends VerticalLayout implements View, HasI18N {
 
@@ -60,7 +60,7 @@ public class AdminView extends VerticalLayout implements View, HasI18N {
         tabNavigator.addTabView(users,
                 getTranslation(UserManagementView.VIEW_NAME),
                 VaadinIcons.USERS);
-        tabNavigator.addViewChangeListener(tabChange -> {
+        tabNavigator.addViewChangeListener(_ -> {
             if (users.getStyleName()
                     .contains(VaadinCreateTheme.ADMINVIEW_USERFORM_CHANGES)) {
                 var errorText = getTranslation(I18n.User.CHANGES);

@@ -98,7 +98,7 @@ public class UserManagementPresenter implements Serializable {
      * @throws IllegalStateException
      *             if the current user is not an admin
      */
-    public void updateUser(@Nullable User user) {
+    public void updateUser(User user) {
         accessControl.assertAdmin();
         saveUser(user, null);
     }
@@ -140,12 +140,12 @@ public class UserManagementPresenter implements Serializable {
             } else {
                 view.showDeputyRequired(e.getPendingCount(), approvers);
             }
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException _) {
             // Covers "last active admin" and similar guards.
             view.showLastAdminError();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             view.showDuplicateError();
-        } catch (OptimisticLockException e) {
+        } catch (OptimisticLockException _) {
             requestUpdateUsers();
             view.showSaveConflict();
         }

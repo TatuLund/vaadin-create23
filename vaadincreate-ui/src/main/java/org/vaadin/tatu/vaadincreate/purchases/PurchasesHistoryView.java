@@ -173,7 +173,7 @@ public class PurchasesHistoryView extends VerticalLayout
         button.setId(EXPORT_BUTTON_ID);
         button.setEnabled(false);
         button.setDisableOnClick(true);
-        button.addClickListener(e -> startExport());
+        button.addClickListener(_ -> startExport());
         return button;
     }
 
@@ -195,6 +195,15 @@ public class PurchasesHistoryView extends VerticalLayout
                 this::handleExportRangeValidationStatus);
         exportRangeBinder.addStatusChangeListener(
                 this::onExportRangeStatusChanged);
+        exportRangeBinder.addValueChangeListener(valueChange -> {
+            if (toDate.getValue() != null && valueChange.isUserOriginated()) {
+                var index = presenter.resolveFirstMatchingRowIndex(
+                        toDate.getValue());
+                if (index != null) {
+                    historyGrid.scrollToIndex(index);
+                }
+            }
+        });
         exportRangeBinder.setBean(exportRange);
     }
 
@@ -279,7 +288,7 @@ public class PurchasesHistoryView extends VerticalLayout
         var resource = csvExporter.createResource(from, to, rows, getLocale(),
                 getTranslation(I18n.Purchases.EXPORT));
         var dialog = new PurchaseExportDownloadDialog(resource);
-        dialog.addCloseListener(e -> resetExportButtonState());
+        dialog.addCloseListener(_ -> resetExportButtonState());
         dialog.open();
     }
 
@@ -298,7 +307,7 @@ public class PurchasesHistoryView extends VerticalLayout
         button.setDescription(getTranslation(I18n.Purchases.PURGE_TOOLTIP));
         button.setEnabled(false);
         button.setDisableOnClick(true);
-        button.addClickListener(e -> openPurgeConfirmDialog());
+        button.addClickListener(_ -> openPurgeConfirmDialog());
         return button;
     }
 
@@ -310,8 +319,8 @@ public class PurchasesHistoryView extends VerticalLayout
                 ConfirmDialog.Type.ALERT);
         dialog.setConfirmText(getTranslation(I18n.Purchases.PURGE));
         dialog.setCancelText(getTranslation(I18n.CANCEL));
-        dialog.addConfirmedListener(e -> executePurge());
-        dialog.addCancelledListener(e -> purgeButton.setEnabled(true));
+        dialog.addConfirmedListener(_ -> executePurge());
+        dialog.addCancelledListener(_ -> purgeButton.setEnabled(true));
         dialog.open();
     }
 

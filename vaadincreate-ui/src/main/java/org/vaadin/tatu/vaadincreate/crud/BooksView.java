@@ -21,9 +21,6 @@ import org.vaadin.tatu.vaadincreate.crud.form.BookForm;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm.SaveEvent;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm.DeleteEvent;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm.DiscardEvent;
-import org.vaadin.tatu.vaadincreate.crud.form.BookForm.CancelEvent;
-import org.vaadin.tatu.vaadincreate.crud.form.BookForm.NavigateNextEvent;
-import org.vaadin.tatu.vaadincreate.crud.form.BookForm.NavigatePreviousEvent;
 import org.vaadin.tatu.vaadincreate.crud.form.BookForm.DraftSaveEvent;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 import org.vaadin.tatu.vaadincreate.observability.Telemetry;
@@ -126,9 +123,9 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         form.addSaveListener(this::onFormSave);
         form.addDeleteListener(this::onFormDelete);
         form.addDiscardListener(this::onFormDiscard);
-        form.addCancelListener(this::onFormCancel);
-        form.addNavigateNextListener(this::onNavigateNext);
-        form.addNavigatePreviousListener(this::onNavigatePrevious);
+        form.addCancelListener(_ -> onFormCancel());
+        form.addNavigateNextListener(_ -> onNavigateNext());
+        form.addNavigatePreviousListener(_ -> onNavigatePrevious());
         form.addDraftSaveListener(this::onDraftSave);
     }
 
@@ -166,16 +163,15 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         }
     }
 
-    private void onFormCancel(CancelEvent cancelEvent) {
+    private void onFormCancel() {
         presenter.cancelProduct();
     }
 
-    private void onNavigateNext(NavigateNextEvent navigateNextEvent) {
+    private void onNavigateNext() {
         navigateRelative(1);
     }
 
-    private void onNavigatePrevious(
-            NavigatePreviousEvent navigatePreviousEvent) {
+    private void onNavigatePrevious() {
         navigateRelative(-1);
     }
 
@@ -203,14 +199,14 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         if (form.hasChanges()) {
             var dialog = createDiscardChangesConfirmDialog();
             dialog.open();
-            dialog.addConfirmedListener(confirmed -> {
+            dialog.addConfirmedListener(_ -> {
                 presenter.unlockBook();
                 form.showForm(false);
                 setFragmentParameter("");
                 newProduct.setEnabled(true);
             }); // Keeping block due to multiple statements
             dialog.addCancelledListener(
-                    cancelled -> grid.select(form.getProduct()));
+                    _ -> grid.select(form.getProduct()));
         } else {
             presenter.rowSelected(product);
             if (product != null) {
@@ -272,7 +268,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         newProduct.addStyleName(ValoTheme.BUTTON_PRIMARY);
         newProduct.setIcon(VaadinIcons.PLUS_CIRCLE);
         newProduct.setDisableOnClick(true);
-        newProduct.addClickListener(click -> presenter.newProduct());
+        newProduct.addClickListener(_ -> presenter.newProduct());
         newProduct.setClickShortcut(KeyCode.N, ModifierKey.ALT);
         AttributeExtension.of(newProduct)
                 .setAttribute(AriaAttributes.KEYSHORTCUTS, "Alt+N");
@@ -325,7 +321,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         if (form.hasChanges()) {
             var dialog = createDiscardChangesConfirmDialog();
             dialog.open();
-            dialog.addConfirmedListener(confirmed -> closeForm());
+            dialog.addConfirmedListener(_ -> closeForm());
         } else {
             closeForm();
         }
@@ -617,7 +613,7 @@ public class BooksView extends CssLayout implements VaadinCreateView {
         if (form.hasChanges()) {
             var dialog = createDiscardChangesConfirmDialog();
             dialog.open();
-            dialog.addConfirmedListener(confirmed -> {
+            dialog.addConfirmedListener(_ -> {
                 form.showForm(false);
                 event.navigate();
             });

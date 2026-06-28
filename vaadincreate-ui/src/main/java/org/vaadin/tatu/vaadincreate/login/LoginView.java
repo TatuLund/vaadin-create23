@@ -209,7 +209,7 @@ public class LoginView extends Composite implements HasI18N {
         buttons.addComponent(login);
         login.setDisableOnClick(true);
         login.setId("login-button");
-        login.addClickListener(click -> {
+        login.addClickListener(_ -> {
             try {
                 login();
             } finally {
@@ -222,7 +222,7 @@ public class LoginView extends Composite implements HasI18N {
         forgotPassword.addStyleNames(ValoTheme.BUTTON_LINK,
                 VaadinCreateTheme.LOGINVIEW_FORGOTBUTTON);
         buttons.addComponent(forgotPassword);
-        forgotPassword.addClickListener(click -> showHintNotification());
+        forgotPassword.addClickListener(_ -> showHintNotification());
 
         lang.setWidth(18, Unit.EM);
         loginForm.addComponent(lang);

@@ -33,7 +33,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * </pre>
  */
 @NullMarked
-@SuppressWarnings({ "serial", "java:S2160" })
+@SuppressWarnings({ "serial", "java:S2160", "java:S110" })
 public class FilterField extends TextField
         implements HasI18N, HasAttributes<FilterField> {
 

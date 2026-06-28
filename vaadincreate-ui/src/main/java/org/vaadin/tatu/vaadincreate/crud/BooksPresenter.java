@@ -208,7 +208,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
             } else {
                 try {
                     lockAndEditIfExistsAndIsUnlocked(productId);
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException _) {
                     view.showNotValidId(productId);
                     logger.warn("Attempt to edit invalid id '{}'", productId);
                 }

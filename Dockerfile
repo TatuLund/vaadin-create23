@@ -1,5 +1,5 @@
 # Produce the WAR file for the Vaadin 8 application
-FROM maven:3.9.12-eclipse-temurin-21 AS build
+FROM maven:3.9.12-eclipse-temurin-25 AS build
 COPY . /app/
 # Set the working directory
 WORKDIR /app
@@ -10,7 +10,7 @@ ENV VAADIN_PRO_KEY=${VAADIN_PRO_KEY}
 RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests -Prelease
 RUN mv /app/vaadincreate-ui/target/*.war /app/vaadincreate-ui/target/ROOT.war
 # Create the final image
-FROM tomcat:9-jre21
+FROM tomcat:9-jre25
 # Add OpenTelemetry Java agent (version can be updated)
 ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.22.0/opentelemetry-javaagent.jar /otel/opentelemetry-javaagent.jar
 

@@ -1,6 +1,6 @@
 # Vaadin Create '23 demo app (Vaadin 8)
 
-This is a showcase application for advanced Vaadin 8 topics. The application focuses on UI design and the architecture of the UI code. These techniques help to keep existing Vaadin 8 applications up to date. The application is built with Vaadin 8.30.1, which is fully compatible with Java 11 and 21.
+This is a showcase application for advanced Vaadin 8 topics. The application focuses on UI design and the architecture of the UI code. These techniques help to keep existing Vaadin 8 applications up to date. The application is built with Vaadin 8.31.1, which is fully compatible with modern Java versions from 11 to 25.
 
 This project is my dogfooding test application for legacy Vaadin 8, as we are still maintaining it under our commercial extended maintenance program. Although it is somewhat fabricated, I have included many details that you would find in a real production application.
 
@@ -116,7 +116,7 @@ For further development of this project, the following toolchain is recommended:
 - Eclipse IDE
 - m2e wtp plug-in (install it from Eclipse Marketplace)
 - Vaadin Eclipse plug-in (install it from Eclipse Marketplace)
-- For Java hotswapping setup HotSwapAgent with JBR 21 or use JRebel Eclipse plug-in (install it from Eclipse Marketplace)
+- For Java hotswapping setup HotSwapAgent with JBR 25 or use JRebel Eclipse plug-in (install it from Eclipse Marketplace)
 - Chrome/Edge/Firefox browser
 
 ### Importing project

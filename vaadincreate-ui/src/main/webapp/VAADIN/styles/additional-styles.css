@@ -1,4 +1,4 @@
-/* This is a workaround. There is a bug in SASS compiler when using JDK17 minus sign is converted to un-supported character */
+/* This is a workaround. There is a bug in SASS compiler when using JDK9 and newer minus sign is converted to un-supported character if locale is not english */
 .vaadincreate .v-filterselect [class$="button"]:before {
   margin-top: -0.47em;
 }

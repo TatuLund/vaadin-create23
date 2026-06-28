@@ -32,7 +32,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 @NullMarked
-@SuppressWarnings({ "serial", "java:S2160" })
+@SuppressWarnings({ "serial", "java:S2160", "java:S110" })
 public class UserManagementView extends VerticalLayout
         implements TabView, HasAttributes<UserManagementView> {
 
@@ -215,7 +215,7 @@ public class UserManagementView extends VerticalLayout
                 userSelect.setValue(null);
                 Telemetry.saveItem(user);
             }
-        } catch (ValidationException e1) {
+        } catch (ValidationException _) {
             // NOP
         }
     }

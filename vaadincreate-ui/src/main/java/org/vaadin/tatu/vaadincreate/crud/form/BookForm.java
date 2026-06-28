@@ -22,7 +22,6 @@ import org.vaadin.tatu.vaadincreate.components.ConfirmDialog;
 import org.vaadin.tatu.vaadincreate.components.Html;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaAttributes;
 import org.vaadin.tatu.vaadincreate.components.AttributeExtension.AriaRoles;
-import org.vaadin.tatu.vaadincreate.components.AttributeExtension.HasAttributes;
 import org.vaadin.tatu.vaadincreate.components.ConfirmDialog.Type;
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
@@ -51,7 +50,6 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.ReflectTools;
 
@@ -594,27 +592,6 @@ public class BookForm extends Composite implements HasI18N {
             DraftSaveListener draftSaveListener) {
         return addListener(DraftSaveEvent.class, draftSaveListener,
                 DraftSaveListener.METHOD);
-    }
-
-    /**
-     * A form component that extends VerticalLayout and sets ARIA attributes to
-     * enhance accessibility. The form is given a tabindex, an aria-label for
-     * screen readers, a role of "form", and aria-keyshortcuts for keyboard
-     * navigation.
-     */
-    public class Form extends VerticalLayout implements HasAttributes<Form> {
-
-        /**
-         * Constructs a new Form instance and sets ARIA attributes to enhance
-         * accessibility.
-         */
-        public Form() {
-            super();
-            // Set ARIA attributes for the form to make it accessible
-            setAttribute("tabindex", 0);
-            setRole(AriaRoles.FORM);
-            setAttribute(AriaAttributes.KEYSHORTCUTS, "Escape PageDown PageUp");
-        }
     }
 
     abstract static class AbstractBookFormEvent extends Component.Event {

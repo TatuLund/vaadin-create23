@@ -17,7 +17,7 @@
 		<logback.version>1.5.25</logback.version>
 		<slf4j.version>2.0.9</slf4j.version>
 		<testbench.version>5.4.1</testbench.version>
-		<jetty.plugin.version>12.0.15</jetty.plugin.version>
+		<jetty.plugin.version>12.1.10</jetty.plugin.version>
 		<jspecify.version>1.0.0</jspecify.version>
 		<servlet.version>4.0.1</servlet.version>
 		<selenium.version>4.44.0</selenium.version>

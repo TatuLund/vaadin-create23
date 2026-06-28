@@ -215,7 +215,7 @@ public class ServletTest extends UIUnitTest {
             throws ServiceException {
         // Arrange
         mockVaadin();
-        var bootstrapListener = new Servlet.LocaleBootstrapListener();
+        var bootstrapListener = new LocaleBootstrapListener();
         var request = VaadinRequest.getCurrent();
         var mockRequest = new MockRequest((HttpServletRequest) request,
                 VaadinService.getCurrent());

@@ -277,7 +277,7 @@ public class BooksPresenter implements Serializable, EventBusListener {
 
         try {
             product = getService().updateProduct(product);
-        } catch (OptimisticLockException e) {
+        } catch (OptimisticLockException _) {
             logger.warn(
                     "Optimistic lock happened, this should not happen in BooksView");
             view.showInternalError();

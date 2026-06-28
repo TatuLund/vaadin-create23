@@ -66,8 +66,8 @@ public class DecisionDialog extends AbstractDialog implements HasI18N {
      */
     public DecisionDialog(boolean isApprove,
             DecisionConfirmedListener listener) {
-        super();
         Objects.requireNonNull(listener, "Listener must not be null");
+        super();
         this.isApprove = isApprove;
 
         window.setClosable(true);

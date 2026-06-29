@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Test;
@@ -35,15 +34,19 @@ public class PurchasesHistoryViewIT extends AbstractViewTest {
         toDateField.setDate(toDate);
 
         var grid = $(GridElement.class).first();
-        // Format date in Finnish Locale using "." as separator to match the grid cell
+        // Format date in Finnish Locale using "." as separator to match the
+        // grid cell
         // content
-        String searchDate = toDate.format(DateTimeFormatter.ofPattern("d.M.yyyy"));
+        String searchDate = toDate
+                .format(DateTimeFormatter.ofPattern("d.M.yyyy"));
         assertTrue(cellsContaining(grid, searchDate) > 0);
     }
 
     private long cellsContaining(GridElement grid, String text) {
         return grid.findElements(By.className("v-grid-cell")).stream()
-                .filter(element -> element.getAttribute("innerHTML").contains(text)).count();
+                .filter(element -> element.getAttribute("innerHTML")
+                        .contains(text))
+                .count();
     }
 
     @Test

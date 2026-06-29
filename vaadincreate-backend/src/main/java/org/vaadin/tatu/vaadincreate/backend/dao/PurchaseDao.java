@@ -181,7 +181,7 @@ public class PurchaseDao {
     public long countByApproverAndStatus(User approver, PurchaseStatus status) {
         Objects.requireNonNull(approver, APPROVER_MUST_NOT_BE_NULL);
         Objects.requireNonNull(status, "Status must not be null");
-        int approverId = Objects.requireNonNull(approver.getId(),
+        var approverId = Objects.requireNonNull(approver.getId(),
                 "Approver ID must not be null");
 
         logger.info("Counting Purchases by approver: ({}) and status: {}",
@@ -307,8 +307,8 @@ public class PurchaseDao {
         return result;
     }
 
-    private List<Purchase> fetchPurchasesWithLinesByIds(
-            Session session,
+    @SuppressWarnings("null")
+    private List<Purchase> fetchPurchasesWithLinesByIds(Session session,
             List<Integer> purchaseIds) {
         if (purchaseIds.isEmpty()) {
             return List.of();
@@ -434,7 +434,12 @@ public class PurchaseDao {
     private void updateProductStock(Purchase purchase,
             HashMap<Integer, Product> productsById) {
         for (var line : purchase.getLines()) {
-            var productId = line.getProduct().getId();
+            var prod = line.getProduct();
+            if (prod == null) {
+                throw new IllegalArgumentException(
+                        "Product in purchase line should not be null");
+            }
+            var productId = prod.getId();
             var product = productsById.get(productId);
             if (product == null) {
                 logger.error(
@@ -455,7 +460,12 @@ public class PurchaseDao {
             Purchase purchase, HashMap<Integer, Product> productsById) {
         var insufficientItems = new ArrayList<String>();
         for (var line : purchase.getLines()) {
-            var productId = line.getProduct().getId();
+            var prod = line.getProduct();
+            if (prod == null) {
+                throw new IllegalArgumentException(
+                        "Product in purchase line should not be null");
+            }
+            var productId = prod.getId();
             @Nullable
             Product product = session.get(Product.class, productId);
             if (product == null) {

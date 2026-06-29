@@ -108,6 +108,7 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
         });
     }
 
+    @SuppressWarnings("null")
     private void configureColumns() {
         grid.addComponentColumn(purchase -> new ToggleButton(grid, purchase))
                 .setWidth(50);

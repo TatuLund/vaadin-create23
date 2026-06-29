@@ -78,6 +78,7 @@ public class StorefrontPresenter implements Serializable {
      *            the user who created the purchases
      * @return optional snapshot of the latest delivery address
      */
+    @SuppressWarnings("null")
     public Optional<Address> getDefaultAddress(User requester) {
         return findLatestPurchase(requester).map(Purchase::getDeliveryAddress)
                 .map(this::copyAddress);
@@ -91,6 +92,7 @@ public class StorefrontPresenter implements Serializable {
      *            the user who created the purchases
      * @return optional latest approver
      */
+    @SuppressWarnings("null")
     public Optional<User> getDefaultSupervisor(User requester) {
         return findLatestPurchase(requester).map(Purchase::getApprover);
     }

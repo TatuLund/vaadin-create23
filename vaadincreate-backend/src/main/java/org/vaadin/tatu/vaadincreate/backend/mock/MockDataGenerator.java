@@ -23,7 +23,7 @@ import org.vaadin.tatu.vaadincreate.backend.data.User;
 import org.vaadin.tatu.vaadincreate.backend.data.User.Role;
 
 @NullMarked
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "null", "java:S8688" })
 public class MockDataGenerator implements Serializable {
     private static final Random random = new Random(1);
 
@@ -60,8 +60,7 @@ public class MockDataGenerator implements Serializable {
         return categories;
     }
 
-    public static List<Product> createProducts(
-            List<Category> categories) {
+    public static List<Product> createProducts(List<Category> categories) {
         var products = new ArrayList<Product>();
         for (int i = 0; i < 100; i++) {
             var p = createProduct(categories);
@@ -193,8 +192,7 @@ public class MockDataGenerator implements Serializable {
                 var purchase = new Purchase();
 
                 var requester = customers.get(
-                        (dayIndex * purchasesPerDate + i)
-                                % customers.size());
+                        (dayIndex * purchasesPerDate + i) % customers.size());
                 purchase.setRequester(requester);
 
                 var approver = approvers.get(random.nextInt(approvers.size()));
@@ -212,7 +210,7 @@ public class MockDataGenerator implements Serializable {
 
                 if (status != PurchaseStatus.PENDING) {
                     // For decided purchases, set decision metadata.
-                    var decidedAt = created.plusHours(1 + random.nextInt(72))
+                    var decidedAt = created.plusHours(1L + random.nextInt(72))
                             .atZone(zone).toInstant();
                     purchase.setDecidedAt(decidedAt);
                     switch (status) {

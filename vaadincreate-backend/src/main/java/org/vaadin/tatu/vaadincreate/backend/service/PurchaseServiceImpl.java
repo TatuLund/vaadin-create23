@@ -35,7 +35,7 @@ import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
  * purchase operations.
  */
 @NullMarked
-@SuppressWarnings("java:S6548")
+@SuppressWarnings({ "java:S6548", "java:S8688" })
 public class PurchaseServiceImpl implements PurchaseService {
 
     private static final String CURRENT_USER_MUST_NOT_BE_NULL = "Current user must not be null";
@@ -137,19 +137,19 @@ public class PurchaseServiceImpl implements PurchaseService {
                 requester.getName());
 
         // Create the purchase entity
-        Purchase purchase = new Purchase();
+        var purchase = new Purchase();
         purchase.setRequester(requester);
         purchase.setStatus(PurchaseStatus.PENDING);
-        purchase.setCreatedAt(Instant.now());
+        purchase.setCreatedAt(now());
 
         // Snapshot the delivery address
-        Address addressSnapshot = new Address(address.getStreet(),
+        var addressSnapshot = new Address(address.getStreet(),
                 address.getPostalCode(), address.getCity(),
                 address.getCountry());
         purchase.setDeliveryAddress(addressSnapshot);
 
         // Determine approver
-        User approver = defaultApproverOrNull;
+        var approver = defaultApproverOrNull;
         if (approver == null) {
             // Try to find default supervisor
             approver = purchaseDao.findSupervisorForEmployee(requester);
@@ -159,7 +159,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         populatePurchaseLines(cart, purchase);
 
         // Persist the purchase (with cascading to lines)
-        Purchase savedPurchase = purchaseDao.updatePurchase(purchase);
+        var savedPurchase = purchaseDao.updatePurchase(purchase);
 
         logger.info("Created pending purchase with ID: {} for requester: '{}'",
                 savedPurchase.getId(), requester.getName());
@@ -168,14 +168,19 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @SuppressWarnings("null")
+    private static Instant now() {
+        return Instant.now();
+    }
+
+    @SuppressWarnings("null")
     private void populatePurchaseLines(Cart cart, Purchase purchase) {
         // Create purchase lines from cart
         for (Map.Entry<Product, Integer> entry : cart.getItems().entrySet()) {
-            Product product = entry.getKey();
-            Integer quantity = entry.getValue();
+            var product = entry.getKey();
+            var quantity = entry.getValue();
 
             // Snapshot the current price
-            PurchaseLine line = new PurchaseLine();
+            var line = new PurchaseLine();
             line.setPurchase(purchase);
             line.setProduct(product);
             line.setQuantity(quantity);
@@ -298,8 +303,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @SuppressWarnings("null")
     public List<MonthlyPurchaseStat> getMonthlyTotals(int months) {
         var now = YearMonth.now();
-        var since = now.minusMonths(months - 1L).atDay(1).atStartOfDay()
-                .atZone(ZoneId.systemDefault()).toInstant();
+        var since = getStartInstant(months, now);
 
         // Pre-fill all months with BigDecimal.ZERO so gaps are continuous
         Map<String, BigDecimal> totals = new LinkedHashMap<>();
@@ -317,6 +321,12 @@ public class PurchaseServiceImpl implements PurchaseService {
         logger.info("Loaded {} rows of monthly purchase stats over {} months.",
                 rows.size(), months);
         return result;
+    }
+
+    @SuppressWarnings("null")
+    private static Instant getStartInstant(int months, YearMonth now) {
+        return now.minusMonths(months - 1L).atDay(1).atStartOfDay()
+                .atZone(ZoneId.systemDefault()).toInstant();
     }
 
     private void updateMonthlyTotals(Map<String, BigDecimal> totals,

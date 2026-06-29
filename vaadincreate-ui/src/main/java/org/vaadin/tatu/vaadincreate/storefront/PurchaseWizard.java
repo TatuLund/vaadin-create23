@@ -203,6 +203,7 @@ public class PurchaseWizard extends Composite implements HasI18N {
         stepContent.setMargin(true);
     }
 
+    @SuppressWarnings("null")
     private void showStep3() {
         stepTitle.setValue(getTranslation(I18n.Storefront.STEP3_TITLE));
         applyDefaultSupervisorIfAvailable();

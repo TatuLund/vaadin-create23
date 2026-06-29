@@ -37,13 +37,14 @@ public class UserServiceImpl implements UserService {
         return instance;
     }
 
+    @SuppressWarnings("null")
     private UserServiceImpl() {
         this.userDao = new UserDao();
         this.purchaseDao = new PurchaseDao();
         var env = System.getProperty("generate.data");
         if (env == null || env.equals("true")) {
             var users = MockDataGenerator.createUsers();
-            users.forEach(user -> userDao.updateUser(user));
+            users.forEach(userDao::updateUser);
             logger.info("Generated mock user data");
         }
     }
@@ -60,6 +61,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @SuppressWarnings("null")
     public User updateUser(User editedUser,
             @Nullable User deputyApproverOrNull) {
         Objects.requireNonNull(editedUser, "User must not be null");
@@ -108,6 +110,7 @@ public class UserServiceImpl implements UserService {
 
     // Validate that the deputy is active, has an approver role, and is not the
     // same user as the one being deactivated.
+    @SuppressWarnings("null")
     private void validateDeputy(User editedUser, User deputy) {
         Objects.requireNonNull(deputy, "Deputy must not be null");
         var id = Objects.requireNonNull(deputy.getId(),
@@ -152,6 +155,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @SuppressWarnings("null")
     public void removeUser(Integer userId) {
         Objects.requireNonNull(userId, "User ID must not be null");
         try {

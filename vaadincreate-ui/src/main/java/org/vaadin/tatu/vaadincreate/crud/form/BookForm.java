@@ -125,7 +125,7 @@ public class BookForm extends Composite implements HasI18N {
      * selection, navigation etc.) must be handled by listeners registered in
      * the owning view.
      */
-    @SuppressWarnings("java:S5669")
+    @SuppressWarnings({ "java:S5669", "null" })
     public BookForm() {
         setCompositionRoot(sidePanel);
         setVisible(false);

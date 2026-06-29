@@ -68,13 +68,7 @@ public class UserForm extends Composite implements HasI18N {
         active = new CheckBox(getTranslation(I18n.User.ACTIVE));
         active.setId("active-field");
 
-        deputyApprover = new ComboBox<>(
-                getTranslation(I18n.User.DEPUTY_APPROVER));
-        deputyApprover.setItemCaptionGenerator(User::getName);
-        deputyApprover.setEmptySelectionAllowed(false);
-        deputyApprover.setId("deputy-approver-field");
-        deputyApprover.setRequiredIndicatorVisible(true);
-        deputyApprover.setVisible(false);
+        setupDeputyApprover();
 
         form.addComponents(username, password, password2, role, active,
                 deputyApprover);
@@ -104,6 +98,17 @@ public class UserForm extends Composite implements HasI18N {
                 _ -> fireEvent(new FormChangedEvent(this, isFormValid())));
 
         setCompositionRoot(form);
+    }
+
+    @SuppressWarnings("null")
+    private void setupDeputyApprover() {
+        deputyApprover = new ComboBox<>(
+                getTranslation(I18n.User.DEPUTY_APPROVER));
+        deputyApprover.setItemCaptionGenerator(User::getName);
+        deputyApprover.setEmptySelectionAllowed(false);
+        deputyApprover.setId("deputy-approver-field");
+        deputyApprover.setRequiredIndicatorVisible(true);
+        deputyApprover.setVisible(false);
     }
 
     private boolean isFormValid() {

@@ -69,6 +69,7 @@ public class BookGrid extends Grid<Product>
      * categories. The grid also supports highlighting the last edited row and
      * showing a traffic light icon for availability.
      */
+    @SuppressWarnings("null")
     public BookGrid() {
         setId("book-grid");
         setSizeFull();
@@ -336,6 +337,7 @@ public class BookGrid extends Grid<Product>
         return wrapper.build();
     }
 
+    @SuppressWarnings("null")
     private String formatCategories(Product product) {
         assert product != null : PRODUCT_MUST_NOT_BE_NULL;
 

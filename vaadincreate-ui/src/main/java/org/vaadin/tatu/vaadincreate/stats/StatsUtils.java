@@ -32,6 +32,7 @@ public class StatsUtils {
      * @return a map where keys are price bracket strings (e.g., "10 - 20 €")
      *         and values are the counts of products in those brackets
      */
+    @SuppressWarnings("null")
     public static Map<String, Long> calculatePriceStats(
             Collection<Product> products) {
         var priceStats = getPriceBrackets(products)
@@ -56,6 +57,7 @@ public class StatsUtils {
      * @return a map where keys are category names and values are arrays
      *         containing the counts of products in those categories
      */
+    @SuppressWarnings("null")
     public static Map<String, CategoryStats> calculateCategoryStats(
             Collection<Category> categories, Collection<Product> products) {
         var categoryStats = categories.stream()

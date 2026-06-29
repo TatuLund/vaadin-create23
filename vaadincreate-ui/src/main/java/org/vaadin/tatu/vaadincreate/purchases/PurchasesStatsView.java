@@ -217,6 +217,7 @@ public class PurchasesStatsView extends VerticalLayout implements TabView {
         chart.setAriaLabel(alt);
     }
 
+    @SuppressWarnings("null")
     private void updateMonthlyChart(List<MonthlyPurchaseStat> stats) {
         var conf = monthlyChart.getConfiguration();
         var xAxis = new XAxis();

@@ -160,6 +160,7 @@ public class PurchasesHistoryView extends VerticalLayout
         }
     }
 
+    @SuppressWarnings("java:S8688")
     private DateField buildDateField(String translationKey, String id) {
         var field = new LocalizedDateField(getTranslation(translationKey));
         field.setId(id);
@@ -177,6 +178,7 @@ public class PurchasesHistoryView extends VerticalLayout
         return button;
     }
 
+    @SuppressWarnings("null")
     private void bindExportRange() {
         exportRangeBinder.forField(fromDate)
                 .asRequired(getTranslation(

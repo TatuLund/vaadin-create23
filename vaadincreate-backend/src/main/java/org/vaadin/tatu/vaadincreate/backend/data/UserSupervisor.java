@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Entity representing the mapping between an employee and their default
@@ -24,17 +25,20 @@ public class UserSupervisor extends AbstractEntity {
     @NotNull(message = "{employee.required}")
     @ManyToOne(optional = false)
     @JoinColumn(name = "employee_id", nullable = false)
+    @Nullable
     private User employee;
 
     @NotNull(message = "{supervisor.required}")
     @ManyToOne(optional = false)
     @JoinColumn(name = "supervisor_id", nullable = false)
+    @Nullable
     private User supervisor;
 
     /**
      * Default constructor.
      */
     public UserSupervisor() {
+        // Needed by JPA
     }
 
     /**
@@ -52,6 +56,7 @@ public class UserSupervisor extends AbstractEntity {
                 "Supervisor must not be null");
     }
 
+    @Nullable
     public User getEmployee() {
         return employee;
     }
@@ -60,6 +65,7 @@ public class UserSupervisor extends AbstractEntity {
         this.employee = employee;
     }
 
+    @Nullable
     public User getSupervisor() {
         return supervisor;
     }

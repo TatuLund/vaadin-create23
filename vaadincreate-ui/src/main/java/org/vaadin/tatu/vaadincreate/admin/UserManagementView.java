@@ -83,6 +83,7 @@ public class UserManagementView extends VerticalLayout
         setSizeFull();
     }
 
+    @SuppressWarnings("null")
     private HorizontalLayout createHeader() {
         var header = new HorizontalLayout();
         userSelect.setEmptySelectionAllowed(false);

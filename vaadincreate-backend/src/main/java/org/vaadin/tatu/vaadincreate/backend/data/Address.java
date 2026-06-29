@@ -8,6 +8,7 @@ import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Value object representing a physical address. This is used as an embedded
@@ -52,6 +53,7 @@ public class Address implements Serializable {
      * @param country
      *            the country name
      */
+    @SuppressWarnings("null")
     public Address(String street, String postalCode, String city,
             String country) {
         this.street = Objects.requireNonNull(street, "Street must not be null");
@@ -95,12 +97,12 @@ public class Address implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj)
             return true;
-        if (o == null || getClass() != o.getClass())
+        if (obj == null || getClass() != obj.getClass())
             return false;
-        Address address = (Address) o;
+        Address address = (Address) obj;
         return Objects.equals(street, address.street)
                 && Objects.equals(postalCode, address.postalCode)
                 && Objects.equals(city, address.city)

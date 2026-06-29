@@ -25,6 +25,7 @@ class AddressForm extends FormLayout
      * @param address
      *            the Address bean to bind to the form
      */
+    @SuppressWarnings("null")
     public AddressForm(Address address) {
         binder = new Binder<>(Address.class);
         setRole("form");

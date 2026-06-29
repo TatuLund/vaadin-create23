@@ -22,7 +22,7 @@ public class Message extends AbstractEntity {
     @Column(name = "date_stamp")
     @NotNull
     @PastOrPresent
-    @SuppressWarnings("null")
+    @SuppressWarnings({ "null", "java:S8688" })
     private LocalDateTime dateStamp = LocalDateTime.now();
 
     public Message() {

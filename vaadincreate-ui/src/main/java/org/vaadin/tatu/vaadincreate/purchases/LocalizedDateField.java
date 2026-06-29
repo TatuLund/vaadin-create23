@@ -22,6 +22,7 @@ public class LocalizedDateField extends DateField implements HasI18N {
      *            the caption for the DateField, which should be localized
      *            before being passed.
      */
+    @SuppressWarnings("java:S8688")
     LocalizedDateField(String caption) {
         super(caption);
         setRangeEnd(LocalDate.now());

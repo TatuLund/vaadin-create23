@@ -25,6 +25,7 @@ class ProductGrid extends Grid<ProductDto> implements HasI18N {
 
     private final FooterRow footerRow;
 
+    @SuppressWarnings("null")
     ProductGrid() {
         super(ProductDto.class);
         setId("purchase-grid");

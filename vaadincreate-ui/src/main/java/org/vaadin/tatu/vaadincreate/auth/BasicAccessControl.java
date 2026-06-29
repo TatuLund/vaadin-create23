@@ -47,6 +47,7 @@ public class BasicAccessControl implements AccessControl {
     }
 
     @Override
+    @SuppressWarnings("null")
     public boolean isUserSignedIn() {
         return CurrentUser.get().map(User::isActive).orElse(false);
     }

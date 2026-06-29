@@ -77,6 +77,7 @@ public class Purchase extends AbstractEntity {
     /**
      * Default constructor.
      */
+    @SuppressWarnings("null")
     public Purchase() {
         this.createdAt = Instant.now();
         this.deliveryAddress = new Address();
@@ -90,6 +91,7 @@ public class Purchase extends AbstractEntity {
      * @param deliveryAddress
      *            the delivery address for this purchase
      */
+    @SuppressWarnings("null")
     public Purchase(User requester, Address deliveryAddress) {
         this.requester = Objects.requireNonNull(requester,
                 "Requester must not be null");
@@ -199,6 +201,7 @@ public class Purchase extends AbstractEntity {
      * @return the total purchase amount
      */
     @Transient
+    @SuppressWarnings("null")
     public BigDecimal getTotalAmount() {
         return lines.stream().map(PurchaseLine::getLineTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

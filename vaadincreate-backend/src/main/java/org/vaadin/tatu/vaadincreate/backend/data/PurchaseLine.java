@@ -36,6 +36,7 @@ public class PurchaseLine extends AbstractEntity {
     @NotNull(message = "{product.required}")
     @ManyToOne(optional = false)
     @JoinColumn(name = "product_id", nullable = false)
+    @Nullable
     private Product product;
 
     @Min(value = 1, message = "{quantity.min}")
@@ -52,6 +53,7 @@ public class PurchaseLine extends AbstractEntity {
      * Default constructor.
      */
     public PurchaseLine() {
+        // Needed by JPA
     }
 
     /**
@@ -87,6 +89,7 @@ public class PurchaseLine extends AbstractEntity {
         this.purchase = purchase;
     }
 
+    @Nullable
     public Product getProduct() {
         return product;
     }
@@ -118,6 +121,7 @@ public class PurchaseLine extends AbstractEntity {
      * @return the line total
      */
     @Transient
+    @SuppressWarnings("null")
     public BigDecimal getLineTotal() {
         return unitPrice.multiply(BigDecimal.valueOf(quantity));
     }

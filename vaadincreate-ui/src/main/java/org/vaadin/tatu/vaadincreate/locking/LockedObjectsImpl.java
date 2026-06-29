@@ -94,21 +94,16 @@ public class LockedObjectsImpl implements LockedObjects, EventBusListener {
 
     @Override
     public void eventFired(AbstractEvent event) {
-        if (event instanceof LockingEvent lockingEvent) {
+        if (event instanceof LockingEvent(Class<?> type, Integer id, Integer userId, String userName, boolean locked)) {
             synchronized (lockedObjects) {
-                if (lockingEvent.locked()
-                        && !lockedObjects.containsKey(lockingEvent.id())) {
+                if (locked && !lockedObjects.containsKey(id)) {
                     logger.debug("Remote locked {} ({}) by user {}",
-                            lockingEvent.type().getSimpleName(),
-                            lockingEvent.id(), lockingEvent.userId());
-                    lockedObjects.put(lockingEvent.id(), new UserData(
-                            lockingEvent.userName(), lockingEvent.userId()));
-                } else if (!lockingEvent.locked()
-                        && lockedObjects.containsKey(lockingEvent.id())) {
+                            type.getSimpleName(), id, userId);
+                    lockedObjects.put(id, new UserData(userName, userId));
+                } else if (!locked && lockedObjects.containsKey(id)) {
                     logger.debug("Remote unlocked {} ({}) by user {}",
-                            lockingEvent.type().getSimpleName(),
-                            lockingEvent.id(), lockingEvent.userId());
-                    lockedObjects.remove(lockingEvent.id());
+                            type.getSimpleName(), id, userId);
+                    lockedObjects.remove(id);
                 }
             }
         }

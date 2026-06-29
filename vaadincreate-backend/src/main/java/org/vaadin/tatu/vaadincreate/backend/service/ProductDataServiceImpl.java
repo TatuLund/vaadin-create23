@@ -33,6 +33,7 @@ public class ProductDataServiceImpl implements ProductDataService {
     private final ProductDao productDao;
     private final DraftDao draftDao;
 
+    @SuppressWarnings("null")
     private ProductDataServiceImpl() {
         this.productDao = new ProductDao();
         this.draftDao = new DraftDao();
@@ -42,7 +43,7 @@ public class ProductDataServiceImpl implements ProductDataService {
             categories.forEach(productDao::updateCategory);
             var savedCategories = getSavedCategories();
             var products = MockDataGenerator.createProducts(savedCategories);
-            products.forEach(prod -> productDao.updateProduct(prod));
+            products.forEach(productDao::updateProduct);
             logger.info("Generated mock product data");
         }
     }
@@ -67,6 +68,7 @@ public class ProductDataServiceImpl implements ProductDataService {
     }
 
     @Override
+    @SuppressWarnings("null")
     public void deleteProduct(Integer id) {
         Objects.requireNonNull(id, ID_CANT_BE_NULL);
         try {

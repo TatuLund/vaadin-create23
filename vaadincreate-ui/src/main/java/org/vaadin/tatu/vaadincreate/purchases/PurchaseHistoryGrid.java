@@ -293,6 +293,9 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
 
     private void adjustColumns(int width) {
         grid.getColumns().forEach(column -> column.setHidden(false));
+        if (width < 600 && mode == PurchaseHistoryMode.PENDING_APPROVALS) {
+            grid.getColumn("actions").setHidden(true);
+        }
         if (width < 800) {
             grid.getColumn(PURCHASE_ID).setHidden(true);
             grid.getColumn(REQUESTER).setHidden(true);

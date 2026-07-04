@@ -380,7 +380,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 toExclusive);
         var rows = new ArrayList<PurchaseExportRow>();
         for (var purchase : purchases) {
-            var lineIndex = 1;
+            var lineIndex = 0;
             for (PurchaseLine line : purchase.getLines()) {
                 lineIndex++;
                 addProductToExportRow(rows, purchase, lineIndex, line);

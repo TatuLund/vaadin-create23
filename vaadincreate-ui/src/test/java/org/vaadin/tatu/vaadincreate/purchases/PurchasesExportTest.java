@@ -82,16 +82,17 @@ public class PurchasesExportTest extends AbstractPurchasesTest {
     }
 
     @Test
-    public void export_date_fields_disallow_future_dates_with_range_end_today() {
+    public void export_date_fields_disallow_future_dates_with_range_end_of_last_purchase() {
         view = navigate(PurchasesView.VIEW_NAME, PurchasesView.class);
 
         var fromDate = $(DateField.class).id(PurchasesHistoryView.FROM_DATE_ID);
         var toDate = $(DateField.class).id(PurchasesHistoryView.TO_DATE_ID);
+        var lastPurchaseDate = lastPurchaseDate();
 
-        assertEquals("From date range end should be today", LocalDate.now(),
-                fromDate.getRangeEnd());
-        assertEquals("To date range end should be today", LocalDate.now(),
-                toDate.getRangeEnd());
+        assertEquals("From date range end should be last purchase date",
+                lastPurchaseDate, fromDate.getRangeEnd());
+        assertEquals("To date range end should be last purchase date",
+                lastPurchaseDate, toDate.getRangeEnd());
     }
 
     @Test
@@ -141,7 +142,7 @@ public class PurchasesExportTest extends AbstractPurchasesTest {
         var historyGrid = $(Grid.class).id("purchase-history-grid");
 
         var from = LocalDate.now().minusDays(10);
-        var to = LocalDate.now();
+        var to = lastPurchaseDate();
         test(fromDate).setValue(from);
         test(toDate).setValue(to);
 

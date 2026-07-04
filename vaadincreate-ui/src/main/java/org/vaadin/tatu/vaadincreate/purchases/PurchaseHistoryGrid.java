@@ -37,11 +37,11 @@ import com.vaadin.ui.UI;
 @SuppressWarnings({ "serial", "java:S2160" })
 public class PurchaseHistoryGrid extends Composite implements HasI18N {
 
-    private static final String DECISION_REASON = "decision-reason";
-    private static final String DECIDED_AT = "decided-at";
-    private static final String REQUESTER = "requester";
-    private static final String APPROVER = "approver";
-    private static final String PURCHASE_ID = "purchase-id";
+    static final String DECISION_REASON = "decision-reason";
+    static final String DECIDED_AT = "decided-at";
+    static final String REQUESTER = "requester";
+    static final String APPROVER = "approver";
+    static final String PURCHASE_ID = "purchase-id";
 
     private final Grid<Purchase> grid = new Grid<>();
     private final PurchaseHistoryPresenter presenter;

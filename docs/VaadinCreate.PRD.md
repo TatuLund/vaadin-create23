@@ -771,7 +771,7 @@ When the window width is less than 800 pixels, the history grid shall adjust its
 - Hide columns: purchase id, requester, approver, decided at and decision reason.
 - Show the hidden columns as extentend content in the details row.
 
-### 18.3 Approvals tab (pending approvals)
+### 18.3 Approvals tab (pending approvals)  
 
 The Purchases view shall provide an approvals tab that lists only purchases pending approval for the current approver.
 

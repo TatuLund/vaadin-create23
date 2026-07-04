@@ -1,13 +1,18 @@
 package org.vaadin.tatu.vaadincreate.purchases;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+
 import org.junit.After;
 import org.junit.Before;
 import org.vaadin.tatu.vaadincreate.AbstractUITest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateUI;
 import org.vaadin.tatu.vaadincreate.backend.ProductDataService;
+import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
+import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;
@@ -68,6 +73,15 @@ public abstract class AbstractPurchasesTest extends AbstractUITest {
         ui = new VaadinCreateUI();
         mockVaadin(ui);
         login(name, password);
+    }
+
+    LocalDate lastPurchaseDate() {
+        var service = PurchaseService.get();
+        var user = Utils.getCurrentUserOrThrow();
+        var purchases = service.fetchPurchases(PurchaseHistoryMode.ALL, 0, 1,
+                user);
+        var instant = purchases.get(0).getCreatedAt();
+        return instant.atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
     static void swapApprovalsPresenter(

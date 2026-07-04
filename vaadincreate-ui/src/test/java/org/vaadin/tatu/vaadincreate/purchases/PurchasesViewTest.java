@@ -175,6 +175,48 @@ public class PurchasesViewTest extends AbstractPurchasesTest {
         SerializationDebugUtil.assertSerializable(view);
     }
 
+    @Test
+    public void purchase_grid_responds_to_window_resize() {
+        view = navigate(PurchasesView.VIEW_NAME, PurchasesView.class);
+
+        var historyGrid = $(Grid.class).id("purchase-history-grid");
+        assertNotNull("Purchase history grid should be present", historyGrid);
+
+        // WHEN: Simulate window resize to a small width
+        ui.getPage().updateBrowserWindowSize(600, 800, true);
+
+        // THEN: Certain columns are hidden in the grid
+        assertTrue("Purchase ID column should be hidden",
+                historyGrid.getColumn(PurchaseHistoryGrid.PURCHASE_ID)
+                        .isHidden());
+        assertTrue("Requester column should be hidden",
+                historyGrid.getColumn(PurchaseHistoryGrid.REQUESTER)
+                        .isHidden());
+        assertTrue("Approver column should be hidden",
+                historyGrid.getColumn(PurchaseHistoryGrid.APPROVER)
+                        .isHidden());
+        assertTrue("Decided At column should be hidden",
+                historyGrid.getColumn(PurchaseHistoryGrid.DECIDED_AT)
+                        .isHidden());
+
+        // WHEN: Simulate window resize to a larger width
+        ui.getPage().updateBrowserWindowSize(1200, 800, true);
+
+        // THEN: All columns are visible again
+        assertFalse("Purchase ID column should be visible",
+                historyGrid.getColumn(PurchaseHistoryGrid.PURCHASE_ID)
+                        .isHidden());
+        assertFalse("Requester column should be visible",
+                historyGrid.getColumn(PurchaseHistoryGrid.REQUESTER)
+                        .isHidden());
+        assertFalse("Approver column should be visible",
+                historyGrid.getColumn(PurchaseHistoryGrid.APPROVER)
+                        .isHidden());
+        assertFalse("Decided At column should be visible",
+                historyGrid.getColumn(PurchaseHistoryGrid.DECIDED_AT)
+                        .isHidden());
+    }
+
     private void assertPurchaseLineItems(Purchase purchase, Label details) {
         assertNotNull("Details component should be present", details);
         var html = details.getValue();

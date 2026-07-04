@@ -70,19 +70,23 @@ public class ProductDao {
      * @param id
      *            the ID of the product to be deleted
      */
-    @SuppressWarnings("unused")
     public void deleteProduct(Integer id) {
         Objects.requireNonNull(id, "Product ID must not be null");
         HibernateUtil.inTransaction(session -> {
             @Nullable
             Product product = session.get(Product.class, id);
-            if (product == null) {
-                throw new IllegalArgumentException(
-                        "Product with ID " + id + " not found");
-            }
+            ensureProductExists(id, product);
             logger.info("Deleting Product: ({})", id);
             session.delete(product);
         });
+    }
+
+    @SuppressWarnings("unused")
+    private void ensureProductExists(Integer id, Product product) {
+        if (product == null) {
+            throw new IllegalArgumentException(
+                    "Product with ID " + id + " not found");
+        }
     }
 
     /**

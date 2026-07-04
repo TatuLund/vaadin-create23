@@ -20,6 +20,7 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 import com.vaadin.data.provider.CallbackDataProvider;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.server.SerializableFunction;
+import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.grid.ScrollDestination;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Composite;
@@ -35,6 +36,13 @@ import com.vaadin.ui.UI;
 @NullMarked
 @SuppressWarnings({ "serial", "java:S2160" })
 public class PurchaseHistoryGrid extends Composite implements HasI18N {
+
+    private static final String DECISION_REASON = "decision-reason";
+    private static final String DECIDED_AT = "decided-at";
+    private static final String REQUESTER = "requester";
+    private static final String APPROVER = "approver";
+    private static final String PURCHASE_ID = "purchase-id";
+
     private final Grid<Purchase> grid = new Grid<>();
     private final PurchaseHistoryPresenter presenter;
     private final PurchaseHistoryMode mode;
@@ -48,6 +56,8 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
 
     @Nullable
     private UI ui;
+    @Nullable
+    private Registration resizeRegistration;
 
     /**
      * Creates a new PurchaseHistoryGrid.
@@ -94,7 +104,6 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
 
         configureColumns();
         configureDataProvider();
-        configureDetailsGenerator();
         setupDetailsToggle();
     }
 
@@ -113,18 +122,17 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
         grid.addComponentColumn(purchase -> new ToggleButton(grid, purchase))
                 .setWidth(50);
 
-        var idColumn = grid.addColumn(Purchase::getId)
+        grid.addColumn(Purchase::getId)
                 .setCaption(getTranslation(I18n.Storefront.PURCHASE_ID))
-                .setSortable(false).setId("purchase-id");
+                .setSortable(false).setId(PURCHASE_ID);
 
-        var requesterColumn = grid.addColumn(p -> p.getRequester().getName())
+        grid.addColumn(purchase -> purchase.getRequester().getName())
                 .setCaption(getTranslation(I18n.REQUESTER)).setSortable(false)
-                .setId("requester");
+                .setId(REQUESTER);
 
-        var approverColumn = grid
-                .addColumn(purchase -> purchase.getApprover().getName())
+        grid.addColumn(purchase -> purchase.getApprover().getName())
                 .setCaption(getTranslation(I18n.Storefront.APPROVER))
-                .setSortable(false).setId("approver");
+                .setSortable(false).setId(APPROVER);
 
         grid.addColumn(
                 purchase -> Utils.formatDateTime(purchase.getCreatedAt()))
@@ -135,33 +143,21 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
                 .setCaption(getTranslation(I18n.STATUS)).setSortable(false)
                 .setId("status");
 
-        var decidedAtColumn = grid.addColumn(purchase -> {
+        grid.addColumn(purchase -> {
             Instant decidedAt = purchase.getDecidedAt();
             return decidedAt != null ? Utils.formatDateTime(decidedAt) : "";
         }).setCaption(getTranslation(I18n.Storefront.DECIDED_AT))
-                .setId("decided-at").setSortable(false);
+                .setId(DECIDED_AT).setSortable(false);
 
         grid.addColumn(Purchase::getTotalAmount, new EuroRenderer())
                 .setCaption(getTranslation(I18n.TOTAL)).setId("total-amount")
                 .setSortable(false);
 
-        var decisionReasonColumn = grid.addColumn(purchase -> {
+        grid.addColumn(purchase -> {
             var reason = purchase.getDecisionReason();
             return reason != null ? reason : "";
         }).setCaption(getTranslation(I18n.Storefront.DECISION_REASON))
-                .setId("decision-reason").setSortable(false);
-
-        if (mode == PurchaseHistoryMode.MY_PURCHASES) {
-            idColumn.setHidden(true);
-            requesterColumn.setHidden(true);
-            approverColumn.setHidden(true);
-            decidedAtColumn.setHidden(true);
-            decisionReasonColumn.setHidden(true);
-        } else if (mode == PurchaseHistoryMode.PENDING_APPROVALS) {
-            approverColumn.setHidden(true);
-            decidedAtColumn.setHidden(true);
-            decisionReasonColumn.setHidden(true);
-        }
+                .setId(DECISION_REASON).setSortable(false);
     }
 
     private void configureDataProvider() {
@@ -209,7 +205,7 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
         grid.scrollTo(index, ScrollDestination.START);
     }
 
-    private void configureDetailsGenerator() {
+    private void configureDetailsGenerator(PurchaseHistoryMode mode) {
         grid.setDetailsGenerator(
                 purchase -> new PurchaseDetails(purchase, mode));
     }
@@ -279,6 +275,45 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
     public void attach() {
         super.attach();
         ui = getUI();
+        resizeRegistration = ui.getPage()
+                .addBrowserWindowResizeListener(
+                        event -> adjustColumns(event.getWidth()));
+        adjustColumns(ui.getPage().getBrowserWindowWidth());
+    }
+
+    @Override
+    public void detach() {
+        super.detach();
+        ui = null;
+        if (resizeRegistration != null) {
+            resizeRegistration.remove();
+            resizeRegistration = null;
+        }
+    }
+
+    private void adjustColumns(int width) {
+        grid.getColumns().forEach(column -> column.setHidden(false));
+        if (width < 800) {
+            grid.getColumn(PURCHASE_ID).setHidden(true);
+            grid.getColumn(REQUESTER).setHidden(true);
+            grid.getColumn(APPROVER).setHidden(true);
+            grid.getColumn(DECIDED_AT).setHidden(true);
+            grid.getColumn(DECISION_REASON).setHidden(true);
+            configureDetailsGenerator(PurchaseHistoryMode.MY_PURCHASES);
+            return;
+        }
+        configureDetailsGenerator(mode);
+        if (mode == PurchaseHistoryMode.MY_PURCHASES) {
+            grid.getColumn(PURCHASE_ID).setHidden(true);
+            grid.getColumn(REQUESTER).setHidden(true);
+            grid.getColumn(APPROVER).setHidden(true);
+            grid.getColumn(DECIDED_AT).setHidden(true);
+            grid.getColumn(DECISION_REASON).setHidden(true);
+        } else if (mode == PurchaseHistoryMode.PENDING_APPROVALS) {
+            grid.getColumn(APPROVER).setHidden(true);
+            grid.getColumn(DECIDED_AT).setHidden(true);
+            grid.getColumn(DECISION_REASON).setHidden(true);
+        }
     }
 
     /**

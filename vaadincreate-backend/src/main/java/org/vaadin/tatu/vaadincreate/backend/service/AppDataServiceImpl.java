@@ -47,7 +47,7 @@ public class AppDataServiceImpl implements AppDataService {
         return messageDao.updateMessage(messageEntity);
     }
 
-    @SuppressWarnings("null")
+    @SuppressWarnings({ "null", "java:S8688" })
     private static LocalDateTime getNow() {
         return LocalDateTime.now();
     }

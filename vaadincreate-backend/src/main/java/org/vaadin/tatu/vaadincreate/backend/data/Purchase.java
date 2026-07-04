@@ -41,12 +41,11 @@ public class Purchase extends AbstractEntity {
     @NotNull(message = "{requester.required}")
     @ManyToOne(optional = false)
     @JoinColumn(name = "requester_id", nullable = false)
-    @Nullable
     private User requester;
 
-    @Nullable
     @ManyToOne
     @JoinColumn(name = "approver_id")
+    @Nullable
     private User approver;
 
     @NotNull(message = "{status.required}")
@@ -140,7 +139,7 @@ public class Purchase extends AbstractEntity {
         return decidedAt;
     }
 
-    public void setDecidedAt(@Nullable Instant decidedAt) {
+    public void setDecidedAt(Instant decidedAt) {
         this.decidedAt = decidedAt;
     }
 

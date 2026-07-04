@@ -83,8 +83,12 @@ public class PurchasesHistoryView extends VerticalLayout
         historyGrid = new PurchaseHistoryGrid(presenter,
                 PurchaseHistoryMode.ALL, Utils.getCurrentUserOrThrow());
 
-        fromDate = buildDateField(I18n.Purchases.FROM, FROM_DATE_ID);
-        toDate = buildDateField(I18n.Purchases.TO, TO_DATE_ID);
+        var newestPurchaseDate = presenter.getEarliestPurchaseDate(
+                PurchaseHistoryMode.ALL, Utils.getCurrentUserOrThrow());
+        fromDate = buildDateField(I18n.Purchases.FROM, FROM_DATE_ID,
+                newestPurchaseDate);
+        toDate = buildDateField(I18n.Purchases.TO, TO_DATE_ID,
+                newestPurchaseDate);
         exportButton = buildExportButton();
         bindExportRange();
         purgeButton = buildPurgeButton();
@@ -161,10 +165,12 @@ public class PurchasesHistoryView extends VerticalLayout
     }
 
     @SuppressWarnings("java:S8688")
-    private DateField buildDateField(String translationKey, String id) {
+    private DateField buildDateField(String translationKey, String id,
+            LocalDate rangeEnd) {
         var field = new LocalizedDateField(getTranslation(translationKey));
         field.setId(id);
         field.setRangeStart(LocalDate.now().minusMonths(RETENTION_MONTHS));
+        field.setRangeEnd(rangeEnd);
         return field;
     }
 

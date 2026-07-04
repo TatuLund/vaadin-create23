@@ -19,6 +19,7 @@ import com.vaadin.ui.Composite;
 import com.vaadin.ui.Label;
 
 class PurchaseDetails extends Composite implements HasI18N {
+
     public PurchaseDetails(Purchase purchase, PurchaseHistoryMode mode) {
         Html.Div htmlDiv;
         if (mode == PurchaseHistoryMode.MY_PURCHASES) {

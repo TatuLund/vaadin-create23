@@ -75,19 +75,23 @@ public class UserDao {
      * @param userId
      *            the ID of the user to be removed
      */
-    @SuppressWarnings("unused")
     public void removeUser(Integer userId) {
         Objects.requireNonNull(userId, "User ID must not be null");
         logger.debug("Deleting User: ({})", userId);
         HibernateUtil.inTransaction(session -> {
             @Nullable
             User user = session.get(User.class, userId);
-            if (user == null) {
-                throw new IllegalArgumentException(
-                        "User to be deleted not found: " + userId);
-            }
+            assertUserExists(userId, user);
             session.delete(user);
         });
+    }
+
+    @SuppressWarnings("unused")
+    private void assertUserExists(Integer userId, User user) {
+        if (user == null) {
+            throw new IllegalArgumentException(
+                    "User to be deleted not found: " + userId);
+        }
     }
 
     /**

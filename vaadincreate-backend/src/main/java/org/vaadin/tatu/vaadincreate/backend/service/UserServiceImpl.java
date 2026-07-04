@@ -23,6 +23,7 @@ import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 @SuppressWarnings("java:S6548")
 public class UserServiceImpl implements UserService {
 
+    private static final String USER_ID_MUST_NOT_BE_NULL = "User ID must not be null";
     private final UserDao userDao;
     private final PurchaseDao purchaseDao;
 
@@ -61,7 +62,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @SuppressWarnings("null")
     public User updateUser(User editedUser,
             @Nullable User deputyApproverOrNull) {
         Objects.requireNonNull(editedUser, "User must not be null");
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
                     "Attempted to last active admin deactivation: user {} (id={})",
                     editedUser.getName(), editedUser.getId());
             var id = Objects.requireNonNull(editedUser.getId(),
-                    "User ID must not be null");
+                    USER_ID_MUST_NOT_BE_NULL);
             var existingUser = userDao.getUserById(id);
             if (existingUser != null && existingUser.isActive()
                     && userDao.countActiveAdmins() <= 1) {
@@ -110,7 +110,6 @@ public class UserServiceImpl implements UserService {
 
     // Validate that the deputy is active, has an approver role, and is not the
     // same user as the one being deactivated.
-    @SuppressWarnings("null")
     private void validateDeputy(User editedUser, User deputy) {
         Objects.requireNonNull(deputy, "Deputy must not be null");
         var id = Objects.requireNonNull(deputy.getId(),
@@ -150,14 +149,14 @@ public class UserServiceImpl implements UserService {
     @Nullable
     @Override
     public User getUserById(Integer userId) {
-        Objects.requireNonNull(userId, "User ID must not be null");
+        Objects.requireNonNull(userId, USER_ID_MUST_NOT_BE_NULL);
         return userDao.getUserById(userId);
     }
 
     @Override
     @SuppressWarnings("null")
     public void removeUser(Integer userId) {
-        Objects.requireNonNull(userId, "User ID must not be null");
+        Objects.requireNonNull(userId, USER_ID_MUST_NOT_BE_NULL);
         try {
             userDao.removeUser(userId);
         } catch (RuntimeException e) {

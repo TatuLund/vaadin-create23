@@ -1,7 +1,5 @@
 package org.vaadin.tatu.vaadincreate.purchases;
 
-import java.time.LocalDate;
-
 import org.vaadin.tatu.vaadincreate.i18n.HasI18N;
 import org.vaadin.tatu.vaadincreate.i18n.I18n;
 
@@ -25,7 +23,6 @@ public class LocalizedDateField extends DateField implements HasI18N {
     @SuppressWarnings("java:S8688")
     LocalizedDateField(String caption) {
         super(caption);
-        setRangeEnd(LocalDate.now());
         setAssistiveText(
                 getTranslation(I18n.Purchases.DATE_FIELD_ASSISTIVE_TEXT));
         setAssistiveLabel(AccessibleElement.NEXT_MONTH,

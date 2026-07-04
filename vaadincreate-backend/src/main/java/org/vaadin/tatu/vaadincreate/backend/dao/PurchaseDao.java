@@ -410,13 +410,13 @@ public class PurchaseDao {
                     productsById);
             if (!insufficientItems.isEmpty()) {
                 purchase.setStatus(PurchaseStatus.CANCELLED);
-                purchase.setDecidedAt(Instant.now());
+                purchase.setDecidedAt(getCurrentInstant());
                 purchase.setDecisionReason("Insufficient stock: "
                         + String.join(", ", insufficientItems));
             } else {
                 updateProductStock(purchase, productsById);
                 purchase.setStatus(PurchaseStatus.COMPLETED);
-                purchase.setDecidedAt(Instant.now());
+                purchase.setDecidedAt(getCurrentInstant());
                 purchase.setDecisionReason(decisionCommentOrNull);
             }
             // purchase is already managed by the session; no explicit
@@ -430,15 +430,17 @@ public class PurchaseDao {
         return result;
     }
 
+    @SuppressWarnings("null")
+    private static Instant getCurrentInstant() {
+        return Instant.now();
+    }
+
     // Must be called within a transaction with products loaded in the session
     private void updateProductStock(Purchase purchase,
             HashMap<Integer, Product> productsById) {
         for (var line : purchase.getLines()) {
             var prod = line.getProduct();
-            if (prod == null) {
-                throw new IllegalArgumentException(
-                        "Product in purchase line should not be null");
-            }
+            ensureProductExists(prod);
             var productId = prod.getId();
             var product = productsById.get(productId);
             if (product == null) {
@@ -456,22 +458,23 @@ public class PurchaseDao {
     }
 
     @SuppressWarnings("unused")
+    private static void ensureProductExists(Product prod) {
+        if (prod == null) {
+            throw new IllegalArgumentException(
+                    "Product in purchase line should not be null");
+        }
+    }
+
     private ArrayList<String> retrieveLowStockItems(Session session,
             Purchase purchase, HashMap<Integer, Product> productsById) {
         var insufficientItems = new ArrayList<String>();
         for (var line : purchase.getLines()) {
             var prod = line.getProduct();
-            if (prod == null) {
-                throw new IllegalArgumentException(
-                        "Product in purchase line should not be null");
-            }
+            ensureProductExists(prod);
             var productId = prod.getId();
             @Nullable
             Product product = session.get(Product.class, productId);
-            if (product == null) {
-                throw new IllegalArgumentException(
-                        "Product not found: " + productId);
-            }
+            ensureProductExists(prod);
             productsById.put(productId, product);
             if (product.getStockCount() < line.getQuantity()) {
                 insufficientItems.add(String.format("%s: needs %d, has %d",
@@ -515,7 +518,7 @@ public class PurchaseDao {
                         "Purchase is not PENDING: " + purchaseId);
             }
             purchase.setStatus(PurchaseStatus.REJECTED);
-            purchase.setDecidedAt(Instant.now());
+            purchase.setDecidedAt(getCurrentInstant());
             purchase.setDecisionReason(reason);
             // purchase is already managed by the session; dirty checking
             // will flush the update on commit.

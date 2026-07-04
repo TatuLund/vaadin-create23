@@ -39,6 +39,8 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 public class PurchaseHistoryPresenter
         implements Serializable, EventBusListener {
 
+    private static final String CURRENT_USER_REQUIRED_MESSAGE = "Current user must not be null";
+
     private static final Logger logger = LoggerFactory
             .getLogger(PurchaseHistoryPresenter.class);
 
@@ -79,9 +81,16 @@ public class PurchaseHistoryPresenter
     public List<@NonNull Purchase> fetchPurchases(PurchaseHistoryMode mode,
             int offset, int limit, User currentUser) {
         Objects.requireNonNull(mode, "Mode must not be null");
-        Objects.requireNonNull(currentUser, "Current user must not be null");
+        Objects.requireNonNull(currentUser, CURRENT_USER_REQUIRED_MESSAGE);
         return getPurchaseService().fetchPurchases(mode, offset, limit,
                 currentUser);
+    }
+
+    public LocalDate getEarliestPurchaseDate(PurchaseHistoryMode mode,
+            User currentUser) {
+        var purchases = fetchPurchases(mode, 0, 1, currentUser);
+        var instant = purchases.get(0).getCreatedAt();
+        return instant.atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
     /**
@@ -95,7 +104,7 @@ public class PurchaseHistoryPresenter
      */
     public long countPurchases(PurchaseHistoryMode mode, User currentUser) {
         Objects.requireNonNull(mode, "Mode must not be null");
-        Objects.requireNonNull(currentUser, "Current user must not be null");
+        Objects.requireNonNull(currentUser, CURRENT_USER_REQUIRED_MESSAGE);
         return getPurchaseService().countPurchases(mode, currentUser);
     }
 
@@ -220,7 +229,7 @@ public class PurchaseHistoryPresenter
     public void register(PurchaseHistoryGrid grid, User currentUser) {
         this.grid = Objects.requireNonNull(grid, "Grid must not be null");
         this.currentUser = Objects.requireNonNull(currentUser,
-                "Current user must not be null");
+                CURRENT_USER_REQUIRED_MESSAGE);
         getEventBus().registerEventBusListener(this);
     }
 

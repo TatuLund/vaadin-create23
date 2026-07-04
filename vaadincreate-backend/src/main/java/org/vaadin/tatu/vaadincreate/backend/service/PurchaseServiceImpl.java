@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.stream.IntStream;
 import java.util.Objects;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -38,6 +37,7 @@ import org.vaadin.tatu.vaadincreate.backend.mock.MockDataGenerator;
 @SuppressWarnings({ "java:S6548", "java:S8688" })
 public class PurchaseServiceImpl implements PurchaseService {
 
+    private static final String PURCHASE_ID_MUST_NOT_BE_NULL = "Purchase ID must not be null";
     private static final String CURRENT_USER_MUST_NOT_BE_NULL = "Current user must not be null";
     private static final String REQUESTER_MUST_NOT_BE_NULL = "Requester must not be null";
     @Nullable
@@ -117,7 +117,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     @Nullable
     public Purchase fetchPurchaseById(Integer purchaseId) {
-        Objects.requireNonNull(purchaseId, "Purchase ID must not be null");
+        Objects.requireNonNull(purchaseId, PURCHASE_ID_MUST_NOT_BE_NULL);
         return purchaseDao.getPurchase(purchaseId);
     }
 
@@ -172,7 +172,6 @@ public class PurchaseServiceImpl implements PurchaseService {
         return Instant.now();
     }
 
-    @SuppressWarnings("null")
     private void populatePurchaseLines(Cart cart, Purchase purchase) {
         // Create purchase lines from cart
         for (Map.Entry<Product, Integer> entry : cart.getItems().entrySet()) {
@@ -182,6 +181,10 @@ public class PurchaseServiceImpl implements PurchaseService {
             // Snapshot the current price
             var line = new PurchaseLine();
             line.setPurchase(purchase);
+            if (product == null || quantity == null) {
+                throw new IllegalStateException(
+                        "Cart contains null product or quantity");
+            }
             line.setProduct(product);
             line.setQuantity(quantity);
             line.setUnitPrice(product.getPrice());
@@ -265,7 +268,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     public Purchase approve(Integer purchaseId, User currentUser,
             @Nullable String decisionCommentOrNull) {
-        Objects.requireNonNull(purchaseId, "Purchase ID must not be null");
+        Objects.requireNonNull(purchaseId, PURCHASE_ID_MUST_NOT_BE_NULL);
         Objects.requireNonNull(currentUser, CURRENT_USER_MUST_NOT_BE_NULL);
         logger.info("Approving purchase: ({}) by user: '{}'", purchaseId,
                 currentUser.getName());
@@ -276,7 +279,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     public Purchase reject(Integer purchaseId, User currentUser,
             String reason) {
-        Objects.requireNonNull(purchaseId, "Purchase ID must not be null");
+        Objects.requireNonNull(purchaseId, PURCHASE_ID_MUST_NOT_BE_NULL);
         Objects.requireNonNull(currentUser, CURRENT_USER_MUST_NOT_BE_NULL);
         Objects.requireNonNull(reason, "Reason must not be null");
         logger.info("Rejecting purchase: ({}) by user: '{}'", purchaseId,
@@ -365,8 +368,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    @SuppressWarnings("null")
-    public List<@NonNull PurchaseExportRow> fetchPurchaseExportRows(
+    public List<PurchaseExportRow> fetchPurchaseExportRows(
             Instant fromInclusive, Instant toExclusive) {
         Objects.requireNonNull(fromInclusive, "From must not be null");
         Objects.requireNonNull(toExclusive, "To must not be null");
@@ -379,21 +381,55 @@ public class PurchaseServiceImpl implements PurchaseService {
         var rows = new ArrayList<PurchaseExportRow>();
         for (var purchase : purchases) {
             var lineIndex = 1;
-            var purchaseId = purchase.getId();
-            var requesterName = purchase.getRequester().getName();
-            var approver = purchase.getApprover();
-            var approverName = approver != null ? approver.getName() : null;
             for (PurchaseLine line : purchase.getLines()) {
-                rows.add(new PurchaseExportRow(purchaseId,
-                        purchase.getCreatedAt(), purchase.getStatus().name(),
-                        requesterName, approverName, purchase.getDecidedAt(),
-                        purchase.getDecisionReason(), purchase.getTotalAmount(),
-                        lineIndex++, line.getProduct().getId(),
-                        line.getProduct().getProductName(), line.getUnitPrice(),
-                        line.getQuantity(), line.getLineTotal()));
+                lineIndex++;
+                addProductToExportRow(rows, purchase, lineIndex, line);
             }
         }
         return rows;
+    }
+
+    private void addProductToExportRow(List<PurchaseExportRow> rows,
+            @Nullable Purchase purchase, int lineIndex,
+            @Nullable PurchaseLine line) {
+        if (purchase == null) {
+            throw new IllegalStateException(
+                    "Purchase should not be null for export");
+        }
+        var requester = purchase.getRequester();
+        if (requester == null) {
+            throw new IllegalStateException(
+                    "Requester should not be null for export");
+        }
+        var requesterName = requester.getName();
+        var approver = purchase.getApprover();
+        var approverName = approver != null ? approver.getName() : "";
+        var purchaseId = purchase.getId();
+        if (purchaseId == null) {
+            throw new IllegalStateException(
+                    "Purchase ID should not be null for export");
+        }
+        var statusName = purchase.getStatus().name();
+        if (statusName == null) {
+            throw new IllegalStateException(
+                    "Purchase status should not be null for export");
+        }
+        if (line == null) {
+            throw new IllegalStateException(
+                    "Purchase line should not be null for export");
+        }
+        var productId = line.getProduct().getId();
+        if (productId == null) {
+            throw new IllegalStateException(
+                    "Product ID should not be null for export");
+        }
+        rows.add(new PurchaseExportRow(purchaseId,
+                purchase.getCreatedAt(), statusName,
+                requesterName, approverName, purchase.getDecidedAt(),
+                purchase.getDecisionReason(), purchase.getTotalAmount(),
+                lineIndex, productId,
+                line.getProduct().getProductName(), line.getUnitPrice(),
+                line.getQuantity(), line.getLineTotal()));
     }
 
     @Override

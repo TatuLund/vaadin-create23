@@ -764,6 +764,13 @@ The Storefront view shall show a purchase history grid with a stable id `purchas
   - Render each purchase line item as:
     - `<ProductName>: <UnitPrice> x <Quantity> = <LineTotal>`
 
+#### 18.2.1 Purchase history responsive behavior
+
+When the window width is less than 800 pixels, the history grid shall adjust itself.
+
+- Hide columns: purchase id, requester, approver, decided at and decision reason.
+- Show the hidden columns as extentend content in the details row.
+
 ### 18.3 Approvals tab (pending approvals)
 
 The Purchases view shall provide an approvals tab that lists only purchases pending approval for the current approver.
@@ -879,7 +886,7 @@ The Purchases history tab shall support CSV export for a selected date range.
   - `Purge`
 - The history toolbar container shall expose toolbar semantics for assistive technologies.
 - `From` and `To` are required date-only fields.
-- Date field upper bound is today.
+- Date field upper bound is the date of the newest purchase.
 - Date field lower bound is today minus 24 months.
 - Date fields shall provide localized parse-error and out-of-range error messages.
 - On entering the history tab, keyboard focus shall be set to `From`.
@@ -899,7 +906,7 @@ The Purchases history tab shall support CSV export for a selected date range.
 
 #### 18.6.3 Grid reaction to date selection
 
-- When a user-originated change sets a valid `To` value, the view shall resolve the first matching history row index for that boundary and scroll to it when such index exists.
+- When a user-originated change sets a valid `From` or `To` value, the view shall resolve the first matching history row index for that boundary and scroll to it when such index exists.
 - If no matching index exists, current scroll position is preserved.
 - Selected valid date range shall be highlighted in the history grid.
 

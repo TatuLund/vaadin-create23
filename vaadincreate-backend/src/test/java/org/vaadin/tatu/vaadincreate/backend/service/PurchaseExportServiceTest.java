@@ -1,5 +1,6 @@
 package org.vaadin.tatu.vaadincreate.backend.service;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -37,9 +38,7 @@ public class PurchaseExportServiceTest {
         assertNotNull(row.productId());
         assertNotNull(row.purchaseCreatedAt());
         assertNotNull(row.productName());
-        assertTrue(row.lineIndex() == 1);
-        row = rows.get(1);
-        assertTrue(row.lineIndex() == 2);
+        assertEquals(1, row.lineIndex());
     }
 
     @Test

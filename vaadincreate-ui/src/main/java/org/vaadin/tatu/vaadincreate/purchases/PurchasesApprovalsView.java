@@ -6,6 +6,7 @@ import javax.persistence.OptimisticLockException;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseHistoryMode;
 import org.vaadin.tatu.vaadincreate.backend.data.Purchase;
 import org.vaadin.tatu.vaadincreate.backend.data.PurchaseStatus;
@@ -16,8 +17,10 @@ import org.vaadin.tatu.vaadincreate.observability.Telemetry;
 import org.vaadin.tatu.vaadincreate.purchases.PurchasesApprovalsPresenter.ApproveResult;
 import org.vaadin.tatu.vaadincreate.util.Utils;
 
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -56,26 +59,34 @@ public class PurchasesApprovalsView extends VerticalLayout
         }
         var approveButton = buildApproveButton(purchase);
         var rejectButton = buildRejectButton(purchase);
-        var layout = new HorizontalLayout(approveButton, rejectButton);
-        layout.setSpacing(true);
+        var layout = new CssLayout(approveButton, rejectButton);
+        layout.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         return layout;
     }
 
     private Button buildApproveButton(Purchase purchase) {
-        var button = new Button(getTranslation(I18n.Storefront.APPROVE));
+        var button = new Button();
+        button.setDescription(getTranslation(I18n.Storefront.APPROVE));
         button.setId("approve-button-" + purchase.getId());
-        button.addStyleNames(ValoTheme.BUTTON_PRIMARY, ValoTheme.BUTTON_SMALL);
+        button.addStyleNames(ValoTheme.BUTTON_PRIMARY, ValoTheme.BUTTON_SMALL,
+                ValoTheme.BUTTON_ICON_ONLY, VaadinCreateTheme.SLOT_HAS_TOOLTIP);
         button.setDisableOnClick(true);
+        button.setIcon(VaadinIcons.CHECK);
+        button.setWidth("45px");
         button.addClickListener(
                 clickEvent -> openDecisionDialog(purchase, true, button));
         return button;
     }
 
     private Button buildRejectButton(Purchase purchase) {
-        var button = new Button(getTranslation(I18n.Storefront.REJECT));
+        var button = new Button();
+        button.setDescription(getTranslation(I18n.Storefront.REJECT));
         button.setId("reject-button-" + purchase.getId());
-        button.addStyleNames(ValoTheme.BUTTON_DANGER, ValoTheme.BUTTON_SMALL);
+        button.addStyleNames(ValoTheme.BUTTON_DANGER, ValoTheme.BUTTON_SMALL,
+                ValoTheme.BUTTON_ICON_ONLY, VaadinCreateTheme.SLOT_HAS_TOOLTIP);
         button.setDisableOnClick(true);
+        button.setIcon(VaadinIcons.CLOSE);
+        button.setWidth("45px");
         button.addClickListener(
                 clickEvent -> openDecisionDialog(purchase, false, button));
         return button;

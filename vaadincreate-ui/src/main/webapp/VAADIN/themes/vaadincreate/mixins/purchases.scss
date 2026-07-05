@@ -39,19 +39,23 @@
     }
   }
 
-  #purchase-approvals-grid .v-grid-row .v-horizontal.v-widget {
+  #purchase-approvals-grid .v-grid-row .v-csslayout.v-widget {
     display: none;
   }
 
-  #purchase-approvals-grid .v-grid-row-focused .v-horizontal.v-widget {
+  #purchase-approvals-grid .v-grid-row-focused .v-csslayout.v-widget {
     display: inline-block;
   }
 
-  #purchase-approvals-grid td:hover .v-horizontal.v-widget {
+  #purchase-approvals-grid td:hover .v-csslayout.v-widget {
     display: inline-block;
   }
 
   .purchase-old td.v-grid-cell.v-grid-cell-focused {
     color: $v-focus-color;
+  }
+
+  .v-button-primary {
+    min-width: 45px;
   }
 }

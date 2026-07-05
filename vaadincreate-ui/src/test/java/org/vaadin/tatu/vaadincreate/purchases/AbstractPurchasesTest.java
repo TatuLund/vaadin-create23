@@ -16,8 +16,8 @@ import org.vaadin.tatu.vaadincreate.util.Utils;
 
 import com.vaadin.server.ServiceException;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.HorizontalLayout;
 
 public abstract class AbstractPurchasesTest extends AbstractUITest {
 
@@ -38,7 +38,7 @@ public abstract class AbstractPurchasesTest extends AbstractUITest {
     }
 
     Button getApproveButton(Grid<Purchase> approvalsGrid) {
-        var approveActionLayout = (HorizontalLayout) test(approvalsGrid).cell(9,
+        var approveActionLayout = (CssLayout) test(approvalsGrid).cell(9,
                 0);
         return $(approveActionLayout, Button.class).first();
     }
@@ -60,7 +60,7 @@ public abstract class AbstractPurchasesTest extends AbstractUITest {
     }
 
     Button getRejectButton(Grid<Purchase> approvalsGrid) {
-        var rejectActionLayout = (HorizontalLayout) test(approvalsGrid).cell(9,
+        var rejectActionLayout = (CssLayout) test(approvalsGrid).cell(9,
                 0);
         return $(rejectActionLayout, Button.class).stream().skip(1).findFirst()
                 .orElseThrow();

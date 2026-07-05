@@ -373,6 +373,6 @@ public class PurchaseHistoryGrid extends Composite implements HasI18N {
         Objects.requireNonNull(actionProvider,
                 "Action provider must not be null");
         grid.addComponentColumn(actionProvider::apply).setId("actions")
-                .setWidth(200);
+                .setWidth(130);
     }
 }

@@ -386,6 +386,9 @@ public class PurchaseServiceImpl implements PurchaseService {
                 addProductToExportRow(rows, purchase, lineIndex, line);
             }
         }
+        logger.info(
+                "Created {} flattened purchase export rows for range: {} to {}",
+                rows.size(), fromInclusive, toExclusive);
         return rows;
     }
 

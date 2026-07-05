@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.tatu.vaadincreate.backend.PurchaseService;
 
+@SuppressWarnings("null")
 public class PurchaseExportServiceTest {
 
     private PurchaseService purchaseService;
@@ -31,12 +32,14 @@ public class PurchaseExportServiceTest {
 
         var rows = purchaseService.fetchPurchaseExportRows(from, to);
         assertFalse(rows.isEmpty());
-        var first = rows.get(0);
-        assertNotNull(first.purchaseId());
-        assertNotNull(first.productId());
-        assertNotNull(first.purchaseCreatedAt());
-        assertNotNull(first.productName());
-        assertTrue(first.lineIndex() >= 1);
+        var row = rows.get(0);
+        assertNotNull(row.purchaseId());
+        assertNotNull(row.productId());
+        assertNotNull(row.purchaseCreatedAt());
+        assertNotNull(row.productName());
+        assertTrue(row.lineIndex() == 1);
+        row = rows.get(1);
+        assertTrue(row.lineIndex() == 2);
     }
 
     @Test

@@ -257,6 +257,23 @@ public class AppLayout extends Composite implements HasI18N {
         return user.isPresent() ? user.get().getName() : "";
     }
 
+    @Override
+    public void attach() {
+        super.attach();
+        ui.getPage().getJavaScript().execute(
+                """
+                        const mobilePatch = () => {
+                            const ui = document.querySelector('.applayout')
+                            const noHover = window.matchMedia('(hover: none)').matches;
+                            const coarse = window.matchMedia('(pointer: coarse)').matches;
+                            const smallScreen = window.matchMedia('(max-width: 900px)').matches;
+                            const isMobile = (noHover && coarse) || smallScreen;
+                            if (ui) ui.classList.add(isMobile ? 'mobile' : 'desktop');
+                        };
+                        mobilePatch();
+                        """);
+    }
+
     // Listener to focus the first menu item when Alt+Shift+N is pressed
     class NavigationFocusListener extends ShortcutListener {
 

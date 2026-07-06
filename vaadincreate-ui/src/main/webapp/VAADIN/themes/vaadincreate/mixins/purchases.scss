@@ -1,16 +1,16 @@
 @mixin purchases {
-  .v-grid-row.purchase-old > td {
+  .v-grid-row.purchase-old>td {
     background-color: #fff3cd;
   }
 
-  .v-grid-row.purchase-old:hover > td {
+  .v-grid-row.purchase-old:hover>td {
     background-color: #ffe8a1;
   }
 
-  .v-grid-row.purchase-range > td {
+  .v-grid-row.purchase-range>td {
     font-weight: 600;
   }
-  
+
   .purchasehistoryview-toolbar {
     height: fit-content;
     display: flex;
@@ -39,16 +39,18 @@
     }
   }
 
-  #purchase-approvals-grid .v-grid-row .v-csslayout.v-widget {
-    display: none;
-  }
+  .desktop {
+    #purchase-approvals-grid .v-grid-row .v-csslayout.v-widget {
+      display: none;
+    }
 
-  #purchase-approvals-grid .v-grid-row-focused .v-csslayout.v-widget {
-    display: inline-block;
-  }
+    #purchase-approvals-grid .v-grid-row-focused .v-csslayout.v-widget {
+      display: inline-block;
+    }
 
-  #purchase-approvals-grid td:hover .v-csslayout.v-widget {
-    display: inline-block;
+    #purchase-approvals-grid td:hover .v-csslayout.v-widget {
+      display: inline-block;
+    }
   }
 
   .purchase-old td.v-grid-cell.v-grid-cell-focused {

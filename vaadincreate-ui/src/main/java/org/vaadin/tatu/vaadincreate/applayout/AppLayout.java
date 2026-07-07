@@ -267,7 +267,7 @@ public class AppLayout extends Composite implements HasI18N {
                             const noHover = window.matchMedia('(hover: none)').matches;
                             const coarse = window.matchMedia('(pointer: coarse)').matches;
                             const smallScreen = window.matchMedia('(max-width: 900px)').matches;
-                            const isMobile = (noHover && coarse) || smallScreen;
+                            const isMobile = (noHover && coarse) || (smallScreen && coarse);
                             if (ui) ui.classList.add(isMobile ? 'mobile' : 'desktop');
                         };
                         mobilePatch();

@@ -60,6 +60,7 @@ public class PurchasesApprovalsView extends VerticalLayout
         var approveButton = buildApproveButton(purchase);
         var rejectButton = buildRejectButton(purchase);
         var layout = new CssLayout(approveButton, rejectButton);
+        layout.addStyleName(VaadinCreateTheme.HAS_TOOLTIP);
         layout.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         return layout;
     }
@@ -69,7 +70,7 @@ public class PurchasesApprovalsView extends VerticalLayout
         button.setDescription(getTranslation(I18n.Storefront.APPROVE));
         button.setId("approve-button-" + purchase.getId());
         button.addStyleNames(ValoTheme.BUTTON_PRIMARY, ValoTheme.BUTTON_SMALL,
-                ValoTheme.BUTTON_ICON_ONLY, VaadinCreateTheme.SLOT_HAS_TOOLTIP);
+                ValoTheme.BUTTON_ICON_ONLY);
         button.setDisableOnClick(true);
         button.setIcon(VaadinIcons.CHECK);
         button.setWidth("45px");
@@ -83,7 +84,7 @@ public class PurchasesApprovalsView extends VerticalLayout
         button.setDescription(getTranslation(I18n.Storefront.REJECT));
         button.setId("reject-button-" + purchase.getId());
         button.addStyleNames(ValoTheme.BUTTON_DANGER, ValoTheme.BUTTON_SMALL,
-                ValoTheme.BUTTON_ICON_ONLY, VaadinCreateTheme.SLOT_HAS_TOOLTIP);
+                ValoTheme.BUTTON_ICON_ONLY);
         button.setDisableOnClick(true);
         button.setIcon(VaadinIcons.CLOSE);
         button.setWidth("45px");

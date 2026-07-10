@@ -12,7 +12,7 @@ RUN mv /app/vaadincreate-ui/target/*.war /app/vaadincreate-ui/target/ROOT.war
 # Create the final image
 FROM tomcat:9-jre25
 # Add OpenTelemetry Java agent (version can be updated)
-ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.22.0/opentelemetry-javaagent.jar /otel/opentelemetry-javaagent.jar
+ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.26.1/opentelemetry-javaagent.jar /otel/opentelemetry-javaagent.jar
 
 # Configure agent
 ENV OTEL_SERVICE_NAME="vaadincreate"

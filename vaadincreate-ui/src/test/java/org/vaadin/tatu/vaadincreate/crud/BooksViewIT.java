@@ -13,6 +13,7 @@ import org.junit.After;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.vaadin.tatu.vaadincreate.AbstractViewTest;
 import org.vaadin.tatu.vaadincreate.VaadinCreateTheme;
 
@@ -126,7 +127,7 @@ public class BooksViewIT extends AbstractViewTest {
                     if (expected.equals(n.getCaption())) {
                         return n;
                     }
-                } catch (org.openqa.selenium.StaleElementReferenceException ignored) {
+                } catch (StaleElementReferenceException _) {
                     return null; // force a retry
                 }
             }
@@ -147,7 +148,7 @@ public class BooksViewIT extends AbstractViewTest {
                     if (expected.equals(n.getCaption())) {
                         return n;
                     }
-                } catch (org.openqa.selenium.StaleElementReferenceException ignored) {
+                } catch (StaleElementReferenceException _) {
                     return null;
                 }
             }
